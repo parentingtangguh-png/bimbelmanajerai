@@ -1,4 +1,4 @@
-# Setup Bimbel Manager — GitHub + Supabase
+# Setup Rumah Belajar Rainbow Kids Alfatih — GitHub + Supabase
 
 ## 1. Koneksi akun
 

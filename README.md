@@ -1,6 +1,6 @@
-# Bimbel Manager
+# Rumah Belajar Rainbow Kids Alfatih
 
-Aplikasi web internal bimbel TK/SD. GitHub Pages menyediakan tampilan; Supabase menyediakan database, autentikasi, dan fungsi server. Anthropic membuat panduan mengajar personal dan draf rapor WhatsApp.
+Aplikasi web internal untuk Rumah Belajar Rainbow Kids Alfatih. GitHub Pages menyediakan tampilan; Supabase menyediakan database, autentikasi, dan fungsi server. Anthropic membuat panduan mengajar personal dan draf rapor WhatsApp.
 
 ## Fitur
 
@@ -42,7 +42,7 @@ Lihat [PANDUAN_SETUP.md](PANDUAN_SETUP.md). Workflow `.github/workflows/pages.ym
 | `supabase/functions/generate-learning/` | Pemanggilan Anthropic dari server |
 | `tests/` | Pengujian domain, database, browser |
 
-`app.py`, `style.css`, `BimbelManager.gs`, `.streamlit/`, dan `requirements.txt` adalah arsip versi awal. Tidak digunakan oleh aplikasi web baru. CSV siswa, secret, dan lingkungan Python lokal tidak diunggah ke GitHub.
+Versi aplikasi lama (`app.py`, `style.css`, `BimbelManager.gs`), `.streamlit/`, dan `requirements.txt` adalah arsip versi awal. Tidak digunakan oleh aplikasi web baru. CSV siswa, secret, dan lingkungan Python lokal tidak diunggah ke GitHub.
 
 ## Batas operasional
 
