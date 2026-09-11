@@ -1,0 +1,17 @@
+/* Compact owner student table: one row per child instead of large cards. */
+.panel.table-wrap{padding:0;overflow-x:auto}
+.owner-students{width:100%;border-collapse:collapse;font-size:13px}
+.owner-students th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:12px 16px;border-bottom:1px solid var(--line);white-space:nowrap}
+.owner-students td{padding:10px 16px;border-bottom:1px solid var(--line);vertical-align:middle}
+.owner-students tbody tr{cursor:pointer}
+.owner-students tbody tr:hover,.owner-students tbody tr:focus{background:var(--cream);outline:none}
+.owner-students tbody tr:last-child td{border-bottom:0}
+.owner-students td strong{display:block;font-size:14px}
+.owner-students td small{color:var(--muted)}
+.owner-students .num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.owner-students td.num b{font-size:14px;color:var(--ink)}
+.owner-students td.teachers{color:var(--muted);min-width:120px}
+/* Keep the name readable and pinned while the numbers scroll sideways on phones. */
+.owner-students th:first-child,.owner-students td:first-child{min-width:170px;position:sticky;left:0;background:var(--green-deep);z-index:1}
+.owner-students tbody tr:hover td:first-child,.owner-students tbody tr:focus td:first-child{background:var(--cream)}
+@media(max-width:620px){.owner-students th,.owner-students td{padding:9px 12px}.owner-students th:first-child,.owner-students td:first-child{min-width:150px;box-shadow:1px 0 0 var(--line)}}

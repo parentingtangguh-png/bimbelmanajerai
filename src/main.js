@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { escapeHtml as h, progress, waLink, localDate } from './domain.js';
 import './style.css';
 import './curriculum.css';
+import './owner.css';
 
 const ORG_NAME='Rumah Belajar Rainbow Kids Alfatih';
 
@@ -132,7 +133,23 @@ function studentRowV2(s){
   const bi=areaProgress(s,['listening','speaking','reading','writing'])||{current:s.reading_level,target:s.reading_target};
   return `<button class="student-row" data-action="student" data-id="${s.id}"><span class="avatar pastel">${h(s.name[0])}</span><div class="student-info"><strong>${h(s.name)}</strong><small>${h(s.interest||'Minat belum diisi')}</small></div><div class="mini-progress"><small>Bahasa Indonesia <b>${bi.current}/${bi.target}</b></small><progress value="${progress(bi.current,bi.baseline||1,bi.target)}" max="100"></progress></div><span class="row-arrow">→</span></button>`;
 }
+function ownerStudentsView(){
+  const list=state.students.filter(s=>s.name.toLowerCase().includes(state.filter.toLowerCase()));
+  const flagged=id=>state.alerts.some(a=>a.student_id===id&&a.intervention);
+  const teachers=id=>state.assignments.filter(a=>a.student_id===id).map(a=>state.profiles.find(p=>p.id===a.teacher_id)?.name).filter(Boolean).join(', ')||'—';
+  const cell=(current,target)=>`<td class="num"><b>${current}</b><small> / ${target}</small></td>`;
+  const active=state.students.filter(s=>s.status==='Aktif').length;
+  const attention=state.students.filter(s=>flagged(s.id)).length;
+  const rows=list.map(s=>{
+    const bi=areaProgress(s,['listening','speaking','reading','writing'])||{current:s.reading_level,target:s.reading_target};
+    const ipas=activeCompetenciesFor(s.id).find(c=>c.subject==='ipas');
+    const status=flagged(s.id)?'<span class="badge amber">Perlu perhatian</span>':ready(s)&&s.status==='Aktif'?'<span class="badge amber">Siap sumatif</span>':`<span class="badge green">${h(s.status)}</span>`;
+    return `<tr data-action="student" data-id="${s.id}" tabindex="0"><td><strong>${h(s.name)}</strong><small>${h(s.parent_name||'')}</small></td>${cell(bi.current,bi.target)}${cell(s.math_level,s.math_target)}${ipas?cell(ipas.current_level,ipas.target):'<td class="num">—</td>'}<td class="teachers">${h(teachers(s.id))}</td><td>${status}</td></tr>`;
+  }).join('');
+  return `${heading('DATA UMUM SISWA','Ringkasan siswa.',`${state.students.length} siswa · ${active} aktif · ${attention} perlu perhatian. Klik baris untuk membuka profil.`)}<div class="toolbar"><input id="student-search" type="search" placeholder="Cari nama siswa…" aria-label="Cari siswa" value="${h(state.filter)}"><span>${list.length} ditampilkan</span></div>${rows?`<div class="panel table-wrap"><table class="owner-students"><thead><tr><th>Siswa</th><th class="num">B. Indonesia</th><th class="num">Matematika</th><th class="num">IPAS</th><th>Guru pendamping</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`:empty('Belum ada siswa','Siswa baru ditambahkan oleh guru dan akan tampil di sini.')}`;
+}
 function studentsViewV2(){
+  if(state.role==='owner')return ownerStudentsView();
   const list=state.students.filter(s=>s.name.toLowerCase().includes(state.filter.toLowerCase()));
   return `${heading('SETIAP ANAK UNIK','Kenali, lalu dampingi.','Profil dan perjalanan kompetensi setiap anak.',state.role==='teacher'?'<button class="primary" data-action="new-student">＋ Tambah siswa</button>':'')}<div class="toolbar"><input id="student-search" type="search" placeholder="Cari nama siswa…" aria-label="Cari siswa" value="${h(state.filter)}"><span>${state.students.length} siswa terdaftar</span></div><div class="student-grid">${list.map(s=>{const bi=areaProgress(s,['listening','speaking','reading','writing'])||{baseline:s.reading_baseline,current:s.reading_level,target:s.reading_target};const ipas=activeCompetenciesFor(s.id).find(c=>c.subject==='ipas');return `<article class="panel student-card"><div class="card-top"><span class="avatar large">${h(s.name[0])}</span><span class="badge ${ready(s)?'amber':'green'}">${h(s.status)}${ready(s)&&s.status==='Aktif'?' · Siap sumatif':''}</span></div><h2>${h(s.name)}</h2><p>${h(s.interest||'Minat belum diisi')}</p>${meter('Bahasa Indonesia',bi.current,bi.baseline,bi.target)}${meter('Matematika',s.math_level,s.math_baseline,s.math_target)}${ipas?meter('IPAS',ipas.current_level,ipas.baseline,ipas.target):''}<button class="secondary full" data-action="student" data-id="${s.id}">Lihat profil & riwayat →</button></article>`;}).join('')||empty('Belum ada siswa',state.role==='owner'?'Siswa baru ditambahkan oleh guru dan akan tampil di sini.':'Data siswa yang ditugaskan kepada Anda akan tampil di sini.')}</div>`;
 }
@@ -220,6 +237,7 @@ document.addEventListener('click',async e=>{
     if(action==='generate'){const r=state.records.find(r=>r.id===id);if(r[kind==='material'?'material':'report'])return notify('Hasil tersimpan sudah tampil di kartu ini.');b.textContent='Sedang menyusun…';const {data,error}=await db.functions.invoke('generate-learning',{body:{record_id:id,kind}});if(error){let detail;try{detail=await error.context?.json();}catch{}throw new Error(detail?.error||error.message);}if(data?.error)throw new Error(data.error);await refresh();notify('Hasil AI tersimpan. Periksa isinya sebelum digunakan.');}
   }catch(err){notify(err.message,true);}finally{b.disabled=false;}
 });
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('tr[data-action]'))e.target.click();});
 document.addEventListener('input',e=>{if(e.target.id==='student-search'){state.filter=e.target.value;const pos=e.target.selectionStart;render();const input=document.querySelector('#student-search');input.focus();try{input.setSelectionRange(pos,pos);}catch{}}});
 document.addEventListener('submit',async e=>{
   e.preventDefault();const form=e.target;const buttons=[...form.querySelectorAll('button')];buttons.forEach(b=>b.disabled=true);
