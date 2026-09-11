@@ -189,7 +189,7 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   const groups=(await as(teacher,'select group_no from session_students where session_id=$1 order by student_id',[cid])).rows.map(x=>x.group_no);
   assert.deepEqual(groups,[1,1,1]);
  });
- await t.test('sumatif dan kelulusan oleh guru pendamping, level tidak melewati target',async()=>{
+ await t.test('sumatif per fase oleh guru pendamping: lulus fase memindahkan target, akhir Fase C berarti lulus',async()=>{
   const x=await create();await finalize(teacher,x.rid,'T','');
   const core=(await as(teacher,'select reading_level,reading_target from students where id=$1',[student])).rows[0];
   assert.ok(core.reading_level<=core.reading_target);
@@ -198,6 +198,11 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   await assert.rejects(as(teacher,'select complete_summative($1,90,true)',[student]),/Target kompetensi wajib/);
   await admin('update student_competencies set current_level=target where student_id=$1 and required',[student]);
   await as(teacher,'select complete_summative($1,90,true)',[student]);
+  const afterPhase=(await as(teacher,'select status,reading_target,math_target from students where id=$1',[student])).rows[0];
+  assert.deepEqual([afterPhase.status,afterPhase.reading_target,afterPhase.math_target],['Aktif',8,8]);
+  assert.equal((await as(teacher,"select target from student_competencies where student_id=$1 and subject='ipas'",[student])).rows[0].target,8);
+  await admin('update student_competencies set current_level=16,target=16 where student_id=$1 and required',[student]);
+  await as(teacher,'select complete_summative($1,95,true)',[student]);
   assert.equal((await as(owner,'select status from students where id=$1',[student])).rows[0].status,'Lulus');
  });
  await t.test('guru mengelola sesi jadwal sendiri dan jamnya tersimpan di kelas',async()=>{
@@ -269,26 +274,23 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   await as(teacher,'select update_student_profile($1,$2::jsonb)',[kid,profile({reading_target:16,reading_level:9,reading_baseline:5})]);
   const s=(await as(teacher,'select * from students where id=$1',[kid])).rows[0];
   assert.deepEqual([s.name,s.parent_name,s.phone,s.interest,s.diagnostic,s.learning_notes],['Fajar Nugraha','Bunda Rina','0812-3456-7890','Robot','Mengenal huruf','Visual']);
-  assert.deepEqual([s.status,s.reading_target,s.reading_level,s.reading_baseline],['Aktif',5,1,1]);
+  assert.deepEqual([s.status,s.reading_target,s.reading_level,s.reading_baseline],['Aktif',4,1,1]);
   await assert.rejects(as(stranger,'select update_student_profile($1,$2::jsonb)',[kid,profile({name:'Diambil alih'})]),/Akses ditolak/);
   await assert.rejects(as(teacher,'select update_student_profile($1,$2::jsonb)',[kid,profile({name:'  '})]),/Nama anak/);
   await assert.rejects(as(teacher,'select update_student_profile($1,$2::jsonb)',[kid,profile({phone:'<script>'})]),/Nomor WhatsApp/);
   assert.equal((await as(teacher,"update students set name='Langsung' where id=$1 returning id",[kid])).rows.length,0);
   assert.equal((await as(teacher,'select name from students where id=$1',[kid])).rows[0].name,'Fajar Nugraha');
  });
- await t.test('guru mengatur target dan status siswanya; pemilik hanya membaca',async()=>{
+ await t.test('target mengalir ke akhir fase; guru mengatur status; pemilik hanya membaca',async()=>{
   const kid=randomUUID();
   await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Gita','Bunda Gita',2,2,6,2,2,6)`,[kid]);
   await admin('insert into assignments values($1,$2)',[kid,teacher]);
-  await as(teacher,'select set_student_targets($1,$2::jsonb)',[kid,JSON.stringify({reading:9,math:8,ipas:7})]);
+  // Inserted with target 6, but targets always flow to the end of the current phase (level 2 → 4).
   const targets=Object.fromEntries((await as(teacher,"select subject,target from student_competencies where student_id=$1 and subject in ('reading','math','ipas')",[kid])).rows.map(r=>[r.subject,r.target]));
-  assert.deepEqual(targets,{ipas:7,math:8,reading:9});
+  assert.deepEqual(targets,{ipas:4,math:4,reading:4});
   const core=(await as(teacher,'select reading_target,math_target from students where id=$1',[kid])).rows[0];
-  assert.deepEqual([core.reading_target,core.math_target],[9,8]);
-  await assert.rejects(as(teacher,'select set_student_targets($1,$2::jsonb)',[kid,JSON.stringify({reading:1})]),/Target reading/);
-  await assert.rejects(as(teacher,'select set_student_targets($1,$2::jsonb)',[kid,JSON.stringify({reading:17})]),/Target reading/);
-  await assert.rejects(as(stranger,'select set_student_targets($1,$2::jsonb)',[kid,JSON.stringify({reading:10})]),/Akses ditolak/);
-  await assert.rejects(as(owner,'select set_student_targets($1,$2::jsonb)',[kid,JSON.stringify({reading:10})]),/Akses ditolak/);
+  assert.deepEqual([core.reading_target,core.math_target],[4,4]);
+  await assert.rejects(as(teacher,'select set_student_targets($1,$2::jsonb)',[kid,JSON.stringify({reading:9})]),/does not exist/);
   const profile=(extra={})=>JSON.stringify({name:'Gita',parent_name:'Bunda Gita',...extra});
   await as(teacher,'select update_student_profile($1,$2::jsonb)',[kid,profile({status:'Non-Aktif'})]);
   assert.equal((await as(teacher,'select status from students where id=$1',[kid])).rows[0].status,'Non-Aktif');
@@ -307,10 +309,10 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   await admin('insert into assignments values($1,$2)',[kid,teacher]);
   await as(teacher,'select correct_student_baseline($1,9,7)',[kid]);
   const s=(await as(teacher,'select reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target from students where id=$1',[kid])).rows[0];
-  assert.deepEqual([s.reading_baseline,s.reading_level,s.reading_target,s.math_baseline,s.math_level,s.math_target],[9,9,9,7,7,7]);
+  assert.deepEqual([s.reading_baseline,s.reading_level,s.reading_target,s.math_baseline,s.math_level,s.math_target],[9,9,12,7,7,8]);
   const comps=Object.fromEntries((await as(teacher,'select subject,baseline,current_level,target from student_competencies where student_id=$1 and active',[kid])).rows.map(r=>[r.subject,[r.baseline,r.current_level,r.target]]));
-  for(const subject of ['listening','speaking','reading','writing','ipas','english'])assert.deepEqual(comps[subject],[9,9,9],subject);
-  assert.deepEqual(comps.math,[7,7,7]);
+  for(const subject of ['listening','speaking','reading','writing','ipas','english'])assert.deepEqual(comps[subject],[9,9,12],subject);
+  assert.deepEqual(comps.math,[7,7,8]);
   await assert.rejects(as(teacher,'select correct_student_baseline($1,17,7)',[kid]),/Level awal harus/);
   await assert.rejects(as(stranger,'select correct_student_baseline($1,2,2)',[kid]),/Akses ditolak/);
   await assert.rejects(as(owner,'select correct_student_baseline($1,2,2)',[kid]),/Akses ditolak/);

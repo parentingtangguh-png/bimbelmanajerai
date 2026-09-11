@@ -27,7 +27,7 @@ Panduan AI memuat alokasi waktu, pembukaan bersama, kartu kelompok terdiferensia
 - Bank tujuan serta kriteria keberhasilan 16 level yang dapat dikelola pemilik.
 - Dua bukti `Tercapai` pada kesempatan berbeda menaikkan kompetensi tersebut satu level.
 - Alarm setelah tiga hasil `Belum tampak` atau `Mulai berkembang` pada kompetensi aktif yang sama.
-- Guru menambahkan dan mengelola siswanya sendiri: profil, target kompetensi, status, serta ujian sumatif dan keputusan kelulusan setelah seluruh kompetensi inti mencapai target. Pemilik hanya membaca data siswa, mendaftarkan guru, dan mengelola kurikulum.
+- Guru menambahkan dan mengelola siswanya sendiri: profil, titik awal (dapat dikoreksi sampai anak ikut kelas), status, serta ujian sumatif per fase. Target tidak diisi guru: setiap kompetensi mengalir ke akhir fasenya (level 4, 8, 12, 16); lulus ujian sumatif fase memindahkan target ke fase berikutnya, dan lulus di akhir Fase C berarti lulus. Pemilik hanya membaca data siswa, mendaftarkan guru, dan mengelola kurikulum.
 - Sakit, Izin, dan Alfa mendapatkan draf pesan tanpa AI dan tanpa kenaikan level.
 - Panduan dan rapor disimpan; permintaan ulang memakai hasil tersimpan.
 - Tautan WhatsApp membawa draf, tetapi guru tetap memeriksa dan mengirim pesan.
@@ -62,4 +62,4 @@ Versi aplikasi lama (`app.py`, `style.css`, `BimbelManager.gs`), `.streamlit/`, 
 
 ## Batas operasional
 
-Aplikasi membutuhkan internet dan keluaran AI wajib diperiksa guru. Posisi awal menyimak, berbicara, menulis, IPAS, dan English Exposure diwarisi secara konservatif dari diagnostik Bahasa Indonesia, lalu berkembang mandiri. Guru pendamping perlu meninjau target setiap elemen setelah diagnostik. Data dibaca dengan pagination, tetapi tampilan perlu dioptimalkan kembali bila riwayat sudah sangat besar. Pencadangan database disesuaikan dengan paket Supabase.
+Aplikasi membutuhkan internet dan keluaran AI wajib diperiksa guru. Posisi awal menyimak, berbicara, menulis, IPAS, dan English Exposure diwarisi secara konservatif dari diagnostik Bahasa Indonesia, lalu berkembang mandiri. Guru pendamping perlu memastikan titik awal sesuai hasil diagnostik sebelum anak ikut kelas. Data dibaca dengan pagination, tetapi tampilan perlu dioptimalkan kembali bila riwayat sudah sangat besar. Pencadangan database disesuaikan dengan paket Supabase.

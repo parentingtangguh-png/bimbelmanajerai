@@ -11,7 +11,8 @@ test('pratinjau desktop menampilkan model kurikulum tematik',async({page})=>{
   await expect(page.getByRole('dialog')).toBeVisible();
   // Demo children have not joined a class yet, so the teacher may still correct the starting level.
   await expect(page.getByRole('combobox',{name:/Level awal Bahasa Indonesia \(bisa dikoreksi/})).toBeEnabled();
-  await expect(page.getByRole('combobox',{name:'Target Matematika'})).toBeDisabled();
+  await expect(page.getByRole('combobox',{name:/Target/})).toHaveCount(0);
+  await expect(page.getByRole('heading',{name:'Target per kompetensi'})).toHaveCount(0);
   await expect(page.getByText('English Exposure',{exact:true}).first()).toBeVisible();
   await expect(page.getByText(/Karakter tidak diberi level/)).toBeVisible();
   await expect(page.getByRole('button',{name:'Nonaktifkan siswa ini'})).toBeVisible();
@@ -64,10 +65,10 @@ test('layar HP 390px tidak meluber dan formulir dapat digunakan',async({page})=>
   await expect(page.getByText(/1–4 Fondasi \(belum SD\) · 5–8 Fase A/)).toBeVisible();
   await page.getByLabel('Perkiraan fase / kelas sekolah').selectOption('sd3');
   await expect(page.getByLabel('Level awal Bahasa Indonesia')).toHaveValue('9');
-  await expect(page.getByLabel('Target awal Bahasa Indonesia & IPAS')).toHaveValue('10');
+  await expect(page.getByLabel('Level awal Matematika')).toHaveValue('9');
   await expect(page.locator('[data-meaning="reading_baseline"]')).toContainText('Fase B');
-  await page.getByLabel('Target Matematika').selectOption('3');
-  await expect(page.getByLabel('Target Matematika')).toHaveValue('9');
+  await expect(page.getByText(/Target mengalir otomatis/)).toBeVisible();
+  await expect(page.getByLabel(/Target/)).toHaveCount(0);
   expect(await page.getByRole('dialog').evaluate(el=>el.scrollWidth<=el.clientWidth)).toBe(true);
   await page.getByRole('button',{name:'Tutup',exact:true}).click();
   await page.getByRole('button',{name:/Kembali ke login/}).click();
