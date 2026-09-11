@@ -223,7 +223,7 @@ dialog .history small {
 .target-eval h4 { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; opacity: .55; margin: 14px 0 6px; }
 .indicator-checks { display: grid; gap: 8px; }
 .indicator-checks .check { display: flex; gap: 9px; align-items: flex-start; line-height: 1.5; }
-.indicator-hint { margin: 4px 0 0; padding: 10px 14px; border-radius: 10px; background: var(--soft, #f4f1ea); font-size: 13px; line-height: 1.55; }
+.indicator-hint { margin: 4px 0 0; padding: 10px 14px; border-radius: 10px; background: var(--cream, #f5f2e8); border: 1px solid var(--line, #e5e9e2); color: inherit; font-size: 13px; line-height: 1.55; }
 @media (max-width: 520px) {
   .spiral-node { margin-left: 10px; padding: 12px 14px; }
   .strand-rung { padding: 16px 16px; }
