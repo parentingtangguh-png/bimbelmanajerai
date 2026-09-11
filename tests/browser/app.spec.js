@@ -9,7 +9,9 @@ test('pratinjau desktop menampilkan model kurikulum tematik',async({page})=>{
   await page.screenshot({path:'test-results/dashboard-desktop.png',fullPage:true});
   await page.getByRole('button',{name:/Alya Putri Kupu-kupu/}).click();
   await expect(page.getByRole('dialog')).toBeVisible();
-  await expect(page.getByRole('spinbutton',{name:'Level awal Bahasa Indonesia (terkunci)'})).toBeDisabled();
+  // Demo children have not joined a class yet, so the teacher may still correct the starting level.
+  await expect(page.getByRole('combobox',{name:/Level awal Bahasa Indonesia \(bisa dikoreksi/})).toBeEnabled();
+  await expect(page.getByRole('combobox',{name:'Target Matematika'})).toBeDisabled();
   await expect(page.getByText('English Exposure',{exact:true}).first()).toBeVisible();
   await expect(page.getByText(/Karakter tidak diberi level/)).toBeVisible();
   await page.getByRole('button',{name:'Simpan profil siswa'}).click();
@@ -49,6 +51,13 @@ test('layar HP 390px tidak meluber dan formulir dapat digunakan',async({page})=>
   await page.getByRole('navigation').getByRole('button',{name:/Data siswa/}).click();
   await page.getByRole('button',{name:/Tambah siswa/}).click();
   await expect(page.getByRole('textbox',{name:'Nama anak'})).toBeVisible();
+  await expect(page.getByText(/1–4 Fondasi \(belum SD\) · 5–8 Fase A/)).toBeVisible();
+  await page.getByLabel('Perkiraan fase / kelas sekolah').selectOption('sd3');
+  await expect(page.getByLabel('Level awal Bahasa Indonesia')).toHaveValue('9');
+  await expect(page.getByLabel('Target awal Bahasa Indonesia & IPAS')).toHaveValue('10');
+  await expect(page.locator('[data-meaning="reading_baseline"]')).toContainText('Fase B');
+  await page.getByLabel('Target Matematika').selectOption('3');
+  await expect(page.getByLabel('Target Matematika')).toHaveValue('9');
   expect(await page.getByRole('dialog').evaluate(el=>el.scrollWidth<=el.clientWidth)).toBe(true);
   await page.getByRole('button',{name:'Tutup',exact:true}).click();
   await page.getByRole('button',{name:/Kembali ke login/}).click();

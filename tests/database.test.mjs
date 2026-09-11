@@ -301,6 +301,22 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   assert.equal((await as(owner,'select * from assignments where student_id=$1',[kid])).rows.length,1);
   assert.equal((await as(owner,'select name from students where id=$1',[kid])).rows[0].name,'Gita');
  });
+ await t.test('guru mengoreksi level awal hanya sebelum anak ikut kelas',async()=>{
+  const kid=randomUUID();
+  await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Hana','Bunda Hana',1,1,4,1,1,4)`,[kid]);
+  await admin('insert into assignments values($1,$2)',[kid,teacher]);
+  await as(teacher,'select correct_student_baseline($1,9,7)',[kid]);
+  const s=(await as(teacher,'select reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target from students where id=$1',[kid])).rows[0];
+  assert.deepEqual([s.reading_baseline,s.reading_level,s.reading_target,s.math_baseline,s.math_level,s.math_target],[9,9,9,7,7,7]);
+  const comps=Object.fromEntries((await as(teacher,'select subject,baseline,current_level,target from student_competencies where student_id=$1 and active',[kid])).rows.map(r=>[r.subject,[r.baseline,r.current_level,r.target]]));
+  for(const subject of ['listening','speaking','reading','writing','ipas','english'])assert.deepEqual(comps[subject],[9,9,9],subject);
+  assert.deepEqual(comps.math,[7,7,7]);
+  await assert.rejects(as(teacher,'select correct_student_baseline($1,17,7)',[kid]),/Level awal harus/);
+  await assert.rejects(as(stranger,'select correct_student_baseline($1,2,2)',[kid]),/Akses ditolak/);
+  await assert.rejects(as(owner,'select correct_student_baseline($1,2,2)',[kid]),/Akses ditolak/);
+  await create(teacher,kid);
+  await assert.rejects(as(teacher,'select correct_student_baseline($1,3,3)',[kid]),/sebelum anak mengikuti kelas/);
+ });
  await t.test('pemilik ditolak menambah siswa dan menjalankan kegiatan kelas',async()=>{
   await assert.rejects(as(owner,`insert into students(name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values('X','Y',1,1,3,1,1,3)`),/row-level security|agregat/i);
   await assert.rejects(as(owner,"select create_class($1,current_date,'Pasar',$2::uuid[])",[randomUUID(),[other]]),/agregat/);
