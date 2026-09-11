@@ -1,0 +1,8 @@
+project_id = "bimbel-manager"
+
+[auth]
+site_url = "https://parentingtangguh-png.github.io/bimbelmanajerai/"
+additional_redirect_urls = ["https://parentingtangguh-png.github.io/bimbelmanajerai/", "http://127.0.0.1:5173/"]
+
+[functions.generate-learning]
+verify_jwt = false

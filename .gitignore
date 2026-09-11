@@ -1,0 +1,24 @@
+venv/
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+data_siswa.csv
+.supabase/
+supabase/.temp/
+test-results/
+*.log
+scripts/bootstrap-owner.sql
+scripts/github-admin.local.ps1
+scripts/smoke-ai.local.mjs
+scripts/run-smoke-ai.local.ps1
+playwright-report/
+scripts/refine-ui.mjs
+
+# Implementasi awal tetap tersimpan lokal sebagai arsip.
+app.py
+style.css
+BimbelManager.gs
+requirements.txt
+.streamlit/
