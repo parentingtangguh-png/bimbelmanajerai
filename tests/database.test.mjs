@@ -29,7 +29,7 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
  // Fixture setup outside any user role (owners may no longer insert students).
  async function admin(sql,args=[]){await db.exec('reset role');await db.query("select set_config('request.jwt.claim.sub','',false)");return db.query(sql,args);}
  await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Alya','Bunda',1,1,3,1,1,3),($2,'Bima','Ayah',1,1,10,1,1,10)`,[student,other]);
- await as(owner,'insert into assignments values($1,$2)',[student,teacher]);
+ await admin('insert into assignments values($1,$2)',[student,teacher]);
  await t.test('guru hanya membaca siswa sendiri dan tidak membaca alarm',async()=>{
   assert.equal((await as(teacher,'select * from students')).rows.length,1);
   assert.equal((await as(stranger,'select * from students')).rows.length,0);
@@ -96,12 +96,15 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
  });
  await t.test('status tetap aktif dan level inti tidak dapat diubah langsung',async()=>{
   const s=(await as(owner,'select * from students where id=$1',[student])).rows[0];assert.equal(s.status,'Aktif');
-  await assert.rejects(as(owner,"update students set reading_level=2 where id=$1",[student]),/alur evaluasi/);
+  // No role has a direct update path to students; levels only move through evaluation RPCs.
+  assert.equal((await as(owner,"update students set reading_level=2 where id=$1 returning id",[student])).rows.length,0);
+  assert.equal((await as(teacher,"update students set reading_level=2 where id=$1 returning id",[student])).rows.length,0);
+  assert.equal((await as(owner,'select reading_level from students where id=$1',[student])).rows[0].reading_level,s.reading_level);
  });
  await t.test('level 11–16 aktif dan asesmen baru menaikkan tiap kompetensi secara mandiri setelah dua bukti',async()=>{
   const advanced=randomUUID();
   await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Citra','Bunda Citra',10,10,16,10,10,16)`,[advanced]);
-  await as(owner,'insert into assignments values($1,$2)',[advanced,teacher]);
+  await admin('insert into assignments values($1,$2)',[advanced,teacher]);
   let x=await create(teacher,advanced);
   const first=(await as(teacher,'select subject from session_assessments where session_student_id=$1 order by subject',[x.rid])).rows.map(x=>x.subject);
   assert.equal(first.length,2);
@@ -161,7 +164,7 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   const ids=[randomUUID(),randomUUID()];
   for(const [index,id] of ids.entries()){
    await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,$2,'Orang tua',2,2,8,2,2,8)`,[id,`Hadir ${index+1}`]);
-   await as(owner,'insert into assignments values($1,$2)',[id,teacher]);
+   await admin('insert into assignments values($1,$2)',[id,teacher]);
   }
   const cid=randomUUID();
   await as(teacher,"select create_class($1,current_date,'Kebun',$2::uuid[],60)",[cid,ids]);
@@ -179,27 +182,28 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   const ids=[randomUUID(),randomUUID(),randomUUID()];
   for(const [index,id] of ids.entries()){
    await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,$2,'Orang tua',4,4,8,4,4,8)`,[id,`Setara ${index+1}`]);
-   await as(owner,'insert into assignments values($1,$2)',[id,teacher]);
+   await admin('insert into assignments values($1,$2)',[id,teacher]);
   }
   const cid=randomUUID();
   await as(teacher,"select create_class($1,current_date,'Kebun',$2::uuid[],60)",[cid,ids]);
   const groups=(await as(teacher,'select group_no from session_students where session_id=$1 order by student_id',[cid])).rows.map(x=>x.group_no);
   assert.deepEqual(groups,[1,1,1]);
  });
- await t.test('sumatif hanya pemilik, level tidak melewati target',async()=>{
+ await t.test('sumatif dan kelulusan oleh guru pendamping, level tidak melewati target',async()=>{
   const x=await create();await finalize(teacher,x.rid,'T','');
-  const core=(await as(owner,'select reading_level,reading_target from students where id=$1',[student])).rows[0];
+  const core=(await as(teacher,'select reading_level,reading_target from students where id=$1',[student])).rows[0];
   assert.ok(core.reading_level<=core.reading_target);
-  await assert.rejects(as(teacher,'select complete_summative($1,90,true)',[student]),/Hanya pemilik/);
-  await assert.rejects(as(owner,'select complete_summative($1,90,true)',[student]),/Target kompetensi wajib/);
-  await as(owner,'update student_competencies set current_level=target where student_id=$1 and required',[student]);
-  await as(owner,'select complete_summative($1,90,true)',[student]);
+  await assert.rejects(as(owner,'select complete_summative($1,90,true)',[student]),/Hanya guru pendamping/);
+  await assert.rejects(as(stranger,'select complete_summative($1,90,true)',[student]),/Hanya guru pendamping/);
+  await assert.rejects(as(teacher,'select complete_summative($1,90,true)',[student]),/Target kompetensi wajib/);
+  await admin('update student_competencies set current_level=target where student_id=$1 and required',[student]);
+  await as(teacher,'select complete_summative($1,90,true)',[student]);
   assert.equal((await as(owner,'select status from students where id=$1',[student])).rows[0].status,'Lulus');
  });
  await t.test('guru mengelola sesi jadwal sendiri dan jamnya tersimpan di kelas',async()=>{
   const kid=randomUUID();
   await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Eka','Bunda Eka',1,1,5,1,1,5)`,[kid]);
-  await as(owner,'insert into assignments values($1,$2)',[kid,teacher]);
+  await admin('insert into assignments values($1,$2)',[kid,teacher]);
   const sid=(await as(teacher,"insert into schedules(name,start_time,end_time) values('Sesi Pagi','08:00','09:30') returning id")).rows[0].id;
   await as(teacher,'insert into schedule_students values($1,$2)',[sid,kid]);
   await assert.rejects(as(teacher,'insert into schedule_students values($1,$2)',[sid,other]),/row-level security/i);
@@ -220,7 +224,7 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
  await t.test('isolasi antar guru: guru lain tidak melihat atau mengubah data guru pertama',async()=>{
   const kidA=randomUUID(),kidB=randomUUID();
   await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Anak Guru A','Bunda A',1,1,5,1,1,5),($2,'Anak Guru B','Bunda B',1,1,5,1,1,5)`,[kidA,kidB]);
-  await as(owner,'insert into assignments values($1,$2),($3,$4)',[kidA,teacher,kidB,stranger]);
+  await admin('insert into assignments values($1,$2),($3,$4)',[kidA,teacher,kidB,stranger]);
   // Guru A: kelas, evaluasi lengkap (asesmen + observasi), dan sesi jadwal.
   const a=await create(teacher,kidA);await finalize(teacher,a.rid,'T','Catatan rahasia guru A');
   const scheduleA=(await as(teacher,"insert into schedules(name,start_time,end_time) values('Jadwal A','08:00','09:00') returning id")).rows[0].id;
@@ -260,9 +264,9 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
  await t.test('guru dapat mengubah profil umum siswanya sendiri saja',async()=>{
   const kid=randomUUID();
   await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Fajar','Bunda Fajar',1,1,5,1,1,5)`,[kid]);
-  await as(owner,'insert into assignments values($1,$2)',[kid,teacher]);
+  await admin('insert into assignments values($1,$2)',[kid,teacher]);
   const profile=(extra={})=>JSON.stringify({name:'Fajar Nugraha',parent_name:'Bunda Rina',phone:'0812-3456-7890',interest:'Robot',diagnostic:'Mengenal huruf',learning_notes:'Visual',...extra});
-  await as(teacher,'select update_student_profile($1,$2::jsonb)',[kid,profile({status:'Non-Aktif',reading_target:16,reading_level:9,reading_baseline:5})]);
+  await as(teacher,'select update_student_profile($1,$2::jsonb)',[kid,profile({reading_target:16,reading_level:9,reading_baseline:5})]);
   const s=(await as(teacher,'select * from students where id=$1',[kid])).rows[0];
   assert.deepEqual([s.name,s.parent_name,s.phone,s.interest,s.diagnostic,s.learning_notes],['Fajar Nugraha','Bunda Rina','0812-3456-7890','Robot','Mengenal huruf','Visual']);
   assert.deepEqual([s.status,s.reading_target,s.reading_level,s.reading_baseline],['Aktif',5,1,1]);
@@ -272,12 +276,37 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   assert.equal((await as(teacher,"update students set name='Langsung' where id=$1 returning id",[kid])).rows.length,0);
   assert.equal((await as(teacher,'select name from students where id=$1',[kid])).rows[0].name,'Fajar Nugraha');
  });
+ await t.test('guru mengatur target dan status siswanya; pemilik hanya membaca',async()=>{
+  const kid=randomUUID();
+  await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Gita','Bunda Gita',2,2,6,2,2,6)`,[kid]);
+  await admin('insert into assignments values($1,$2)',[kid,teacher]);
+  await as(teacher,'select set_student_targets($1,$2::jsonb)',[kid,JSON.stringify({reading:9,math:8,ipas:7})]);
+  const targets=Object.fromEntries((await as(teacher,"select subject,target from student_competencies where student_id=$1 and subject in ('reading','math','ipas')",[kid])).rows.map(r=>[r.subject,r.target]));
+  assert.deepEqual(targets,{ipas:7,math:8,reading:9});
+  const core=(await as(teacher,'select reading_target,math_target from students where id=$1',[kid])).rows[0];
+  assert.deepEqual([core.reading_target,core.math_target],[9,8]);
+  await assert.rejects(as(teacher,'select set_student_targets($1,$2::jsonb)',[kid,JSON.stringify({reading:1})]),/Target reading/);
+  await assert.rejects(as(teacher,'select set_student_targets($1,$2::jsonb)',[kid,JSON.stringify({reading:17})]),/Target reading/);
+  await assert.rejects(as(stranger,'select set_student_targets($1,$2::jsonb)',[kid,JSON.stringify({reading:10})]),/Akses ditolak/);
+  await assert.rejects(as(owner,'select set_student_targets($1,$2::jsonb)',[kid,JSON.stringify({reading:10})]),/Akses ditolak/);
+  const profile=(extra={})=>JSON.stringify({name:'Gita',parent_name:'Bunda Gita',...extra});
+  await as(teacher,'select update_student_profile($1,$2::jsonb)',[kid,profile({status:'Non-Aktif'})]);
+  assert.equal((await as(teacher,'select status from students where id=$1',[kid])).rows[0].status,'Non-Aktif');
+  await assert.rejects(as(teacher,'select update_student_profile($1,$2::jsonb)',[kid,profile({status:'Lulus'})]),/kelulusan/);
+  await assert.rejects(as(owner,'select update_student_profile($1,$2::jsonb)',[kid,profile({name:'Pemilik'})]),/hanya membaca/);
+  // Pemilik tidak punya jalur tulis langsung ke data siswa, tetapi tetap bisa membaca.
+  assert.equal((await as(owner,"update students set name='X' where id=$1 returning id",[kid])).rows.length,0);
+  await assert.rejects(as(owner,'update student_competencies set target=10 where student_id=$1',[kid]),/permission denied/);
+  await assert.rejects(as(owner,'insert into assignments values($1,$2)',[kid,stranger]),/row-level security/i);
+  assert.equal((await as(owner,'select * from assignments where student_id=$1',[kid])).rows.length,1);
+  assert.equal((await as(owner,'select name from students where id=$1',[kid])).rows[0].name,'Gita');
+ });
  await t.test('pemilik ditolak menambah siswa dan menjalankan kegiatan kelas',async()=>{
   await assert.rejects(as(owner,`insert into students(name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values('X','Y',1,1,3,1,1,3)`),/row-level security|agregat/i);
   await assert.rejects(as(owner,"select create_class($1,current_date,'Pasar',$2::uuid[])",[randomUUID(),[other]]),/agregat/);
   const fresh=randomUUID();
   await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Dewi','Bunda Dewi',1,1,5,1,1,5)`,[fresh]);
-  await as(owner,'insert into assignments values($1,$2)',[fresh,teacher]);
+  await admin('insert into assignments values($1,$2)',[fresh,teacher]);
   const x=await create(teacher,fresh);
   await assert.rejects(as(owner,"select save_attendance($1,'Sakit')",[x.rid]),/agregat/);
   await assert.rejects(as(owner,'select claim_class_ai_job($1)',[x.cid]),/agregat/);
