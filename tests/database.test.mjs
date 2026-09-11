@@ -317,6 +317,22 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   await create(teacher,kid);
   await assert.rejects(as(teacher,'select correct_student_baseline($1,3,3)',[kid]),/sebelum anak mengikuti kelas/);
  });
+ await t.test('guru hanya bisa menghapus siswanya yang belum pernah ikut kelas',async()=>{
+  const fresh=randomUUID(),used=randomUUID(),shared=randomUUID();
+  await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Salah Input','Bunda',1,1,4,1,1,4),($2,'Pernah Kelas','Bunda',1,1,4,1,1,4),($3,'Dibagi','Bunda',1,1,4,1,1,4)`,[fresh,used,shared]);
+  await admin('insert into assignments values($1,$2),($3,$2),($4,$2),($4,$5)',[fresh,teacher,used,shared,stranger]);
+  const sid=(await as(teacher,"insert into schedules(name,start_time,end_time) values('Jadwal hapus','13:00','14:00') returning id")).rows[0].id;
+  await as(teacher,'insert into schedule_students values($1,$2)',[sid,fresh]);
+  await assert.rejects(as(stranger,'select delete_student($1)',[fresh]),/Akses ditolak/);
+  await assert.rejects(as(owner,'select delete_student($1)',[fresh]),/Akses ditolak/);
+  await as(teacher,'select delete_student($1)',[fresh]);
+  for(const sql of ['select count(*)::int as n from students where id=$1','select count(*)::int as n from student_competencies where student_id=$1','select count(*)::int as n from schedule_students where student_id=$1','select count(*)::int as n from assignments where student_id=$1'])assert.equal((await admin(sql,[fresh])).rows[0].n,0,sql);
+  await create(teacher,used);
+  await assert.rejects(as(teacher,'select delete_student($1)',[used]),/Non-Aktif/);
+  await assert.rejects(as(teacher,'select delete_student($1)',[shared]),/guru lain/);
+  await assert.rejects(as(teacher,'delete from students where id=$1',[used]),/permission denied/);
+  assert.equal((await admin('select count(*)::int as n from students where id=any($1::uuid[])',[[used,shared]])).rows[0].n,2);
+ });
  await t.test('pemilik ditolak menambah siswa dan menjalankan kegiatan kelas',async()=>{
   await assert.rejects(as(owner,`insert into students(name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values('X','Y',1,1,3,1,1,3)`),/row-level security|agregat/i);
   await assert.rejects(as(owner,"select create_class($1,current_date,'Pasar',$2::uuid[])",[randomUUID(),[other]]),/agregat/);
