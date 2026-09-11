@@ -82,23 +82,61 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   const advanced=randomUUID();
   await as(owner,`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Citra','Bunda Citra',10,10,16,10,10,16)`,[advanced]);
   await as(owner,'insert into assignments values($1,$2)',[advanced,teacher]);
-  const assess=async(rid,reading,math)=>{
-   const rows=(await as(teacher,'select subject from session_assessments where session_student_id=$1 order by subject',[rid])).rows;
-   assert.equal(rows.length,3);
-   const payload=rows.map(({subject})=>({subject,rating:subject==='reading'?reading:subject==='math'?math:'T',note:'Bukti diamati'}));
-   await assert.rejects(as(teacher,'select finalize_competency_evaluation($1,$2::jsonb,$3)',[rid,JSON.stringify([...payload,payload[0]]),'Duplikat']),/Lengkapi semua target/);
-   await as(teacher,'select finalize_competency_evaluation($1,$2::jsonb,$3)',[rid,JSON.stringify(payload),'Observasi kompetensi']);
-  };
-  let x=await create(teacher,advanced);await assess(x.rid,'T','MB');
-  let levels=(await as(teacher,'select subject,current_level,evidence_count from student_competencies where student_id=$1 and subject in ($2,$3) order by subject',[advanced,'math','reading'])).rows;
-  assert.deepEqual(levels.map(x=>[x.subject,x.current_level,x.evidence_count]),[['math',10,0],['reading',10,1]]);
-  x=await create(teacher,advanced);await assess(x.rid,'T','MB');
-  levels=(await as(teacher,'select subject,current_level from student_competencies where student_id=$1 and subject in ($2,$3) order by subject',[advanced,'math','reading'])).rows;
-  assert.deepEqual(levels.map(x=>[x.subject,x.current_level]),[['math',10],['reading',11]]);
+  let x=await create(teacher,advanced);
+  const first=(await as(teacher,'select subject from session_assessments where session_student_id=$1 order by subject',[x.rid])).rows.map(x=>x.subject);
+  assert.equal(first.length,2);
+  let payload=first.map(subject=>({subject,rating:'T',note:'Bukti pertama'}));
+  await assert.rejects(as(teacher,'select finalize_competency_evaluation($1,$2::jsonb,$3)',[x.rid,JSON.stringify([...payload,payload[0]]),'Duplikat']),/Lengkapi semua target/);
+  await as(teacher,'select finalize_competency_evaluation($1,$2::jsonb,$3)',[x.rid,JSON.stringify(payload),'Observasi pertama']);
+  x=await create(teacher,advanced);
+  const second=(await as(teacher,'select subject from session_assessments where session_student_id=$1 order by subject',[x.rid])).rows.map(x=>x.subject);
+  const shared=first.find(subject=>second.includes(subject));
+  assert.ok(shared,'dua sesi spiral berurutan berbagi satu kompetensi');
+  payload=second.map(subject=>({subject,rating:subject===shared?'T':'MB',note:'Bukti kedua'}));
+  await as(teacher,'select finalize_competency_evaluation($1,$2::jsonb,$3)',[x.rid,JSON.stringify(payload),'Observasi kedua']);
+  const level=(await as(teacher,'select current_level from student_competencies where student_id=$1 and subject=$2',[advanced,shared])).rows[0].current_level;
+  assert.equal(level,11);
+ });
+ await t.test('model tematik memakai kompetensi aktif baru dan mengarsipkan data lama',async()=>{
+  const active=(await as(teacher,'select subject,required from student_competencies where student_id=$1 and active order by subject',[student])).rows;
+  assert.deepEqual(active.map(x=>x.subject),['english','ipas','listening','math','reading','speaking','writing']);
+  assert.equal(active.find(x=>x.subject==='english').required,false);
+  assert.ok(active.filter(x=>x.subject!=='english').every(x=>x.required));
+  const archived=(await as(teacher,"select subject,active,required from student_competencies where student_id=$1 and subject in ('character','pancasila') order by subject",[student])).rows;
+  assert.ok(archived.every(x=>x.active===false&&x.required===false));
+ });
+ await t.test('kelas 90 menit memiliki tiga target bersama, kelompok, English Exposure, dan observasi karakter',async()=>{
+  const advanced=(await as(teacher,"select id from students where name='Citra'")).rows[0].id;
+  const cid=randomUUID();
+  await as(teacher,"select create_class($1,current_date,'Air Bersih',$2::uuid[],90)",[cid,[student,advanced]]);
+  const records=(await as(teacher,'select id,student_id,group_no from session_students where session_id=$1 order by group_no',[cid])).rows;
+  assert.equal(records.length,2);
+  assert.deepEqual(records.map(x=>x.group_no),[1,2]);
+  const targetSets=[];
+  for(const record of records){
+   const targetRows=(await as(teacher,'select subject from session_assessments where session_student_id=$1 order by subject',[record.id])).rows;
+   assert.equal(targetRows.length,3);
+   targetSets.push(targetRows.map(x=>x.subject));
+   const payload=targetRows.map(x=>({subject:x.subject,rating:'T',note:'Terlihat dalam kegiatan tema'}));
+   const observation={english_rating:'T',english_note:'Menggunakan kosakata water',character_dimensions:['kerja_sama','tanggung_jawab'],character_note:'Berbagi alat dan merapikan kembali'};
+   await as(teacher,'select finalize_competency_evaluation($1,$2::jsonb,$3,$4::jsonb)',[record.id,JSON.stringify(payload),'Aktif dalam kelompok',JSON.stringify(observation)]);
+  }
+  assert.deepEqual(targetSets[0],targetSets[1]);
+  assert.equal((await as(teacher,'select duration_minutes from class_sessions where id=$1',[cid])).rows[0].duration_minutes,90);
+  const saved=(await as(teacher,'select * from session_observations where session_student_id=$1',[records[0].id])).rows[0];
+  assert.equal(saved.english_rating,'T');
+  assert.deepEqual(saved.character_dimensions,['kerja_sama','tanggung_jawab']);
+  assert.equal((await as(teacher,"select evidence_count from student_competencies where student_id=$1 and subject='english'",[student])).rows[0].evidence_count,1);
+  await assert.rejects(as(stranger,'select claim_class_ai_job($1)',[cid]),/Akses ditolak/);
+  const job=(await as(teacher,'select claim_class_ai_job($1) as id',[cid])).rows[0].id;
+  await db.exec('reset role; set role service_role');
+  await db.query("select finish_class_ai_job($1,'Panduan multigrade tematik dengan English Exposure.',false)",[job]);
+  assert.match((await as(teacher,'select material from class_sessions where id=$1',[cid])).rows[0].material,/English Exposure/);
  });
  await t.test('sumatif hanya pemilik, level tidak melewati target',async()=>{
   const x=await create();await as(teacher,"select finalize_evaluation($1,'SB','')",[x.rid]);
-  assert.equal((await as(owner,'select reading_level from students where id=$1',[student])).rows[0].reading_level,3);
+  const core=(await as(owner,'select reading_level,reading_target from students where id=$1',[student])).rows[0];
+  assert.ok(core.reading_level<=core.reading_target);
   await assert.rejects(as(teacher,'select complete_summative($1,90,true)',[student]),/Hanya pemilik/);
   await assert.rejects(as(owner,'select complete_summative($1,90,true)',[student]),/Target kompetensi wajib/);
   await as(owner,'update student_competencies set current_level=target where student_id=$1 and required',[student]);

@@ -100,6 +100,64 @@
   margin-top: 14px;
 }
 
+.class-guide {
+  border-top: 5px solid var(--green);
+  margin-bottom: 28px;
+}
+
+.class-guide pre {
+  max-height: none;
+  white-space: pre-wrap;
+}
+
+.student-evaluation-title {
+  font-family: Georgia, serif;
+  margin: 30px 0 14px;
+}
+
+.session-card .panel-heading h2 small {
+  color: var(--muted);
+  font: 600 12px/1.2 Inter, system-ui, sans-serif;
+}
+
+.observation-block {
+  border-top: 1px solid var(--line);
+  margin-top: 22px;
+  padding-top: 20px;
+}
+
+.character-checks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+  margin: 12px 0 16px;
+}
+
+.curriculum-card > h3 {
+  color: var(--green);
+  font-size: 13px;
+  letter-spacing: .06em;
+  margin: 22px 0 8px;
+  text-transform: uppercase;
+}
+
+@media print {
+  body:has(.class-guide.print-target) .session-card,
+  body:has(.class-guide.print-target) .sidebar,
+  body:has(.class-guide.print-target) .topbar {
+    display: none !important;
+  }
+
+  .class-guide.print-target {
+    border: 0;
+    box-shadow: none;
+  }
+
+  .class-guide.print-target button {
+    display: none;
+  }
+}
+
 @media (max-width: 760px) {
   .target-eval {
     grid-template-columns: 1fr;

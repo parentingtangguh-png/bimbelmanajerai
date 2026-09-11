@@ -9,7 +9,7 @@ npx.cmd --yes supabase@latest projects list
 npx.cmd --yes supabase@latest link --project-ref ypofmienpffbpgrwpclm
 ```
 
-Proyek: `bimbelmanajerai` / `ypofmienpffbpgrwpclm`. Pastikan akun benar. Untuk berganti akun, jalankan `supabase logout` dahulu. Login browser dan CLI merupakan sesi berbeda.
+Proyek: `bimbelmanajerai` / `ypofmienpffbpgrwpclm`. Login browser dan CLI merupakan sesi berbeda. Gunakan `supabase logout` sebelum berganti akun.
 
 ## 2. Database
 
@@ -18,11 +18,11 @@ npx.cmd --yes supabase@latest db push --linked --dry-run
 npx.cmd --yes supabase@latest db push --linked
 ```
 
-Jangan menjalankan `db reset` di produksi. Migrasi membuat tabel, kebijakan akses, bank kurikulum, dan fungsi evaluasi. Pengunjung anonim tidak memiliki akses data siswa.
+Jangan menjalankan `db reset` di produksi. Migrasi bersifat bertambah: riwayat Karakter dan Pendidikan Pancasila lama diarsipkan sebagai jalur nonaktif, bukan dihapus.
 
 ## 3. Pemilik pertama
 
-Jalankan di SQL Editor dengan email pemilik yang benar, lowercase:
+Jalankan melalui SQL Editor dengan email pemilik yang benar dan huruf kecil:
 
 ```sql
 insert into public.access_list(email,name,role,active)
@@ -30,55 +30,58 @@ values ('email-pemilik@example.com','Pemilik Bimbel','owner',true)
 on conflict(email) do nothing;
 ```
 
-Buka aplikasi, isi email dan kata sandi pilihan sendiri, klik **Aktivasi akun yang sudah didaftarkan pemilik**, lalu konfirmasi email. Sesudahnya gunakan **Masuk ke ruang belajar**. Jangan memberikan password kepada pengembang.
+Buka aplikasi, isi email dan kata sandi pilihan sendiri, pilih **Aktivasi akun yang sudah didaftarkan pemilik**, lalu konfirmasi email. Setelah itu gunakan **Masuk ke ruang belajar**. Jangan memberikan kata sandi kepada pengembang.
 
-Jika akun Auth sudah dibuat sebelum skema dipasang, tambahkan baris `profiles` untuk akun tersebut melalui SQL Editor dengan `id` dari `auth.users`. Akun baru setelah migrasi dibuatkan profil otomatis.
+Jika akun Auth sudah ada sebelum skema dipasang, tambahkan profil melalui SQL Editor menggunakan `id` dari `auth.users`. Akun baru setelah migrasi dibuatkan profil otomatis.
 
 ## 4. URL autentikasi
 
 Di **Authentication → URL Configuration**:
 
 - Site URL: `https://parentingtangguh-png.github.io/bimbelmanajerai/`
-- Redirect URLs: URL di atas dan `http://127.0.0.1:5173/` untuk pengembangan.
+- Redirect URLs: URL di atas dan `http://127.0.0.1:5173/`
 
-Sign-up email/password harus aktif. Trigger menolak email di luar daftar akses. Gunakan SMTP sendiri bila kuota email bawaan tidak mencukupi.
+Sign-up email/password harus aktif. Trigger menolak email yang tidak terdaftar dalam daftar akses. Gunakan SMTP sendiri bila kuota email bawaan tidak mencukupi.
 
 ## 5. Konfigurasi browser
 
-`public/config.json` hanya berisi URL proyek dan **publishable key**. Boleh disimpan di GitHub. `scripts/configure-public.ps1` mengambil konfigurasi ini tanpa mencetak atau menyimpan secret key. Variabel `VITE_SUPABASE_URL` dan `VITE_SUPABASE_PUBLISHABLE_KEY` dapat menimpa konfigurasi file. Jangan menaruh secret pada variabel berawalan `VITE_`.
+`public/config.json` hanya berisi URL proyek dan **publishable key**. Nilai ini boleh disimpan di GitHub. `scripts/configure-public.ps1` mengambil konfigurasi tanpa mencetak atau menyimpan secret key. Variabel `VITE_SUPABASE_URL` dan `VITE_SUPABASE_PUBLISHABLE_KEY` dapat menimpa konfigurasi file. Jangan menaruh secret pada variabel berawalan `VITE_`.
 
 ## 6. AI
 
-Di **Edge Functions → Secrets**, simpan `ANTHROPIC_API_KEY` dengan API key Anthropic yang memiliki saldo. Opsional: `ANTHROPIC_MODEL`, default `claude-haiku-4-5-20251001`. Simpan langsung di dashboard, jangan dalam chat atau commit Git.
+Di **Edge Functions → Secrets**, simpan `ANTHROPIC_API_KEY` dengan API key Anthropic yang memiliki saldo. Opsional: `ANTHROPIC_MODEL`, dengan default `claude-haiku-4-5-20251001`. Simpan langsung melalui dashboard dan jangan masukkan ke chat atau commit Git.
 
 ```powershell
 npx.cmd --yes supabase@latest functions deploy generate-learning --project-ref ypofmienpffbpgrwpclm
 ```
 
-`verify_jwt=false` disengaja untuk kompatibilitas signing key: setiap permintaan diverifikasi melalui `auth.getUser(token)`, lalu pemeriksaan RLS dan keanggotaan aktif sebelum AI. Secret Anthropic tidak masuk browser. Siswa absen tidak memerlukan AI.
+`verify_jwt=false` disengaja untuk kompatibilitas signing key. Setiap permintaan tetap diverifikasi melalui `auth.getUser(token)`, kemudian diperiksa kembali oleh RLS dan keanggotaan aktif. Secret Anthropic tidak masuk ke browser.
 
 ## 7. GitHub Pages
 
 Repositori: `https://github.com/parentingtangguh-png/bimbelmanajerai`.
 
-1. **Settings → Pages → Build and deployment**: pilih **GitHub Actions**.
+1. Di **Settings → Pages → Build and deployment**, pilih **GitHub Actions**.
 2. Push ke `main` dan tunggu workflow **Publish Bimbel Manager** selesai.
 3. Buka `https://parentingtangguh-png.github.io/bimbelmanajerai/`.
 
-Hanya `dist/` yang dipublikasikan; data siswa berada di Supabase. Jangan commit CSV siswa, token, `.env`, atau `venv/`. Evaluasi kembali ketentuan GitHub Pages jika aplikasi berkembang menjadi layanan SaaS komersial.
+Hanya build aplikasi yang dipublikasikan; data siswa berada di Supabase. Jangan commit CSV siswa, token, `.env`, atau `venv/`.
 
-## 8. Operasional
+## 8. Alur operasional guru
 
-1. Pemilik menambah siswa, diagnostik, baseline, dan target 1–16. Jalur selain Membaca dan Matematika memakai baseline Membaca sebagai titik awal, lalu berkembang mandiri.
-2. Pemilik mendaftarkan email guru pada **Tim pengajar**.
-3. Guru mengaktifkan akun, lalu pemilik menugaskan siswa melalui profilnya.
-4. Guru membuka **Ruang kelas** dan memilih tema serta siswa. Sistem memilih Membaca, Matematika, dan satu kompetensi lintas bidang secara bergilir. Satu siswa hanya boleh memiliki satu sesi terbuka.
-5. Simpan kehadiran sebelum membuat panduan. Sakit/Izin/Alfa mendapat draf tanpa AI.
-6. Simpan bukti perkembangan setiap target di akhir kelas: **Belum tampak**, **Mulai berkembang**, atau **Tercapai**. Dua bukti Tercapai menaikkan kompetensi tersebut satu level. Hasil final tidak bisa diubah dari browser agar tidak terjadi kenaikan ganda.
-7. Buat dan periksa rapor, lalu buka WhatsApp. Guru yang mengirim pesan.
-8. Pemilik memantau intervensi per kompetensi dan mencatat hasil sumatif setelah seluruh kompetensi wajib mencapai target. Bahasa Inggris adalah pengayaan dan tidak menghalangi kelulusan.
+1. Pemilik menambah siswa, diagnostik, baseline, serta target level 1–16.
+2. Pemilik mendaftarkan email guru dan menugaskan siswa.
+3. Guru membuka **Ruang kelas**, lalu memilih tanggal, durasi 60/75/90 menit, tema, dan siswa.
+4. Sistem memilih dua target untuk 60/75 menit atau tiga target untuk 90 menit. Targetnya sama bagi kelas, tetapi level dan tugasnya berbeda sesuai posisi siswa.
+5. Sistem membentuk maksimal tiga kelompok kompetensi. Kelompok bukan kelas sekolah dan dapat berubah pada sesi berikutnya.
+6. Guru memeriksa kehadiran, lalu membuat satu **Panduan kelas bersama**. Panduan berisi alur waktu, kartu kelompok, English Exposure yang menyatu dengan tema, asesmen, dan titik observasi karakter.
+7. Di akhir kelas, guru menilai setiap target dengan **Belum tampak**, **Mulai berkembang**, atau **Tercapai**. Dua bukti Tercapai pada kesempatan berbeda menaikkan kompetensi satu level.
+8. Guru boleh mencatat respons English Exposure. Perkembangannya tersimpan, tetapi tidak menghalangi kelulusan.
+9. Guru memilih karakter yang terlihat dan menulis konteksnya. Karakter tidak diberi nilai atau level.
+10. Setelah evaluasi disimpan, guru membuat, memeriksa, dan mengirim draf kabar orang tua melalui WhatsApp.
+11. Pemilik mencatat hasil sumatif setelah menyimak, berbicara, membaca, menulis, Matematika, dan IPAS mencapai target.
 
-CSV lama dapat menjadi referensi profil, tetapi tidak memiliki baseline. Tetapkan baseline melalui diagnostik; jangan menganggap nilai default sebagai hasil tes anak.
+Siswa Sakit, Izin, atau Alfa tidak memerlukan panduan AI dan tidak mendapatkan kenaikan level. Perubahan kehadiran akan mengosongkan panduan kelas agar dapat dibuat kembali berdasarkan siswa yang benar-benar hadir.
 
 ## Pemecahan masalah
 
@@ -86,9 +89,10 @@ CSV lama dapat menjadi referensi profil, tetapi tidak memiliki baseline. Tetapka
 | --- | --- |
 | Access token not provided | Login CLI kembali. |
 | Cannot find project ref | Jalankan `supabase link`. |
-| Email belum didaftarkan | Pemilik menambahkan email di daftar akses. |
+| Email belum didaftarkan | Pemilik menambahkan email ke daftar akses. |
 | Guru tidak melihat siswa | Periksa keaktifan akun dan penugasan siswa. |
 | AI belum aktif | Atur secret Anthropic dan pastikan saldo tersedia. |
-| AI sedang berlangsung | Tunggu; pekerjaan macet dapat dicoba lagi setelah 3 menit. |
+| AI sedang berlangsung | Tunggu; pekerjaan macet dapat dicoba lagi setelah tiga menit. |
+| Panduan tidak sesuai kehadiran | Simpan ulang kehadiran, lalu buat panduan kelas kembali. |
 | Konfirmasi email salah alamat | Periksa Site URL dan Redirect URLs. |
-| Perubahan belum terlihat | Klik muat ulang data atau muat ulang halaman. |
+| Perubahan belum terlihat | Muat ulang data atau halaman. |

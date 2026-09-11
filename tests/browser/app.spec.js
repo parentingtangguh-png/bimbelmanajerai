@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
-test('pratinjau desktop, profil, navigasi, dan tidak menyimpan data contoh',async({page})=>{
+
+test('pratinjau desktop menampilkan model kurikulum tematik',async({page})=>{
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('/');
   await expect(page.getByRole('heading',{name:'Selamat datang kembali'})).toBeVisible();
@@ -8,7 +9,9 @@ test('pratinjau desktop, profil, navigasi, dan tidak menyimpan data contoh',asyn
   await page.screenshot({path:'test-results/dashboard-desktop.png',fullPage:true});
   await page.getByRole('button',{name:/Alya Putri Kupu-kupu/}).click();
   await expect(page.getByRole('dialog')).toBeVisible();
-  await expect(page.getByRole('spinbutton',{name:'Level awal membaca (terkunci)'})).toBeDisabled();
+  await expect(page.getByRole('spinbutton',{name:'Level awal Bahasa Indonesia (terkunci)'})).toBeDisabled();
+  await expect(page.getByText('English Exposure',{exact:true}).first()).toBeVisible();
+  await expect(page.getByText(/Karakter tidak diberi level/)).toBeVisible();
   await page.getByRole('button',{name:'Simpan profil siswa'}).click();
   await expect(page.getByRole('status')).toContainText('pratinjau');
   await page.getByRole('button',{name:'Tutup',exact:true}).click();
@@ -17,13 +20,15 @@ test('pratinjau desktop, profil, navigasi, dan tidak menyimpan data contoh',asyn
   await expect(page.getByRole('heading',{name:'Bima Pratama'})).toBeVisible();
   await expect(page.getByRole('heading',{name:'Alya Putri'})).toHaveCount(0);
   await page.getByRole('button',{name:'Ruang kelas',exact:false}).first().click();
-  await page.getByRole('button',{name:'＋ Mulai sesi kelas'}).click();
+  await page.getByRole('button',{name:/Mulai sesi kelas/}).click();
   await expect(page.getByRole('dialog')).toBeVisible();
+  await expect(page.getByRole('combobox',{name:'Durasi kelas'})).toHaveValue('60');
   await page.getByRole('checkbox',{name:/Alya/}).check();
-  await page.getByRole('button',{name:'Buka ruang kelas →'}).click();
+  await page.getByRole('button',{name:/Buka ruang kelas/}).click();
   await expect(page.getByRole('status')).toContainText('pratinjau');
   expect(errors).toEqual([]);
 });
+
 test('layar HP 390px tidak meluber dan formulir dapat digunakan',async({page})=>{
   await page.setViewportSize({width:390,height:844});await page.goto('/');
   await page.getByRole('button',{name:'Lihat pratinjau aplikasi'}).click();
@@ -31,10 +36,10 @@ test('layar HP 390px tidak meluber dan formulir dapat digunakan',async({page})=>
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.screenshot({path:'test-results/dashboard-mobile.png',fullPage:true});
   await page.getByRole('navigation').getByRole('button',{name:/Data siswa/}).click();
-  await page.getByRole('button',{name:'＋ Tambah siswa'}).click();
+  await page.getByRole('button',{name:/Tambah siswa/}).click();
   await expect(page.getByRole('textbox',{name:'Nama anak'})).toBeVisible();
   expect(await page.getByRole('dialog').evaluate(el=>el.scrollWidth<=el.clientWidth)).toBe(true);
   await page.getByRole('button',{name:'Tutup',exact:true}).click();
-  await page.getByRole('button',{name:'Kembali ke login →'}).click();
+  await page.getByRole('button',{name:/Kembali ke login/}).click();
   await expect(page.getByRole('heading',{name:'Selamat datang kembali'})).toBeVisible();
 });
