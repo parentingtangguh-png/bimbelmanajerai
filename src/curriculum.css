@@ -230,3 +230,5 @@ dialog .history small {
 }
 .spiral-node.crossing { border-left-style: solid; border-left-color: var(--accent, #3f7d5e); }
 .spiral-node.crossing .star { color: var(--accent, #3f7d5e); }
+.spiral-node.top { border-left: 0; padding-left: 0; margin-left: 0; }
+.spiral-node.top strong { letter-spacing: .06em; text-transform: uppercase; font-size: 12px; }
