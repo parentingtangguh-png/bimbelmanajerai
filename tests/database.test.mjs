@@ -333,6 +333,21 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   await assert.rejects(as(teacher,'delete from students where id=$1',[used]),/permission denied/);
   assert.equal((await admin('select count(*)::int as n from students where id=any($1::uuid[])',[[used,shared]])).rows[0].n,2);
  });
+ await t.test('guru menonaktifkan dan mengaktifkan kembali siswanya; sesi terbuka mencegah nonaktif',async()=>{
+  const kid=randomUUID();
+  await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Indra','Bunda Indra',1,1,4,1,1,4)`,[kid]);
+  await admin('insert into assignments values($1,$2)',[kid,teacher]);
+  const status=async()=>(await as(teacher,'select status from students where id=$1',[kid])).rows[0].status;
+  await as(teacher,'select set_student_active($1,false)',[kid]);assert.equal(await status(),'Non-Aktif');
+  await assert.rejects(as(teacher,"select create_class($1,current_date,'Pasar',$2::uuid[])",[randomUUID(),[kid]]),/Siswa tidak tersedia/);
+  await as(teacher,'select set_student_active($1,true)',[kid]);assert.equal(await status(),'Aktif');
+  await assert.rejects(as(stranger,'select set_student_active($1,false)',[kid]),/Akses ditolak/);
+  await assert.rejects(as(owner,'select set_student_active($1,false)',[kid]),/Akses ditolak/);
+  await create(teacher,kid);
+  await assert.rejects(as(teacher,'select set_student_active($1,false)',[kid]),/sesi yang masih terbuka/);
+  await assert.rejects(as(teacher,'select update_student_profile($1,$2::jsonb)',[kid,JSON.stringify({name:'Indra',parent_name:'Bunda Indra',status:'Non-Aktif'})]),/sesi yang masih terbuka/);
+  assert.equal(await status(),'Aktif');
+ });
  await t.test('pemilik ditolak menambah siswa dan menjalankan kegiatan kelas',async()=>{
   await assert.rejects(as(owner,`insert into students(name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values('X','Y',1,1,3,1,1,3)`),/row-level security|agregat/i);
   await assert.rejects(as(owner,"select create_class($1,current_date,'Pasar',$2::uuid[])",[randomUUID(),[other]]),/agregat/);

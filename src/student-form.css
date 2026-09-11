@@ -1,3 +1,5 @@
+/* The app styles labels with display rules, which would override the hidden attribute. */
+[hidden]{display:none!important}
 /* Student form: explain what each level means right where the teacher picks it. */
 .level-guide{margin:6px 0 16px;line-height:1.55}
 .danger{color:#f2b1a8;border-color:#6d3a33}

@@ -14,6 +14,8 @@ test('pratinjau desktop menampilkan model kurikulum tematik',async({page})=>{
   await expect(page.getByRole('combobox',{name:'Target Matematika'})).toBeDisabled();
   await expect(page.getByText('English Exposure',{exact:true}).first()).toBeVisible();
   await expect(page.getByText(/Karakter tidak diberi level/)).toBeVisible();
+  await expect(page.getByRole('button',{name:'Nonaktifkan siswa ini'})).toBeVisible();
+  await expect(page.getByRole('combobox',{name:'Status'})).toHaveCount(0);
   await page.getByRole('button',{name:'Simpan profil siswa'}).click();
   await expect(page.getByRole('status')).toContainText('pratinjau');
   await page.getByRole('button',{name:'Tutup',exact:true}).click();
@@ -36,6 +38,14 @@ test('pratinjau desktop menampilkan model kurikulum tematik',async({page})=>{
   await page.getByRole('button',{name:/Mulai sesi kelas/}).click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await expect(page.getByRole('combobox',{name:'Durasi kelas'})).toHaveValue('60');
+  const theme=page.getByRole('combobox',{name:'Tema bersama'});
+  await expect(theme).toHaveValue('Pasar');
+  await theme.selectOption('Alam & Lingkungan');
+  await expect(theme).toHaveValue('Alam & Lingkungan');
+  await expect(page.getByLabel('Nama tema baru')).toBeHidden();
+  await theme.selectOption('__new');
+  await expect(page.getByLabel('Nama tema baru')).toBeVisible();
+  await page.getByLabel('Nama tema baru').fill('Hewan di sekitar kita');
   await page.getByRole('checkbox',{name:/Alya/}).check();
   await page.getByRole('button',{name:/Buka ruang kelas/}).click();
   await expect(page.getByRole('status')).toContainText('pratinjau');
