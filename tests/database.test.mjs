@@ -29,9 +29,18 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
  await t.test('fungsi trigger tidak tersedia sebagai RPC pengguna',async()=>{
   assert.equal((await db.query("select has_function_privilege('authenticated','public.handle_new_user()','execute') as allowed")).rows[0].allowed,false);
   assert.equal((await db.query("select has_function_privilege('authenticated','public.guard_student_update()','execute') as allowed")).rows[0].allowed,false);
+  assert.equal((await db.query("select has_function_privilege('authenticated','public.finalize_evaluation(uuid,text,text)','execute') as allowed")).rows[0].allowed,false);
+  assert.equal((await db.query("select has_function_privilege('authenticated','public.finalize_competency_evaluation(uuid,jsonb,text)','execute') as allowed")).rows[0].allowed,false);
+  assert.equal((await db.query("select has_function_privilege('anon','public.create_student(jsonb)','execute') as allowed")).rows[0].allowed,false);
  });
  await t.test('email tidak dikenal tidak bisa mendaftar',async()=>{await db.exec('reset role');await assert.rejects(db.query('insert into auth.users values($1,$2)',[randomUUID(),'unknown@test.invalid']),/belum didaftarkan/);});
  async function create(id=teacher,sid=student){const cid=randomUUID();await as(id,"select create_class($1,current_date,'Pasar',$2::uuid[])",[cid,[sid]]);return {cid,rid:(await as(id,'select id from session_students where session_id=$1',[cid])).rows[0].id};}
+ async function finalize(id,rid,rating='T',anecdote=''){
+  const targets=(await as(id,'select subject from session_assessments where session_student_id=$1 order by subject',[rid])).rows;
+  const payload=targets.map(({subject})=>({subject,rating,note:anecdote}));
+  const observation={english_rating:'',english_note:'',character_dimensions:[],character_note:''};
+  return as(id,'select finalize_competency_evaluation($1,$2::jsonb,$3,$4::jsonb)',[rid,JSON.stringify(payload),anecdote,JSON.stringify(observation)]);
+ }
  let session;
  await t.test('kelas menolak siswa lain dan duplikasi sesi terbuka',async()=>{
   await assert.rejects(create(teacher,other),/Siswa tidak tersedia/);
@@ -42,22 +51,23 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
  });
  await t.test('akses langsung nilai ditolak, RPC tidak boleh lintas guru',async()=>{
   await assert.rejects(as(teacher,"update session_students set grade='SB' where id=$1",[session.rid]),/permission denied/);
-  await assert.rejects(as(stranger,"select finalize_evaluation($1,'SB','')",[session.rid]),/Akses ditolak/);
+  await assert.rejects(finalize(stranger,session.rid),/Akses ditolak/);
  });
- await t.test('evaluasi dua kali hanya menaikkan satu level',async()=>{
-  await as(teacher,"select finalize_evaluation($1,'SB','Aktif')",[session.rid]);
-  await as(teacher,"select finalize_evaluation($1,'SB','Aktif')",[session.rid]);
-  assert.equal((await as(teacher,'select reading_level from students where id=$1',[student])).rows[0].reading_level,2);
+ await t.test('evaluasi final idempoten dan tidak menggandakan bukti',async()=>{
+  await finalize(teacher,session.rid,'T','Aktif');
+  await finalize(teacher,session.rid,'T','Aktif');
+  const reading=(await as(teacher,"select current_level,evidence_count from student_competencies where student_id=$1 and subject='reading'",[student])).rows[0];
+  assert.deepEqual([reading.current_level,reading.evidence_count],[1,1]);
  });
  await t.test('sakit tidak menaikkan level dan tidak memanggil AI',async()=>{
   const x=await create();await as(teacher,"select save_attendance($1,'Sakit')",[x.rid]);
   await assert.rejects(as(teacher,"select claim_ai_job($1,'material')",[x.rid]),/absen/);
-  await as(teacher,"select finalize_evaluation($1,'SB','')",[x.rid]);
-  assert.equal((await as(teacher,'select reading_level from students where id=$1',[student])).rows[0].reading_level,2);
+  await finalize(teacher,x.rid,'T','');
+  assert.equal((await as(teacher,'select reading_level from students where id=$1',[student])).rows[0].reading_level,1);
   const row=(await as(teacher,'select * from session_students where id=$1',[x.rid])).rows[0];assert.equal(row.grade,null);assert.match(row.report,/lekas sembuh/);
  });
  await t.test('tiga MB di level sama memicu alarm khusus pemilik',async()=>{
-  for(let i=0;i<3;i++){const x=await create();await as(teacher,"select finalize_evaluation($1,'MB','Perlu latihan')",[x.rid]);}
+  for(let i=0;i<7;i++){const x=await create();await finalize(teacher,x.rid,'MB','Perlu latihan');}
   assert.equal((await as(owner,'select * from student_alerts where student_id=$1',[student])).rows[0].intervention,true);
   assert.equal((await as(teacher,'select * from student_alerts')).rows.length,0);
  });
@@ -71,11 +81,10 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   await db.exec('reset role; set role service_role');
   await db.query("select finish_ai_job($1,'Panduan membaca dan menulis.',false)",[job]);
   assert.equal((await as(teacher,"select claim_ai_job($1,'material') as id",[x.rid])).rows[0].id,null);
-  await as(teacher,"select finalize_evaluation($1,'BSH','')",[x.rid]);
+  await finalize(teacher,x.rid,'MB','');
  });
- await t.test('mencapai target tetap aktif, alarm remedial terhapus',async()=>{
-  const s=(await as(owner,'select * from students where id=$1',[student])).rows[0];assert.equal(s.reading_level,3);assert.equal(s.status,'Aktif');
-  assert.equal((await as(owner,'select * from student_alerts where student_id=$1',[student])).rows[0].intervention,false);
+ await t.test('status tetap aktif dan level inti tidak dapat diubah langsung',async()=>{
+  const s=(await as(owner,'select * from students where id=$1',[student])).rows[0];assert.equal(s.status,'Aktif');
   await assert.rejects(as(owner,"update students set reading_level=2 where id=$1",[student]),/alur evaluasi/);
  });
  await t.test('level 11–16 aktif dan asesmen baru menaikkan tiap kompetensi secara mandiri setelah dua bukti',async()=>{
@@ -86,14 +95,15 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   const first=(await as(teacher,'select subject from session_assessments where session_student_id=$1 order by subject',[x.rid])).rows.map(x=>x.subject);
   assert.equal(first.length,2);
   let payload=first.map(subject=>({subject,rating:'T',note:'Bukti pertama'}));
-  await assert.rejects(as(teacher,'select finalize_competency_evaluation($1,$2::jsonb,$3)',[x.rid,JSON.stringify([...payload,payload[0]]),'Duplikat']),/Lengkapi semua target/);
-  await as(teacher,'select finalize_competency_evaluation($1,$2::jsonb,$3)',[x.rid,JSON.stringify(payload),'Observasi pertama']);
+  const noObservation=JSON.stringify({english_rating:'',english_note:'',character_dimensions:[],character_note:''});
+  await assert.rejects(as(teacher,'select finalize_competency_evaluation($1,$2::jsonb,$3,$4::jsonb)',[x.rid,JSON.stringify([...payload,payload[0]]),'Duplikat',noObservation]),/Lengkapi semua target/);
+  await as(teacher,'select finalize_competency_evaluation($1,$2::jsonb,$3,$4::jsonb)',[x.rid,JSON.stringify(payload),'Observasi pertama',noObservation]);
   x=await create(teacher,advanced);
   const second=(await as(teacher,'select subject from session_assessments where session_student_id=$1 order by subject',[x.rid])).rows.map(x=>x.subject);
   const shared=first.find(subject=>second.includes(subject));
   assert.ok(shared,'dua sesi spiral berurutan berbagi satu kompetensi');
   payload=second.map(subject=>({subject,rating:subject===shared?'T':'MB',note:'Bukti kedua'}));
-  await as(teacher,'select finalize_competency_evaluation($1,$2::jsonb,$3)',[x.rid,JSON.stringify(payload),'Observasi kedua']);
+  await as(teacher,'select finalize_competency_evaluation($1,$2::jsonb,$3,$4::jsonb)',[x.rid,JSON.stringify(payload),'Observasi kedua',noObservation]);
   const level=(await as(teacher,'select current_level from student_competencies where student_id=$1 and subject=$2',[advanced,shared])).rows[0].current_level;
   assert.equal(level,11);
  });
@@ -123,18 +133,32 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   }
   assert.deepEqual(targetSets[0],targetSets[1]);
   assert.equal((await as(teacher,'select duration_minutes from class_sessions where id=$1',[cid])).rows[0].duration_minutes,90);
+  await assert.rejects(as(teacher,"update class_sessions set material='Palsu' where id=$1",[cid]),/permission denied/);
+  await assert.rejects(as(teacher,"update session_observations set character_note='Palsu' where session_student_id=$1",[records[0].id]),/permission denied/);
   const saved=(await as(teacher,'select * from session_observations where session_student_id=$1',[records[0].id])).rows[0];
   assert.equal(saved.english_rating,'T');
   assert.deepEqual(saved.character_dimensions,['kerja_sama','tanggung_jawab']);
   assert.equal((await as(teacher,"select evidence_count from student_competencies where student_id=$1 and subject='english'",[student])).rows[0].evidence_count,1);
   await assert.rejects(as(stranger,'select claim_class_ai_job($1)',[cid]),/Akses ditolak/);
   const job=(await as(teacher,'select claim_class_ai_job($1) as id',[cid])).rows[0].id;
+  await assert.rejects(as(teacher,"select finish_class_ai_job($1,'Panduan palsu',false)",[job]),/permission denied/);
   await db.exec('reset role; set role service_role');
   await db.query("select finish_class_ai_job($1,'Panduan multigrade tematik dengan English Exposure.',false)",[job]);
   assert.match((await as(teacher,'select material from class_sessions where id=$1',[cid])).rows[0].material,/English Exposure/);
  });
+ await t.test('siswa dengan posisi kompetensi sama tidak dipecah ke kelompok berbeda',async()=>{
+  const ids=[randomUUID(),randomUUID(),randomUUID()];
+  for(const [index,id] of ids.entries()){
+   await as(owner,`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,$2,'Orang tua',4,4,8,4,4,8)`,[id,`Setara ${index+1}`]);
+   await as(owner,'insert into assignments values($1,$2)',[id,teacher]);
+  }
+  const cid=randomUUID();
+  await as(teacher,"select create_class($1,current_date,'Kebun',$2::uuid[],60)",[cid,ids]);
+  const groups=(await as(teacher,'select group_no from session_students where session_id=$1 order by student_id',[cid])).rows.map(x=>x.group_no);
+  assert.deepEqual(groups,[1,1,1]);
+ });
  await t.test('sumatif hanya pemilik, level tidak melewati target',async()=>{
-  const x=await create();await as(teacher,"select finalize_evaluation($1,'SB','')",[x.rid]);
+  const x=await create();await finalize(teacher,x.rid,'T','');
   const core=(await as(owner,'select reading_level,reading_target from students where id=$1',[student])).rows[0];
   assert.ok(core.reading_level<=core.reading_target);
   await assert.rejects(as(teacher,'select complete_summative($1,90,true)',[student]),/Hanya pemilik/);
