@@ -43,9 +43,11 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   assert.equal(row.reading_key,3);
   assert.match(row.reading_spiral,/suku kata terbuka/);
   // Fondasi is written strand by strand: every level 1-4 carries indicators and a knot to the next.
-  for(const strand of ['reading','writing','math','ipas','listening','speaking']){
-   const rows=(await admin(`select level, jsonb_array_length(${strand}_indicators) as n, ${strand}_key as key, ${strand}_spiral as spiral from curriculum where level between 1 and 4 order by level`)).rows;
-   assert.equal(rows.length,4);
+  // Fondasi covers six strands; Fase A so far covers the three core ones.
+  const covered={reading:8,writing:8,math:8,ipas:4,listening:4,speaking:4};
+  for(const [strand,last] of Object.entries(covered)){
+   const rows=(await admin(`select level, jsonb_array_length(${strand}_indicators) as n, ${strand}_key as key, ${strand}_spiral as spiral from curriculum where level between 1 and ${last} order by level`)).rows;
+   assert.equal(rows.length,last);
    for(const r of rows){
     assert.ok(r.n>=3,`${strand} level ${r.level} kekurangan indikator`);
     assert.ok(r.key>0,`${strand} level ${r.level} belum menunjuk simpul spiral`);
