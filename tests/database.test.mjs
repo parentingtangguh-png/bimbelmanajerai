@@ -13,6 +13,15 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
  const migrationDir=new URL('../supabase/migrations/',import.meta.url);
  const migrations=(await readdir(migrationDir)).filter(file=>file.endsWith('.sql')).sort();
  for(const file of migrations)await db.exec((await readFile(new URL(file,migrationDir),'utf8')).replace(/^\uFEFF/,''));
+ await t.test('data uji mencakup 20 siswa Fondasi sampai SD 6 tanpa nomor telepon',async()=>{
+  const seeded=(await db.query("select name,phone from students where id::text like '20000000-0000-4000-8000-0000000000%' order by id")).rows;
+  assert.equal(seeded.length,20);
+  assert.ok(seeded.every(row=>row.name.startsWith('Siswa Uji ')&&row.phone===''));
+  assert.match(seeded[0].name,/Fondasi/);
+  assert.match(seeded.at(-1).name,/SD 6/);
+  const active=(await db.query("select count(*)::int as total from student_competencies where student_id::text like '20000000-0000-4000-8000-0000000000%' and active")).rows[0].total;
+  assert.equal(active,140);
+ });
  const owner=randomUUID(),teacher=randomUUID(),stranger=randomUUID(),student=randomUUID(),other=randomUUID();
  await db.exec(`insert into access_list values('owner@test.invalid','Pemilik','owner',true),('guru@test.invalid','Guru','teacher',true),('lain@test.invalid','Guru Lain','teacher',true);`);
  await db.query('insert into auth.users values($1,$2),($3,$4),($5,$6)',[owner,'owner@test.invalid',teacher,'guru@test.invalid',stranger,'lain@test.invalid']);
