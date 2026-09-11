@@ -217,6 +217,61 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   await as(teacher,'delete from schedules where id=$1',[sid]);
   assert.equal((await as(teacher,'select schedule_id from class_sessions where id=$1',[cid])).rows[0].schedule_id,null);
  });
+ await t.test('isolasi antar guru: guru lain tidak melihat atau mengubah data guru pertama',async()=>{
+  const kidA=randomUUID(),kidB=randomUUID();
+  await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Anak Guru A','Bunda A',1,1,5,1,1,5),($2,'Anak Guru B','Bunda B',1,1,5,1,1,5)`,[kidA,kidB]);
+  await as(owner,'insert into assignments values($1,$2),($3,$4)',[kidA,teacher,kidB,stranger]);
+  // Guru A: kelas, evaluasi lengkap (asesmen + observasi), dan sesi jadwal.
+  const a=await create(teacher,kidA);await finalize(teacher,a.rid,'T','Catatan rahasia guru A');
+  const scheduleA=(await as(teacher,"insert into schedules(name,start_time,end_time) values('Jadwal A','08:00','09:00') returning id")).rows[0].id;
+  await as(teacher,'insert into schedule_students values($1,$2)',[scheduleA,kidA]);
+  const scheduleB=(await as(stranger,"insert into schedules(name,start_time,end_time) values('Jadwal B','10:00','11:00') returning id")).rows[0].id;
+  // Guru B hanya melihat miliknya sendiri di setiap tabel.
+  const ids=async sql=>(await as(stranger,sql)).rows.map(x=>Object.values(x)[0]);
+  const hidden=async sql=>{try{assert.equal((await as(stranger,sql)).rows.length,0,sql);}catch(error){if(!/permission denied/.test(error.message))throw error;}};
+  assert.deepEqual(await ids('select id from students'),[kidB]);
+  assert.deepEqual([...new Set(await ids('select student_id from student_competencies'))],[kidB]);
+  assert.deepEqual(await ids('select student_id from assignments'),[kidB]);
+  assert.deepEqual(await ids('select id from profiles'),[stranger]);
+  assert.deepEqual(await ids('select email from access_list'),['lain@test.invalid']);
+  assert.deepEqual(await ids('select id from schedules'),[scheduleB]);
+  for(const sql of [`select * from class_sessions where id='${a.cid}'`,`select * from session_students where id='${a.rid}'`,`select * from session_assessments where session_student_id='${a.rid}'`,`select * from session_observations where session_student_id='${a.rid}'`,`select * from schedule_students where schedule_id='${scheduleA}'`,'select * from student_alerts','select * from ai_jobs','select * from class_ai_jobs'])await hidden(sql);
+  // Guru B tidak bisa menulis ke data guru A, baik langsung maupun lewat RPC.
+  assert.equal((await as(stranger,"update students set name='Diubah' where id=$1 returning id",[kidA])).rows.length,0);
+  assert.equal((await as(stranger,"update schedules set name='Diubah' where id=$1 returning id",[scheduleA])).rows.length,0);
+  assert.equal((await as(stranger,'delete from schedules where id=$1 returning id',[scheduleA])).rows.length,0);
+  await assert.rejects(as(stranger,'insert into schedule_students values($1,$2)',[scheduleA,kidB]),/row-level security/i);
+  await assert.rejects(as(stranger,'insert into schedule_students values($1,$2)',[scheduleB,kidA]),/row-level security/i);
+  await assert.rejects(as(stranger,'insert into assignments values($1,$2)',[kidA,stranger]),/row-level security/i);
+  await assert.rejects(as(stranger,"select create_class($1,current_date,'Pasar',$2::uuid[])",[randomUUID(),[kidA]]),/Siswa tidak tersedia/);
+  await assert.rejects(as(stranger,"select create_class($1,current_date,'Pasar',$2::uuid[])",[a.cid,[kidB]]),/Akses ditolak/);
+  await assert.rejects(as(stranger,"select create_class($1,current_date,'Pasar',$2::uuid[],60)",[randomUUID(),[kidA]]),/Siswa tidak tersedia/);
+  await assert.rejects(as(stranger,"select create_class($1,current_date,'Pasar',$2::uuid[],60)",[a.cid,[kidB]]),/Akses ditolak/);
+  await assert.rejects(as(stranger,"select save_attendance($1,'Alfa')",[a.rid]),/Akses ditolak/);
+  await assert.rejects(as(stranger,"select finalize_competency_evaluation($1,'[]'::jsonb,'',$2::jsonb)",[a.rid,'{}']),/Akses ditolak/);
+  await assert.rejects(as(stranger,"select claim_ai_job($1,'report')",[a.rid]),/Akses ditolak/);
+  await assert.rejects(as(stranger,'select claim_class_ai_job($1)',[a.cid]),/Akses ditolak/);
+  await assert.rejects(as(stranger,'select set_class_schedule($1,$2)',[a.cid,scheduleB]),/Akses ditolak/);
+  // Data guru A tetap utuh.
+  assert.equal((await as(teacher,'select name from students where id=$1',[kidA])).rows[0].name,'Anak Guru A');
+  assert.equal((await as(teacher,'select anecdote from session_students where id=$1',[a.rid])).rows[0].anecdote,'Catatan rahasia guru A');
+  assert.equal((await as(teacher,'select count(*)::int as n from schedule_students where schedule_id=$1',[scheduleA])).rows[0].n,1);
+ });
+ await t.test('guru dapat mengubah profil umum siswanya sendiri saja',async()=>{
+  const kid=randomUUID();
+  await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Fajar','Bunda Fajar',1,1,5,1,1,5)`,[kid]);
+  await as(owner,'insert into assignments values($1,$2)',[kid,teacher]);
+  const profile=(extra={})=>JSON.stringify({name:'Fajar Nugraha',parent_name:'Bunda Rina',phone:'0812-3456-7890',interest:'Robot',diagnostic:'Mengenal huruf',learning_notes:'Visual',...extra});
+  await as(teacher,'select update_student_profile($1,$2::jsonb)',[kid,profile({status:'Non-Aktif',reading_target:16,reading_level:9,reading_baseline:5})]);
+  const s=(await as(teacher,'select * from students where id=$1',[kid])).rows[0];
+  assert.deepEqual([s.name,s.parent_name,s.phone,s.interest,s.diagnostic,s.learning_notes],['Fajar Nugraha','Bunda Rina','0812-3456-7890','Robot','Mengenal huruf','Visual']);
+  assert.deepEqual([s.status,s.reading_target,s.reading_level,s.reading_baseline],['Aktif',5,1,1]);
+  await assert.rejects(as(stranger,'select update_student_profile($1,$2::jsonb)',[kid,profile({name:'Diambil alih'})]),/Akses ditolak/);
+  await assert.rejects(as(teacher,'select update_student_profile($1,$2::jsonb)',[kid,profile({name:'  '})]),/Nama anak/);
+  await assert.rejects(as(teacher,'select update_student_profile($1,$2::jsonb)',[kid,profile({phone:'<script>'})]),/Nomor WhatsApp/);
+  assert.equal((await as(teacher,"update students set name='Langsung' where id=$1 returning id",[kid])).rows.length,0);
+  assert.equal((await as(teacher,'select name from students where id=$1',[kid])).rows[0].name,'Fajar Nugraha');
+ });
  await t.test('pemilik ditolak menambah siswa dan menjalankan kegiatan kelas',async()=>{
   await assert.rejects(as(owner,`insert into students(name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values('X','Y',1,1,3,1,1,3)`),/row-level security|agregat/i);
   await assert.rejects(as(owner,"select create_class($1,current_date,'Pasar',$2::uuid[])",[randomUUID(),[other]]),/agregat/);

@@ -54,3 +54,18 @@ test('layar HP 390px tidak meluber dan formulir dapat digunakan',async({page})=>
   await page.getByRole('button',{name:/Kembali ke login/}).click();
   await expect(page.getByRole('heading',{name:'Selamat datang kembali'})).toBeVisible();
 });
+
+test('keluar akun mengosongkan data dan isian sesi sebelumnya',async({page})=>{
+  await page.goto('/');
+  await page.getByRole('button',{name:'Lihat pratinjau aplikasi'}).click();
+  await page.getByRole('navigation').getByRole('button',{name:/Data siswa/}).click();
+  await page.getByRole('searchbox',{name:'Cari siswa'}).fill('Bima');
+  await expect(page.getByRole('button',{name:/Alya Putri/})).toHaveCount(0);
+  await page.getByRole('button',{name:/Kembali ke login/}).click();
+  await expect(page.getByRole('heading',{name:'Selamat datang kembali'})).toBeVisible();
+  await page.getByRole('button',{name:'Lihat pratinjau aplikasi'}).click();
+  await expect(page.getByRole('heading',{name:'Perjalanan belajar'})).toBeVisible();
+  await page.getByRole('navigation').getByRole('button',{name:/Data siswa/}).click();
+  await expect(page.getByRole('searchbox',{name:'Cari siswa'})).toHaveValue('');
+  await expect(page.getByRole('button',{name:/Alya Putri/})).toBeVisible();
+});
