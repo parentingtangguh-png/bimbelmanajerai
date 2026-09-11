@@ -18,7 +18,7 @@ scripts/refine-ui.mjs
 
 # Implementasi awal tetap tersimpan lokal sebagai arsip.
 app.py
-style.css
+/style.css
 BimbelManager.gs
 requirements.txt
 .streamlit/
