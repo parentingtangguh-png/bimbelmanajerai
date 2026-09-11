@@ -40,7 +40,9 @@
   border: 1px solid var(--line);
   border-radius: 9px;
   padding: 14px;
-  background: #fafbf8;
+  background: #111511;
+  border-color: #3f463e;
+  box-shadow: 0 4px 16px #0000001f;
 }
 
 .competency-meter > div {
@@ -54,6 +56,19 @@
 .competency-meter span,
 .competency-meter small {
   color: var(--muted);
+}
+
+dialog label {
+  color: #b9c2b7;
+}
+
+dialog .competency-meter strong {
+  color: #fffdf7;
+}
+
+dialog .history,
+dialog .history small {
+  color: #c5cbc2;
 }
 
 .competency-meter small {
