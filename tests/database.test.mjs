@@ -42,6 +42,14 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   assert.equal(row.reading_indicators.length,3);
   assert.equal(row.reading_key,3);
   assert.match(row.reading_spiral,/suku kata terbuka/);
+  // Fondasi Membaca is written as one strand: every level 1-4 carries indicators and a knot to the next.
+  const fondasi=(await admin('select level, jsonb_array_length(reading_indicators) as n, reading_key, reading_spiral from curriculum where level between 1 and 4 order by level')).rows;
+  assert.equal(fondasi.length,4);
+  for(const r of fondasi){
+   assert.ok(r.n>=3,`level ${r.level} kekurangan indikator membaca`);
+   assert.ok(r.reading_key>0,`level ${r.level} belum menunjuk simpul spiral`);
+   assert.ok(r.reading_spiral.length>40,`level ${r.level} belum menjelaskan simpul spiral`);
+  }
   // The knot must point at an indicator that exists, otherwise the evaluation card would star nothing.
   const orphan=(await admin('select count(*)::int as n from curriculum where reading_key>jsonb_array_length(reading_indicators)')).rows[0].n;
   assert.equal(orphan,0);

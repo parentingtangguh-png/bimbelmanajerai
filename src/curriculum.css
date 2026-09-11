@@ -228,3 +228,5 @@ dialog .history small {
   .spiral-node { margin-left: 10px; padding: 12px 14px; }
   .strand-rung { padding: 16px 16px; }
 }
+.spiral-node.crossing { border-left-style: solid; border-left-color: var(--accent, #3f7d5e); }
+.spiral-node.crossing .star { color: var(--accent, #3f7d5e); }
