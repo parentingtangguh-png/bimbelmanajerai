@@ -155,6 +155,24 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   await db.query("select finish_class_ai_job($1,'Panduan multigrade tematik dengan English Exposure.',false)",[job]);
   assert.match((await as(teacher,'select material from class_sessions where id=$1',[cid])).rows[0].material,/English Exposure/);
  });
+ await t.test('mengubah kehadiran tidak menghapus panduan kelas dan anak absen bisa diselesaikan',async()=>{
+  const ids=[randomUUID(),randomUUID()];
+  for(const [index,id] of ids.entries()){
+   await as(owner,`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,$2,'Orang tua',2,2,8,2,2,8)`,[id,`Hadir ${index+1}`]);
+   await as(owner,'insert into assignments values($1,$2)',[id,teacher]);
+  }
+  const cid=randomUUID();
+  await as(teacher,"select create_class($1,current_date,'Kebun',$2::uuid[],60)",[cid,ids]);
+  const job=(await as(teacher,'select claim_class_ai_job($1) as id',[cid])).rows[0].id;
+  await db.exec('reset role; set role service_role');
+  await db.query("select finish_class_ai_job($1,'Panduan kelas kebun untuk dua kelompok.',false)",[job]);
+  const absent=(await as(teacher,'select id from session_students where session_id=$1 and student_id=$2',[cid,ids[0]])).rows[0].id;
+  await as(teacher,"select save_attendance($1,'Sakit')",[absent]);
+  assert.match((await as(teacher,'select material from class_sessions where id=$1',[cid])).rows[0].material,/Panduan kelas kebun/);
+  assert.match((await as(teacher,'select report from session_students where id=$1',[absent])).rows[0].report,/lekas sembuh/);
+  await as(teacher,"select finalize_competency_evaluation($1,'[]'::jsonb,'',$2::jsonb)",[absent,JSON.stringify({})]);
+  assert.ok((await as(teacher,'select finalized_at from session_students where id=$1',[absent])).rows[0].finalized_at);
+ });
  await t.test('siswa dengan posisi kompetensi sama tidak dipecah ke kelompok berbeda',async()=>{
   const ids=[randomUUID(),randomUUID(),randomUUID()];
   for(const [index,id] of ids.entries()){
