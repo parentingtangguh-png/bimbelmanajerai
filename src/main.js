@@ -1,8 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
-import { escapeHtml as h, progress, waLink, localDate } from './domain.js';
+import { escapeHtml as h, progress, waLink, localDate, minutesBetween, durationPattern, formatTime } from './domain.js';
 import './style.css';
 import './curriculum.css';
 import './owner.css';
+import './schedule.css';
 
 const ORG_NAME='Rumah Belajar Rainbow Kids Alfatih';
 
@@ -13,7 +14,7 @@ const url = import.meta.env.VITE_SUPABASE_URL || publicConfig.supabaseUrl;
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || publicConfig.supabasePublishableKey;
 const configured = url?.startsWith('https://') && key && !url.includes('PROJECT_REF');
 const db = configured ? createClient(url,key) : null;
-const state = { user:null, role:'teacher', name:'', view:'dashboard', students:[], classes:[], records:[], competencies:[], assessments:[], observations:[], alerts:[], members:[], assignments:[], profiles:[], themes:[], curriculum:[], active:null, demo:false, filter:'', onboarding:false };
+const state = { user:null, role:'teacher', name:'', view:'dashboard', students:[], classes:[], records:[], competencies:[], assessments:[], observations:[], alerts:[], members:[], assignments:[], profiles:[], themes:[], curriculum:[], active:null, demo:false, filter:'', onboarding:false, schedules:[], scheduleStudents:[] };
 let messageTimer;
 const icons={dashboard:'◫',students:'◉',sessions:'▤',team:'♧',curriculum:'▥'};
 const labels={dashboard:'Ringkasan',students:'Data siswa',sessions:'Ruang kelas',team:'Tim pengajar',curriculum:'Kurikulum'};
@@ -31,13 +32,16 @@ const assessmentsFor=id=>state.assessments.filter(a=>a.session_student_id===id);
 const observationFor=id=>state.observations.find(o=>o.session_student_id===id)||{english_rating:null,english_note:'',character_dimensions:[],character_note:''};
 const activeCompetenciesFor=id=>competenciesFor(id).filter(c=>c.active!==false&&subjects.includes(c.subject));
 const ready=s=>{const rows=activeCompetenciesFor(s.id).filter(c=>c.required);return rows.length?rows.every(c=>c.current_level>=c.target):s.reading_level>=s.reading_target&&s.math_level>=s.math_target;};
+const timeLabel=x=>x?.start_time?`${formatTime(x.start_time)}–${formatTime(x.end_time)}`:'';
+const scheduleMembers=id=>new Set(state.scheduleStudents.filter(x=>x.schedule_id===id).map(x=>x.student_id));
+function durationText(start,end){if(!start||!end)return 'Isi jam mulai dan jam selesai.';const mins=minutesBetween(start,end);if(mins<30||mins>180)return 'Durasi harus 30–180 menit.';return `${mins} menit · kelas memakai pola ${durationPattern(mins)} menit.`;}
 function notify(text,error=false){ document.querySelector('.toast')?.remove(); const el=document.createElement('div');el.className=`toast ${error?'error':''}`;el.role='status';el.textContent=text;document.body.append(el);clearTimeout(messageTimer);messageTimer=setTimeout(()=>el.remove(),6500); }
 async function result(query){ const {data,error}=await query;if(error)throw new Error(error.message);return data; }
 async function allRows(table,order='id') { const rows=[]; for(let from=0;;from+=500){let query=db.from(table).select('*').order(order);if(table==='assignments')query=query.order('teacher_id');if(table==='student_competencies'||table==='session_assessments')query=query.order('subject');const page=await result(query.range(from,from+499));rows.push(...page);if(page.length<500)return rows;} }
 function guardDemo(){if(state.demo)throw new Error('Ini pratinjau. Hubungkan Supabase dan masuk untuk menyimpan data.');}
 async function refresh(){
   if(state.demo){render();return;}
-  const [students,classes,records,themes,curriculum,competencies,assessments,observations]=await Promise.all([
+  const [students,classes,records,themes,curriculum,competencies,assessments,observations,schedules,scheduleStudents]=await Promise.all([
     allRows('students'),
     allRows('class_sessions'),
     allRows('session_students'),
@@ -45,10 +49,13 @@ async function refresh(){
     result(db.from('curriculum').select('*').order('level')),
     allRows('student_competencies','student_id'),
     allRows('session_assessments','session_student_id'),
-    allRows('session_observations','session_student_id')
+    allRows('session_observations','session_student_id'),
+    allRows('schedules'),
+    allRows('schedule_students','schedule_id')
   ]);
   students.sort((a,b)=>a.name.localeCompare(b.name)); classes.sort((a,b)=>b.date.localeCompare(a.date)||b.created_at.localeCompare(a.created_at));
-  Object.assign(state,{students,classes,records,themes,curriculum,competencies,assessments,observations});
+  schedules.sort((a,b)=>a.start_time.localeCompare(b.start_time)||a.name.localeCompare(b.name));
+  Object.assign(state,{students,classes,records,themes,curriculum,competencies,assessments,observations,schedules,scheduleStudents});
   if(state.role==='owner'){
     [state.alerts,state.members,state.assignments,state.profiles]=await Promise.all([
       allRows('student_alerts','student_id'),allRows('access_list','email'),
@@ -71,7 +78,7 @@ function demo(){Object.assign(state,{demo:true,role:'teacher',name:'Guru Pratinj
   {id:'demo-1',name:'Alya Putri',parent_name:'Bunda Rani',phone:'',interest:'Kupu-kupu & menggambar',reading_baseline:1,reading_level:4,reading_target:7,math_baseline:1,math_level:3,math_target:7,status:'Aktif',diagnostic:'Mengenali huruf vokal',learning_notes:'Senang belajar lewat gambar'},
   {id:'demo-2',name:'Bima Pratama',parent_name:'Ayah Danu',phone:'',interest:'Dinosaurus',reading_baseline:2,reading_level:3,reading_target:6,math_baseline:2,math_level:4,math_target:7,status:'Aktif'},
   {id:'demo-3',name:'Citra Kirana',parent_name:'Bunda Maya',phone:'',interest:'Cerita & hewan',reading_baseline:3,reading_level:7,reading_target:7,math_baseline:2,math_level:7,math_target:7,status:'Aktif'}
-],classes:[],records:[],alerts:[],members:[],assignments:[],profiles:[],themes:[{name:'Pasar'},{name:'Alam & Lingkungan'}],curriculum:[]});state.competencies=state.students.flatMap(s=>subjects.map(subject=>({student_id:s.id,subject,baseline:subject==='math'?s.math_baseline:s.reading_baseline,current_level:subject==='math'?s.math_level:s.reading_level,target:subject==='math'?s.math_target:s.reading_target,evidence_count:subject==='writing'?1:0,repeat_count:0,intervention:false,required:subject!=='english',active:true})));state.assessments=[];state.observations=[];render();}
+],classes:[],records:[],alerts:[],members:[],assignments:[],profiles:[],themes:[{name:'Pasar'},{name:'Alam & Lingkungan'}],curriculum:[]});state.competencies=state.students.flatMap(s=>subjects.map(subject=>({student_id:s.id,subject,baseline:subject==='math'?s.math_baseline:s.reading_baseline,current_level:subject==='math'?s.math_level:s.reading_level,target:subject==='math'?s.math_target:s.reading_target,evidence_count:subject==='writing'?1:0,repeat_count:0,intervention:false,required:subject!=='english',active:true})));state.assessments=[];state.observations=[];state.schedules=[{id:'demo-s1',name:'Sesi Pagi',start_time:'08:00:00',end_time:'09:30:00'},{id:'demo-s2',name:'Sesi Sore',start_time:'15:30:00',end_time:'16:30:00'}];state.scheduleStudents=[{schedule_id:'demo-s1',student_id:'demo-1'},{schedule_id:'demo-s1',student_id:'demo-2'},{schedule_id:'demo-s2',student_id:'demo-3'}];render();}
 // Re-rendering replaces the whole page, so keep unsaved classroom inputs and the scroll position.
 const drafts=new Map();let lastScreen='';
 function saveDrafts(){document.querySelectorAll('.session-card form[data-id]').forEach(form=>{const values={};form.querySelectorAll('input,select,textarea').forEach(el=>{if(!el.name||el.disabled)return;if(el.type==='checkbox'){(values[el.name]??=[]);if(el.checked)values[el.name].push(el.value);}else values[el.name]=el.value;});drafts.set(form.dataset.form+':'+form.dataset.id,values);});}
@@ -148,10 +155,24 @@ function ownerStudentsView(){
   }).join('');
   return `${heading('DATA UMUM SISWA','Ringkasan siswa.',`${state.students.length} siswa · ${active} aktif · ${attention} perlu perhatian. Klik baris untuk membuka profil.`)}<div class="toolbar"><input id="student-search" type="search" placeholder="Cari nama siswa…" aria-label="Cari siswa" value="${h(state.filter)}"><span>${list.length} ditampilkan</span></div>${rows?`<div class="panel table-wrap"><table class="owner-students"><thead><tr><th>Siswa</th><th class="num">B. Indonesia</th><th class="num">Matematika</th><th class="num">IPAS</th><th>Guru pendamping</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`:empty('Belum ada siswa','Siswa baru ditambahkan oleh guru dan akan tampil di sini.')}`;
 }
-function studentsViewV2(){
-  if(state.role==='owner')return ownerStudentsView();
+function teacherStudentsView(){
   const list=state.students.filter(s=>s.name.toLowerCase().includes(state.filter.toLowerCase()));
-  return `${heading('SETIAP ANAK UNIK','Kenali, lalu dampingi.','Profil dan perjalanan kompetensi setiap anak.',state.role==='teacher'?'<button class="primary" data-action="new-student">＋ Tambah siswa</button>':'')}<div class="toolbar"><input id="student-search" type="search" placeholder="Cari nama siswa…" aria-label="Cari siswa" value="${h(state.filter)}"><span>${state.students.length} siswa terdaftar</span></div><div class="student-grid">${list.map(s=>{const bi=areaProgress(s,['listening','speaking','reading','writing'])||{baseline:s.reading_baseline,current:s.reading_level,target:s.reading_target};const ipas=activeCompetenciesFor(s.id).find(c=>c.subject==='ipas');return `<article class="panel student-card"><div class="card-top"><span class="avatar large">${h(s.name[0])}</span><span class="badge ${ready(s)?'amber':'green'}">${h(s.status)}${ready(s)&&s.status==='Aktif'?' · Siap sumatif':''}</span></div><h2>${h(s.name)}</h2><p>${h(s.interest||'Minat belum diisi')}</p>${meter('Bahasa Indonesia',bi.current,bi.baseline,bi.target)}${meter('Matematika',s.math_level,s.math_baseline,s.math_target)}${ipas?meter('IPAS',ipas.current_level,ipas.baseline,ipas.target):''}<button class="secondary full" data-action="student" data-id="${s.id}">Lihat profil & riwayat →</button></article>`;}).join('')||empty('Belum ada siswa',state.role==='owner'?'Siswa baru ditambahkan oleh guru dan akan tampil di sini.':'Data siswa yang ditugaskan kepada Anda akan tampil di sini.')}</div>`;
+  const searching=!!state.filter.trim();
+  const scheduled=new Set(state.scheduleStudents.filter(x=>state.schedules.some(sc=>sc.id===x.schedule_id)).map(x=>x.student_id));
+  const group=(title,meta,action,students,extra='')=>`<section class="panel schedule-group ${extra}"><div class="panel-heading"><div><h2>${title}</h2><p>${meta}</p></div>${action}</div>${students.length?students.map(studentRow).join(''):'<p class="muted">Belum ada anak di sesi ini. Tekan Ubah untuk memilih anak.</p>'}</section>`;
+  const sections=state.schedules.map(sc=>{
+    const members=scheduleMembers(sc.id);const kids=list.filter(s=>members.has(s.id));
+    if(searching&&!kids.length)return '';
+    const mins=minutesBetween(sc.start_time,sc.end_time);
+    return group(h(sc.name),`${timeLabel(sc)} · ${mins} menit · pola ${durationPattern(mins)} menit · ${members.size} anak`,`<button class="secondary" data-action="edit-schedule" data-id="${sc.id}">Ubah</button>`,kids);
+  }).join('');
+  const loose=list.filter(s=>!scheduled.has(s.id));
+  const looseSection=loose.length?group('Belum masuk sesi',`${loose.length} anak · masukkan ke sesi jadwal agar mudah dipilih saat membuka kelas`,'',loose,'unscheduled'):'';
+  const buttons='<div class="button-row"><button class="secondary" data-action="new-schedule">＋ Buat sesi jadwal</button><button class="primary" data-action="new-student">＋ Tambah siswa</button></div>';
+  return `${heading('SETIAP ANAK UNIK','Kenali, lalu dampingi.','Siswa dikelompokkan menurut sesi jadwal rutin Anda.',buttons)}<div class="toolbar"><input id="student-search" type="search" placeholder="Cari nama siswa…" aria-label="Cari siswa" value="${h(state.filter)}"><span>${state.students.length} siswa · ${state.schedules.length} sesi jadwal</span></div>${state.students.length?(sections+looseSection||empty('Tidak ditemukan','Tidak ada siswa dengan nama itu.')):empty('Belum ada siswa','Data siswa yang ditugaskan kepada Anda akan tampil di sini.')}`;
+}
+function studentsViewV2(){
+  return state.role==='owner'?ownerStudentsView():teacherStudentsView();
 }
 function sessionsViewV2(){
   const c=state.classes.find(c=>c.id===state.active);
@@ -159,9 +180,9 @@ function sessionsViewV2(){
     const records=state.records.filter(r=>r.session_id===c.id);
     const groups=[...new Set(records.filter(r=>r.attendance==='Hadir').map(r=>r.group_no||1))].sort();
     const done=records.filter(r=>r.finalized_at).length;
-    return `${heading('SATU TEMA, BERAGAM TANTANGAN',h(c.theme),`${h(c.date)} · ${c.duration_minutes||60} menit · ${groups.length||1} kelompok · ${done} dari ${records.length} anak selesai dievaluasi`,'<button class="secondary" data-action="back-sessions">← Semua sesi</button>')}<div class="notice"><strong>Langkah kelas</strong><br>① Tandai anak yang tidak datang. Kehadiran bisa diubah sampai evaluasinya disimpan, dan panduan kelas tetap aman.<br>② Buat panduan kelas sekali untuk semua kelompok.<br>③ Setelah kegiatan, simpan evaluasi setiap anak, termasuk yang tidak hadir.<br>④ Buat kabar orang tua, periksa, lalu kirim lewat WhatsApp.</div><article class="panel class-guide"><div class="section-title"><div><h2>Panduan kelas bersama</h2><p>Satu alur mengajar dengan kartu kegiatan untuk maksimal tiga kelompok.</p></div><button class="primary" data-action="generate-class" data-id="${c.id}">${c.material?'Lihat panduan tersimpan':'✦ Buat panduan kelas AI'}</button></div>${c.material?`<pre>${h(c.material)}</pre><button class="text-btn" data-action="print-class" data-id="${c.id}">Cetak panduan (opsional)</button>`:'<p class="muted">Panduan akan mengatur waktu, aktivitas tematik, diferensiasi kelompok, English Exposure, dan titik observasi karakter.</p>'}</article><h2 class="student-evaluation-title">Evaluasi individual</h2><div class="session-list">${records.map(recordCardV2).join('')}</div>`;
+    return `${heading('SATU TEMA, BERAGAM TANTANGAN',h(c.theme),`${h(c.date)}${c.start_time?' · '+timeLabel(c):''} · ${c.duration_minutes||60} menit · ${groups.length||1} kelompok · ${done} dari ${records.length} anak selesai dievaluasi`,'<button class="secondary" data-action="back-sessions">← Semua sesi</button>')}<div class="notice"><strong>Langkah kelas</strong><br>① Tandai anak yang tidak datang. Kehadiran bisa diubah sampai evaluasinya disimpan, dan panduan kelas tetap aman.<br>② Buat panduan kelas sekali untuk semua kelompok.<br>③ Setelah kegiatan, simpan evaluasi setiap anak, termasuk yang tidak hadir.<br>④ Buat kabar orang tua, periksa, lalu kirim lewat WhatsApp.</div><article class="panel class-guide"><div class="section-title"><div><h2>Panduan kelas bersama</h2><p>Satu alur mengajar dengan kartu kegiatan untuk maksimal tiga kelompok.</p></div><button class="primary" data-action="generate-class" data-id="${c.id}">${c.material?'Lihat panduan tersimpan':'✦ Buat panduan kelas AI'}</button></div>${c.material?`<pre>${h(c.material)}</pre><button class="text-btn" data-action="print-class" data-id="${c.id}">Cetak panduan (opsional)</button>`:'<p class="muted">Panduan akan mengatur waktu, aktivitas tematik, diferensiasi kelompok, English Exposure, dan titik observasi karakter.</p>'}</article><h2 class="student-evaluation-title">Evaluasi individual</h2><div class="session-list">${records.map(recordCardV2).join('')}</div>`;
   }
-  return `${heading('RUANG KELAS','Siap belajar bersama?','Satu tema, satu panduan multigrade, dan bukti perkembangan individual.','<button class="primary" data-action="new-session">＋ Mulai sesi kelas</button>')}<div class="panel">${state.classes.map(x=>{const rr=state.records.filter(r=>r.session_id===x.id);return `<button class="class-row" data-action="open-session" data-id="${x.id}"><span class="calendar">${h(x.date.slice(8))}<small>${h(x.date.slice(0,7))}</small></span><div><h3>${h(x.theme)}</h3><p>${x.duration_minutes||60} menit · ${rr.length} siswa · ${rr.filter(r=>r.finalized_at).length} evaluasi selesai</p></div><span>Masuk kelas →</span></button>`;}).join('')||empty('Ruang kelas menanti','Pilih durasi, tema, dan siswa untuk membuka sesi pertama.')}</div>`;
+  return `${heading('RUANG KELAS','Siap belajar bersama?','Satu tema, satu panduan multigrade, dan bukti perkembangan individual.','<button class="primary" data-action="new-session">＋ Mulai sesi kelas</button>')}<div class="panel">${state.classes.map(x=>{const rr=state.records.filter(r=>r.session_id===x.id);return `<button class="class-row" data-action="open-session" data-id="${x.id}"><span class="calendar">${h(x.date.slice(8))}<small>${h(x.date.slice(0,7))}</small></span><div><h3>${h(x.theme)}</h3><p>${x.start_time?timeLabel(x)+' · ':''}${x.duration_minutes||60} menit · ${rr.length} siswa · ${rr.filter(r=>r.finalized_at).length} evaluasi selesai</p></div><span>Masuk kelas →</span></button>`;}).join('')||empty('Ruang kelas menanti','Pilih durasi, tema, dan siswa untuk membuka sesi pertama.')}</div>`;
 }
 function recordCardV2(r){
   const s=studentFor(r);if(!s)return '';
@@ -190,9 +211,13 @@ function studentFormV2(s={}){
   const owner=state.role==='owner';const canCreate=state.role==='teacher'||(owner&&!!s.id);const edit=!!s.id;
   modal(edit?h(s.name):'Siswa baru',`<form data-form="student" data-id="${s.id||''}"><fieldset ${canCreate?'':'disabled'}><div class="form-grid">${field('Nama anak','name','text',s.name,'required maxlength="120"')}${field('Sapaan orang tua','parent_name','text',s.parent_name,'required maxlength="120"')}${field('Nomor WhatsApp','phone','tel',s.phone)}${field('Minat / hobi','interest','text',s.interest,'required maxlength="300"')}</div>${area('Hasil diagnostik awal','diagnostic',s.diagnostic,'maxlength="3000"')}${area('Catatan gaya belajar','learning_notes',s.learning_notes,'maxlength="3000"')}<div class="form-grid">${field(edit?'Level awal Bahasa Indonesia (terkunci)':'Level awal Bahasa Indonesia','reading_baseline','number',s.reading_baseline||1,`min="1" max="16" required ${edit?'disabled':''}`)}${field('Target awal Bahasa Indonesia & IPAS','reading_target','number',s.reading_target||7,'min="1" max="16" required')}${field(edit?'Level awal Matematika (terkunci)':'Level awal Matematika','math_baseline','number',s.math_baseline||1,`min="1" max="16" required ${edit?'disabled':''}`)}${field('Target Matematika','math_target','number',s.math_target||7,'min="1" max="16" required')}</div>${edit?select('Status','status',s.status==='Lulus'?['Lulus','Non-Aktif']:['Aktif','Non-Aktif'],s.status):''}</fieldset>${canCreate?'<button class="primary full">Simpan profil siswa</button>':''}</form>${edit?`<hr><h3>Perjalanan kompetensi</h3>${competencyMetersV2(s)}<div class="notice">Karakter tidak diberi level. Guru mencatat perilaku yang tampak dalam konteks kegiatan.</div>${owner?`<hr>${competencyTargetsFormV2(s)}<hr><form data-form="assign" data-id="${s.id}"><h3>Guru pendamping</h3>${state.profiles.filter(p=>state.members.some(m=>m.email===p.email&&m.role==='teacher'&&m.active)).map(p=>`<label class="check"><input type="checkbox" name="teacher" value="${p.id}" ${state.assignments.some(a=>a.student_id===s.id&&a.teacher_id===p.id)?'checked':''}>${h(p.name)}</label>`).join('')||'<p>Belum ada guru yang mengaktifkan akun.</p>'}<button class="secondary">Simpan penugasan</button></form>`:''}${owner&&ready(s)&&s.status==='Aktif'?`<hr><form data-form="summative" data-id="${s.id}"><h3>Ujian sumatif akhir</h3>${field('Nilai akhir (1–100)','score','number',s.summative_score||'','required min="1" max="100"')}${select('Keputusan pemilik','pass',[['false','Perlu pendampingan lanjutan'],['true','Lulus']],'false')}<button class="primary">Simpan hasil sumatif</button></form>`:''}<hr><h3>Riwayat evaluasi</h3>${state.records.filter(r=>r.student_id===s.id&&r.finalized_at).sort((a,b)=>b.finalized_at.localeCompare(a.finalized_at)).map(r=>`<p class="history">${h(state.classes.find(c=>c.id===r.session_id)?.date||r.finalized_at.slice(0,10))} · ${h(r.attendance)} · <strong>${h(r.grade||'Tanpa nilai')}</strong><br><small>${h(r.anecdote)}</small></p>`).join('')||'<p class="muted">Belum ada evaluasi tersimpan.</p>'}`:''}`);
 }
+function scheduleForm(sc={}){
+  const members=scheduleMembers(sc.id);const active=state.students.filter(s=>s.status==='Aktif');
+  modal(sc.id?'Ubah sesi jadwal':'Sesi jadwal baru',`<form data-form="schedule" data-id="${sc.id||''}">${field('Nama sesi','name','text',sc.name||'','required maxlength="60" placeholder="Sesi Pagi"')}<div class="form-grid">${field('Jam mulai','start_time','time',sc.start_time?.slice(0,5)||'','required')}${field('Jam selesai','end_time','time',sc.end_time?.slice(0,5)||'','required')}</div><p class="muted schedule-hint" id="schedule-duration">${durationText(sc.start_time,sc.end_time)}</p><h3>Anak di sesi ini</h3>${active.map(s=>`<label class="check"><input type="checkbox" name="student" value="${s.id}" ${members.has(s.id)?'checked':''}>${h(s.name)}</label>`).join('')||'<p>Belum ada siswa aktif.</p>'}<button class="primary full">Simpan sesi jadwal</button>${sc.id?`<button type="button" class="text-btn full" data-action="delete-schedule" data-id="${sc.id}">Hapus sesi jadwal</button>`:''}</form>`);
+}
 function newSessionV2(){
   const available=state.students.filter(s=>s.status==='Aktif'&&!state.records.some(r=>r.student_id===s.id&&!r.finalized_at));
-  modal('Mulai sesi kelas',`<form data-form="session" data-id="${crypto.randomUUID()}">${field('Tanggal','date','date',localDate(),'required')}${select('Durasi kelas','duration',[['60','60 menit · 2 target inti'],['75','75 menit · 2 target + integrasi'],['90','90 menit · maksimal 3 target']],'60','required')}${field('Tema bersama','theme','text',state.themes[0]?.name||'','required maxlength="120" list="themes"')}<datalist id="themes">${state.themes.map(t=>`<option value="${h(t.name)}">`).join('')}</datalist><div class="notice">Sistem memilih target spiral bersama dan membagi siswa menjadi maksimal tiga kelompok berdasarkan posisi kompetensi.</div><h3>Pilih anak yang mengikuti sesi</h3>${available.map(s=>`<label class="check"><input type="checkbox" name="student" value="${s.id}">${h(s.name)} <small>Bahasa Indonesia ${s.reading_level} · Matematika ${s.math_level}</small></label>`).join('')||'<p>Belum ada siswa tersedia. Tambahkan siswa atau selesaikan sesi yang masih terbuka.</p>'}<button class="primary full" ${available.length?'':'disabled'}>Buka ruang kelas →</button></form>`);
+  modal('Mulai sesi kelas',`<form data-form="session" data-id="${crypto.randomUUID()}">${field('Tanggal','date','date',localDate(),'required')}${state.schedules.length?select('Sesi jadwal','schedule',[['','Tanpa sesi jadwal'],...state.schedules.map(sc=>[sc.id,`${sc.name} · ${timeLabel(sc)}`])],''):''}${select('Durasi kelas','duration',[['60','60 menit · 2 target inti'],['75','75 menit · 2 target + integrasi'],['90','90 menit · maksimal 3 target']],'60','required')}${field('Tema bersama','theme','text',state.themes[0]?.name||'','required maxlength="120" list="themes"')}<datalist id="themes">${state.themes.map(t=>`<option value="${h(t.name)}">`).join('')}</datalist><div class="notice">Sistem memilih target spiral bersama dan membagi siswa menjadi maksimal tiga kelompok berdasarkan posisi kompetensi.</div><h3>Pilih anak yang mengikuti sesi</h3>${available.map(s=>`<label class="check"><input type="checkbox" name="student" value="${s.id}">${h(s.name)} <small>Bahasa Indonesia ${s.reading_level} · Matematika ${s.math_level}</small></label>`).join('')||'<p>Belum ada siswa tersedia. Tambahkan siswa atau selesaikan sesi yang masih terbuka.</p>'}<button class="primary full" ${available.length?'':'disabled'}>Buka ruang kelas →</button></form>`);
 }
 
 studentRow=studentRowV2;
@@ -218,6 +243,8 @@ document.addEventListener('click',async e=>{
     if(action==='student')return studentForm(state.students.find(s=>s.id===id));
     if(action==='new-student'){if(state.role!=='teacher')return notify('Siswa baru ditambahkan oleh guru.',true);return studentForm();}
     if(action==='new-session')return newSession();
+    if(action==='new-schedule')return scheduleForm();
+    if(action==='edit-schedule')return scheduleForm(state.schedules.find(x=>x.id===id));
     if(action==='open-session'){state.active=id;return render();}
     if(action==='back-sessions'){state.active=null;return render();}
     if(action==='new-member')return modal('Daftarkan guru',`<form data-form="member">${field('Nama guru','name','text','','required maxlength="120"')}${field('Email guru','email','email','','required')}<button class="primary full">Daftarkan email guru</button></form>`);
@@ -225,6 +252,7 @@ document.addEventListener('click',async e=>{
     if(action==='copy'){await navigator.clipboard.writeText(state.records.find(r=>r.id===id).report);return notify('Pesan berhasil disalin.');}
     if(action==='print'){document.querySelectorAll('.session-card').forEach(el=>el.classList.toggle('print-target',!!el.querySelector(`[data-id="${id}"]`)));return window.print();}
     guardDemo();b.disabled=true;
+    if(action==='delete-schedule'){if(!confirm('Hapus sesi jadwal ini? Data siswa tidak ikut terhapus.'))return;await result(db.from('schedules').delete().eq('id',id));document.querySelector('#modal').close();await refresh();return notify('Sesi jadwal dihapus.');}
     if(action==='generate-class'){
       const c=state.classes.find(c=>c.id===id);if(c?.material)return notify('Panduan kelas tersimpan sudah tampil.');
       b.textContent='Sedang menyusun…';const {data,error}=await db.functions.invoke('generate-learning',{body:{session_id:id,kind:'class_material'}});
@@ -237,8 +265,16 @@ document.addEventListener('click',async e=>{
     if(action==='generate'){const r=state.records.find(r=>r.id===id);if(r[kind==='material'?'material':'report'])return notify('Hasil tersimpan sudah tampil di kartu ini.');b.textContent='Sedang menyusun…';const {data,error}=await db.functions.invoke('generate-learning',{body:{record_id:id,kind}});if(error){let detail;try{detail=await error.context?.json();}catch{}throw new Error(detail?.error||error.message);}if(data?.error)throw new Error(data.error);await refresh();notify('Hasil AI tersimpan. Periksa isinya sebelum digunakan.');}
   }catch(err){notify(err.message,true);}finally{b.disabled=false;}
 });
+// Picking a schedule slot when opening a class pre-selects its children and duration pattern.
+document.addEventListener('change',e=>{
+  if(e.target.name!=='schedule'||e.target.form?.dataset.form!=='session')return;
+  const sc=state.schedules.find(x=>x.id===e.target.value);if(!sc)return;
+  const members=scheduleMembers(sc.id);const form=e.target.form;
+  form.querySelectorAll('input[name="student"]').forEach(box=>{box.checked=members.has(box.value);});
+  form.elements.duration.value=String(durationPattern(minutesBetween(sc.start_time,sc.end_time)));
+});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('tr[data-action]'))e.target.click();});
-document.addEventListener('input',e=>{if(e.target.id==='student-search'){state.filter=e.target.value;const pos=e.target.selectionStart;render();const input=document.querySelector('#student-search');input.focus();try{input.setSelectionRange(pos,pos);}catch{}}});
+document.addEventListener('input',e=>{if(e.target.form?.dataset.form==='schedule'&&['start_time','end_time'].includes(e.target.name)){const els=e.target.form.elements;document.querySelector('#schedule-duration').textContent=durationText(els.start_time.value,els.end_time.value);return;}if(e.target.id==='student-search'){state.filter=e.target.value;const pos=e.target.selectionStart;render();const input=document.querySelector('#student-search');input.focus();try{input.setSelectionRange(pos,pos);}catch{}}});
 document.addEventListener('submit',async e=>{
   e.preventDefault();const form=e.target;const buttons=[...form.querySelectorAll('button')];buttons.forEach(b=>b.disabled=true);
   try{
@@ -246,7 +282,8 @@ document.addEventListener('submit',async e=>{
     if(form.id==='login-form'){const data=await result(db.auth.signInWithPassword({email:v.email,password:v.password}));await loadUser(data.user);return;}
     switch(form.dataset.form){
       case 'student':{const payload={name:v.name.trim(),parent_name:v.parent_name.trim(),phone:v.phone,interest:v.interest,diagnostic:v.diagnostic,learning_notes:v.learning_notes,reading_target:Number(v.reading_target),math_target:Number(v.math_target)};if(id){payload.status=v.status;await result(db.from('students').update(payload).eq('id',id));}else{Object.assign(payload,{reading_baseline:Number(v.reading_baseline),math_baseline:Number(v.math_baseline)});await result(db.rpc('create_student',{p_payload:payload}));}break;}
-      case 'session':{const ids=f.getAll('student');if(!ids.length)throw new Error('Pilih minimal satu siswa.');state.active=await result(db.rpc('create_class',{p_id:id,p_date:v.date,p_theme:v.theme,p_students:ids,p_duration:Number(v.duration)}));state.view='sessions';break;}
+      case 'session':{const ids=f.getAll('student');if(!ids.length)throw new Error('Pilih minimal satu siswa.');const sc=state.schedules.find(x=>x.id===v.schedule);const duration=sc?durationPattern(minutesBetween(sc.start_time,sc.end_time)):Number(v.duration);state.active=await result(db.rpc('create_class',{p_id:id,p_date:v.date,p_theme:v.theme,p_students:ids,p_duration:duration}));if(sc)await result(db.rpc('set_class_schedule',{p_session:state.active,p_schedule:sc.id}));state.view='sessions';break;}
+      case 'schedule':{const mins=minutesBetween(v.start_time,v.end_time);if(!(mins>=30&&mins<=180))throw new Error('Durasi sesi harus 30–180 menit.');const payload={name:v.name.trim(),start_time:v.start_time,end_time:v.end_time};let sid=id;if(sid)await result(db.from('schedules').update(payload).eq('id',sid));else sid=(await result(db.from('schedules').insert(payload).select('id').single())).id;const chosen=f.getAll('student');const old=[...scheduleMembers(sid)];const removed=old.filter(x=>!chosen.includes(x));if(removed.length)await result(db.from('schedule_students').delete().eq('schedule_id',sid).in('student_id',removed));const added=chosen.filter(x=>!old.includes(x));if(added.length)await result(db.from('schedule_students').insert(added.map(student_id=>({schedule_id:sid,student_id}))));break;}
       case 'attendance':await result(db.rpc('save_attendance',{p_id:id,p_attendance:v.attendance}));break;
       case 'evaluation':{const targets=assessmentsFor(id);if(targets.length){const payload=targets.map(a=>({subject:a.subject,rating:v[`rating_${a.subject}`],note:v[`note_${a.subject}`]||''}));const observation={english_rating:v.english_rating||'',english_note:v.english_note||'',character_dimensions:f.getAll('character'),character_note:v.character_note||''};await result(db.rpc('finalize_competency_evaluation',{p_id:id,p_assessments:payload,p_anecdote:v.anecdote||'',p_observation:observation}));}else await result(db.rpc('finalize_evaluation',{p_id:id,p_grade:v.grade||null,p_anecdote:v.anecdote||''}));break;}
       case 'summative':await result(db.rpc('complete_summative',{p_student:id,p_score:Number(v.score),p_pass:v.pass==='true'}));break;

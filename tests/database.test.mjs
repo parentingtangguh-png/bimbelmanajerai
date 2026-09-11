@@ -196,6 +196,27 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   await as(owner,'select complete_summative($1,90,true)',[student]);
   assert.equal((await as(owner,'select status from students where id=$1',[student])).rows[0].status,'Lulus');
  });
+ await t.test('guru mengelola sesi jadwal sendiri dan jamnya tersimpan di kelas',async()=>{
+  const kid=randomUUID();
+  await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Eka','Bunda Eka',1,1,5,1,1,5)`,[kid]);
+  await as(owner,'insert into assignments values($1,$2)',[kid,teacher]);
+  const sid=(await as(teacher,"insert into schedules(name,start_time,end_time) values('Sesi Pagi','08:00','09:30') returning id")).rows[0].id;
+  await as(teacher,'insert into schedule_students values($1,$2)',[sid,kid]);
+  await assert.rejects(as(teacher,'insert into schedule_students values($1,$2)',[sid,other]),/row-level security/i);
+  await assert.rejects(as(teacher,"insert into schedules(name,start_time,end_time) values('Terlalu singkat','08:00','08:10')"),/check constraint/i);
+  await assert.rejects(as(owner,"insert into schedules(name,start_time,end_time) values('Pemilik','08:00','09:00')"),/row-level security/i);
+  assert.equal((await as(stranger,'select * from schedules')).rows.length,0);
+  assert.equal((await as(owner,'select * from schedules where id=$1',[sid])).rows.length,1);
+  await as(teacher,"update schedules set end_time='09:45' where id=$1",[sid]);
+  const cid=randomUUID();
+  await as(teacher,"select create_class($1,current_date,'Kebun',$2::uuid[],90)",[cid,[kid]]);
+  await assert.rejects(as(stranger,'select set_class_schedule($1,$2)',[cid,sid]),/Akses ditolak/);
+  await as(teacher,'select set_class_schedule($1,$2)',[cid,sid]);
+  const c=(await as(teacher,'select schedule_id,start_time,end_time from class_sessions where id=$1',[cid])).rows[0];
+  assert.equal(c.schedule_id,sid);assert.equal(c.start_time,'08:00:00');assert.equal(c.end_time,'09:45:00');
+  await as(teacher,'delete from schedules where id=$1',[sid]);
+  assert.equal((await as(teacher,'select schedule_id from class_sessions where id=$1',[cid])).rows[0].schedule_id,null);
+ });
  await t.test('pemilik ditolak menambah siswa dan menjalankan kegiatan kelas',async()=>{
   await assert.rejects(as(owner,`insert into students(name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values('X','Y',1,1,3,1,1,3)`),/row-level security|agregat/i);
   await assert.rejects(as(owner,"select create_class($1,current_date,'Pasar',$2::uuid[])",[randomUUID(),[other]]),/agregat/);
