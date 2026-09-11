@@ -37,6 +37,19 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   await assert.rejects(as(teacher,`insert into students(name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values('X','Y',1,1,3,1,1,3)`),/row-level security/i);
   assert.equal((await as(teacher,"update students set reading_target=10 where id=$1 returning id",[student])).rows.length,0);
  });
+ await t.test('indikator kurikulum: level 1 terisi, hanya pemilik yang mengubah',async()=>{
+  const row=(await admin('select reading_indicators,reading_key,reading_spiral from curriculum where level=1')).rows[0];
+  assert.equal(row.reading_indicators.length,3);
+  assert.equal(row.reading_key,3);
+  assert.match(row.reading_spiral,/suku kata terbuka/);
+  // The knot must point at an indicator that exists, otherwise the evaluation card would star nothing.
+  const orphan=(await admin('select count(*)::int as n from curriculum where reading_key>jsonb_array_length(reading_indicators)')).rows[0].n;
+  assert.equal(orphan,0);
+  await as(owner,`update curriculum set reading_indicators='["Satu indikator uji"]'::jsonb, reading_key=1 where level=1`);
+  assert.equal((await admin('select reading_key from curriculum where level=1')).rows[0].reading_key,1);
+  await assert.rejects(as(owner,'update curriculum set reading_key=5 where level=1'),/curriculum_reading_key_range/);
+  assert.equal((await as(teacher,'update curriculum set reading_key=0 where level=1 returning level')).rows.length,0);
+ });
  await t.test('fungsi trigger tidak tersedia sebagai RPC pengguna',async()=>{
   assert.equal((await db.query("select has_function_privilege('authenticated','public.handle_new_user()','execute') as allowed")).rows[0].allowed,false);
   assert.equal((await db.query("select has_function_privilege('authenticated','public.guard_student_update()','execute') as allowed")).rows[0].allowed,false);
