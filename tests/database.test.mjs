@@ -26,7 +26,9 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
  await db.exec(`insert into access_list values('owner@test.invalid','Pemilik','owner',true),('guru@test.invalid','Guru','teacher',true),('lain@test.invalid','Guru Lain','teacher',true);`);
  await db.query('insert into auth.users values($1,$2),($3,$4),($5,$6)',[owner,'owner@test.invalid',teacher,'guru@test.invalid',stranger,'lain@test.invalid']);
  async function as(id,sql,args=[]){await db.exec('reset role');await db.query("select set_config('request.jwt.claim.sub',$1,false)",[id]);await db.exec('set role authenticated');return db.query(sql,args);}
- await as(owner,`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Alya','Bunda',1,1,3,1,1,3),($2,'Bima','Ayah',1,1,10,1,1,10)`,[student,other]);
+ // Fixture setup outside any user role (owners may no longer insert students).
+ async function admin(sql,args=[]){await db.exec('reset role');await db.query("select set_config('request.jwt.claim.sub','',false)");return db.query(sql,args);}
+ await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Alya','Bunda',1,1,3,1,1,3),($2,'Bima','Ayah',1,1,10,1,1,10)`,[student,other]);
  await as(owner,'insert into assignments values($1,$2)',[student,teacher]);
  await t.test('guru hanya membaca siswa sendiri dan tidak membaca alarm',async()=>{
   assert.equal((await as(teacher,'select * from students')).rows.length,1);
@@ -98,7 +100,7 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
  });
  await t.test('level 11–16 aktif dan asesmen baru menaikkan tiap kompetensi secara mandiri setelah dua bukti',async()=>{
   const advanced=randomUUID();
-  await as(owner,`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Citra','Bunda Citra',10,10,16,10,10,16)`,[advanced]);
+  await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Citra','Bunda Citra',10,10,16,10,10,16)`,[advanced]);
   await as(owner,'insert into assignments values($1,$2)',[advanced,teacher]);
   let x=await create(teacher,advanced);
   const first=(await as(teacher,'select subject from session_assessments where session_student_id=$1 order by subject',[x.rid])).rows.map(x=>x.subject);
@@ -158,7 +160,7 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
  await t.test('mengubah kehadiran tidak menghapus panduan kelas dan anak absen bisa diselesaikan',async()=>{
   const ids=[randomUUID(),randomUUID()];
   for(const [index,id] of ids.entries()){
-   await as(owner,`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,$2,'Orang tua',2,2,8,2,2,8)`,[id,`Hadir ${index+1}`]);
+   await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,$2,'Orang tua',2,2,8,2,2,8)`,[id,`Hadir ${index+1}`]);
    await as(owner,'insert into assignments values($1,$2)',[id,teacher]);
   }
   const cid=randomUUID();
@@ -176,7 +178,7 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
  await t.test('siswa dengan posisi kompetensi sama tidak dipecah ke kelompok berbeda',async()=>{
   const ids=[randomUUID(),randomUUID(),randomUUID()];
   for(const [index,id] of ids.entries()){
-   await as(owner,`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,$2,'Orang tua',4,4,8,4,4,8)`,[id,`Setara ${index+1}`]);
+   await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,$2,'Orang tua',4,4,8,4,4,8)`,[id,`Setara ${index+1}`]);
    await as(owner,'insert into assignments values($1,$2)',[id,teacher]);
   }
   const cid=randomUUID();
@@ -193,6 +195,18 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   await as(owner,'update student_competencies set current_level=target where student_id=$1 and required',[student]);
   await as(owner,'select complete_summative($1,90,true)',[student]);
   assert.equal((await as(owner,'select status from students where id=$1',[student])).rows[0].status,'Lulus');
+ });
+ await t.test('pemilik ditolak menambah siswa dan menjalankan kegiatan kelas',async()=>{
+  await assert.rejects(as(owner,`insert into students(name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values('X','Y',1,1,3,1,1,3)`),/row-level security|agregat/i);
+  await assert.rejects(as(owner,"select create_class($1,current_date,'Pasar',$2::uuid[])",[randomUUID(),[other]]),/agregat/);
+  const fresh=randomUUID();
+  await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Dewi','Bunda Dewi',1,1,5,1,1,5)`,[fresh]);
+  await as(owner,'insert into assignments values($1,$2)',[fresh,teacher]);
+  const x=await create(teacher,fresh);
+  await assert.rejects(as(owner,"select save_attendance($1,'Sakit')",[x.rid]),/agregat/);
+  await assert.rejects(as(owner,'select claim_class_ai_job($1)',[x.cid]),/agregat/);
+  await as(teacher,"select save_attendance($1,'Sakit')",[x.rid]);
+  assert.equal((await as(owner,'select attendance from session_students where id=$1',[x.rid])).rows[0].attendance,'Sakit');
  });
  await t.test('guru nonaktif kehilangan akses',async()=>{
   await as(owner,"update access_list set active=false where email='guru@test.invalid'");
