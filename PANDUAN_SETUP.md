@@ -69,14 +69,14 @@ Hanya `dist/` yang dipublikasikan; data siswa berada di Supabase. Jangan commit 
 
 ## 8. Operasional
 
-1. Pemilik menambah siswa, diagnostik, baseline, dan target 1–10.
+1. Pemilik menambah siswa, diagnostik, baseline, dan target 1–16. Jalur selain Membaca dan Matematika memakai baseline Membaca sebagai titik awal, lalu berkembang mandiri.
 2. Pemilik mendaftarkan email guru pada **Tim pengajar**.
 3. Guru mengaktifkan akun, lalu pemilik menugaskan siswa melalui profilnya.
-4. Guru membuka **Ruang kelas** dan memilih tema serta siswa. Satu siswa hanya boleh memiliki satu sesi terbuka.
+4. Guru membuka **Ruang kelas** dan memilih tema serta siswa. Sistem memilih Membaca, Matematika, dan satu kompetensi lintas bidang secara bergilir. Satu siswa hanya boleh memiliki satu sesi terbuka.
 5. Simpan kehadiran sebelum membuat panduan. Sakit/Izin/Alfa mendapat draf tanpa AI.
-6. Simpan evaluasi di akhir kelas. Nilai final tidak bisa diubah dari browser agar tidak terjadi kenaikan level ganda.
+6. Simpan bukti perkembangan setiap target di akhir kelas: **Belum tampak**, **Mulai berkembang**, atau **Tercapai**. Dua bukti Tercapai menaikkan kompetensi tersebut satu level. Hasil final tidak bisa diubah dari browser agar tidak terjadi kenaikan ganda.
 7. Buat dan periksa rapor, lalu buka WhatsApp. Guru yang mengirim pesan.
-8. Pemilik memantau remedial dan mencatat hasil sumatif saat target tercapai.
+8. Pemilik memantau intervensi per kompetensi dan mencatat hasil sumatif setelah seluruh kompetensi wajib mencapai target. Bahasa Inggris adalah pengayaan dan tidak menghalangi kelulusan.
 
 CSV lama dapat menjadi referensi profil, tetapi tidak memiliki baseline. Tetapkan baseline melalui diagnostik; jangan menganggap nilai default sebagai hasil tes anak.
 

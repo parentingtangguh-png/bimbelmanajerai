@@ -1,0 +1,116 @@
+.curriculum-card details {
+  border-top: 1px solid var(--line);
+  padding: 13px 0;
+}
+
+.curriculum-card summary {
+  cursor: pointer;
+  font-weight: 650;
+  color: #365a44;
+}
+
+.curriculum-card details p {
+  margin: 11px 0 7px;
+  color: #53675a;
+}
+
+.curriculum-card details small {
+  display: block;
+  color: #7f8a82;
+  line-height: 1.65;
+}
+
+.curriculum-card > .secondary {
+  margin-top: 18px;
+}
+
+.curriculum-edit {
+  border-bottom: 1px solid var(--line);
+  padding: 5px 0 8px;
+  margin-bottom: 18px;
+}
+
+.competency-list {
+  display: grid;
+  gap: 12px;
+  margin: 18px 0 25px;
+}
+
+.competency-meter {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 14px;
+  background: #fafbf8;
+}
+
+.competency-meter > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+
+.competency-meter span,
+.competency-meter small {
+  color: var(--muted);
+}
+
+.competency-meter small {
+  display: block;
+  margin-top: 7px;
+  font-size: 10px;
+}
+
+.competency-evaluation {
+  display: block;
+}
+
+.target-eval {
+  display: grid;
+  grid-template-columns: minmax(170px, 1fr) minmax(150px, .7fr) minmax(200px, 1.2fr);
+  gap: 15px;
+  align-items: start;
+  border-top: 1px solid var(--line);
+  padding: 18px 0;
+}
+
+.target-eval > div:first-child {
+  padding-top: 8px;
+}
+
+.target-eval > div small {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.6;
+  margin-top: 8px;
+}
+
+.target-eval label {
+  margin-bottom: 0;
+}
+
+.competency-evaluation > .primary {
+  margin-top: 8px;
+}
+
+.competency-evaluation > .fine {
+  display: block;
+  margin-top: 14px;
+}
+
+@media (max-width: 760px) {
+  .target-eval {
+    grid-template-columns: 1fr;
+  }
+
+  .target-eval > div:first-child {
+    padding-top: 0;
+  }
+
+  .competency-meter > div {
+    flex-direction: column;
+    gap: 4px;
+  }
+}

@@ -5,12 +5,13 @@ Aplikasi web internal untuk Rumah Belajar Rainbow Kids Alfatih. GitHub Pages men
 ## Fitur
 
 - Login pemilik/guru berdasarkan email terdaftar dan penugasan siswa, dengan Row Level Security.
-- Profil siswa, minat, diagnostik, baseline terkunci, target membaca/berhitung.
-- Satu rekaman per anak dalam setiap sesi: kehadiran, materi, evaluasi, rapor.
-- Bank instruksi lima bidang pada 10 level yang dapat dikelola pemilik.
-- SB/BSH menaikkan level sekali; MB mempertahankan level untuk remedial.
-- Alarm tiga MB berturut-turut pada level sama, hanya terlihat pemilik.
-- Keputusan kelulusan oleh pemilik setelah ujian sumatif, saat target tercapai.
+- Profil siswa, minat, diagnostik, baseline terkunci, dan target kompetensi 1–16.
+- Tujuh jalur kompetensi mandiri: Membaca, Menulis, Matematika, Bahasa Inggris, Karakter, IPAS, dan Pendidikan Pancasila.
+- Satu rekaman per anak dalam setiap sesi: kehadiran, tiga target prioritas, materi, bukti perkembangan, dan rapor.
+- Bank tujuan dan kriteria keberhasilan pada 16 level yang dapat dikelola pemilik.
+- Dua bukti `Tercapai` pada kesempatan berbeda menaikkan bidang tersebut satu level; bidang lain tidak ikut berubah.
+- Alarm tiga hasil `Belum tampak`/`Mulai berkembang` pada bidang yang sama, hanya terlihat pemilik.
+- Keputusan kelulusan oleh pemilik setelah seluruh kompetensi wajib mencapai target dan ujian sumatif selesai. Bahasa Inggris bersifat pengayaan.
 - Sakit/Izin/Alfa mendapatkan draf tanpa AI dan tanpa kenaikan level.
 - Materi/rapor disimpan. Permintaan ulang menggunakan hasil tersimpan.
 - Batas 100 percobaan AI per pengguna dalam 24 jam; 5 percobaan per keluaran.
@@ -46,4 +47,4 @@ Versi aplikasi lama (`app.py`, `style.css`, `BimbelManager.gs`), `.streamlit/`, 
 
 ## Batas operasional
 
-Aplikasi membutuhkan internet. Guru perlu memeriksa keluaran AI. Progres dihitung relatif terhadap baseline dan target. Kedua bidang naik bersama berdasarkan satu nilai formatif sesuai cetak biru; penilaian terpisah per bidang belum tersedia. Data dibaca dengan pagination agar tidak terpotong batas API, tetapi tampilan memuat seluruh riwayat yang diizinkan dan perlu dioptimalkan jika volumenya sangat besar. Pencadangan database perlu disesuaikan dengan paket Supabase.
+Aplikasi membutuhkan internet. Guru perlu memeriksa keluaran AI. Progres dihitung relatif terhadap baseline dan target masing-masing kompetensi. Penempatan awal bidang selain Membaca dan Matematika diwarisi dari baseline Membaca, lalu berkembang secara mandiri; tinjau hasil diagnostik sebelum digunakan. Data dibaca dengan pagination agar tidak terpotong batas API, tetapi tampilan memuat seluruh riwayat yang diizinkan dan perlu dioptimalkan jika volumenya sangat besar. Pencadangan database perlu disesuaikan dengan paket Supabase.

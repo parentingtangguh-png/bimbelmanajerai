@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { PGlite } from '@electric-sql/pglite';
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 
 test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t=>{
@@ -10,7 +10,9 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
  create table auth.users(id uuid primary key,email text);
  create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
  grant usage on schema public,auth to authenticated,anon,service_role; grant execute on function auth.uid() to authenticated,anon,service_role;`);
- for(const file of ['20260911000000_bimbel.sql','20260911010000_ai_jobs.sql','20260911020000_harden_trigger_functions.sql'])await db.exec(await readFile(new URL('../supabase/migrations/'+file,import.meta.url),'utf8'));
+ const migrationDir=new URL('../supabase/migrations/',import.meta.url);
+ const migrations=(await readdir(migrationDir)).filter(file=>file.endsWith('.sql')).sort();
+ for(const file of migrations)await db.exec((await readFile(new URL(file,migrationDir),'utf8')).replace(/^\uFEFF/,''));
  const owner=randomUUID(),teacher=randomUUID(),stranger=randomUUID(),student=randomUUID(),other=randomUUID();
  await db.exec(`insert into access_list values('owner@test.invalid','Pemilik','owner',true),('guru@test.invalid','Guru','teacher',true),('lain@test.invalid','Guru Lain','teacher',true);`);
  await db.query('insert into auth.users values($1,$2),($3,$4),($5,$6)',[owner,'owner@test.invalid',teacher,'guru@test.invalid',stranger,'lain@test.invalid']);
@@ -76,10 +78,30 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   assert.equal((await as(owner,'select * from student_alerts where student_id=$1',[student])).rows[0].intervention,false);
   await assert.rejects(as(owner,"update students set reading_level=2 where id=$1",[student]),/alur evaluasi/);
  });
+ await t.test('level 11–16 aktif dan asesmen baru menaikkan tiap kompetensi secara mandiri setelah dua bukti',async()=>{
+  const advanced=randomUUID();
+  await as(owner,`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Citra','Bunda Citra',10,10,16,10,10,16)`,[advanced]);
+  await as(owner,'insert into assignments values($1,$2)',[advanced,teacher]);
+  const assess=async(rid,reading,math)=>{
+   const rows=(await as(teacher,'select subject from session_assessments where session_student_id=$1 order by subject',[rid])).rows;
+   assert.equal(rows.length,3);
+   const payload=rows.map(({subject})=>({subject,rating:subject==='reading'?reading:subject==='math'?math:'T',note:'Bukti diamati'}));
+   await assert.rejects(as(teacher,'select finalize_competency_evaluation($1,$2::jsonb,$3)',[rid,JSON.stringify([...payload,payload[0]]),'Duplikat']),/Lengkapi semua target/);
+   await as(teacher,'select finalize_competency_evaluation($1,$2::jsonb,$3)',[rid,JSON.stringify(payload),'Observasi kompetensi']);
+  };
+  let x=await create(teacher,advanced);await assess(x.rid,'T','MB');
+  let levels=(await as(teacher,'select subject,current_level,evidence_count from student_competencies where student_id=$1 and subject in ($2,$3) order by subject',[advanced,'math','reading'])).rows;
+  assert.deepEqual(levels.map(x=>[x.subject,x.current_level,x.evidence_count]),[['math',10,0],['reading',10,1]]);
+  x=await create(teacher,advanced);await assess(x.rid,'T','MB');
+  levels=(await as(teacher,'select subject,current_level from student_competencies where student_id=$1 and subject in ($2,$3) order by subject',[advanced,'math','reading'])).rows;
+  assert.deepEqual(levels.map(x=>[x.subject,x.current_level]),[['math',10],['reading',11]]);
+ });
  await t.test('sumatif hanya pemilik, level tidak melewati target',async()=>{
   const x=await create();await as(teacher,"select finalize_evaluation($1,'SB','')",[x.rid]);
   assert.equal((await as(owner,'select reading_level from students where id=$1',[student])).rows[0].reading_level,3);
   await assert.rejects(as(teacher,'select complete_summative($1,90,true)',[student]),/Hanya pemilik/);
+  await assert.rejects(as(owner,'select complete_summative($1,90,true)',[student]),/Target kompetensi wajib/);
+  await as(owner,'update student_competencies set current_level=target where student_id=$1 and required',[student]);
   await as(owner,'select complete_summative($1,90,true)',[student]);
   assert.equal((await as(owner,'select status from students where id=$1',[student])).rows[0].status,'Lulus');
  });
