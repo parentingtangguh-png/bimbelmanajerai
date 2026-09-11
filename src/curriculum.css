@@ -232,3 +232,5 @@ dialog .history small {
 .spiral-node.crossing .star { color: var(--accent, #3f7d5e); }
 .spiral-node.top { border-left: 0; padding-left: 0; margin-left: 0; }
 .spiral-node.top strong { letter-spacing: .06em; text-transform: uppercase; font-size: 12px; }
+.indicator-checks .check em.seen { font-style: normal; font-size: 11px; letter-spacing: .04em; text-transform: uppercase; opacity: .6; margin-left: 6px; }
+.indicator-history { margin: 8px 0 0; font-size: 12px; line-height: 1.55; opacity: .75; }

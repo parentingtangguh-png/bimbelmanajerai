@@ -15,6 +15,8 @@ Baca file ini dulu sebelum mengubah apa pun. Pengguna (pemilik bimbel) berkomuni
 - **Level**: 16 level (1–4 Fondasi, 5–8 Fase A/SD 1–2, 9–12 Fase B/SD 3–4, 13–16 Fase C/SD 5–6). Guru hanya mengisi **titik awal** (Bahasa Indonesia dipakai juga untuk Menyimak, Berbicara, IPAS, English; Matematika terpisah). Titik awal bisa dikoreksi (`correct_student_baseline`) hanya sebelum anak ikut kelas pertama.
 - **Target mengalir per fase**: target = akhir fase level saat ini (`phase_end`). Tidak ada input target manual. Lulus ujian sumatif fase memindahkan target ke akhir fase berikutnya; lulus di akhir Fase C = status Lulus.
 - Naik level: dua bukti "Tercapai" pada kesempatan berbeda. Alarm setelah 3 kali BT/MB berturut-turut.
+- **Indikator disusun per untaian, bukan per level.** Karena 16 level adalah satu spiral, indikator satu bidang ditulis menurun dari Level 1 sampai 16 sekaligus agar kedalamannya bertambah konsisten. Jangan pernah mengarang indikator langsung di kartu evaluasi: sumbernya selalu tabel `curriculum`.
+- Tiap level punya satu **simpul spiral** (`<bidang>_key` menunjuk nomor indikator, `<bidang>_spiral` menjelaskan mengapa level berikutnya menuntut hal itu). Level 16 memakai `_spiral` sebagai penutup tangga/kelulusan. English Exposure sengaja `_key=0` di semua level: pengayaan, tidak pernah menahan kenaikan level.
 - Siswa dengan sesi yang belum dievaluasi tidak boleh dinonaktifkan (dijaga di UI dan DB).
 
 ## Alur kerja yang diharapkan pengguna
@@ -38,13 +40,21 @@ Baca file ini dulu sebelum mengubah apa pun. Pengguna (pemilik bimbel) berkomuni
 - `src/main.js` masih memuat fungsi versi lama (`studentsView`, `recordCard`, dll.) yang ditimpa oleh versi `V2` di bagian bawah — edit versi V2.
 - Batas email Supabase bawaan kecil ("email rate limit exceeded"). Guru baru: daftarkan email di Tim pengajar dulu, lalu pemilik membuat user di Supabase Dashboard → Authentication → Add user dengan **Auto Confirm**. Pemasangan SMTP sendiri disarankan.
 
-## Pekerjaan yang sedang menunggu keputusan pengguna (per 11 Sep 2026)
-**Indikator pencapaian di kartu evaluasi.** Mockup sudah dikirim: `docs/mockups/indicator-desktop.png`, `docs/mockups/indicator-mobile.png` (dibuat oleh `docs/mockups/indicator-mockup.mjs`, jalankan dari root repo).
-- **A (tampilan)**: panduan menilai (BT/MB/T), tujuan level, dan kotak indikator di setiap target pada kartu evaluasi (`recordCardV2`). Data tujuan/kriteria sudah ada di tabel `curriculum` (`<bidang>` dan `<bidang>_criteria`, lengkap 16 × 7).
-- **B (isi)**: indikator konkret yang bisa dicentang (2–4 per level per bidang, 16 × 7) + saran penilaian otomatis ("4/4 → Tercapai", hanya saran). Draf contoh baru untuk Membaca L5 dan Matematika L5 (ada di skrip mockup). Usulan: mulai dari draf Fase A (level 5–8) untuk ditinjau pengguna, lalu simpan ke database (perlu kolom/struktur baru).
-- Pertanyaan terbuka ke pengguna: tampilannya sudah sesuai? Kerjakan A saja atau A+B?
+## Keadaan kurikulum (per 12 Sep 2026) — sudah selesai
+Indikator pencapaian **lengkap**: 16 level x 6 bidang wajib (Menyimak, Berbicara, Membaca, Menulis, Matematika, IPAS), masing-masing 3 indikator + simpul spiral, plus English Exposure 16 level tanpa simpul. Tidak ada lubang; `tests/database.test.mjs` memakai peta cakupan yang menolak satu kotak kosong pun.
+- Kolom di `curriculum`: `<bidang>`, `<bidang>_criteria`, `<bidang>_indicators` (jsonb, maks 6), `<bidang>_key` (nomor indikator simpul, 0 = tidak ada), `<bidang>_spiral` (teks). Pemilik yang mengedit; guru membaca.
+- Tab Kurikulum punya dua tab: **Per untaian** (default; satu bidang menurun 16 level dengan kotak simpul di antaranya) dan **Per level** (kartu lama + jumlah indikator).
+- Kartu evaluasi (`recordCardV2`) menampilkan tujuan level, indikator yang bisa dicentang, saran penilaian otomatis ("2 dari 3 -> MB", hanya saran), dan baris riwayat "pernah terlihat di sesi sebelumnya".
+- Busur antar fase: Fondasi menirukan -> memegang satuan lebih besar; Fase A mengerjakan -> memilih dan memeriksa; Fase B satu sumber -> beberapa sumber dan bersedia berubah oleh bukti; Fase C menimbang dan memutuskan sendiri lalu mempertanggungjawabkannya.
+- Mockup lama `docs/mockups/indicator-*.png` sudah usang (memakai kerangka per-level yang ditolak pengguna).
+
+## Centang indikator
+- Tabel `session_indicator_checks` (session_student_id, subject, indicator_index, level_snapshot, indicator_text, checked_at). Teks indikator disalin saat dicentang supaya riwayat tetap terbaca kalau pemilik mengubah kurikulum.
+- Disimpan lewat RPC `set_indicator_check(uuid,text,integer,boolean,text)` saat guru mencentang, bukan saat evaluasi disimpan, supaya guru bisa mencentang selama kegiatan berlangsung. Ditolak bila sesi sudah final, anak tidak hadir, atau bidang bukan target sesi itu.
+- Centang **tidak** mengubah nilai formatif. Saran penilaian tetap saran; keputusan di tangan guru.
 
 ## Catatan lain
 - File tidak dilacak yang **bukan** buatan Claude: `scripts/.tmp-inspect-hafsah.ps1`, `scripts/.tmp-run-hafsah-scenario.ps1` — jangan di-commit (kemungkinan berisi skenario siswa tertentu).
-- Jumlah siswa di produksi turun dari 24 menjadi 8 pada 11 Sep 2026 (kemungkinan guru menghapus siswa uji); belum dikonfirmasi.
-- Aplikasi belum punya fitur ganti kata sandi (ditawarkan, pengguna menunda).
+- Jumlah siswa di produksi turun dari 24 menjadi 8 pada 11 Sep 2026 (kemungkinan guru menghapus siswa uji); **masih belum dikonfirmasi** — per 12 Sep 2026 tetap 8, semuanya aktif.
+- Ganti kata sandi: tombol ⚿ di kartu akun (sidebar) -> `db.auth.updateUser`. Minimal 8 karakter, harus diketik dua kali. **Claude tidak pernah mengetikkan kata sandi pengguna.**
+- Belum ada: SMTP sendiri (perlu kredensial penyedia email di Dashboard Supabase — di luar jangkauan Claude, harus dikerjakan pemilik).

@@ -54,6 +54,13 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
     assert.ok(r.spiral.length>40,`${strand} level ${r.level} belum menjelaskan simpul spiral`);
    }
   }
+  // English is enrichment: it carries indicators on every level but never a knot, so it gates nothing.
+  const eng=(await admin('select level, jsonb_array_length(english_indicators) as n, english_key as key from curriculum order by level')).rows;
+  assert.equal(eng.length,16);
+  for(const r of eng){
+   assert.ok(r.n>=3,`english level ${r.level} kekurangan indikator`);
+   assert.equal(r.key,0,`english level ${r.level} tidak boleh menjadi simpul`);
+  }
   // The knot must point at an indicator that exists, otherwise the evaluation card would star nothing.
   const orphan=(await admin('select count(*)::int as n from curriculum where reading_key>jsonb_array_length(reading_indicators)')).rows[0].n;
   assert.equal(orphan,0);
@@ -89,8 +96,29 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   await assert.rejects(as(teacher,"update session_students set grade='SB' where id=$1",[session.rid]),/permission denied/);
   await assert.rejects(finalize(stranger,session.rid),/Akses ditolak/);
  });
+ await t.test('centang indikator tersimpan dan tidak bisa disentuh guru lain',async()=>{
+  const subject=(await as(teacher,'select subject from session_assessments where session_student_id=$1 order by subject limit 1',[session.rid])).rows[0].subject;
+  await as(teacher,'select set_indicator_check($1,$2,1,true,$3)',[session.rid,subject,'Indikator uji']);
+  const saved=(await as(teacher,'select * from session_indicator_checks where session_student_id=$1',[session.rid])).rows;
+  assert.equal(saved.length,1);
+  assert.equal(saved[0].indicator_text,'Indikator uji');
+  assert.ok(saved[0].level_snapshot>=1,'level ikut tercatat untuk riwayat');
+  // Unticking removes the row, so history never claims something the teacher took back.
+  await as(teacher,'select set_indicator_check($1,$2,1,false,$3)',[session.rid,subject,'']);
+  assert.equal((await as(teacher,'select * from session_indicator_checks where session_student_id=$1',[session.rid])).rows.length,0);
+  await as(teacher,'select set_indicator_check($1,$2,2,true,$3)',[session.rid,subject,'Indikator kedua']);
+  await assert.rejects(as(stranger,'select set_indicator_check($1,$2,3,true,$3)',[session.rid,subject,'x']),/Akses ditolak/);
+  assert.equal((await as(stranger,'select * from session_indicator_checks')).rows.length,0);
+  await assert.rejects(as(teacher,'select set_indicator_check($1,$2,1,true,$3)',[session.rid,'pancasila','x']),/Bidang bukan target/);
+  await assert.rejects(as(teacher,'select set_indicator_check($1,$2,9,true,$3)',[session.rid,subject,'x']),/Indikator tidak dikenal/);
+  await assert.rejects(as(teacher,"update session_indicator_checks set indicator_index=5 where session_student_id=$1",[session.rid]),/permission denied/);
+ });
  await t.test('evaluasi final idempoten dan tidak menggandakan bukti',async()=>{
   await finalize(teacher,session.rid,'T','Aktif');
+  // Once the evaluation is saved the ticks are part of the record and stop being editable.
+  const subject=(await as(teacher,'select subject from session_assessments where session_student_id=$1 order by subject limit 1',[session.rid])).rows[0].subject;
+  await assert.rejects(as(teacher,'select set_indicator_check($1,$2,3,true,$3)',[session.rid,subject,'x']),/Evaluasi sudah disimpan/);
+  assert.equal((await as(teacher,'select * from session_indicator_checks where session_student_id=$1',[session.rid])).rows.length,1,'centang sebelum final tetap tersimpan sebagai riwayat');
   await finalize(teacher,session.rid,'T','Aktif');
   const reading=(await as(teacher,"select current_level,evidence_count from student_competencies where student_id=$1 and subject='reading'",[student])).rows[0];
   assert.deepEqual([reading.current_level,reading.evidence_count],[1,1]);
