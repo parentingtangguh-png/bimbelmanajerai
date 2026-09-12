@@ -38,7 +38,7 @@ Baca file ini dulu sebelum mengubah apa pun. Pengguna (pemilik bimbel) berkomuni
 - Pernah muncul byte NUL di `main.js` akibat edit; setelah edit besar cek: `$b=[IO.File]::ReadAllBytes('src/main.js'); @($b | ? {$_ -eq 0}).Count` harus 0. Untuk mengganti baris sangat panjang, pakai skrip Node dengan penanda awal/akhir.
 - CSS aplikasi memberi `display` ke `label`, jadi atribut `hidden` dipaksa lewat `[hidden]{display:none!important}` (`src/student-form.css`).
 - `src/main.js` masih memuat fungsi versi lama (`studentsView`, `recordCard`, dll.) yang ditimpa oleh versi `V2` di bagian bawah — edit versi V2.
-- Batas email Supabase bawaan kecil ("email rate limit exceeded"). Guru baru: daftarkan email di Tim pengajar dulu, lalu pemilik membuat user di Supabase Dashboard → Authentication → Add user dengan **Auto Confirm**. Pemasangan SMTP sendiri disarankan.
+- Batas email Supabase bawaan kecil ("email rate limit exceeded"). Guru baru: daftarkan email di Tim pengajar dulu, lalu pemilik membuat user di Supabase Dashboard → Authentication → Add user dengan **Auto Confirm**. Ini alur tetap, bukan jalan darurat: pengguna memutuskan **tidak memasang SMTP sendiri** (12 Sep 2026). Jangan tawarkan lagi.
 
 ## Keadaan kurikulum (per 12 Sep 2026) — sudah selesai
 Indikator pencapaian **lengkap**: 16 level x 6 bidang wajib (Menyimak, Berbicara, Membaca, Menulis, Matematika, IPAS), masing-masing 3 indikator + simpul spiral, plus English Exposure 16 level tanpa simpul. Tidak ada lubang; `tests/database.test.mjs` memakai peta cakupan yang menolak satu kotak kosong pun.
@@ -55,6 +55,5 @@ Indikator pencapaian **lengkap**: 16 level x 6 bidang wajib (Menyimak, Berbicara
 
 ## Catatan lain
 - File tidak dilacak yang **bukan** buatan Claude: `scripts/.tmp-inspect-hafsah.ps1`, `scripts/.tmp-run-hafsah-scenario.ps1` — jangan di-commit (kemungkinan berisi skenario siswa tertentu).
-- Jumlah siswa di produksi turun dari 24 menjadi 8 pada 11 Sep 2026 (kemungkinan guru menghapus siswa uji); **masih belum dikonfirmasi** — per 12 Sep 2026 tetap 8, semuanya aktif.
+- Jumlah siswa di produksi turun dari 24 menjadi 8 pada 11 Sep 2026. **Sudah dikonfirmasi pengguna (12 Sep 2026): sebagian sengaja dihapus.** Bukan insiden; tidak perlu ditelusuri lagi.
 - Ganti kata sandi: tombol ⚿ di kartu akun (sidebar) -> `db.auth.updateUser`. Minimal 8 karakter, harus diketik dua kali. **Claude tidak pernah mengetikkan kata sandi pengguna.**
-- Belum ada: SMTP sendiri (perlu kredensial penyedia email di Dashboard Supabase — di luar jangkauan Claude, harus dikerjakan pemilik).
