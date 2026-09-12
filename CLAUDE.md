@@ -33,6 +33,10 @@ Baca file ini dulu sebelum mengubah apa pun. Pengguna (pemilik bimbel) berkomuni
 - Skrip screenshot Playwright headless ke `http://localhost:5173` (dev server `npm run dev`, konfigurasi `.claude/launch.json`) atau render HTML statis dengan CSS asli (contoh: `docs/mockups/indicator-mockup.mjs`).
 
 ## Jebakan teknis yang sudah ditemui (Windows PowerShell 5.1)
+- **`npm run build` hijau tidak membuktikan impor benar.** Bundler menggabungkan semua modul jadi satu lingkup, jadi nama yang lupa diimpor tetap ketemu; dev server (modul terpisah) baru melemparkan galat. Karena itu `npm test` menjalankan `scripts/check-imports.mjs` lebih dulu.
+- **Jangan tinggalkan dev server berjalan saat mengubah banyak berkas.** `playwright.config.js` memakai `reuseExistingServer:true`, jadi Playwright akan memakai server lama yang modulnya sudah basi — tesnya gagal karena server, bukan karena kode. Pernah membuang waktu lama pada 12 Sep 2026. Periksa dengan `netstat -ano | findstr :5173`.
+- Kode diformat **Prettier** (`.prettierrc.json`, lebar 110). Jalankan `npx prettier --write` setelah mengedit. `src/demo-curriculum.js` sengaja dikecualikan (data, bukan kode).
+
 - Pesan commit: jangan pakai tanda kutip ganda di here-string; gunakan `git commit -F <file>` bila perlu.
 - `supabase db query` dengan SQL multi-baris sampai kosong → tulis SQL dalam **satu baris**. Multi-statement hanya mengembalikan hasil terakhir.
 - Pernah muncul byte NUL di `main.js` akibat edit; setelah edit besar cek: `$b=[IO.File]::ReadAllBytes('src/main.js'); @($b | ? {$_ -eq 0}).Count` harus 0. Untuk mengganti baris sangat panjang, pakai skrip Node dengan penanda awal/akhir.
