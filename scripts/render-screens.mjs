@@ -1,0 +1,34 @@
+// Renders every screen with a fixed sample classroom and writes the HTML to a file.
+// Run it before and after a refactor and compare the two files: identical HTML means the screens
+// still produce exactly what they produced before, without needing a browser or a login.
+//
+//   node scripts/render-screens.mjs before.html
+//   ...refactor...
+//   node scripts/render-screens.mjs after.html
+//   diff before.html after.html
+import fs from 'node:fs';
+import { loadSampleState } from '../tests/fixtures/sample-state.mjs';
+import { sessionsView } from '../src/views/sessions.js';
+import { dashboard } from '../src/views/dashboard.js';
+import { studentsView } from '../src/views/students.js';
+import { curriculumView } from '../src/views/curriculum.js';
+import { state } from '../src/state.js';
+
+const out = process.argv[2] || 'screens.html';
+loadSampleState();
+
+const screens = [];
+const add = (name, html) => screens.push(`<!-- ${name} -->\n${html}`);
+
+add('sessionsView (di dalam kelas)', sessionsView());
+state.active = null;
+add('sessionsView (daftar sesi)', sessionsView());
+add('dashboard', dashboard());
+add('studentsView', studentsView());
+add('curriculumView (per untaian)', curriculumView());
+state.curriculumTab = 'level';
+add('curriculumView (per level)', curriculumView());
+
+const html = screens.join('\n\n');
+fs.writeFileSync(out, html);
+console.log('ditulis', out, Math.round(html.length / 1024) + ' KB');

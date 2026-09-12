@@ -57,5 +57,36 @@ export function dashboard() {
   const today = state.classes.filter(c => c.date === localDate());
   const interventions = state.alerts.filter(a => a.intervention);
   const sum = active.filter(ready);
-  return `${heading('HARI BARU, KESEMPATAN BARU', `Halo, ${h(state.name.split(' ')[0])} <span class="wave">✳</span>`, 'Mari temani langkah kecil yang berarti hari ini.', '<button class="primary" data-action="new-session">＋ Mulai sesi kelas</button>')}<section class="welcome"><div><span class="pill light">BELAJAR SESUAI RITME ANAK</span><h2>Bukan siapa yang paling cepat.<br>Melainkan siapa yang terus bertumbuh.</h2><p>Kenali minatnya, dampingi prosesnya, rayakan kemajuannya.</p><button data-view="students">Lihat perjalanan siswa <span>↗</span></button></div><div class="growth-art" aria-hidden="true"><div class="orbit"></div><span class="petal p1"></span><span class="petal p2"></span><span class="petal p3"></span><span class="stem"></span><span class="art-label">TUMBUH DENGAN CARANYA</span></div></section><div class="stats"><div class="stat"><span>Siswa aktif <i>◉</i></span><strong>${active.length.toString().padStart(2, '0')}</strong><small>Perjalanan yang kita dampingi</small></div><div class="stat"><span>Sesi hari ini <i>▤</i></span><strong>${today.length.toString().padStart(2, '0')}</strong><small>Ruang untuk belajar bersama</small></div><div class="stat"><span>Siap ujian sumatif <i>✧</i></span><strong>${sum.length.toString().padStart(2, '0')}</strong><small>Target belajar sudah tercapai</small></div>${state.role === 'owner' ? `<div class="stat warm"><span>Butuh perhatian <i>♡</i></span><strong>${interventions.length.toString().padStart(2, '0')}</strong><small>Mari dampingi lebih dekat</small></div>` : ''}</div><div class="dashboard-grid"><section class="panel"><div class="panel-heading"><h2>Perjalanan belajar</h2><button class="text-btn" data-view="students">Semua siswa →</button></div>${active.length ? active.slice(0, 5).map(studentRow).join('') : empty('Perjalanan dimulai di sini', 'Tambahkan siswa pertama untuk mulai mendampingi belajarnya.')}</section><section class="panel attention"><div class="panel-heading"><h2>Catatan untuk Anda</h2><span>✧</span></div>${state.role === 'owner' && interventions.length ? interventions.map(a => `<article class="attention-item"><span class="badge amber">Pendampingan khusus</span><h3>${h(state.students.find(s => s.id === a.student_id)?.name)}</h3><p>Tiga kali mengulang di level yang sama. Tinjau pendekatan belajar dan diskusikan dengan guru.</p></article>`).join('') : '<article class="attention-item"><span class="badge green">Langkah hari ini</span><h3>Mulai dari rasa ingin tahu</h3><p>Gunakan minat anak sebagai pintu masuk sebelum mengenalkan tantangan baru.</p></article>'}${sum.length ? `<article class="attention-item"><span class="badge green">Siap sumatif</span><h3>${sum.length} siswa mencapai target</h3><p>Buka profil siswa untuk mencatat hasil ujian akhir.</p></article>` : ''}<div class="quote">“Kemajuan kecil tetaplah kemajuan.”<small>Pengingat untuk hari ini</small></div></section></div>`;
+  return [
+    greetingBand(state),
+    welcomeBand(),
+    statBand(active, today, sum, interventions),
+    panelBand(active, interventions, sum)
+  ].join('');
+}
+
+// The four bands of the teacher dashboard, so one can be changed without rereading the rest.
+function greetingBand(state) {
+  return `${heading('HARI BARU, KESEMPATAN BARU', `Halo, ${h(state.name.split(' ')[0])} <span class="wave">✳</span>`, 'Mari temani langkah kecil yang berarti hari ini.', '<button class="primary" data-action="new-session">＋ Mulai sesi kelas</button>')}`;
+}
+
+function welcomeBand() {
+  return `<section class="welcome"><div><span class="pill light">BELAJAR SESUAI RITME ANAK</span><h2>Bukan siapa yang paling cepat.<br>Melainkan siapa yang terus bertumbuh.</h2><p>Kenali minatnya, dampingi prosesnya, rayakan kemajuannya.</p><button data-view="students">Lihat perjalanan siswa <span>↗</span></button></div><div class="growth-art" aria-hidden="true"><div class="orbit"></div><span class="petal p1"></span><span class="petal p2"></span><span class="petal p3"></span><span class="stem"></span><span class="art-label">TUMBUH DENGAN CARANYA</span></div></section>`;
+}
+
+function statBand(active, today, sum, interventions) {
+  return `<div class="stats"><div class="stat"><span>Siswa aktif <i>◉</i></span><strong>${active.length.toString().padStart(2, '0')}</strong><small>Perjalanan yang kita dampingi</small></div><div class="stat"><span>Sesi hari ini <i>▤</i></span><strong>${today.length.toString().padStart(2, '0')}</strong><small>Ruang untuk belajar bersama</small></div><div class="stat"><span>Siap ujian sumatif <i>✧</i></span><strong>${sum.length.toString().padStart(2, '0')}</strong><small>Target belajar sudah tercapai</small></div>${state.role === 'owner' ? `<div class="stat warm"><span>Butuh perhatian <i>♡</i></span><strong>${interventions.length.toString().padStart(2, '0')}</strong><small>Mari dampingi lebih dekat</small></div>` : ''}</div>`;
+}
+
+function panelBand(active, interventions, sum) {
+  return [journeyPanel(active, interventions, sum), notesPanel(active, interventions, sum)].join('');
+}
+
+// Left: the children. Right: what needs the teacher's attention today.
+function journeyPanel(active, interventions, sum) {
+  return `<div class="dashboard-grid"><section class="panel"><div class="panel-heading"><h2>Perjalanan belajar</h2><button class="text-btn" data-view="students">Semua siswa →</button></div>${active.length ? active.slice(0, 5).map(studentRow).join('') : empty('Perjalanan dimulai di sini', 'Tambahkan siswa pertama untuk mulai mendampingi belajarnya.')}</section>`;
+}
+
+function notesPanel(active, interventions, sum) {
+  return `<section class="panel attention"><div class="panel-heading"><h2>Catatan untuk Anda</h2><span>✧</span></div>${state.role === 'owner' && interventions.length ? interventions.map(a => `<article class="attention-item"><span class="badge amber">Pendampingan khusus</span><h3>${h(state.students.find(s => s.id === a.student_id)?.name)}</h3><p>Tiga kali mengulang di level yang sama. Tinjau pendekatan belajar dan diskusikan dengan guru.</p></article>`).join('') : '<article class="attention-item"><span class="badge green">Langkah hari ini</span><h3>Mulai dari rasa ingin tahu</h3><p>Gunakan minat anak sebagai pintu masuk sebelum mengenalkan tantangan baru.</p></article>'}${sum.length ? `<article class="attention-item"><span class="badge green">Siap sumatif</span><h3>${sum.length} siswa mencapai target</h3><p>Buka profil siswa untuk mencatat hasil ujian akhir.</p></article>` : ''}<div class="quote">“Kemajuan kecil tetaplah kemajuan.”<small>Pengingat untuk hari ini</small></div></section></div>`;
 }

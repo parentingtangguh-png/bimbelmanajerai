@@ -78,14 +78,7 @@ async function allRows(table, order = 'id') {
     if (page.length < 500) return rows;
   }
 }
-function guardDemo() {
-  if (state.demo) throw new Error('Ini pratinjau. Hubungkan Supabase dan masuk untuk menyimpan data.');
-}
 async function refresh() {
-  if (state.demo) {
-    render();
-    return;
-  }
   const [
     students,
     classes,
@@ -139,7 +132,6 @@ async function refresh() {
 }
 async function loadUser(user) {
   state.user = user;
-  state.demo = false;
   const profile = await result(db.from('profiles').select('*').eq('id', user.id).single());
   const member = await result(db.from('access_list').select('*').eq('email', profile.email).single());
   if (!member.active) throw new Error('Akses akun ini dinonaktifkan. Hubungi pemilik.');
@@ -148,96 +140,7 @@ async function loadUser(user) {
   await refresh();
 }
 function login() {
-  root.innerHTML = `<main class="login"><section class="login-story"><div class="brand">b<span>·</span> ${ORG_NAME}</div><div><div class="eyebrow">RUANG TUMBUH BERSAMA</div><h1>Langkah kecil.<br><em>Kemajuan berarti.</em></h1><p>Lebih dekat dengan setiap anak.<br>Lebih tenang menjalani hari mengajar.</p><div class="story-card"><span class="sprout">✳</span><div><strong>Setiap anak punya jalannya.</strong><p>Materi personal · Evaluasi adaptif · Kabar baik untuk keluarga</p></div></div></div><small>Dibangun untuk guru yang peduli.</small></section><section class="login-form"><div class="login-box"><span class="pill">RUMAH BELAJAR / 02</span><h2>Selamat datang kembali</h2><p class="muted">Masuk untuk melanjutkan perjalanan belajar anak.</p>${!configured ? '<div class="notice">Koneksi Supabase belum diatur. Pratinjau tampilan tersedia dengan data contoh.</div>' : ''}<form id="login-form">${field('Email terdaftar', 'email', 'email', '', 'required autocomplete="email"')}${field('Kata sandi', 'password', 'password', '', 'required minlength="8" autocomplete="current-password"')}<button class="primary full" ${configured ? '' : 'disabled'}>Masuk ke ruang belajar →</button><button type="button" class="text-btn full" data-action="register" ${configured ? '' : 'disabled'}>Aktivasi akun yang sudah didaftarkan pemilik</button></form><button class="secondary full" data-action="demo">Lihat pratinjau aplikasi</button><p class="fine">Akses hanya untuk pemilik dan guru terdaftar.</p></div></section></main>`;
-}
-async function demo() {
-  const { default: demoCurriculum } = await import('./demo-curriculum.js');
-  Object.assign(state, {
-    demo: true,
-    role: 'teacher',
-    name: 'Guru Pratinjau',
-    view: 'dashboard',
-    students: [
-      {
-        id: 'demo-1',
-        name: 'Alya Putri',
-        parent_name: 'Bunda Rani',
-        phone: '',
-        interest: 'Kupu-kupu & menggambar',
-        reading_baseline: 1,
-        reading_level: 4,
-        reading_target: 7,
-        math_baseline: 1,
-        math_level: 3,
-        math_target: 7,
-        status: 'Aktif',
-        diagnostic: 'Mengenali huruf vokal',
-        learning_notes: 'Senang belajar lewat gambar'
-      },
-      {
-        id: 'demo-2',
-        name: 'Bima Pratama',
-        parent_name: 'Ayah Danu',
-        phone: '',
-        interest: 'Dinosaurus',
-        reading_baseline: 2,
-        reading_level: 3,
-        reading_target: 6,
-        math_baseline: 2,
-        math_level: 4,
-        math_target: 7,
-        status: 'Aktif'
-      },
-      {
-        id: 'demo-3',
-        name: 'Citra Kirana',
-        parent_name: 'Bunda Maya',
-        phone: '',
-        interest: 'Cerita & hewan',
-        reading_baseline: 3,
-        reading_level: 7,
-        reading_target: 7,
-        math_baseline: 2,
-        math_level: 7,
-        math_target: 7,
-        status: 'Aktif'
-      }
-    ],
-    classes: [],
-    records: [],
-    alerts: [],
-    members: [],
-    assignments: [],
-    profiles: [],
-    themes: [{ name: 'Pasar' }, { name: 'Alam & Lingkungan' }],
-    curriculum: demoCurriculum.map(c => ({ ...c }))
-  });
-  state.competencies = state.students.flatMap(s =>
-    subjects.map(subject => ({
-      student_id: s.id,
-      subject,
-      baseline: subject === 'math' ? s.math_baseline : s.reading_baseline,
-      current_level: subject === 'math' ? s.math_level : s.reading_level,
-      target: phaseEnd(subject === 'math' ? s.math_level : s.reading_level),
-      evidence_count: subject === 'writing' ? 1 : 0,
-      repeat_count: 0,
-      intervention: false,
-      required: subject !== 'english',
-      active: true
-    }))
-  );
-  state.assessments = [];
-  state.observations = [];
-  state.schedules = [
-    { id: 'demo-s1', name: 'Sesi Pagi', start_time: '08:00:00', end_time: '09:30:00' },
-    { id: 'demo-s2', name: 'Sesi Sore', start_time: '15:30:00', end_time: '16:30:00' }
-  ];
-  state.scheduleStudents = [
-    { schedule_id: 'demo-s1', student_id: 'demo-1' },
-    { schedule_id: 'demo-s1', student_id: 'demo-2' },
-    { schedule_id: 'demo-s2', student_id: 'demo-3' }
-  ];
-  render();
+  root.innerHTML = `<main class="login"><section class="login-story"><div class="brand">b<span>·</span> ${ORG_NAME}</div><div><div class="eyebrow">RUANG TUMBUH BERSAMA</div><h1>Langkah kecil.<br><em>Kemajuan berarti.</em></h1><p>Lebih dekat dengan setiap anak.<br>Lebih tenang menjalani hari mengajar.</p><div class="story-card"><span class="sprout">✳</span><div><strong>Setiap anak punya jalannya.</strong><p>Materi personal · Evaluasi adaptif · Kabar baik untuk keluarga</p></div></div></div><small>Dibangun untuk guru yang peduli.</small></section><section class="login-form"><div class="login-box"><span class="pill">RUMAH BELAJAR / 02</span><h2>Selamat datang kembali</h2><p class="muted">Masuk untuk melanjutkan perjalanan belajar anak.</p>${!configured ? '<div class="notice">Koneksi Supabase belum diatur. Pratinjau tampilan tersedia dengan data contoh.</div>' : ''}<form id="login-form">${field('Email terdaftar', 'email', 'email', '', 'required autocomplete="email"')}${field('Kata sandi', 'password', 'password', '', 'required minlength="8" autocomplete="current-password"')}<button class="primary full" ${configured ? '' : 'disabled'}>Masuk ke ruang belajar →</button><button type="button" class="text-btn full" data-action="register" ${configured ? '' : 'disabled'}>Aktivasi akun yang sudah didaftarkan pemilik</button></form><p class="fine">Akses hanya untuk pemilik dan guru terdaftar.</p></div></section></main>`;
 }
 // Re-rendering replaces the whole page, so keep unsaved classroom inputs and the scroll position.
 const drafts = new Map();
@@ -273,7 +176,7 @@ function restoreDrafts() {
   });
 }
 function render() {
-  if (!state.user && !state.demo) {
+  if (!state.user) {
     login();
     return;
   }
@@ -297,7 +200,7 @@ function render() {
           return `<div class="onboarding reminder"><div><strong>${h(lead)}</strong><p>${h(rest)}</p></div></div>`;
         })()
       : ''
-  }${state.demo ? '<div class="demo-banner">PRATINJAU · Data contoh, tidak tersimpan. <button data-action="logout">Kembali ke login →</button></div>' : ''}<section class="content">${{ dashboard: dashboard, students: studentsView, sessions: sessionsView, team: teamView, curriculum: curriculumView }[state.view]()}</section><footer>${ORG_NAME} <span>Belajar bertumbuh, bersama.</span></footer></main></div><dialog id="modal"></dialog>`;
+  }<section class="content">${{ dashboard: dashboard, students: studentsView, sessions: sessionsView, team: teamView, curriculum: curriculumView }[state.view]()}</section><footer>${ORG_NAME} <span>Belajar bertumbuh, bersama.</span></footer></main></div><dialog id="modal"></dialog>`;
   restoreDrafts();
   scrollTo(0, y);
 }
@@ -310,7 +213,6 @@ document.addEventListener('change', async e => {
   const key = Number(wrap.dataset.key || 0);
   const keyDone = !key || !all[key - 1] || all[key - 1].checked;
   wrap.querySelector('.indicator-hint').innerHTML = hintText(done, all.length, key, keyDone);
-  if (state.demo) return;
   const { record, subject } = wrap.dataset;
   const index = Number(box.dataset.index);
   const checked = box.checked;
@@ -365,7 +267,6 @@ document.addEventListener('click', async e => {
   }
   const { action, id, kind } = b.dataset;
   try {
-    if (action === 'demo') return demo();
     if (action === 'curriculum-tab') {
       state.curriculumTab = id;
       return render();
@@ -383,7 +284,7 @@ document.addEventListener('click', async e => {
       return notify('Data terbaru sudah dimuat.');
     }
     if (action === 'logout') {
-      if (db && !state.demo) await db.auth.signOut();
+      if (db) await db.auth.signOut();
       resetSession();
       return login();
     }
@@ -431,7 +332,6 @@ document.addEventListener('click', async e => {
         .forEach(el => el.classList.toggle('print-target', !!el.querySelector(`[data-id="${id}"]`)));
       return window.print();
     }
-    guardDemo();
     b.disabled = true;
     if (action === 'delete-student') {
       const s = state.students.find(x => x.id === id);
@@ -598,7 +498,6 @@ document.addEventListener('submit', async e => {
   const buttons = [...form.querySelectorAll('button')];
   buttons.forEach(b => (b.disabled = true));
   try {
-    guardDemo();
     const f = new FormData(form);
     const v = Object.fromEntries(f);
     const id = form.dataset.id;

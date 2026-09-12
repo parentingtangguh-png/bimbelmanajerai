@@ -22,7 +22,6 @@ export const initialState = () => ({
   themes: [],
   curriculum: [],
   active: null,
-  demo: false,
   filter: '',
   schedules: [],
   scheduleStudents: [],

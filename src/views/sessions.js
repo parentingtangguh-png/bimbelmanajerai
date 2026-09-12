@@ -22,7 +22,9 @@ export function sessionsView() {
       ...new Set(records.filter(r => r.attendance === 'Hadir').map(r => r.group_no || 1))
     ].sort();
     const done = records.filter(r => r.finalized_at).length;
-    return `${heading('SATU TEMA, BERAGAM TANTANGAN', h(c.theme), `${h(c.date)}${c.start_time ? ' · ' + timeLabel(c) : ''} · ${c.duration_minutes || 60} menit · ${groups.length || 1} kelompok · ${done} dari ${records.length} anak selesai dievaluasi`, '<button class="secondary" data-action="back-sessions">← Semua sesi</button>')}<div class="notice"><strong>Langkah kelas</strong><br>① Tandai anak yang tidak datang. Kehadiran bisa diubah sampai evaluasinya disimpan, dan panduan kelas tetap aman.<br>② Buat panduan kelas sekali untuk semua kelompok.<br>③ Setelah kegiatan, simpan evaluasi setiap anak, termasuk yang tidak hadir.<br>④ Buat kabar orang tua, periksa, lalu kirim lewat WhatsApp.</div><article class="panel class-guide"><div class="section-title"><div><h2>Panduan kelas bersama</h2><p>Satu alur mengajar dengan kartu kegiatan untuk maksimal tiga kelompok.</p></div><button class="primary" data-action="generate-class" data-id="${c.id}">${c.material ? 'Lihat panduan tersimpan' : '✦ Buat panduan kelas AI'}</button></div>${c.material ? `<pre>${h(c.material)}</pre><button class="text-btn" data-action="print-class" data-id="${c.id}">Cetak panduan (opsional)</button>` : '<p class="muted">Panduan akan mengatur waktu, aktivitas tematik, diferensiasi kelompok, English Exposure, dan titik observasi karakter.</p>'}</article><h2 class="student-evaluation-title">Evaluasi individual</h2><div class="session-list">${records.map(recordCard).join('')}</div>`;
+    return [classHeading(c, groups, records, done), teachingSteps(), classGuide(c), childCards(records)].join(
+      ''
+    );
   }
   return `${heading('RUANG KELAS', 'Siap belajar bersama?', 'Satu tema, satu panduan multigrade, dan bukti perkembangan individual.', '<button class="primary" data-action="new-session">＋ Mulai sesi kelas</button>')}<div class="panel">${
     state.classes
@@ -89,7 +91,13 @@ export function recordCard(r) {
         `<label class="check"><input type="checkbox" name="character" value="${value}" ${(observation.character_dimensions || []).includes(value) ? 'checked' : ''} ${locked ? 'disabled' : ''}>${label}</label>`
     )
     .join('');
-  return `<article class="panel session-card"><div class="panel-heading"><div><h2>${h(s.name)} <small>· Kelompok ${r.group_no || 1}</small></h2><p>${h(s.interest || 'Minat belum diisi')} · ${h(targetText)}</p></div><span class="badge ${locked ? 'green' : 'amber'}">${locked ? 'Evaluasi tersimpan' : 'Sesi berlangsung'}</span></div><form data-form="attendance" data-id="${r.id}" class="inline-form">${select('Kehadiran', 'attendance', ['Hadir', 'Sakit', 'Izin', 'Alfa'], r.attendance, locked ? 'disabled' : '')}<button class="secondary" ${locked ? 'disabled' : ''}>Simpan kehadiran</button></form>${absent ? absentForm : `<form data-form="evaluation" data-id="${r.id}" class="evaluation competency-evaluation"><h3>01 / Bukti target inti</h3>${evaluation}<div class="observation-block"><h3>02 / English Exposure</h3><p class="muted">Dicatat sebagai pengayaan tematik dan tidak menentukan kelulusan.</p>${select('Respons Bahasa Inggris', 'english_rating', englishRatings, observation.english_rating || '', locked ? 'disabled' : '')}${area('Bukti English Exposure (opsional)', 'english_note', observation.english_note || '', `maxlength="1000" ${locked ? 'disabled' : ''}`)}</div><div class="observation-block"><h3>03 / Observasi karakter</h3><p class="muted">Pilih perilaku yang terlihat dalam kegiatan; ini bukan nilai atau level anak.</p><div class="character-checks">${chars}</div>${area('Konteks observasi karakter (opsional)', 'character_note', observation.character_note || '', `maxlength="1000" ${locked ? 'disabled' : ''}`)}</div>${area('Catatan anekdot umum (opsional)', 'anecdote', r.anecdote || '', `maxlength="3000" ${locked ? 'disabled' : ''}`)}<button class="primary" ${locked ? 'disabled' : ''}>${locked ? '✓ Evaluasi sudah tersimpan' : 'Simpan & selesaikan evaluasi'}</button><small class="fine">Target inti dinilai mandiri. English Exposure dan karakter dicatat tanpa menjadi syarat kelulusan.</small></form>`}<section class="report"><div class="section-title"><h3>${absent ? '02' : '04'} / Kabar untuk orang tua</h3>${r.attendance === 'Hadir' ? `<button class="secondary" data-action="generate" data-kind="report" data-id="${r.id}" ${!locked ? 'disabled' : ''}>${r.report ? 'Lihat rapor tersimpan' : '✦ Buat draf rapor'}</button>` : ''}</div>${r.report ? `<pre>${h(r.report)}</pre><div class="button-row"><button class="secondary" data-action="copy" data-id="${r.id}">Salin pesan</button>${link ? `<a class="primary" target="_blank" rel="noopener noreferrer" href="${h(link)}">Periksa & buka WhatsApp →</a>` : '<small>Lengkapi nomor WhatsApp di profil siswa untuk membuka percakapan.</small>'}</div>` : '<p class="muted">Rapor dibuat setelah evaluasi agar kabarnya sesuai kegiatan nyata.</p>'}</section></article>`;
+  return [
+    cardHeading(s, r, targetText, locked),
+    attendanceForm(r, locked),
+    evaluationSection(absent, absentForm, r, evaluation, observation, englishRatings, chars, locked),
+    reportSection(r, link, absent, locked),
+    `</article>`
+  ].join(``);
 }
 export function themeFields() {
   const names = state.themes.map(t => t.name);
@@ -121,4 +129,39 @@ export function newSession() {
       'required'
     )}${themeFields()}<div class="notice">Sistem memilih target spiral bersama dan membagi siswa menjadi maksimal tiga kelompok berdasarkan posisi kompetensi.</div><h3>Pilih anak yang mengikuti sesi</h3>${available.map(s => `<label class="check"><input type="checkbox" name="student" value="${s.id}">${h(s.name)} <small>Bahasa Indonesia ${s.reading_level} · Matematika ${s.math_level}</small></label>`).join('') || '<p>Belum ada siswa tersedia. Tambahkan siswa atau selesaikan sesi yang masih terbuka.</p>'}<button class="primary full" ${available.length ? '' : 'disabled'}>Buka ruang kelas →</button></form>`
   );
+}
+
+// The four pieces of a child card. Splitting them out is what lets one part be changed without
+// rereading the whole screen; the HTML is exactly what the single template produced before.
+function cardHeading(s, r, targetText, locked) {
+  return `<article class="panel session-card"><div class="panel-heading"><div><h2>${h(s.name)} <small>· Kelompok ${r.group_no || 1}</small></h2><p>${h(s.interest || 'Minat belum diisi')} · ${h(targetText)}</p></div><span class="badge ${locked ? 'green' : 'amber'}">${locked ? 'Evaluasi tersimpan' : 'Sesi berlangsung'}</span></div>`;
+}
+
+function attendanceForm(r, locked) {
+  return `<form data-form="attendance" data-id="${r.id}" class="inline-form">${select('Kehadiran', 'attendance', ['Hadir', 'Sakit', 'Izin', 'Alfa'], r.attendance, locked ? 'disabled' : '')}<button class="secondary" ${locked ? 'disabled' : ''}>Simpan kehadiran</button></form>`;
+}
+
+function evaluationSection(absent, absentForm, r, evaluation, observation, englishRatings, chars, locked) {
+  return `${absent ? absentForm : `<form data-form="evaluation" data-id="${r.id}" class="evaluation competency-evaluation"><h3>01 / Bukti target inti</h3>${evaluation}<div class="observation-block"><h3>02 / English Exposure</h3><p class="muted">Dicatat sebagai pengayaan tematik dan tidak menentukan kelulusan.</p>${select('Respons Bahasa Inggris', 'english_rating', englishRatings, observation.english_rating || '', locked ? 'disabled' : '')}${area('Bukti English Exposure (opsional)', 'english_note', observation.english_note || '', `maxlength="1000" ${locked ? 'disabled' : ''}`)}</div><div class="observation-block"><h3>03 / Observasi karakter</h3><p class="muted">Pilih perilaku yang terlihat dalam kegiatan; ini bukan nilai atau level anak.</p><div class="character-checks">${chars}</div>${area('Konteks observasi karakter (opsional)', 'character_note', observation.character_note || '', `maxlength="1000" ${locked ? 'disabled' : ''}`)}</div>${area('Catatan anekdot umum (opsional)', 'anecdote', r.anecdote || '', `maxlength="3000" ${locked ? 'disabled' : ''}`)}<button class="primary" ${locked ? 'disabled' : ''}>${locked ? '✓ Evaluasi sudah tersimpan' : 'Simpan & selesaikan evaluasi'}</button><small class="fine">Target inti dinilai mandiri. English Exposure dan karakter dicatat tanpa menjadi syarat kelulusan.</small></form>`}`;
+}
+
+function reportSection(r, link, absent, locked) {
+  return `<section class="report"><div class="section-title"><h3>${absent ? '02' : '04'} / Kabar untuk orang tua</h3>${r.attendance === 'Hadir' ? `<button class="secondary" data-action="generate" data-kind="report" data-id="${r.id}" ${!locked ? 'disabled' : ''}>${r.report ? 'Lihat rapor tersimpan' : '✦ Buat draf rapor'}</button>` : ''}</div>${r.report ? `<pre>${h(r.report)}</pre><div class="button-row"><button class="secondary" data-action="copy" data-id="${r.id}">Salin pesan</button>${link ? `<a class="primary" target="_blank" rel="noopener noreferrer" href="${h(link)}">Periksa & buka WhatsApp →</a>` : '<small>Lengkapi nomor WhatsApp di profil siswa untuk membuka percakapan.</small>'}</div>` : '<p class="muted">Rapor dibuat setelah evaluasi agar kabarnya sesuai kegiatan nyata.</p>'}</section>`;
+}
+
+// The four bands of the in-class screen.
+function classHeading(c, groups, records, done) {
+  return `${heading('SATU TEMA, BERAGAM TANTANGAN', h(c.theme), `${h(c.date)}${c.start_time ? ' · ' + timeLabel(c) : ''} · ${c.duration_minutes || 60} menit · ${groups.length || 1} kelompok · ${done} dari ${records.length} anak selesai dievaluasi`, '<button class="secondary" data-action="back-sessions">← Semua sesi</button>')}`;
+}
+
+function teachingSteps() {
+  return `<div class="notice"><strong>Langkah kelas</strong><br>① Tandai anak yang tidak datang. Kehadiran bisa diubah sampai evaluasinya disimpan, dan panduan kelas tetap aman.<br>② Buat panduan kelas sekali untuk semua kelompok.<br>③ Setelah kegiatan, simpan evaluasi setiap anak, termasuk yang tidak hadir.<br>④ Buat kabar orang tua, periksa, lalu kirim lewat WhatsApp.</div>`;
+}
+
+function classGuide(c) {
+  return `<article class="panel class-guide"><div class="section-title"><div><h2>Panduan kelas bersama</h2><p>Satu alur mengajar dengan kartu kegiatan untuk maksimal tiga kelompok.</p></div><button class="primary" data-action="generate-class" data-id="${c.id}">${c.material ? 'Lihat panduan tersimpan' : '✦ Buat panduan kelas AI'}</button></div>${c.material ? `<pre>${h(c.material)}</pre><button class="text-btn" data-action="print-class" data-id="${c.id}">Cetak panduan (opsional)</button>` : '<p class="muted">Panduan akan mengatur waktu, aktivitas tematik, diferensiasi kelompok, English Exposure, dan titik observasi karakter.</p>'}</article>`;
+}
+
+function childCards(records) {
+  return `<h2 class="student-evaluation-title">Evaluasi individual</h2><div class="session-list">${records.map(recordCard).join('')}</div>`;
 }

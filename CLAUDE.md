@@ -29,7 +29,9 @@ Baca file ini dulu sebelum mengubah apa pun. Pengguna (pemilik bimbel) berkomuni
 
 ## Menguji
 - `npm test`: tes domain + database (PGlite menjalankan semua migrasi). `admin()` di tes = setup data tanpa peran pengguna.
-- `npx playwright test`: memakai mode **pratinjau** (selalu berperan guru, data contoh, tidak bisa membuka sesi/menyimpan). Tampilan pemilik dan layar kelas sungguhan perlu login asli — jangan memasukkan kata sandi.
+- **Mode pratinjau sudah dihapus** (12 Sep 2026, atas keputusan pengguna). Tidak ada lagi cara masuk tanpa akun.
+- `npx playwright test`: kini hanya menguji **layar login** (aplikasi memuat, tidak ada galat, tidak meluber di 390px). Semua layar di balik login diuji oleh `tests/render.test.mjs`, yang memanggil fungsi view langsung dengan data contoh di `tests/fixtures/sample-state.mjs` — tanpa browser, tanpa login.
+- `node scripts/render-screens.mjs keluaran.html` menulis HTML semua layar. Jalankan sebelum dan sesudah perombakan lalu bandingkan: HTML identik = perilaku tidak berubah. Cara inilah yang dipakai saat memecah template `recordCard` dan `dashboard`.
 - Skrip screenshot Playwright headless ke `http://localhost:5173` (dev server `npm run dev`, konfigurasi `.claude/launch.json`) atau render HTML statis dengan CSS asli (contoh: `docs/mockups/indicator-mockup.mjs`).
 
 ## Jebakan teknis yang sudah ditemui (Windows PowerShell 5.1)
@@ -42,6 +44,7 @@ Baca file ini dulu sebelum mengubah apa pun. Pengguna (pemilik bimbel) berkomuni
 - Pernah muncul byte NUL di `main.js` akibat edit; setelah edit besar cek: `$b=[IO.File]::ReadAllBytes('src/main.js'); @($b | ? {$_ -eq 0}).Count` harus 0. Untuk mengganti baris sangat panjang, pakai skrip Node dengan penanda awal/akhir.
 - CSS aplikasi memberi `display` ke `label`, jadi atribut `hidden` dipaksa lewat `[hidden]{display:none!important}` (`src/student-form.css`).
 - Fungsi versi lama dan penimpaan `V2` sudah **dihapus** (12 Sep 2026). Kini satu nama = satu fungsi; tidak ada lagi versi bayangan yang harus diingat.
+- View menyusun HTML lewat fungsi-fungsi kecil bernama (`cardHeading`, `attendanceForm`, `evaluationSection`, `reportSection`, `classGuide`, `statBand`, dan seterusnya). Kalau menambah bagian baru, buat fungsi baru — jangan menyambung ke template yang sudah panjang.
 - **Susunan berkas (12 Sep 2026):** `src/main.js` (26 KB) hanya berisi sambungan — klien Supabase, login, `refresh`, `render`, dan semua penangan klik/submit. Tiap layar punya berkasnya sendiri di `src/views/`: `dashboard.js`, `students.js`, `sessions.js`, `curriculum.js`, `team.js`. Yang dipakai bersama: `src/state.js` (state + konstanta + pembaca data, tanpa DOM) dan `src/ui.js` (`field`, `select`, `area`, `empty`, `heading`, `meter`, `modal`, `notify`).
 - **Aturan penting:** view hanya menyusun teks HTML. View tidak boleh memanggil `db`, `result`, `render`, atau `notify` — semua aksi lewat atribut `data-action`/`data-form` yang ditangani di `main.js`. Menjaga aturan ini yang membuat tiap layar bisa berdiri sendiri.
 - `npm test` menjalankan `scripts/check-imports.mjs` lebih dulu: memeriksa tiap nama antar modul sudah diimpor. Ini menangkap kesalahan yang **lolos `npm run build`** tetapi membuat layar kosong saat dibuka (pernah terjadi pada alias `h`).
