@@ -4,10 +4,14 @@ import { test, expect } from '@playwright/test';
 // this code around risky. These walk the parts a refactor would most easily break.
 
 test('tab kurikulum: untaian, simpul spiral, dan penutup tangga', async ({ page }) => {
-  const errors = []; page.on('pageerror', e => errors.push(e.message));
+  const errors = [];
+  page.on('pageerror', e => errors.push(e.message));
   await page.goto('/');
   await page.getByRole('button', { name: 'Lihat pratinjau aplikasi' }).click();
-  await page.getByRole('navigation').getByRole('button', { name: /Kurikulum/ }).click();
+  await page
+    .getByRole('navigation')
+    .getByRole('button', { name: /Kurikulum/ })
+    .click();
 
   // Per untaian is the default, reading down one subject.
   await expect(page.getByRole('button', { name: 'Per untaian' })).toHaveClass(/active/);
@@ -59,7 +63,10 @@ test('pengingat harian tampil untuk guru di semua tab dan tidak bisa ditutup', a
 
   // It follows the teacher across the app rather than living on one screen.
   for (const tab of ['Data siswa', 'Ruang kelas', 'Kurikulum']) {
-    await page.getByRole('navigation').getByRole('button', { name: new RegExp(tab) }).click();
+    await page
+      .getByRole('navigation')
+      .getByRole('button', { name: new RegExp(tab) })
+      .click();
     await expect(reminder).toBeVisible();
     expect(await reminder.innerText()).toBe(text);
   }

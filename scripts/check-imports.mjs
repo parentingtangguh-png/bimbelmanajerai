@@ -12,7 +12,8 @@ const shared = new Map();
 for (const n of exportsOf('src/state.js')) shared.set(n, 'state.js');
 for (const n of exportsOf('src/ui.js')) shared.set(n, 'ui.js');
 for (const v of views) for (const n of exportsOf(v)) shared.set(n, v);
-for (const n of ['h', 'progress', 'waLink', 'localDate', 'minutesBetween', 'durationPattern', 'formatTime']) shared.set(n, 'domain.js');
+for (const n of ['h', 'progress', 'waLink', 'localDate', 'minutesBetween', 'durationPattern', 'formatTime'])
+  shared.set(n, 'domain.js');
 
 let problems = 0;
 for (const p of ['src/main.js', ...views]) {

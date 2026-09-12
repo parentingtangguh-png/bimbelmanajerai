@@ -1,5 +1,8 @@
 // Tim pengajar: hanya dibuka pemilik.
-import { state } from '../state.js';
+import { state } from '../state.js';
+
 import { escapeHtml as h } from '../domain.js';
 import { empty, heading } from '../ui.js';
-export function teamView(){return `${heading('TIM YANG SALING MENDUKUNG','Guru yang mendampingi.','Daftarkan email guru. Setiap guru menambahkan dan mengelola siswanya sendiri.','<button class="primary" data-action="new-member">＋ Daftarkan guru</button>')}<div class="panel">${state.members.map(m=>`<div class="class-row"><span class="avatar">${h(m.name[0])}</span><div><h3>${h(m.name)}</h3><p>${h(m.email)} · ${m.role==='owner'?'Pemilik':'Guru'} · ${m.active?'Aktif':'Nonaktif'}</p></div>${m.role==='teacher'?`<button class="secondary" data-action="toggle-member" data-id="${h(m.email)}">${m.active?'Nonaktifkan':'Aktifkan'}</button>`:''}</div>`).join('')||empty('Belum ada guru','Tambahkan email guru. Guru kemudian mengaktifkan akun melalui halaman login.')}</div><div class="notice">Guru mengaktifkan akun menggunakan email yang didaftarkan di sini, lalu menambahkan siswanya sendiri di menu Data siswa.</div>`;}
+export function teamView() {
+  return `${heading('TIM YANG SALING MENDUKUNG', 'Guru yang mendampingi.', 'Daftarkan email guru. Setiap guru menambahkan dan mengelola siswanya sendiri.', '<button class="primary" data-action="new-member">＋ Daftarkan guru</button>')}<div class="panel">${state.members.map(m => `<div class="class-row"><span class="avatar">${h(m.name[0])}</span><div><h3>${h(m.name)}</h3><p>${h(m.email)} · ${m.role === 'owner' ? 'Pemilik' : 'Guru'} · ${m.active ? 'Aktif' : 'Nonaktif'}</p></div>${m.role === 'teacher' ? `<button class="secondary" data-action="toggle-member" data-id="${h(m.email)}">${m.active ? 'Nonaktifkan' : 'Aktifkan'}</button>` : ''}</div>`).join('') || empty('Belum ada guru', 'Tambahkan email guru. Guru kemudian mengaktifkan akun melalui halaman login.')}</div><div class="notice">Guru mengaktifkan akun menggunakan email yang didaftarkan di sini, lalu menambahkan siswanya sendiri di menu Data siswa.</div>`;
+}
