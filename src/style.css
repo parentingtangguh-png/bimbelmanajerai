@@ -1883,27 +1883,71 @@ dialog::backdrop {
 
 /* Menu utama layar HP (views/home.js). Di layar lebar sidebar sudah jadi menu, jadi bagian ini
    hanya hidup di bawah 620px; markupnya tetap dikirim supaya tidak ada pengukuran lebar di JS. */
-.home {
+/* Kepala dan doa menemani semua tab di HP; di layar lebar ketiganya diam. */
+.home,
+.home-top,
+.home-doa,
+.home-nav {
   display: none;
 }
 @media (max-width: 620px) {
-  .at-home .sidebar,
-  .at-home .topbar,
-  .at-home .reminder,
+  /* Sidebar dan topbar diganti kepala + menu di semua tab; kaki halaman diganti doa. */
+  .sidebar,
+  .topbar,
+  /* Pita pengingat harian dihapus di HP: motto di menu utama sudah mengisi perannya, dan di tab
+     lain ia hanya mendorong pekerjaan guru ke bawah layar. Layar lebar tetap memakainya. */
+  .reminder,
   .at-home .content,
-  /* Hanya kaki halaman aplikasi, bukan .home-doa yang juga sebuah <footer>. */
-  .at-home .workspace > footer {
+  /* :not() wajib — .home-doa juga sebuah <footer> anak .workspace. */
+  .workspace > footer:not(.home-doa) {
     display: none;
   }
-  .at-home .workspace {
+  .workspace {
     margin-left: 0;
     width: 100%;
+  }
+  .home-top {
+    padding: 18px 14px 0;
+  }
+  /* Navbar menempel di bawah layar; isi halaman diberi ruang supaya tidak tertutup olehnya. */
+  .workspace {
+    padding-bottom: 78px;
+  }
+  .home-nav {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    background: #12150f;
+    border-top: 1px solid var(--line);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .home-nav-item {
+    display: grid;
+    justify-items: center;
+    gap: 3px;
+    padding: 9px 4px 10px;
+    border: 0;
+    background: none;
+    color: var(--muted);
+    /* 44px penuh: jempol tidak boleh meleset ke tab sebelah. */
+    min-height: 44px;
+  }
+  .home-nav-item span {
+    font-size: 10px;
+    line-height: 1.2;
+  }
+  .home-nav-item.aktif {
+    color: #d7b35d;
   }
   .home {
     display: block;
     position: relative;
     overflow-x: hidden;
-    padding: 18px 14px 32px;
+    padding: 0 14px 8px;
   }
   .home > *:not(.home-leaf) {
     position: relative;
@@ -1941,14 +1985,20 @@ dialog::backdrop {
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    margin-bottom: 20px;
+    margin-bottom: 14px;
   }
+  /* Logo dan nama adalah tombol pulang ke menu, jadi rupanya harus tetap teks biasa. */
   .home-brand {
     display: flex;
     align-items: center;
     gap: 10px;
     flex: 1;
     min-width: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    text-align: left;
+    color: var(--ink);
   }
   .home-mark {
     position: relative;
@@ -2086,11 +2136,11 @@ dialog::backdrop {
   /* footer global memakai flex dan font 9px; .home-doa harus melepaskan diri dari keduanya. */
   .home-doa {
     display: block;
+    margin: 22px 14px 0;
     max-width: none;
-    padding: 18px 0 0;
+    padding: 18px 0 24px;
     font-size: 12.5px;
     color: var(--ink);
-    margin-top: 22px;
     border-top: 1px solid var(--line);
     text-align: center;
   }

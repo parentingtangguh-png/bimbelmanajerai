@@ -43,7 +43,7 @@ import { curriculumView } from './views/curriculum.js';
 import { sessionsView, newSession } from './views/sessions.js';
 import { studentsView, levelMeaning, studentForm, scheduleForm } from './views/students.js';
 import { dashboard } from './views/dashboard.js';
-import { homeMenu } from './views/home.js';
+import { homeMenu, homeTop, homeDoa, homeNav } from './views/home.js';
 import { teamView } from './views/team.js';
 import './style.css';
 import './curriculum.css';
@@ -296,17 +296,18 @@ function render() {
     state.role === 'owner'
       ? ['dashboard', 'students', 'team', 'curriculum']
       : ['dashboard', 'students', 'sessions', 'curriculum'];
-  // Di layar HP dasbor dibuka oleh menu utama; CSS yang memilih mana yang tampil, jadi tidak ada
-  // pengukuran lebar layar di sini dan tidak ada pendengar resize.
-  const home = state.view === 'dashboard' ? homeMenu(ORG_NAME) : '';
-  root.innerHTML = `<div class="shell${home ? ' at-home' : ''}">${sidebar(nav)}<main class="workspace">${topbar()}${
+  // Di layar HP dasbor dibuka oleh menu utama, dan kepala serta doa menemani semua tab. CSS yang
+  // memilih mana yang tampil, jadi tidak ada pengukuran lebar layar di sini dan tidak ada
+  // pendengar resize.
+  const home = state.view === 'dashboard' ? homeMenu() : '';
+  root.innerHTML = `<div class="shell${home ? ' at-home' : ''}">${sidebar(nav)}<main class="workspace">${topbar()}${homeTop(ORG_NAME)}${
     state.role === 'teacher'
       ? (() => {
           const [lead, rest] = reminderOfTheDay();
           return `<div class="onboarding reminder"><div><strong>${h(lead)}</strong><p>${h(rest)}</p></div></div>`;
         })()
       : ''
-  }${home}<section class="content">${{ dashboard: dashboard, students: studentsView, sessions: sessionsView, team: teamView, curriculum: curriculumView }[state.view]()}</section><footer>${ORG_NAME} <span>Belajar bertumbuh, bersama.</span></footer></main></div><dialog id="modal"></dialog>`;
+  }${home}<section class="content">${{ dashboard: dashboard, students: studentsView, sessions: sessionsView, team: teamView, curriculum: curriculumView }[state.view]()}</section>${homeDoa()}${homeNav()}<footer>${ORG_NAME} <span>Belajar bertumbuh, bersama.</span></footer></main></div><dialog id="modal"></dialog>`;
   restoreDrafts();
   scrollTo(0, y);
 }

@@ -7,7 +7,7 @@ import { dashboard } from '../src/views/dashboard.js';
 import { studentsView, scheduleForm } from '../src/views/students.js';
 import { curriculumView } from '../src/views/curriculum.js';
 import { teamView } from '../src/views/team.js';
-import { homeMenu } from '../src/views/home.js';
+import { homeMenu, homeTop, homeDoa, homeNav } from '../src/views/home.js';
 import { slogans, doas, sloganOfTheMoment, doaOfTheDay } from '../src/state.js';
 
 // The screens are plain functions that return HTML, so they can be checked without a browser, a
@@ -206,7 +206,7 @@ test('tidak ada kebocoran undefined atau [object Object] di layar mana pun', () 
     ['students', studentsView()],
     ['curriculum', curriculumView()],
     ['team', teamView()],
-    ['home', homeMenu('Rumah Belajar Contoh')]
+    ['home', homeMenu() + homeTop('Rumah Belajar Contoh') + homeDoa() + homeNav()]
   ]) {
     assert.ok(!html.includes('undefined'), name + ' memuat undefined');
     assert.ok(!html.includes('[object Object]'), name + ' memuat [object Object]');
@@ -216,7 +216,7 @@ test('tidak ada kebocoran undefined atau [object Object] di layar mana pun', () 
 
 test('menu utama HP: kartu guru, kartu pemilik, dan tombol yang dikenali main.js', () => {
   loadSampleState();
-  const guru = homeMenu('Rumah Belajar Contoh');
+  const guru = homeMenu();
   // Empat kartu, tidak lebih: Tim pengajar bukan milik guru.
   assert.equal(count(guru, 'class="home-card'), 4);
   for (const view of ['sessions', 'dashboard', 'students', 'curriculum'])
@@ -225,11 +225,17 @@ test('menu utama HP: kartu guru, kartu pemilik, dan tombol yang dikenali main.js
   // Kartu melintang adalah pekerjaan harian guru.
   assert.match(guru, /class="home-card wide" data-view="sessions"/);
   // Aksi memakai atribut yang sudah ditangani main.js, bukan penangan baru.
-  assert.match(guru, /data-action="logout"/);
-  assert.match(guru, /data-action="password"/);
+  const kepala = homeTop('Rumah Belajar Contoh');
+  assert.match(kepala, /data-action="logout"/);
+  assert.match(homeDoa(), /data-action="password"/);
+  // Di HP tidak ada sidebar, jadi logo harus jadi jalan pulang ke menu.
+  assert.match(kepala, /class="home-brand" data-view="dashboard"/);
+  // Kepala dan doa milik semua tab, jadi tidak boleh ikut tercetak di dalam menu.
+  assert.ok(!guru.includes('home-brand'), 'kepala dipasang main.js, bukan homeMenu');
+  assert.ok(!guru.includes('home-doa'), 'doa dipasang main.js, bukan homeMenu');
 
   state.role = 'owner';
-  const pemilik = homeMenu('Rumah Belajar Contoh');
+  const pemilik = homeMenu();
   assert.equal(count(pemilik, 'class="home-card'), 4);
   assert.match(pemilik, /class="home-card wide" data-view="team"/, 'pemilik mengurus tim');
   assert.ok(!pemilik.includes('data-view="sessions"'), 'pemilik tidak membuka kelas');
@@ -249,5 +255,24 @@ test('menu utama HP: slogan berganti tiap 30 menit, doa sekali sehari', () => {
   const [arab, arti, sumber] = doaOfTheDay();
   assert.equal(doas.filter(d => d[0] === arab).length, 1, 'doa harus dari daftar');
   assert.ok(arti.length > 10 && sumber.length > 3);
-  assert.match(homeMenu('Rumah Belajar Contoh'), new RegExp('dir="rtl"'));
+  assert.match(homeDoa(), new RegExp('dir="rtl"'));
+});
+
+test('navbar HP: empat tujuan, menandai layar yang sedang dibuka, dan ikut peran', () => {
+  loadSampleState();
+  state.view = 'sessions';
+  const guru = homeNav();
+  assert.equal(count(guru, 'class="home-nav-item'), 4);
+  for (const view of ['dashboard', 'sessions', 'students', 'curriculum'])
+    assert.match(guru, new RegExp('data-view="' + view + '"'), view + ' ada di navbar');
+  // Layar yang sedang dibuka ditandai, sekali saja.
+  assert.equal(count(guru, 'aria-current="page"'), 1);
+  assert.match(guru, /class="home-nav-item aktif" data-view="sessions"/);
+
+  state.role = 'owner';
+  state.view = 'team';
+  const pemilik = homeNav();
+  assert.match(pemilik, /data-view="team"/, 'pemilik mengurus tim');
+  assert.ok(!pemilik.includes('data-view="sessions"'), 'pemilik tidak membuka kelas');
+  assert.equal(count(pemilik, 'aria-current="page"'), 1);
 });
