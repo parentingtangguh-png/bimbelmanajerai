@@ -218,7 +218,9 @@ function topbar() {
     new Date()
   );
   const actions = `<div class="top-actions"><button data-action="refresh" title="Muat ulang data" aria-label="Muat ulang data">↻</button><button data-action="logout" aria-label="Keluar akun">Keluar ↗</button></div>`;
-  return `<header class="topbar"><span>${ORG_NAME} <span class="slash">/</span> ${labels[state.view]}</span><span class="date">${today}</span>${actions}</header>`;
+  // The name is wrapped so a phone can drop it and keep only the screen it names.
+  const where = `<span class="org">${ORG_NAME}</span> <span class="slash">/</span> ${labels[state.view]}`;
+  return `<header class="topbar"><span>${where}</span><span class="date">${today}</span>${actions}</header>`;
 }
 
 // The login screen is a story column beside the form. The story is fixed; only the form reacts to

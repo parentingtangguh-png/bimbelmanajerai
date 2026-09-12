@@ -1239,6 +1239,7 @@ hr {
     font-size: 11px;
     padding: 11px 13px;
     white-space: nowrap;
+    min-height: 44px;
   }
   .page-heading h1 {
     font-size: 28px;
@@ -1269,6 +1270,8 @@ hr {
     position: relative;
     z-index: 1;
   }
+  /* On a phone the motif sits behind the paragraph and the button instead of beside them, so it
+     is faint enough to stay decoration. Its 7px label is unreadable at this size; it is hidden. */
   .growth-art {
     position: absolute;
     right: 6px;
@@ -1276,15 +1279,19 @@ hr {
     width: 210px;
     height: 210px;
     min-width: 0;
-    opacity: 0.4;
+    opacity: 0.18;
     transform: scale(0.72);
     transform-origin: bottom right;
     z-index: 0;
     pointer-events: none;
   }
+  .art-label {
+    display: none;
+  }
   .welcome button {
     position: relative;
     z-index: 1;
+    min-height: 44px;
   }
   .stats {
     grid-template-columns: 1fr 1fr;
@@ -1315,14 +1322,38 @@ hr {
   .curriculum-grid {
     grid-template-columns: 1fr;
   }
+  /* Two narrow columns do not fit a phone: the name wrapped to two lines and "Bahasa Indonesia
+     Level 7 · Fase A" to three, inside a 95px box. Name and arrow keep the first line; the
+     progress drops to its own full-width line, which also gives the bar something to show. */
   .student-row {
-    padding: 18px 0;
+    padding: 13px 0;
+    flex-wrap: wrap;
+    row-gap: 7px;
+  }
+  .student-info {
+    flex: 1 1 auto;
+  }
+  .student-info strong {
+    margin-bottom: 3px;
+  }
+  .row-arrow {
+    order: 5;
   }
   .mini-progress {
-    width: 95px;
+    order: 9;
+    flex: 1 1 100%;
+    width: auto;
+    margin-left: 0;
+  }
+  .mini-progress small {
+    display: block;
+    margin-bottom: 4px;
   }
   .student-info small {
     font-size: 10px;
+  }
+  .text-btn {
+    min-height: 44px;
   }
   .toolbar {
     gap: 10px;
@@ -1502,11 +1533,24 @@ hr {
   .topbar > .date {
     display: none;
   }
+  /* "Rumah Belajar Rainbow Kids Alfatih / Ringkasan" wrapped to two lines on a phone. The name is
+     already in the sidebar brand above, so the bar keeps only the screen it names. */
+  .topbar .org,
+  .topbar .slash {
+    display: none;
+  }
   .top-actions {
     gap: 4px;
   }
+  /* The labels stay small so the bar still fits; the hit area is grown instead of the text, so a
+     thumb has something to land on. */
   .top-actions button {
     font-size: 9px;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 7px;
+    /* min-width alone squeezed the content box until "Keluar ↗" broke across two lines. */
+    white-space: nowrap;
   }
   .top-actions button:first-child {
     font-size: 16px;
