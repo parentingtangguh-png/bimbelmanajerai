@@ -95,7 +95,7 @@ Indikator **lengkap**: 16 level × 6 bidang wajib (Menyimak, Berbicara, Membaca,
 ## Catatan lain
 - Ganti kata sandi: tombol ⚿ di kartu akun (sidebar) → `db.auth.updateUser`. Minimal 8 karakter, diketik dua kali. **Claude tidak pernah mengetikkan kata sandi pengguna.**
 - Karena pratinjau dihapus, Claude **tidak bisa memeriksa tampilan di balik login sendirian**. Bila perlu, minta pengguna login di pane browser, lalu periksa lewat `mcp__Claude_Browser__*`. Jangan mengubah data produksi; bila terpaksa mencoba (mis. mencentang indikator), **kembalikan seperti semula** dan buktikan dengan query.
-- Berkas tidak dilacak yang **bukan** buatan Claude: `scripts/.tmp-inspect-hafsah.ps1`, `scripts/.tmp-run-hafsah-scenario.ps1` — jangan di-commit.
+- Berkas tidak dilacak yang **bukan** buatan Claude: `scripts/.tmp-inspect-hafsah.ps1`, `scripts/.tmp-run-hafsah-scenario.ps1`. Sejak 12 Sep 2026 `.gitignore` mengabaikan `scripts/.tmp-*` dan `.claude/`, jadi skrip coba-coba sekali pakai aman diberi awalan `.tmp-` — repo ini publik.
 - Yang masih terbuka (hanya bila pengguna meminta): baris terpanjang tersisa ~691 di `views/curriculum.js`; opacity motif tunas di HP (0,4) menunggu penilaian pengguna; baris siswa di dasbor menampilkan rata-rata Bahasa Indonesia sehingga ketimpangan antar bidang tersembunyi.
 - Semua layar sudah dipecah jadi fungsi kecil 12 Sep 2026: `views/sessions.js` (max 434), `views/dashboard.js` (366), `views/students.js` (362), `src/main.js` (346), `views/team.js` (199). Rangka aplikasi di main.js sekarang `sidebar`/`navButtons`/`accountCard`/`topbar`/`loginStory`/`loginForm`/`passwordForm`/`curriculumFieldset`.
 - Cara membuktikan perombakan tanpa perubahan tampilan, tiga lapis sesuai jangkauannya:

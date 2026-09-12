@@ -16,6 +16,11 @@ scripts/run-smoke-ai.local.ps1
 playwright-report/
 scripts/refine-ui.mjs
 
+# Pengaturan alat bantu lokal (mis. launch.json untuk dev server di pane browser).
+.claude/
+# Skrip coba-coba sekali pakai. Repo ini publik, jadi jangan sampai ikut ter-commit.
+scripts/.tmp-*
+
 # Implementasi awal tetap tersimpan lokal sebagai arsip.
 app.py
 /style.css
