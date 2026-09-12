@@ -46,7 +46,7 @@ Berkas ini menggambarkan **keadaan sekarang**, bukan riwayat. Kalau sesuatu di s
 - Kode diformat **Prettier** (`.prettierrc.json`, lebar 110). Jalankan `npx prettier --write` setelah mengedit.
 
 ## Menguji
-- `npm test` → `scripts/check-imports.mjs` lebih dulu, lalu 41 tes Node: domain, database (PGlite menjalankan semua migrasi), dan **render**.
+- `npm test` → `scripts/check-imports.mjs` lebih dulu, lalu 47 tes Node: domain, database (PGlite menjalankan semua migrasi), dan **render**.
 - `tests/render.test.mjs` memanggil fungsi layar langsung dengan data contoh `tests/fixtures/sample-state.mjs` — tanpa browser, tanpa login. **Inilah satu-satunya tes yang menjangkau kartu evaluasi.** Kalau menambah fitur di layar mana pun, tambahkan tesnya di sini.
 - `npx playwright test` hanya menguji layar login (aplikasi memuat, tanpa galat, tidak meluber di 390px). Lebih dari itu tidak mungkin tanpa akun.
 - **Playwright pernah rapuh pada server dingin** — sudah diperbaiki 12 Sep 2026 dengan menaikkan `timeout` ke 60 dtk dan `expect.timeout` ke 20 dtk di `playwright.config.js`. Vite dingin butuh ~10 dtk sampai layar login tampil, sedangkan `toBeVisible` bawaan menyerah di 5 dtk; halaman masih "Memuat…" lalu tes gagal padahal kodenya benar. Kalau gagal lagi: itu waktu, bukan kode — jalankan sekali lagi, atau hidupkan dev server dulu supaya Playwright memakainya (`reuseExistingServer:true`), lalu pastikan server itu memuat kode terbaru. Jangan turunkan lagi ambang batasnya.
@@ -63,6 +63,7 @@ Pengguna cukup menyebut perintah pendek; ini yang harus dikerjakan.
 
 **"rapikan kode"**
 `npx prettier --write "src/**/*.js" "src/*.css" "tests/**/*.js"`, lalu buktikan bundel hasil build tidak berubah: bandingkan `md5sum dist/assets/index-*.js` sebelum dan sesudah.
+⚠ **Jangan memasukkan `tests/**/*.mjs` ke glob itu.** `tests/database.test.mjs` dan `tests/domain.test.mjs` sengaja bergaya padat; sekali diformat, diff-nya membengkak 1.600+ baris dan menenggelamkan perubahan asli. (`render.test.mjs` dan `fixtures/sample-state.mjs` sudah terformat, jadi keduanya aman.)
 
 **"deploy"**
 Ikuti Alur kerja langkah 3–4. Jangan pernah push tanpa persetujuan lebih dulu.
@@ -87,6 +88,13 @@ Indikator **lengkap**: 16 level × 6 bidang wajib (Menyimak, Berbicara, Membaca,
 - Kartu evaluasi menampilkan tujuan level, indikator yang bisa dicentang, saran penilaian otomatis ("2 dari 3 → MB", hanya saran), dan baris riwayat "pernah terlihat di sesi sebelumnya".
 - Busur antar fase: Fondasi menirukan → memegang satuan lebih besar; Fase A mengerjakan → memilih dan memeriksa; Fase B satu sumber → beberapa sumber dan bersedia berubah oleh bukti; Fase C menimbang dan memutuskan sendiri lalu mempertanggungjawabkannya.
 
+## Mengoreksi dan membatalkan (12 Sep 2026)
+- **Koreksi evaluasi** — `reopen_evaluation(uuid)`. Menyelesaikan evaluasi memindahkan level, `evidence_count`, `repeat_count`, dan alarm; membalik aritmetikanya mustahil karena satu keadaan akhir bisa berasal dari beberapa keadaan awal. Jadi `finalize_competency_evaluation` **memotret** baris `student_competencies` ke `session_competency_snapshots` sebelum mengubah apa pun, dan membuka kembali mengembalikan potret itu persis. Kalau menambah efek baru pada finalisasi, pastikan efeknya ikut terpotret.
+- Hanya evaluasi **terakhir** anak yang bisa dibuka (potret lama akan menghapus kemajuan sesudahnya), bukan milik anak yang sudah Lulus, dan tidak saat anak punya sesi terbuka. Aturan sama dijaga dua kali: `canReopen` di `state.js` untuk menampilkan tombol, dan RPC-nya untuk menolak.
+- Jawaban guru sengaja **tidak** dihapus saat dibuka kembali, supaya ia mengoreksi di atas yang sudah diketik.
+- **Batalkan sesi** — `delete_class(uuid)`. Hanya sesi yang **belum** punya satu pun evaluasi tersimpan. Ini menutup jebakan lama: anak dengan sesi belum dievaluasi tidak bisa ikut kelas lain, tidak bisa dinonaktifkan, dan tidak bisa dihapus, jadi satu sesi salah buka mengunci semua anak di dalamnya. `ai_jobs` dan `session_students` tidak punya `on delete cascade`, jadi RPC menghapusnya berurutan.
+- Daftar Ruang kelas terbagi "Belum selesai dievaluasi" (selalu tampil, itu antrean kerja guru) dan "Sudah selesai" (10 terbaru, sisanya lewat tombol; `state.allSessions`).
+
 ## Centang indikator
 - Tabel `session_indicator_checks` (session_student_id, subject, indicator_index, level_snapshot, indicator_text, checked_at). Teks indikator disalin saat dicentang supaya riwayat tetap terbaca kalau pemilik mengubah kurikulum.
 - Disimpan lewat RPC `set_indicator_check(uuid,text,integer,boolean,text)` **saat guru mencentang**, bukan saat evaluasi disimpan, supaya guru bisa mencentang selama kegiatan berlangsung. Ditolak bila sesi sudah final, anak tidak hadir, atau bidang bukan target sesi itu.
@@ -96,7 +104,7 @@ Indikator **lengkap**: 16 level × 6 bidang wajib (Menyimak, Berbicara, Membaca,
 - Ganti kata sandi: tombol ⚿ di kartu akun (sidebar) → `db.auth.updateUser`. Minimal 8 karakter, diketik dua kali. **Claude tidak pernah mengetikkan kata sandi pengguna.**
 - Karena pratinjau dihapus, Claude **tidak bisa memeriksa tampilan di balik login sendirian**. Bila perlu, minta pengguna login di pane browser, lalu periksa lewat `mcp__Claude_Browser__*`. Jangan mengubah data produksi; bila terpaksa mencoba (mis. mencentang indikator), **kembalikan seperti semula** dan buktikan dengan query.
 - Berkas tidak dilacak yang **bukan** buatan Claude: `scripts/.tmp-inspect-hafsah.ps1`, `scripts/.tmp-run-hafsah-scenario.ps1`. Sejak 12 Sep 2026 `.gitignore` mengabaikan `scripts/.tmp-*` dan `.claude/`, jadi skrip coba-coba sekali pakai aman diberi awalan `.tmp-` — repo ini publik.
-- Yang masih terbuka (hanya bila pengguna meminta): baris terpanjang tersisa ~691 di `views/curriculum.js`; opacity motif tunas di HP (0,4) menunggu penilaian pengguna; baris siswa di dasbor menampilkan rata-rata Bahasa Indonesia sehingga ketimpangan antar bidang tersembunyi.
+- Yang masih terbuka (hanya bila pengguna meminta): baris terpanjang tersisa ~691 di `views/curriculum.js`; baris siswa di dasbor menampilkan rata-rata Bahasa Indonesia sehingga ketimpangan antar bidang tersembunyi; layar Kurikulum belum diperiksa untuk kenyamanan di HP.
 - Semua layar sudah dipecah jadi fungsi kecil 12 Sep 2026: `views/sessions.js` (max 434), `views/dashboard.js` (366), `views/students.js` (362), `src/main.js` (346), `views/team.js` (199). Rangka aplikasi di main.js sekarang `sidebar`/`navButtons`/`accountCard`/`topbar`/`loginStory`/`loginForm`/`passwordForm`/`curriculumFieldset`.
 - Cara membuktikan perombakan tanpa perubahan tampilan, tiga lapis sesuai jangkauannya:
   1. Layar biasa → `node scripts/render-screens.mjs` sebelum/sesudah harus md5 sama.

@@ -793,6 +793,21 @@ footer {
   padding-top: 23px;
   margin-top: 25px;
 }
+/* Cancelling sits at the very bottom of the class, after every child, so it is never the first
+   thing a hand reaches for. */
+.cancel-class {
+  margin-top: 25px;
+}
+.cancel-class p {
+  margin-bottom: 14px;
+}
+/* Correcting a saved evaluation is a rare, deliberate step, so it sits quietly under the form. */
+.reopen {
+  margin-top: 16px;
+}
+.reopen p {
+  margin-bottom: 2px;
+}
 .section-title {
   display: flex;
   align-items: center;

@@ -285,7 +285,9 @@ function evaluationHistory(s) {
 }
 export function scheduleForm(sc = {}) {
   const members = scheduleMembers(sc.id);
-  const active = state.students.filter(s => s.status === 'Aktif');
+  // A child who was deactivated while in this slot stays a member. Listing only active children
+  // hid them, and saving then dropped them silently, so they are shown and marked instead.
+  const active = state.students.filter(s => s.status === 'Aktif' || members.has(s.id));
   modal(
     sc.id ? 'Ubah sesi jadwal' : 'Sesi jadwal baru',
     `<form data-form="schedule" data-id="${sc.id || ''}">${scheduleTimeFields(sc)}<h3>Anak di sesi ini</h3>${scheduleRoster(active, members)}<button class="primary full">Simpan sesi jadwal</button>${scheduleDeleteButton(sc)}</form>`
@@ -310,10 +312,10 @@ function scheduleTimeFields(sc) {
 function scheduleRoster(active, members) {
   return (
     active
-      .map(
-        s =>
-          `<label class="check"><input type="checkbox" name="student" value="${s.id}" ${members.has(s.id) ? 'checked' : ''}>${h(s.name)}</label>`
-      )
+      .map(s => {
+        const tanda = s.status === 'Aktif' ? '' : ` <small>· ${h(s.status).toLowerCase()}</small>`;
+        return `<label class="check"><input type="checkbox" name="student" value="${s.id}" ${members.has(s.id) ? 'checked' : ''}>${h(s.name)}${tanda}</label>`;
+      })
       .join('') || '<p>Belum ada siswa aktif.</p>'
   );
 }

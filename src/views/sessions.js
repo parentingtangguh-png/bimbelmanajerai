@@ -10,7 +10,9 @@ import {
   hintText,
   observationFor,
   timeLabel,
-  indicatorsOf
+  indicatorsOf,
+  canReopen,
+  RECENT_SESSIONS
 } from '../state.js';
 import { field, select, area, empty, heading, modal } from '../ui.js';
 import { escapeHtml as h, waLink, localDate } from '../domain.js';
@@ -22,9 +24,13 @@ export function sessionsView() {
       ...new Set(records.filter(r => r.attendance === 'Hadir').map(r => r.group_no || 1))
     ].sort();
     const done = records.filter(r => r.finalized_at).length;
-    return [classHeading(c, groups, records, done), teachingSteps(), classGuide(c), childCards(records)].join(
-      ''
-    );
+    return [
+      classHeading(c, groups, records, done),
+      teachingSteps(),
+      classGuide(c),
+      childCards(records),
+      cancelClass(c, records)
+    ].join('');
   }
   const buttons = `<div class="button-row"><button class="secondary" data-action="new-schedule">＋ Buat sesi jadwal</button><button class="primary" data-action="new-session">＋ Mulai sesi kelas</button></div>`;
   const head = heading(
@@ -33,14 +39,35 @@ export function sessionsView() {
     'Satu tema, satu panduan multigrade, dan bukti perkembangan individual.',
     buttons
   );
-  return `${head}<div class="panel">${
-    state.classes
-      .map(x => {
-        const rr = state.records.filter(r => r.session_id === x.id);
-        return `<button class="class-row" data-action="open-session" data-id="${x.id}"><span class="calendar">${h(x.date.slice(8))}<small>${h(x.date.slice(0, 7))}</small></span><div><h3>${h(x.theme)}</h3><p>${x.start_time ? timeLabel(x) + ' · ' : ''}${x.duration_minutes || 60} menit · ${rr.length} siswa · ${rr.filter(r => r.finalized_at).length} evaluasi selesai</p></div><span>Masuk kelas →</span></button>`;
-      })
-      .join('') || empty('Ruang kelas menanti', 'Pilih durasi, tema, dan siswa untuk membuka sesi pertama.')
-  }</div>`;
+  if (!state.classes.length)
+    return `${head}<div class="panel">${empty('Ruang kelas menanti', 'Pilih durasi, tema, dan siswa untuk membuka sesi pertama.')}</div>`;
+  return `${head}${openClasses()}${finishedClasses()}`;
+}
+
+// Sessions still waiting on an evaluation are the teacher's work queue, so they are never hidden.
+function openClasses() {
+  const open = state.classes.filter(x => state.records.some(r => r.session_id === x.id && !r.finalized_at));
+  if (!open.length) return '';
+  return `<section class="panel"><div class="panel-heading"><h2>Belum selesai dievaluasi</h2><span>${open.length}</span></div>${open.map(classRow).join('')}</section>`;
+}
+
+// Everything else is history. After a year of teaching it is hundreds of rows, so only the newest
+// are drawn until the teacher asks for the rest.
+function finishedClasses() {
+  const done = state.classes.filter(x => state.records.every(r => r.session_id !== x.id || r.finalized_at));
+  if (!done.length) return '';
+  const shown = state.allSessions ? done : done.slice(0, RECENT_SESSIONS);
+  const rest = done.length - shown.length;
+  const more = rest
+    ? `<button class="text-btn full" data-action="all-sessions">Tampilkan ${rest} sesi sebelumnya</button>`
+    : '';
+  return `<section class="panel"><div class="panel-heading"><h2>Sudah selesai</h2><span>${done.length}</span></div>${shown.map(classRow).join('')}${more}</section>`;
+}
+
+function classRow(x) {
+  const rr = state.records.filter(r => r.session_id === x.id);
+  const meta = `${x.start_time ? timeLabel(x) + ' · ' : ''}${x.duration_minutes || 60} menit · ${rr.length} siswa · ${rr.filter(r => r.finalized_at).length} evaluasi selesai`;
+  return `<button class="class-row" data-action="open-session" data-id="${x.id}"><span class="calendar">${h(x.date.slice(8))}<small>${h(x.date.slice(0, 7))}</small></span><div><h3>${h(x.theme)}</h3><p>${meta}</p></div><span>Masuk kelas →</span></button>`;
 }
 export function recordCard(r) {
   const s = studentFor(r);
@@ -119,6 +146,7 @@ export function recordCard(r) {
     cardHeading(s, r, targetText, locked),
     attendanceForm(r, locked),
     evaluationSection(absent, absentForm, r, evaluation, observation, englishRatings, chars, locked),
+    reopenSection(r),
     reportSection(r, link, absent, locked),
     `</article>`
   ].join(``);
@@ -176,6 +204,13 @@ function sessionWhenFields() {
     'required'
   );
   return `${field('Tanggal', 'date', 'date', localDate(), 'required')}${schedule}${duration}`;
+}
+
+// A saved evaluation can be corrected, because two "Tercapai" move the child's level and a misclick
+// would otherwise stand for good. Offered only on the newest one; see canReopen.
+function reopenSection(r) {
+  if (!canReopen(r)) return '';
+  return `<div class="reopen"><p class="muted">Ada yang keliru? Buka kembali untuk mengubah penilaian. Level dan bukti anak dikembalikan seperti sebelum evaluasi ini disimpan.</p><button type="button" class="text-btn" data-action="reopen-eval" data-id="${r.id}">Buka kembali evaluasi</button></div>`;
 }
 
 // A child who was not there is still closed off, so the next session can include them. Nothing is
@@ -274,6 +309,13 @@ function classGuide(c) {
     ? `<pre>${h(c.material)}</pre><button class="text-btn" data-action="print-class" data-id="${c.id}">Cetak panduan (opsional)</button>`
     : '<p class="muted">Panduan akan mengatur waktu, aktivitas tematik, diferensiasi kelompok, English Exposure, dan titik observasi karakter.</p>';
   return `<article class="panel class-guide"><div class="section-title">${head}</div>${body}</article>`;
+}
+
+// A session opened by mistake keeps every child in it out of any other class, so it needs a way out.
+// Once one evaluation is saved the session belongs to that child's record and the offer disappears.
+function cancelClass(c, records) {
+  if (records.some(r => r.finalized_at)) return '';
+  return `<section class="panel cancel-class"><h3>Salah membuka sesi ini?</h3><p class="muted">Belum ada evaluasi tersimpan, jadi sesi ini masih bisa dibatalkan. Anak-anak di dalamnya langsung bebas mengikuti sesi lain. Setelah satu evaluasi disimpan, sesi tidak bisa dibatalkan lagi.</p><button type="button" class="secondary danger" data-action="delete-class" data-id="${c.id}">Batalkan sesi ini</button></section>`;
 }
 
 function childCards(records) {

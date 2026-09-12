@@ -337,8 +337,10 @@ document.addEventListener('change', async e => {
           {
             session_student_id: record,
             subject,
+            // The level the database stamps on the tick. Kept truthful locally so the "seen in an
+            // earlier session" line keeps working before the next refresh.
+            level_snapshot: assessmentsFor(record).find(a => a.subject === subject)?.level_snapshot ?? 0,
             indicator_index: index,
-            level_snapshot: 0,
             indicator_text: box.dataset.text || ''
           }
         ]
@@ -459,6 +461,37 @@ document.addEventListener('click', async e => {
       document.querySelector('#modal').close();
       await refresh();
       return notify(activate ? 'Siswa diaktifkan kembali.' : 'Siswa dinonaktifkan.');
+    }
+    if (action === 'all-sessions') {
+      state.allSessions = true;
+      return render();
+    }
+    if (action === 'delete-class') {
+      const c = state.classes.find(x => x.id === id);
+      if (
+        !confirm(
+          `Batalkan sesi "${c?.theme || 'ini'}" pada ${c?.date || ''}? Sesi dan daftar anaknya dihapus permanen. Tidak ada evaluasi yang hilang karena belum ada yang tersimpan.`
+        )
+      )
+        return;
+      await result(db.rpc('delete_class', { p_session: id }));
+      state.active = null;
+      state.view = 'sessions';
+      await refresh();
+      return notify('Sesi dibatalkan.');
+    }
+    if (action === 'reopen-eval') {
+      const r = state.records.find(x => x.id === id);
+      const s = state.students.find(x => x.id === r?.student_id);
+      if (
+        !confirm(
+          `Buka kembali evaluasi ${s?.name || 'anak ini'}? Level dan bukti dikembalikan seperti sebelum evaluasi ini disimpan, lalu Anda menilai ulang.`
+        )
+      )
+        return;
+      await result(db.rpc('reopen_evaluation', { p_id: id }));
+      await refresh();
+      return notify('Evaluasi dibuka kembali. Silakan perbaiki penilaiannya.');
     }
     if (action === 'delete-schedule') {
       if (!confirm('Hapus sesi jadwal ini? Data siswa tidak ikut terhapus.')) return;
@@ -621,7 +654,9 @@ document.addEventListener('submit', async e => {
           await result(
             db.rpc('update_student_profile', {
               p_student: id,
-              p_payload: { name, parent_name, phone, interest, diagnostic, learning_notes, status: v.status }
+              // No status here: the profile form has no status field, and activating or deactivating
+              // a child goes through set_student_active so the open-session guard runs.
+              p_payload: { name, parent_name, phone, interest, diagnostic, learning_notes }
             })
           );
           const before = state.students.find(x => x.id === id);
@@ -680,8 +715,11 @@ document.addEventListener('submit', async e => {
         if (sid) await result(db.from('schedules').update(payload).eq('id', sid));
         else sid = (await result(db.from('schedules').insert(payload).select('id').single())).id;
         const chosen = f.getAll('student');
+        // Only unticking a box removes a child. A member the form never offered stays a member,
+        // so a roster that hides someone can never quietly drop them.
+        const offered = new Set([...form.querySelectorAll('input[name="student"]')].map(el => el.value));
         const old = [...scheduleMembers(sid)];
-        const removed = old.filter(x => !chosen.includes(x));
+        const removed = old.filter(x => offered.has(x) && !chosen.includes(x));
         if (removed.length)
           await result(
             db.from('schedule_students').delete().eq('schedule_id', sid).in('student_id', removed)

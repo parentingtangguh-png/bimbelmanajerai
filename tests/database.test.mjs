@@ -415,6 +415,65 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   await as(teacher,"select save_attendance($1,'Sakit')",[x.rid]);
   assert.equal((await as(owner,'select attendance from session_students where id=$1',[x.rid])).rows[0].attendance,'Sakit');
  });
+ await t.test('evaluasi terakhir bisa dibuka kembali dan mengembalikan kenaikan level',async()=>{
+  const koreksi=randomUUID();
+  await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Dewi','Bunda Dewi',10,10,16,10,10,16)`,[koreksi]);
+  await admin('insert into assignments values($1,$2)',[koreksi,teacher]);
+  const kosong=JSON.stringify({english_rating:'',english_note:'',character_dimensions:[],character_note:''});
+  const nilai=async()=>(await as(teacher,'select subject,current_level,evidence_count,repeat_count from student_competencies where student_id=$1 and active order by subject',[koreksi])).rows;
+  const simpan=(rid,subjects,note)=>as(teacher,'select finalize_competency_evaluation($1,$2::jsonb,$3,$4::jsonb)',[rid,JSON.stringify(subjects.map(subject=>({subject,rating:'T',note}))),note,kosong]);
+  // Dua bukti Tercapai pada kompetensi yang sama menaikkan level; itulah yang harus bisa dibatalkan.
+  let x=await create(teacher,koreksi);
+  const pertama=(await as(teacher,'select subject from session_assessments where session_student_id=$1 order by subject',[x.rid])).rows.map(r=>r.subject);
+  await simpan(x.rid,pertama,'Bukti pertama');
+  x=await create(teacher,koreksi);
+  const kedua=(await as(teacher,'select subject from session_assessments where session_student_id=$1 order by subject',[x.rid])).rows.map(r=>r.subject);
+  const bersama=pertama.find(subject=>kedua.includes(subject));
+  const sebelum=await nilai();
+  await simpan(x.rid,kedua,'Bukti kedua');
+  assert.equal((await nilai()).find(r=>r.subject===bersama).current_level,11,'dua bukti menaikkan level');
+  await assert.rejects(as(owner,'select reopen_evaluation($1)',[x.rid]),/Pemilik hanya membaca/);
+  await assert.rejects(as(stranger,'select reopen_evaluation($1)',[x.rid]),/Akses ditolak/);
+  await as(teacher,'select reopen_evaluation($1)',[x.rid]);
+  assert.deepEqual(await nilai(),sebelum,'kompetensi kembali persis seperti sebelum evaluasi');
+  const r=(await as(teacher,'select finalized_at,grade from session_students where id=$1',[x.rid])).rows[0];
+  assert.equal(r.finalized_at,null,'sesi kembali bisa diedit');
+  assert.equal(r.grade,null);
+  assert.equal((await as(teacher,'select count(*)::int as n from session_assessments where session_student_id=$1 and rating is not null',[x.rid])).rows[0].n,kedua.length,'jawaban guru tetap terbaca saat dibuka kembali');
+  await assert.rejects(as(teacher,'select reopen_evaluation($1)',[x.rid]),/belum disimpan/);
+  // Menyimpan ulang menaikkan levelnya lagi: koreksi tidak merusak alur kenaikan.
+  await simpan(x.rid,kedua,'Bukti kedua diulang');
+  assert.equal((await nilai()).find(r=>r.subject===bersama).current_level,11);
+  // Evaluasi lama ditolak: mengembalikan potret lama akan menghapus kemajuan sesudahnya.
+  const lama=(await as(teacher,'select id from session_students where student_id=$1 and id<>$2 and finalized_at is not null',[koreksi,x.rid])).rows[0].id;
+  await assert.rejects(as(teacher,'select reopen_evaluation($1)',[lama]),/Hanya evaluasi terakhir/);
+ });
+ await t.test('sesi yang belum dievaluasi bisa dibatalkan; yang sudah, tidak',async()=>{
+  const batal=randomUUID();
+  await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Eka','Bunda Eka',5,5,8,5,5,8)`,[batal]);
+  await admin('insert into assignments values($1,$2)',[batal,teacher]);
+  const x=await create(teacher,batal);
+  // Sesi terbuka mengunci anak: tidak bisa masuk kelas lain sampai dievaluasi.
+  await assert.rejects(create(teacher,batal),/sesi/i);
+  await assert.rejects(as(owner,'select delete_class($1)',[x.cid]),/Pemilik tidak membuka/);
+  await assert.rejects(as(stranger,'select delete_class($1)',[x.cid]),/Akses ditolak/);
+  await as(teacher,'select delete_class($1)',[x.cid]);
+  assert.equal((await admin('select count(*)::int as n from class_sessions where id=$1',[x.cid])).rows[0].n,0);
+  assert.equal((await admin('select count(*)::int as n from session_students where session_id=$1',[x.cid])).rows[0].n,0,'baris anak ikut terhapus');
+  assert.equal((await admin('select count(*)::int as n from session_assessments where session_student_id=$1',[x.rid])).rows[0].n,0,'target ikut terhapus');
+  // Anak bebas lagi setelah sesinya dibatalkan.
+  const y=await create(teacher,batal);
+  const kosong=JSON.stringify({english_rating:'',english_note:'',character_dimensions:[],character_note:''});
+  const subjects=(await as(teacher,'select subject from session_assessments where session_student_id=$1',[y.rid])).rows.map(r=>r.subject);
+  await as(teacher,'select finalize_competency_evaluation($1,$2::jsonb,$3,$4::jsonb)',[y.rid,JSON.stringify(subjects.map(subject=>({subject,rating:'MB',note:'Bukti'}))),'Sudah dievaluasi',kosong]);
+  await assert.rejects(as(teacher,'select delete_class($1)',[y.cid]),/sudah punya evaluasi tersimpan/);
+ });
+ await t.test('tabel potret kompetensi tertutup untuk pengguna',async()=>{
+  // Dua lapis: tidak ada izin tabel, dan RLS menyala tanpa satu pun kebijakan.
+  assert.equal((await db.query("select has_table_privilege('authenticated','public.session_competency_snapshots','select') as boleh")).rows[0].boleh,false);
+  assert.equal((await db.query("select relrowsecurity as on from pg_class where relname='session_competency_snapshots'")).rows[0].on,true);
+  assert.equal((await db.query("select count(*)::int as n from pg_policies where tablename='session_competency_snapshots'")).rows[0].n,0);
+ });
  await t.test('guru nonaktif kehilangan akses',async()=>{
   await as(owner,"update access_list set active=false where email='guru@test.invalid'");
   assert.equal((await as(teacher,'select * from students')).rows.length,0);

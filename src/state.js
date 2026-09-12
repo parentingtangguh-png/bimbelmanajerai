@@ -27,8 +27,11 @@ export const initialState = () => ({
   scheduleStudents: [],
   curriculumTab: 'strand',
   curriculumSubject: 'reading',
-  curriculumPhase: 'all'
+  curriculumPhase: 'all',
+  // The class list keeps every session ever taught. Only the latest are shown until asked.
+  allSessions: false
 });
+export const RECENT_SESSIONS = 10;
 export const state = initialState();
 export const icons = { dashboard: '◫', students: '◉', sessions: '▤', team: '♧', curriculum: '▥' };
 export const labels = {
@@ -111,6 +114,18 @@ export const hintText = (done, total, key, keyDone) =>
         ? ` ★ Indikator ${key} adalah simpul menuju level berikutnya, jadi anak belum dapat naik.`
         : '') +
       ' Saran, bukan keputusan. Penilaian tetap di tangan guru.';
+// Only a child's newest saved evaluation can be corrected: reopening an older one would restore a
+// snapshot taken before everything recorded since. The same rule is enforced in the database.
+export const canReopen = record => {
+  if (!record.finalized_at) return false;
+  const s = state.students.find(x => x.id === record.student_id);
+  if (s?.status === 'Lulus') return false;
+  return !state.records.some(
+    o =>
+      o.student_id === record.student_id &&
+      (o.finalized_at === null || (o.id !== record.id && o.finalized_at > record.finalized_at))
+  );
+};
 export const observationFor = id =>
   state.observations.find(o => o.session_student_id === id) || {
     english_rating: null,
