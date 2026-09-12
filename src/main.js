@@ -1,12 +1,17 @@
 import { createClient } from '@supabase/supabase-js';
 import { escapeHtml as h, progress, waLink, localDate, minutesBetween, durationPattern, formatTime } from './domain.js';
+import { ORG_NAME, initialState, state, icons, labels, subjects, subjectLabels, reminderOfTheDay, characterLabels, studentFor, assessmentsFor, checksFor, priorChecks, hintText, observationFor, activeCompetenciesFor, ready, timeLabel, scheduleMembers, durationText, areaProgress, indicatorsOf, phaseOf, phaseShort, phaseEnd, phasePct, startPresets, levelOptions } from './state.js';
+import { field, select, area, empty, notify, heading, meter, modal } from './ui.js';
+import { curriculumView } from './views/curriculum.js';
+import { sessionsView, newSession } from './views/sessions.js';
+import { studentsView, levelMeaning, studentForm, scheduleForm } from './views/students.js';
+import { dashboard } from './views/dashboard.js';
+import { teamView } from './views/team.js';
 import './style.css';
 import './curriculum.css';
 import './owner.css';
 import './schedule.css';
 import './student-form.css';
-
-const ORG_NAME='Rumah Belajar Rainbow Kids Alfatih';
 
 const root = document.querySelector('#app');
 let publicConfig = {};
@@ -15,56 +20,6 @@ const url = import.meta.env.VITE_SUPABASE_URL || publicConfig.supabaseUrl;
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || publicConfig.supabasePublishableKey;
 const configured = url?.startsWith('https://') && key && !url.includes('PROJECT_REF');
 const db = configured ? createClient(url,key) : null;
-const initialState = () => ({ user:null, role:'teacher', name:'', view:'dashboard', students:[], classes:[], records:[], competencies:[], assessments:[], observations:[], indicatorChecks:[], alerts:[], members:[], assignments:[], profiles:[], themes:[], curriculum:[], active:null, demo:false, filter:'', schedules:[], scheduleStudents:[], curriculumTab:'strand', curriculumSubject:'reading', curriculumPhase:'all' });
-const state = initialState();
-let messageTimer;
-const icons={dashboard:'◫',students:'◉',sessions:'▤',team:'♧',curriculum:'▥'};
-const labels={dashboard:'Ringkasan',students:'Data siswa',sessions:'Ruang kelas',team:'Tim pengajar',curriculum:'Kurikulum'};
-const subjects=['listening','speaking','reading','writing','math','ipas','english'];
-const coreSubjects=['listening','speaking','reading','writing','math','ipas'];
-const subjectLabels={listening:'Menyimak',speaking:'Berbicara',reading:'Membaca',writing:'Menulis',math:'Matematika',ipas:'IPAS',english:'English Exposure'};
-// Shown to teachers on every screen, every day. The old banner explained how to start, which stopped
-// being true once teachers began adding their own students; its purpose now is empathy and
-// responsibility. One line per day, picked by the date, so every teacher sees the same one and it
-// never flickers between renders.
-const reminders=[
- ['Anak yang lambat hari ini bukan anak yang gagal.','Ia sedang berada di anak tangga yang berbeda, bukan di tangga yang salah.'],
- ['Catatan yang jujur lebih berharga daripada catatan yang indah.','Yang kita tulis hari ini menjadi dasar keputusan esok hari.'],
- ['Sebelum menilai anak, tanyakan dulu pada diri sendiri:','apakah ia sudah pernah diajari dengan cara yang ia pahami?'],
- ['Anak membaca wajah kita lebih dulu,','baru kemudian kata-kata kita.'],
- ['“Belum saya periksa” adalah jawaban yang terhormat','— bagi anak, dan bagi kita.'],
- ['Satu anak yang merasa didampingi saat belajar','lebih berarti daripada sepuluh lembar latihan.'],
- ['Rapor yang kita kirim akan dibaca orang tuanya berkali-kali.','Tulis yang benar, dengan cara yang menguatkan.'],
- ['Kemajuan kecil tetap kemajuan.','Tugas kita memastikan kemajuan itu benar-benar terjadi, bukan sekadar terlihat.']
-];
-const reminderOfTheDay=()=>reminders[Math.floor(Date.parse(localDate())/86400000)%reminders.length];
-const characterLabels={kemandirian:'Kemandirian',tanggung_jawab:'Tanggung jawab',kerja_sama:'Kerja sama',kepedulian:'Kepedulian',komunikasi_santun:'Komunikasi santun'};
-const field=(label,name,type='text',value='',extra='')=>`<label>${label}<input name="${name}" type="${type}" value="${h(value)}" ${extra}></label>`;
-const select=(label,name,items,value='',extra='')=>`<label>${label}<select name="${name}" ${extra}>${items.map(x=>{const [v,t]=Array.isArray(x)?x:[x,x];return `<option value="${h(v)}" ${v===value?'selected':''}>${h(t)}</option>`;}).join('')}</select></label>`;
-const area=(label,name,value='',extra='')=>`<label>${label}<textarea name="${name}" rows="3" ${extra}>${h(value)}</textarea></label>`;
-const empty=(title,text)=>`<div class="empty"><span>✧</span><h3>${title}</h3><p>${text}</p></div>`;
-const studentFor=r=>state.students.find(s=>s.id===r.student_id);
-const competenciesFor=id=>state.competencies.filter(c=>c.student_id===id);
-const assessmentsFor=id=>state.assessments.filter(a=>a.session_student_id===id);
-// Ticks saved for this record, and what the same child already showed at the same level before.
-const checksFor=id=>state.indicatorChecks.filter(c=>c.session_student_id===id);
-const priorChecks=(record,subject,level)=>{
- const mine=new Set(state.records.filter(r=>r.student_id===record.student_id&&r.id!==record.id&&r.finalized_at).map(r=>r.id));
- return state.indicatorChecks.filter(c=>mine.has(c.session_student_id)&&c.subject===subject&&c.level_snapshot===level);
-};
-// One wording for the suggestion, used both when the card is drawn and when a box is ticked.
-const hintText=(done,total,key,keyDone)=>done===0
- ?'Centang indikator yang terlihat hari ini untuk melihat saran penilaian. Saran, bukan keputusan.'
- :`<strong>${done} dari ${total} tercapai → saran: ${done===total?'T (Tercapai)':'MB (Mulai Berkembang)'}.</strong>`
-  +(key&&!keyDone?` ★ Indikator ${key} adalah simpul menuju level berikutnya, jadi anak belum dapat naik.`:'')
-  +' Saran, bukan keputusan. Penilaian tetap di tangan guru.';
-const observationFor=id=>state.observations.find(o=>o.session_student_id===id)||{english_rating:null,english_note:'',character_dimensions:[],character_note:''};
-const activeCompetenciesFor=id=>competenciesFor(id).filter(c=>c.active!==false&&subjects.includes(c.subject));
-const ready=s=>{const rows=activeCompetenciesFor(s.id).filter(c=>c.required);return rows.length?rows.every(c=>c.current_level>=c.target):s.reading_level>=s.reading_target&&s.math_level>=s.math_target;};
-const timeLabel=x=>x?.start_time?`${formatTime(x.start_time)}–${formatTime(x.end_time)}`:'';
-const scheduleMembers=id=>new Set(state.scheduleStudents.filter(x=>x.schedule_id===id).map(x=>x.student_id));
-function durationText(start,end){if(!start||!end)return 'Isi jam mulai dan jam selesai.';const mins=minutesBetween(start,end);if(mins<30||mins>180)return 'Durasi harus 30–180 menit.';return `${mins} menit · kelas memakai pola ${durationPattern(mins)} menit.`;}
-function notify(text,error=false){ document.querySelector('.toast')?.remove(); const el=document.createElement('div');el.className=`toast ${error?'error':''}`;el.role='status';el.textContent=text;document.body.append(el);clearTimeout(messageTimer);messageTimer=setTimeout(()=>el.remove(),6500); }
 async function result(query){ const {data,error}=await query;if(error)throw new Error(error.message);return data; }
 async function allRows(table,order='id') { const rows=[]; for(let from=0;;from+=500){let query=db.from(table).select('*').order(order);if(table==='assignments')query=query.order('teacher_id');if(table==='student_competencies'||table==='session_assessments')query=query.order('subject');const page=await result(query.range(from,from+499));rows.push(...page);if(page.length<500)return rows;} }
 function guardDemo(){if(state.demo)throw new Error('Ini pratinjau. Hubungkan Supabase dan masuk untuk menyimpan data.');}
@@ -124,199 +79,6 @@ function render(){
   root.innerHTML=`<div class="shell"><aside class="sidebar"><a href="#" class="brand" data-view="dashboard">b<span>·</span><div>${ORG_NAME}<small>Ruang tumbuh bersama</small></div></a><div class="nav-label">RUANG KERJA</div><nav>${nav.map(k=>`<button class="nav-item ${state.view===k?'active':''}" data-view="${k}"><span aria-hidden="true">${icons[k]}</span>${labels[k]}${k==='sessions'?'<i>→</i>':''}</button>`).join('')}</nav><div class="sidebar-note"><span>✳</span><p>Setiap kemajuan<br>layak dirayakan.</p><small>Satu anak, satu perjalanan.</small></div><div class="account"><span class="avatar">${h(state.name.slice(0,1))}</span><div><strong>${h(state.name)}</strong><small>${state.role==='owner'?'Pemilik':'Guru pengajar'}</small></div><button title="Ganti kata sandi" aria-label="Ganti kata sandi" data-action="password">⚿</button><button title="Keluar" aria-label="Keluar" data-action="logout">↗</button></div></aside><main class="workspace"><header class="topbar"><span>${ORG_NAME} <span class="slash">/</span> ${labels[state.view]}</span><span class="date">${new Intl.DateTimeFormat('id-ID',{dateStyle:'long',timeZone:'Asia/Jakarta'}).format(new Date())}</span><div class="top-actions"><button data-action="refresh" title="Muat ulang data" aria-label="Muat ulang data">↻</button><button data-action="logout" aria-label="Keluar akun">Keluar ↗</button></div></header>${state.role==='teacher'?(()=>{const [lead,rest]=reminderOfTheDay();return `<div class="onboarding reminder"><div><strong>${h(lead)}</strong><p>${h(rest)}</p></div></div>`;})():''}${state.demo?'<div class="demo-banner">PRATINJAU · Data contoh, tidak tersimpan. <button data-action="logout">Kembali ke login →</button></div>':''}<section class="content">${({dashboard:dashboard,students:studentsView,sessions:sessionsView,team:teamView,curriculum:curriculumView})[state.view]()}</section><footer>${ORG_NAME} <span>Belajar bertumbuh, bersama.</span></footer></main></div><dialog id="modal"></dialog>`;
   restoreDrafts();scrollTo(0,y);
 }
-function heading(kicker,title,subtitle,button=''){return `<div class="page-heading"><div><div class="eyebrow">${kicker}</div><h1>${title}</h1><p>${subtitle}</p></div>${button}</div>`;}
-function ownerDashboard(){
-  const active=state.students.filter(s=>s.status==='Aktif');
-  const today=state.classes.filter(c=>c.date===localDate());
-  const interventions=state.alerts.filter(a=>a.intervention);
-  const sum=active.filter(ready);
-  const pending=state.records.filter(r=>!r.finalized_at).length;
-  const teachers=state.members.filter(m=>m.role==='teacher'&&m.active).length;
-  return heading('PETA RUMAH BELAJAR','Halo, '+h(state.name.split(' ')[0])+' <span class="wave">✳</span>','Berikut hal penting yang membutuhkan perhatian Anda hari ini.','<button class="secondary" data-action="new-member">Kelola tim</button>')+
-    '<div class="stats"><div class="stat"><span>Siswa aktif <i>◉</i></span><strong>'+active.length.toString().padStart(2,'0')+'</strong><small>Total perjalanan belajar</small></div><div class="stat"><span>Guru aktif <i>♧</i></span><strong>'+teachers.toString().padStart(2,'0')+'</strong><small>Tim yang mendampingi</small></div><div class="stat"><span>Sesi hari ini <i>▤</i></span><strong>'+today.length.toString().padStart(2,'0')+'</strong><small>Kelas yang berlangsung</small></div><div class="stat warm"><span>Perlu perhatian <i>♡</i></span><strong>'+interventions.length.toString().padStart(2,'0')+'</strong><small>Alarm untuk ditinjau</small></div></div>'+
-    '<div class="dashboard-grid"><section class="panel"><div class="panel-heading"><div><h2>Perlu keputusan</h2><p>Ringkasan pengecualian, bukan pekerjaan kelas.</p></div><span>✧</span></div>'+(interventions.length?interventions.map(a=>'<article class="attention-item"><span class="badge amber">Pendampingan khusus</span><h3>'+h(state.students.find(s=>s.id===a.student_id)?.name||'Siswa')+'</h3><p>Tiga kali mengulang di level yang sama. Tinjau bersama guru pendamping.</p></article>').join(''):'<article class="attention-item"><span class="badge green">Semua terkendali</span><h3>Tidak ada alarm intervensi</h3><p>Belum ada siswa yang membutuhkan keputusan khusus.</p></article>')+(sum.length?'<article class="attention-item"><span class="badge green">Siap sumatif</span><h3>'+sum.length+' siswa mencapai target</h3><p>Ujian sumatif dan kelulusan dicatat oleh guru pendamping.</p></article>':'')+'</section><section class="panel"><div class="panel-heading"><div><h2>Ketertiban operasional</h2><p>Pemilik memantau; guru menyelesaikan.</p></div><span>◌</span></div><article class="attention-item"><span class="badge '+(pending?'amber':'green')+'">'+(pending?'Perlu ditinjau':'Rapi')+'</span><h3>'+(pending?pending+' sesi belum selesai dievaluasi':'Semua sesi sudah dievaluasi')+'</h3><p>Guru tetap menjadi pelaksana utama kegiatan kelas.</p></article></section></div>';
-}
-function dashboard(){
-  if(state.role==='owner')return ownerDashboard();
-  const active=state.students.filter(s=>s.status==='Aktif');const today=state.classes.filter(c=>c.date===localDate());const interventions=state.alerts.filter(a=>a.intervention);const sum=active.filter(ready);
-  return `${heading('HARI BARU, KESEMPATAN BARU',`Halo, ${h(state.name.split(' ')[0])} <span class="wave">✳</span>`,'Mari temani langkah kecil yang berarti hari ini.','<button class="primary" data-action="new-session">＋ Mulai sesi kelas</button>')}<section class="welcome"><div><span class="pill light">BELAJAR SESUAI RITME ANAK</span><h2>Bukan siapa yang paling cepat.<br>Melainkan siapa yang terus bertumbuh.</h2><p>Kenali minatnya, dampingi prosesnya, rayakan kemajuannya.</p><button data-view="students">Lihat perjalanan siswa <span>↗</span></button></div><div class="growth-art" aria-hidden="true"><div class="orbit"></div><span class="petal p1"></span><span class="petal p2"></span><span class="petal p3"></span><span class="stem"></span><span class="art-label">TUMBUH DENGAN CARANYA</span></div></section><div class="stats"><div class="stat"><span>Siswa aktif <i>◉</i></span><strong>${active.length.toString().padStart(2,'0')}</strong><small>Perjalanan yang kita dampingi</small></div><div class="stat"><span>Sesi hari ini <i>▤</i></span><strong>${today.length.toString().padStart(2,'0')}</strong><small>Ruang untuk belajar bersama</small></div><div class="stat"><span>Siap ujian sumatif <i>✧</i></span><strong>${sum.length.toString().padStart(2,'0')}</strong><small>Target belajar sudah tercapai</small></div>${state.role==='owner'?`<div class="stat warm"><span>Butuh perhatian <i>♡</i></span><strong>${interventions.length.toString().padStart(2,'0')}</strong><small>Mari dampingi lebih dekat</small></div>`:''}</div><div class="dashboard-grid"><section class="panel"><div class="panel-heading"><h2>Perjalanan belajar</h2><button class="text-btn" data-view="students">Semua siswa →</button></div>${active.length?active.slice(0,5).map(studentRow).join(''):empty('Perjalanan dimulai di sini','Tambahkan siswa pertama untuk mulai mendampingi belajarnya.')}</section><section class="panel attention"><div class="panel-heading"><h2>Catatan untuk Anda</h2><span>✧</span></div>${state.role==='owner'&&interventions.length?interventions.map(a=>`<article class="attention-item"><span class="badge amber">Pendampingan khusus</span><h3>${h(state.students.find(s=>s.id===a.student_id)?.name)}</h3><p>Tiga kali mengulang di level yang sama. Tinjau pendekatan belajar dan diskusikan dengan guru.</p></article>`).join(''):'<article class="attention-item"><span class="badge green">Langkah hari ini</span><h3>Mulai dari rasa ingin tahu</h3><p>Gunakan minat anak sebagai pintu masuk sebelum mengenalkan tantangan baru.</p></article>'}${sum.length?`<article class="attention-item"><span class="badge green">Siap sumatif</span><h3>${sum.length} siswa mencapai target</h3><p>Buka profil siswa untuk mencatat hasil ujian akhir.</p></article>`:''}<div class="quote">“Kemajuan kecil tetaplah kemajuan.”<small>Pengingat untuk hari ini</small></div></section></div>`;
-}
-function meter(label,current,baseline,target){return `<div class="meter"><div><span>${label}</span><strong>Level ${current} <small>/ ${target}</small></strong></div><progress value="${progress(current,baseline,target)}" max="100"></progress><small>Mulai level ${baseline} · ${progress(current,baseline,target)}% menuju target</small></div>`;}
-function teamView(){return `${heading('TIM YANG SALING MENDUKUNG','Guru yang mendampingi.','Daftarkan email guru. Setiap guru menambahkan dan mengelola siswanya sendiri.','<button class="primary" data-action="new-member">＋ Daftarkan guru</button>')}<div class="panel">${state.members.map(m=>`<div class="class-row"><span class="avatar">${h(m.name[0])}</span><div><h3>${h(m.name)}</h3><p>${h(m.email)} · ${m.role==='owner'?'Pemilik':'Guru'} · ${m.active?'Aktif':'Nonaktif'}</p></div>${m.role==='teacher'?`<button class="secondary" data-action="toggle-member" data-id="${h(m.email)}">${m.active?'Nonaktifkan':'Aktifkan'}</button>`:''}</div>`).join('')||empty('Belum ada guru','Tambahkan email guru. Guru kemudian mengaktifkan akun melalui halaman login.')}</div><div class="notice">Guru mengaktifkan akun menggunakan email yang didaftarkan di sini, lalu menambahkan siswanya sendiri di menu Data siswa.</div>`;}
-function modal(title,body){const d=document.querySelector('#modal');d.innerHTML=`<div class="modal-head"><h2>${title}</h2><button data-action="close" aria-label="Tutup">✕</button></div>${body}`;d.showModal();}
-function areaProgress(s,codes){
-  const rows=activeCompetenciesFor(s.id).filter(c=>codes.includes(c.subject));
-  if(!rows.length)return null;
-  return {baseline:Math.round(rows.reduce((n,c)=>n+c.baseline,0)/rows.length),current:Math.round(rows.reduce((n,c)=>n+c.current_level,0)/rows.length),target:Math.round(rows.reduce((n,c)=>n+c.target,0)/rows.length)};
-}
-function studentRow(s){
-  const bi=areaProgress(s,['listening','speaking','reading','writing'])||{current:s.reading_level,target:s.reading_target};
-  return `<button class="student-row" data-action="student" data-id="${s.id}"><span class="avatar pastel">${h(s.name[0])}</span><div class="student-info"><strong>${h(s.name)}</strong><small>${h(s.interest||'Minat belum diisi')}</small></div><div class="mini-progress"><small>Bahasa Indonesia <b>Level ${bi.current}</b> · ${phaseShort(bi.current)}</small><progress value="${phasePct(bi.current)}" max="100"></progress></div><span class="row-arrow">→</span></button>`;
-}
-function ownerStudentsView(){
-  const list=state.students.filter(s=>s.name.toLowerCase().includes(state.filter.toLowerCase()));
-  const flagged=id=>state.alerts.some(a=>a.student_id===id&&a.intervention);
-  const teachers=id=>state.assignments.filter(a=>a.student_id===id).map(a=>state.profiles.find(p=>p.id===a.teacher_id)?.name).filter(Boolean).join(', ')||'—';
-  const cell=(current,target)=>`<td class="num"><b>${current}</b><small> / ${target}</small></td>`;
-  const active=state.students.filter(s=>s.status==='Aktif').length;
-  const attention=state.students.filter(s=>flagged(s.id)).length;
-  const rows=list.map(s=>{
-    const bi=areaProgress(s,['listening','speaking','reading','writing'])||{current:s.reading_level,target:s.reading_target};
-    const ipas=activeCompetenciesFor(s.id).find(c=>c.subject==='ipas');
-    const status=flagged(s.id)?'<span class="badge amber">Perlu perhatian</span>':ready(s)&&s.status==='Aktif'?'<span class="badge amber">Siap sumatif</span>':`<span class="badge green">${h(s.status)}</span>`;
-    return `<tr data-action="student" data-id="${s.id}" tabindex="0"><td><strong>${h(s.name)}</strong><small>${h(s.parent_name||'')}</small></td>${cell(bi.current,bi.target)}${cell(s.math_level,s.math_target)}${ipas?cell(ipas.current_level,ipas.target):'<td class="num">—</td>'}<td class="teachers">${h(teachers(s.id))}</td><td>${status}</td></tr>`;
-  }).join('');
-  return `${heading('DATA UMUM SISWA','Ringkasan siswa.',`${state.students.length} siswa · ${active} aktif · ${attention} perlu perhatian. Klik baris untuk membuka profil.`)}<div class="toolbar"><input id="student-search" type="search" placeholder="Cari nama siswa…" aria-label="Cari siswa" value="${h(state.filter)}"><span>${list.length} ditampilkan</span></div>${rows?`<div class="panel table-wrap"><table class="owner-students"><thead><tr><th>Siswa</th><th class="num">B. Indonesia</th><th class="num">Matematika</th><th class="num">IPAS</th><th>Guru pendamping</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`:empty('Belum ada siswa','Siswa baru ditambahkan oleh guru dan akan tampil di sini.')}`;
-}
-function teacherStudentsView(){
-  const list=state.students.filter(s=>s.name.toLowerCase().includes(state.filter.toLowerCase()));
-  const searching=!!state.filter.trim();
-  // Only active children belong to schedule groups; non-active and graduated ones get their own group.
-  const active=list.filter(s=>s.status==='Aktif');const inactive=list.filter(s=>s.status!=='Aktif');
-  const scheduled=new Set(state.scheduleStudents.filter(x=>state.schedules.some(sc=>sc.id===x.schedule_id)).map(x=>x.student_id));
-  const group=(title,meta,action,students,extra='')=>`<section class="panel schedule-group ${extra}"><div class="panel-heading"><div><h2>${title}</h2><p>${meta}</p></div>${action}</div>${students.length?students.map(studentRow).join(''):'<p class="muted">Belum ada anak di sesi ini. Tekan Ubah untuk memilih anak.</p>'}</section>`;
-  const sections=state.schedules.map(sc=>{
-    const members=scheduleMembers(sc.id);const kids=active.filter(s=>members.has(s.id));const activeCount=state.students.filter(s=>s.status==='Aktif'&&members.has(s.id)).length;
-    if(searching&&!kids.length)return '';
-    const mins=minutesBetween(sc.start_time,sc.end_time);
-    return group(h(sc.name),`${timeLabel(sc)} · ${mins} menit · pola ${durationPattern(mins)} menit · ${activeCount} anak`,`<button class="secondary" data-action="edit-schedule" data-id="${sc.id}">Ubah</button>`,kids);
-  }).join('');
-  const loose=active.filter(s=>!scheduled.has(s.id));
-  const inactiveSection=inactive.length?group('Siswa non-aktif &amp; lulus',`${inactive.length} anak · tidak ikut sesi kelas; riwayat belajarnya tetap tersimpan`,'',inactive,'unscheduled'):'';
-  const looseSection=loose.length?group('Belum masuk sesi',`${loose.length} anak · masukkan ke sesi jadwal agar mudah dipilih saat membuka kelas`,'',loose,'unscheduled'):'';
-  const buttons='<div class="button-row"><button class="secondary" data-action="new-schedule">＋ Buat sesi jadwal</button><button class="primary" data-action="new-student">＋ Tambah siswa</button></div>';
-  return `${heading('SETIAP ANAK UNIK','Kenali, lalu dampingi.','Siswa dikelompokkan menurut sesi jadwal rutin Anda.',buttons)}<div class="toolbar"><input id="student-search" type="search" placeholder="Cari nama siswa…" aria-label="Cari siswa" value="${h(state.filter)}"><span>${state.students.length} siswa · ${state.schedules.length} sesi jadwal</span></div>${state.students.length?(sections+looseSection+inactiveSection||empty('Tidak ditemukan','Tidak ada siswa dengan nama itu.')):empty('Belum ada siswa','Tambahkan siswa pertama Anda untuk mulai mendampingi belajarnya.')}`;
-}
-function studentsView(){
-  return state.role==='owner'?ownerStudentsView():teacherStudentsView();
-}
-function sessionsView(){
-  const c=state.classes.find(c=>c.id===state.active);
-  if(c){
-    const records=state.records.filter(r=>r.session_id===c.id);
-    const groups=[...new Set(records.filter(r=>r.attendance==='Hadir').map(r=>r.group_no||1))].sort();
-    const done=records.filter(r=>r.finalized_at).length;
-    return `${heading('SATU TEMA, BERAGAM TANTANGAN',h(c.theme),`${h(c.date)}${c.start_time?' · '+timeLabel(c):''} · ${c.duration_minutes||60} menit · ${groups.length||1} kelompok · ${done} dari ${records.length} anak selesai dievaluasi`,'<button class="secondary" data-action="back-sessions">← Semua sesi</button>')}<div class="notice"><strong>Langkah kelas</strong><br>① Tandai anak yang tidak datang. Kehadiran bisa diubah sampai evaluasinya disimpan, dan panduan kelas tetap aman.<br>② Buat panduan kelas sekali untuk semua kelompok.<br>③ Setelah kegiatan, simpan evaluasi setiap anak, termasuk yang tidak hadir.<br>④ Buat kabar orang tua, periksa, lalu kirim lewat WhatsApp.</div><article class="panel class-guide"><div class="section-title"><div><h2>Panduan kelas bersama</h2><p>Satu alur mengajar dengan kartu kegiatan untuk maksimal tiga kelompok.</p></div><button class="primary" data-action="generate-class" data-id="${c.id}">${c.material?'Lihat panduan tersimpan':'✦ Buat panduan kelas AI'}</button></div>${c.material?`<pre>${h(c.material)}</pre><button class="text-btn" data-action="print-class" data-id="${c.id}">Cetak panduan (opsional)</button>`:'<p class="muted">Panduan akan mengatur waktu, aktivitas tematik, diferensiasi kelompok, English Exposure, dan titik observasi karakter.</p>'}</article><h2 class="student-evaluation-title">Evaluasi individual</h2><div class="session-list">${records.map(recordCard).join('')}</div>`;
-  }
-  return `${heading('RUANG KELAS','Siap belajar bersama?','Satu tema, satu panduan multigrade, dan bukti perkembangan individual.','<button class="primary" data-action="new-session">＋ Mulai sesi kelas</button>')}<div class="panel">${state.classes.map(x=>{const rr=state.records.filter(r=>r.session_id===x.id);return `<button class="class-row" data-action="open-session" data-id="${x.id}"><span class="calendar">${h(x.date.slice(8))}<small>${h(x.date.slice(0,7))}</small></span><div><h3>${h(x.theme)}</h3><p>${x.start_time?timeLabel(x)+' · ':''}${x.duration_minutes||60} menit · ${rr.length} siswa · ${rr.filter(r=>r.finalized_at).length} evaluasi selesai</p></div><span>Masuk kelas →</span></button>`;}).join('')||empty('Ruang kelas menanti','Pilih durasi, tema, dan siswa untuk membuka sesi pertama.')}</div>`;
-}
-function recordCard(r){
-  const s=studentFor(r);if(!s)return '';
-  const targets=assessmentsFor(r.id);const observation=observationFor(r.id);const link=waLink(s.phone,r.report);const locked=!!r.finalized_at;const absent=r.attendance!=='Hadir';
-  const targetText=targets.map(a=>`${subjectLabels[a.subject]||a.subject} ${a.level_snapshot}`).join(' · ');
-  const ratings=[['','Pilih perkembangan'],['BT','Belum tampak'],['MB','Mulai berkembang'],['T','Tercapai']];
-  const englishRatings=[['','Tidak dicatat'],['BT','Belum merespons'],['MB','Mulai merespons'],['T','Menggunakan/merespons']];
-  const evaluation=targets.map(a=>{
-    const c=state.curriculum.find(x=>x.level===a.level_snapshot);const list=indicatorsOf(c,a.subject);const key=Number((c&&c[`${a.subject}_key`])||0);
-    const goal=c&&c[a.subject]?`<h4>Tujuan level ${a.level_snapshot}</h4><p class="target-goal">${h(c[a.subject])}</p>`:'';
-    const saved=new Set(checksFor(r.id).filter(c=>c.subject===a.subject).map(c=>c.indicator_index));
-    const before=new Set(priorChecks(r,a.subject,a.level_snapshot).map(c=>c.indicator_index));
-    const done=[...saved].length;const keyDone=!key||saved.has(key);
-    const history=before.size?`<p class="indicator-history">Pernah terlihat di sesi sebelumnya pada level ini: indikator ${[...before].sort((x,y)=>x-y).join(', ')}.</p>`:'';
-    const checks=list.length?`<h4>Indikator</h4><div class="indicator-checks" data-key="${key}" data-record="${r.id}" data-subject="${a.subject}">${list.map((t,i)=>`<label class="check"><input type="checkbox" class="indicator-check" data-index="${i+1}" data-text="${h(t)}" ${saved.has(i+1)?'checked':''} ${locked||absent?'disabled':''}>${i+1===key?'<span class="star">★</span> ':''}${i+1}. ${h(t)}${before.has(i+1)?' <em class="seen">sudah pernah</em>':''}</label>`).join('')}<p class="indicator-hint">${hintText(done,list.length,key,keyDone)}</p>${history}</div>`:'<p class="muted">Indikator level ini belum disusun. Buka menu Kurikulum untuk melengkapinya.</p>';
-    return `<div class="target-eval"><div><span class="badge green">${h(subjectLabels[a.subject]||a.subject)} · Level ${a.level_snapshot}</span><small>Dua bukti Tercapai dibutuhkan sebelum naik level.</small></div>${goal}${checks}${select('Perkembangan',`rating_${a.subject}`,ratings,a.rating||'',locked||absent?'disabled':'required')}${area('Bukti singkat',`note_${a.subject}`,a.evidence_note||'',`maxlength="1000" ${locked||absent?'disabled':''}`)}</div>`;
-  }).join('');
-  const absentForm=`<form data-form="evaluation" data-id="${r.id}" class="evaluation competency-evaluation"><h3>01 / Selesaikan catatan</h3><p class="muted">${h(s.name)} tercatat ${h(r.attendance)}. Tidak ada penilaian dan level tidak berubah. ${locked?'':'Tekan tombol di bawah agar anak dapat ikut sesi berikutnya.'}</p>${area('Catatan (opsional)','anecdote',r.anecdote||'',`maxlength="3000" ${locked?'disabled':''}`)}<button class="primary" ${locked?'disabled':''}>${locked?'✓ Sudah diselesaikan':'Selesaikan untuk anak tidak hadir'}</button></form>`;
-  const chars=Object.entries(characterLabels).map(([value,label])=>`<label class="check"><input type="checkbox" name="character" value="${value}" ${(observation.character_dimensions||[]).includes(value)?'checked':''} ${locked?'disabled':''}>${label}</label>`).join('');
-  return `<article class="panel session-card"><div class="panel-heading"><div><h2>${h(s.name)} <small>· Kelompok ${r.group_no||1}</small></h2><p>${h(s.interest||'Minat belum diisi')} · ${h(targetText)}</p></div><span class="badge ${locked?'green':'amber'}">${locked?'Evaluasi tersimpan':'Sesi berlangsung'}</span></div><form data-form="attendance" data-id="${r.id}" class="inline-form">${select('Kehadiran','attendance',['Hadir','Sakit','Izin','Alfa'],r.attendance,locked?'disabled':'')}<button class="secondary" ${locked?'disabled':''}>Simpan kehadiran</button></form>${absent?absentForm:`<form data-form="evaluation" data-id="${r.id}" class="evaluation competency-evaluation"><h3>01 / Bukti target inti</h3>${evaluation}<div class="observation-block"><h3>02 / English Exposure</h3><p class="muted">Dicatat sebagai pengayaan tematik dan tidak menentukan kelulusan.</p>${select('Respons Bahasa Inggris','english_rating',englishRatings,observation.english_rating||'',locked?'disabled':'')}${area('Bukti English Exposure (opsional)','english_note',observation.english_note||'',`maxlength="1000" ${locked?'disabled':''}`)}</div><div class="observation-block"><h3>03 / Observasi karakter</h3><p class="muted">Pilih perilaku yang terlihat dalam kegiatan; ini bukan nilai atau level anak.</p><div class="character-checks">${chars}</div>${area('Konteks observasi karakter (opsional)','character_note',observation.character_note||'',`maxlength="1000" ${locked?'disabled':''}`)}</div>${area('Catatan anekdot umum (opsional)','anecdote',r.anecdote||'',`maxlength="3000" ${locked?'disabled':''}`)}<button class="primary" ${locked?'disabled':''}>${locked?'✓ Evaluasi sudah tersimpan':'Simpan & selesaikan evaluasi'}</button><small class="fine">Target inti dinilai mandiri. English Exposure dan karakter dicatat tanpa menjadi syarat kelulusan.</small></form>`}<section class="report"><div class="section-title"><h3>${absent?'02':'04'} / Kabar untuk orang tua</h3>${r.attendance==='Hadir'?`<button class="secondary" data-action="generate" data-kind="report" data-id="${r.id}" ${!locked?'disabled':''}>${r.report?'Lihat rapor tersimpan':'✦ Buat draf rapor'}</button>`:''}</div>${r.report?`<pre>${h(r.report)}</pre><div class="button-row"><button class="secondary" data-action="copy" data-id="${r.id}">Salin pesan</button>${link?`<a class="primary" target="_blank" rel="noopener noreferrer" href="${h(link)}">Periksa & buka WhatsApp →</a>`:'<small>Lengkapi nomor WhatsApp di profil siswa untuk membuka percakapan.</small>'}</div>`:'<p class="muted">Rapor dibuat setelah evaluasi agar kabarnya sesuai kegiatan nyata.</p>'}</section></article>`;
-}
-function curriculumView(){
-  const tab=state.curriculumTab==='level'?'level':'strand';
-  const tabs=`<div class="curriculum-tabs">${[['strand','Per untaian'],['level','Per level']].map(([v,t])=>`<button class="${tab===v?'active':''}" data-action="curriculum-tab" data-id="${v}">${t}</button>`).join('')}</div>`;
-  return `${heading('TANGGA KOMPETENSI','16 level yang saling berulang dan bertumbuh.','Tujuan tetap; aktivitas berubah mengikuti tema, kelompok, dan kebutuhan anak.')}${tabs}<div class="notice">Bahasa Indonesia terdiri dari menyimak, berbicara, membaca, dan menulis. English Exposure wajib hadir dalam tema, tetapi tidak menjadi syarat kelulusan. Karakter diamati pada semua kegiatan.</div>${tab==='level'?curriculumByLevel():curriculumByStrand()}`;
-}
-// Levels are a spiral, so the strand view reads down one subject and names the knot between each pair of levels.
-function curriculumByStrand(){
-  const subject=subjects.includes(state.curriculumSubject)?state.curriculumSubject:'reading';
-  const band=state.curriculumPhase||'all';
-  const pick=(label,action,items,current)=>`<div class="strand-picker"><span>${label}</span>${items.map(([v,t])=>`<button class="${v===current?'active':''}" data-action="${action}" data-id="${v}">${h(t)}</button>`).join('')}</div>`;
-  const pickers=pick('Bidang','curriculum-subject',subjects.map(k=>[k,subjectLabels[k]]),subject)+pick('Fase','curriculum-phase',[['all','Semua'],['1','Fondasi 1–4'],['2','Fase A 5–8'],['3','Fase B 9–12'],['4','Fase C 13–16']],band);
-  const rows=state.curriculum.filter(c=>band==='all'||Math.ceil(c.level/4)===Number(band)).sort((x,y)=>x.level-y.level);
-  if(!rows.length)return pickers+empty('Bank kurikulum','Enam belas level kurikulum akan tersedia setelah database terhubung.');
-  const body=rows.map((c,i)=>{
-    const header=i===0||phaseShort(c.level)!==phaseShort(rows[i-1].level)?`<h2 class="strand-band">${phaseShort(c.level)}</h2>`:'';
-    return header+strandRung(c,subject)+spiralNode(c,subject);
-  }).join('');
-  return `${pickers}<div class="strand">${body}</div>`;
-}
-function strandRung(c,k){
-  const list=indicatorsOf(c,k);const key=Number(c[`${k}_key`]||0);
-  const items=list.length?`<ol class="indicator-list">${list.map((t,i)=>`<li class="${i+1===key?'key':''}">${i+1===key?'<span class="star" title="Simpul spiral">★</span>':''}${h(t)}</li>`).join('')}</ol>`:'<p class="muted">Indikator belum disusun untuk level ini.</p>';
-  return `<article class="panel strand-rung"><div class="rung-head"><span class="badge green">LEVEL ${c.level}</span><span class="badge">${phaseShort(c.level)}</span></div><h4>Tujuan</h4><p>${h(c[k]||'—')}</p><h4>Indikator</h4>${items}<h4>Bukti berhasil</h4><small>${h(c[`${k}_criteria`]||'Kriteria belum tersedia.')}</small>${state.role==='owner'?`<button class="secondary" data-action="edit-curriculum" data-id="${c.level}">Edit level ${c.level}</button>`:''}</article>`;
-}
-function spiralNode(c,k){
-  const key=Number(c[`${k}_key`]||0);const note=c[`${k}_spiral`]||'';
-  // A knot that crosses a phase boundary matters most: that step goes through the summative exam.
-  // Level 16 has nothing above it, so its note closes the ladder instead of pointing onwards.
-  const top=c.level===16;const crossing=c.level%4===0;
-  if(!note)return `<div class="spiral-node muted-node"><span aria-hidden="true">↓</span><p>${top?'Penutup tangga belum ditulis.':'Simpul spiral menuju level berikutnya belum ditulis.'}</p></div>`;
-  const label=top?`Menutup tangga${key?` → indikator ${key}`:''} · kelulusan setelah ujian sumatif akhir`:`Simpul spiral${key?` → indikator ${key}`:''}${crossing?` · menuju ${phaseShort(c.level+1)} lewat ujian sumatif`:''}`;
-  return `<div class="spiral-node${crossing?' crossing':''}${top?' top':''}"><span class="star" aria-hidden="true">${crossing?'⇅':'★'}</span><div><strong>${label}</strong><p>${h(note)}</p></div></div>`;
-}
-function curriculumByLevel(){
-  const detail=(c,k)=>{const list=indicatorsOf(c,k);const key=Number(c[`${k}_key`]||0);return `<details><summary>${h(subjectLabels[k])} <em>(${list.length||'–'})</em></summary><p>${h(c[k])}</p>${list.length?`<ol class="indicator-list">${list.map((t,i)=>`<li class="${i+1===key?'key':''}">${h(t)}</li>`).join('')}</ol>`:'<p class="muted">Indikator belum disusun.</p>'}<small><strong>Bukti berhasil</strong><br>${h(c[`${k}_criteria`]||'Kriteria belum tersedia.')}</small></details>`;};
-  return `<div class="curriculum-grid">${state.curriculum.map(c=>`<article class="panel curriculum-card"><span class="badge green">LEVEL ${c.level}</span><h2>${phaseOf(c.level)}</h2><h3>Bahasa Indonesia</h3>${['listening','speaking','reading','writing'].map(k=>detail(c,k)).join('')}<h3>Matematika</h3>${detail(c,'math')}<h3>IPAS tematik</h3>${detail(c,'ipas')}<h3>English Exposure</h3>${detail(c,'english')}${state.role==='owner'?`<button class="secondary" data-action="edit-curriculum" data-id="${c.level}">Edit tujuan & kriteria</button>`:''}</article>`).join('')||empty('Bank kurikulum','Enam belas level kurikulum akan tersedia setelah database terhubung.')}</div>`;
-}
-// Indicators arrive as jsonb; tolerate a string payload so older rows keep rendering.
-function indicatorsOf(c,k){const v=c&&c[`${k}_indicators`];if(Array.isArray(v))return v.filter(x=>typeof x==='string'&&x.trim());if(typeof v==='string'&&v.trim()){try{const parsed=JSON.parse(v);return Array.isArray(parsed)?parsed:[];}catch{return [];}}return [];}
-function competencyMeters(s){
-  const rows=activeCompetenciesFor(s.id);
-  if(!rows.length)return `${meter('Bahasa Indonesia',s.reading_level,s.reading_baseline,s.reading_target)}${meter('Matematika',s.math_level,s.math_baseline,s.math_target)}`;
-  const order=['listening','speaking','reading','writing','math','ipas','english'];
-  return `<div class="competency-list">${order.map(code=>rows.find(c=>c.subject===code)).filter(Boolean).map(c=>`<div class="competency-meter"><div><strong>${h(subjectLabels[c.subject])}</strong><span>Level ${c.current_level} · ${phaseOf(c.current_level)}${c.required?'':' · pengayaan'}</span></div><progress value="${phasePct(c.current_level)}" max="100"></progress><small>${c.current_level>=c.target?(c.target>=16?'Level tertinggi tercapai':'Akhir fase tercapai · menunggu ujian sumatif'):`${phasePct(c.current_level)}% fase · ${c.evidence_count}/2 bukti menuju kenaikan berikutnya`}${c.intervention?' · perlu ditinjau':''}</small></div>`).join('')}</div>`;
-}
-function competencyTargetsForm(s){const rows=activeCompetenciesFor(s.id);return rows.length?`<form data-form="competency-targets" data-id="${s.id}"><h3>Target per kompetensi</h3><p class="muted">Empat elemen Bahasa Indonesia, Matematika, dan IPAS wajib. English Exposure tetap pengayaan.</p><div class="form-grid">${rows.map(c=>field(subjectLabels[c.subject],`target_${c.subject}`,'number',c.target,`required min="${c.current_level}" max="16"`)).join('')}</div><button class="secondary">Simpan target kompetensi</button></form>`:'';}
-const phaseOf=level=>level<=4?'Fondasi (belum SD)':level<=8?'Fase A · SD 1–2':level<=12?'Fase B · SD 3–4':'Fase C · SD 5–6';
-const phaseShort=level=>level<=4?'Fondasi':level<=8?'Fase A':level<=12?'Fase B':'Fase C';
-// Targets flow per phase: each competency aims at the end of its current phase (4, 8, 12, 16).
-const phaseEnd=level=>Math.min(16,Math.ceil(Math.max(1,Number(level)||1)/4)*4);
-const phasePct=level=>((Math.max(1,Number(level)||1)-1)%4+1)*25;
-// Suggested starting level per school grade; levels are competency positions, so teachers may adjust.
-const startPresets={fondasi:1,sd1:5,sd2:7,sd3:9,sd4:11,sd5:13,sd6:15};
-const levelOptions=[...Array(16)].map((_,i)=>[String(i+1),`Level ${i+1} · ${phaseOf(i+1)}`]);
-function levelMeaning(kind,level){
-  const n=Number(level);const c=state.curriculum.find(x=>x.level===n);const clip=t=>t&&t.length>170?t.slice(0,167)+'…':t||'—';
-  if(!c)return `${phaseOf(n)}. Lihat menu Kurikulum untuk tujuan lengkap level ini.`;
-  return kind==='math'?`${phaseOf(n)} · Matematika: ${clip(c.math)}`:`${phaseOf(n)} · Membaca: ${clip(c.reading)} · Menulis: ${clip(c.writing)}`;
-}
-function levelFields(s,edit,owner){
-  const correctable=edit&&!owner&&!state.records.some(r=>r.student_id===s.id);const lockBase=edit&&!correctable;
-  const pick=(label,name,value,kind)=>`<div>${select(label,name,levelOptions,String(value),lockBase?'disabled':'required')}<small class="level-meaning" data-meaning="${name}">${h(levelMeaning(kind,value))}</small></div>`;
-  const baseLabel=label=>lockBase?`${label} (terkunci)`:correctable?`${label} (bisa dikoreksi sampai anak ikut kelas)`:label;
-  const phases=[['','Pilih untuk mengisi level otomatis…'],['fondasi','Belum SD (Fondasi)'],['sd1','SD kelas 1'],['sd2','SD kelas 2'],['sd3','SD kelas 3'],['sd4','SD kelas 4'],['sd5','SD kelas 5'],['sd6','SD kelas 6']];
-  return `${edit?'':select('Perkiraan fase / kelas sekolah','phase',phases,'')}<div class="notice level-guide"><strong>Arti level</strong><br>1–4 Fondasi (belum SD) · 5–8 Fase A (SD 1–2) · 9–12 Fase B (SD 3–4) · 13–16 Fase C (SD 5–6).<br>Guru cukup menentukan titik awal sesuai hasil diagnostik; level adalah posisi kemampuan anak, bukan kelas sekolah. Target mengalir otomatis: akhir fase anak saat ini, lalu pindah ke fase berikutnya setelah anak lulus ujian sumatif fase itu. Titik awal Bahasa Indonesia juga dipakai untuk Menyimak, Berbicara, IPAS, dan English Exposure.</div><div class="form-grid">${pick(baseLabel('Level awal Bahasa Indonesia'),'reading_baseline',s.reading_baseline||1,'bi')}${pick(baseLabel('Level awal Matematika'),'math_baseline',s.math_baseline||1,'math')}</div>`;
-}
-function studentActionsSection(s){
-  const openSession=state.records.some(r=>r.student_id===s.id&&!r.finalized_at);
-  const status=s.status==='Lulus'?'<p class="muted">Siswa ini sudah lulus melalui ujian sumatif.</p>'
-    :s.status!=='Aktif'?`<p class="muted">Siswa ini non-aktif: tidak ikut sesi kelas, tetapi riwayat belajarnya tetap tersimpan.</p><button type="button" class="secondary" data-action="toggle-student" data-active="true" data-id="${s.id}">Aktifkan kembali</button>`
-    :openSession?'<p class="muted">Siswa ini masih punya sesi kelas yang belum dievaluasi. Selesaikan evaluasinya dulu sebelum menonaktifkan.</p><button type="button" class="secondary danger" disabled>Nonaktifkan siswa ini</button>'
-    :`<p class="muted">Untuk anak yang berhenti atau cuti. Anak tidak ikut sesi kelas, riwayat belajarnya tetap tersimpan, dan bisa diaktifkan kembali kapan saja.</p><button type="button" class="secondary danger" data-action="toggle-student" data-active="false" data-id="${s.id}">Nonaktifkan siswa ini</button>`;
-  const remove=state.records.some(r=>r.student_id===s.id)
-    ?'<p class="muted">Siswa ini sudah pernah ikut kelas, jadi tidak bisa dihapus agar riwayat belajarnya tetap tersimpan. Gunakan Nonaktifkan bila anak berhenti.</p>'
-    :`<p class="muted">Hanya untuk data yang salah input atau ganda. Siswa yang belum pernah ikut kelas dihapus permanen beserta level dan keanggotaan sesi jadwalnya.</p><button type="button" class="secondary danger" data-action="delete-student" data-id="${s.id}">Hapus siswa ini</button>`;
-  return `<h3>Status siswa</h3>${status}<hr><h3>Hapus siswa</h3>${remove}`;
-}
-function themeFields(){
-  const names=state.themes.map(t=>t.name);
-  if(!names.length)return field('Tema bersama','theme_custom','text','','required maxlength="120" placeholder="Contoh: Pasar"');
-  return `${select('Tema bersama','theme',[...names.map(n=>[n,n]),['__new','＋ Tema lain…']],names[0],'required')}<label class="theme-custom" hidden>Nama tema baru<input name="theme_custom" type="text" maxlength="120" placeholder="Contoh: Hewan di sekitar kita"></label>`;
-}
-function studentForm(s={}){
-  // Teachers own their students' data; the owner only reads profiles.
-  const owner=state.role==='owner';const canCreate=state.role==='teacher';const edit=!!s.id;const lockTargets=edit;
-  modal(edit?h(s.name):'Siswa baru',`<form data-form="student" data-id="${s.id||''}"><fieldset ${canCreate?'':'disabled'}><div class="form-grid">${field('Nama anak','name','text',s.name,'required maxlength="120"')}${field('Sapaan orang tua','parent_name','text',s.parent_name,'required maxlength="120"')}${field('Nomor WhatsApp','phone','tel',s.phone)}${field('Minat / hobi','interest','text',s.interest,'required maxlength="300"')}</div>${area('Hasil diagnostik awal','diagnostic',s.diagnostic,'maxlength="3000"')}${area('Catatan gaya belajar','learning_notes',s.learning_notes,'maxlength="3000"')}${levelFields(s,edit,owner)}${edit?`<p class="muted">${owner?'Profil ini hanya dapat dibaca. Perubahan dilakukan oleh guru pendamping.':'Target mengalir otomatis per fase. Lihat kemajuan tiap bidang di bawah.'}</p>`:''}</fieldset>${canCreate?'<button class="primary full">Simpan profil siswa</button>':''}</form>${edit?`<hr><h3>Perjalanan kompetensi</h3>${competencyMeters(s)}<div class="notice">Karakter tidak diberi level. Guru mencatat perilaku yang tampak dalam konteks kegiatan.</div>${!owner?`<hr>${studentActionsSection(s)}`:''}${!owner&&ready(s)&&s.status==='Aktif'?`<hr><form data-form="summative" data-id="${s.id}"><h3>Ujian sumatif akhir fase</h3><p class="muted">Semua bidang inti sudah mencapai akhir fasenya. Lulus fase membuka fase berikutnya; lulus di akhir Fase C berarti lulus dari rumah belajar.</p>${field('Nilai sumatif (1–100)','score','number','','required min="1" max="100"')}${select('Keputusan guru','pass',[['false','Perlu pendampingan lanjutan'],['true',activeCompetenciesFor(s.id).filter(c=>c.required).every(c=>c.target>=16)?'Lulus (akhir Fase C)':'Lulus fase — lanjut ke fase berikutnya']],'false')}<button class="primary">Simpan hasil sumatif</button></form>`:''}<hr><h3>Riwayat evaluasi</h3>${state.records.filter(r=>r.student_id===s.id&&r.finalized_at).sort((a,b)=>b.finalized_at.localeCompare(a.finalized_at)).map(r=>`<p class="history">${h(state.classes.find(c=>c.id===r.session_id)?.date||r.finalized_at.slice(0,10))} · ${h(r.attendance)} · <strong>${h(r.grade||'Tanpa nilai')}</strong><br><small>${h(r.anecdote)}</small></p>`).join('')||'<p class="muted">Belum ada evaluasi tersimpan.</p>'}`:''}`);
-}
-function scheduleForm(sc={}){
-  const members=scheduleMembers(sc.id);const active=state.students.filter(s=>s.status==='Aktif');
-  modal(sc.id?'Ubah sesi jadwal':'Sesi jadwal baru',`<form data-form="schedule" data-id="${sc.id||''}">${field('Nama sesi','name','text',sc.name||'','required maxlength="60" placeholder="Sesi Pagi"')}<div class="form-grid">${field('Jam mulai','start_time','time',sc.start_time?.slice(0,5)||'','required')}${field('Jam selesai','end_time','time',sc.end_time?.slice(0,5)||'','required')}</div><p class="muted schedule-hint" id="schedule-duration">${durationText(sc.start_time,sc.end_time)}</p><h3>Anak di sesi ini</h3>${active.map(s=>`<label class="check"><input type="checkbox" name="student" value="${s.id}" ${members.has(s.id)?'checked':''}>${h(s.name)}</label>`).join('')||'<p>Belum ada siswa aktif.</p>'}<button class="primary full">Simpan sesi jadwal</button>${sc.id?`<button type="button" class="text-btn full" data-action="delete-schedule" data-id="${sc.id}">Hapus sesi jadwal</button>`:''}</form>`);
-}
-function newSession(){
-  const available=state.students.filter(s=>s.status==='Aktif'&&!state.records.some(r=>r.student_id===s.id&&!r.finalized_at));
-  modal('Mulai sesi kelas',`<form data-form="session" data-id="${crypto.randomUUID()}">${field('Tanggal','date','date',localDate(),'required')}${state.schedules.length?select('Sesi jadwal','schedule',[['','Tanpa sesi jadwal'],...state.schedules.map(sc=>[sc.id,`${sc.name} · ${timeLabel(sc)}`])],''):''}${select('Durasi kelas','duration',[['60','60 menit · 2 target inti'],['75','75 menit · 2 target + integrasi'],['90','90 menit · maksimal 3 target']],'60','required')}${themeFields()}<div class="notice">Sistem memilih target spiral bersama dan membagi siswa menjadi maksimal tiga kelompok berdasarkan posisi kompetensi.</div><h3>Pilih anak yang mengikuti sesi</h3>${available.map(s=>`<label class="check"><input type="checkbox" name="student" value="${s.id}">${h(s.name)} <small>Bahasa Indonesia ${s.reading_level} · Matematika ${s.math_level}</small></label>`).join('')||'<p>Belum ada siswa tersedia. Tambahkan siswa atau selesaikan sesi yang masih terbuka.</p>'}<button class="primary full" ${available.length?'':'disabled'}>Buka ruang kelas →</button></form>`);
-}
-
-
 document.addEventListener('change',async e=>{
   const box=e.target.closest('.indicator-check');if(!box)return;
   const wrap=box.closest('.indicator-checks');const all=[...wrap.querySelectorAll('.indicator-check')];
