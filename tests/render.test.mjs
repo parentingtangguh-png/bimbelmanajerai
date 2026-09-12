@@ -7,6 +7,8 @@ import { dashboard } from '../src/views/dashboard.js';
 import { studentsView, scheduleForm } from '../src/views/students.js';
 import { curriculumView } from '../src/views/curriculum.js';
 import { teamView } from '../src/views/team.js';
+import { homeMenu } from '../src/views/home.js';
+import { slogans, doas, sloganOfTheMoment, doaOfTheDay } from '../src/state.js';
 
 // The screens are plain functions that return HTML, so they can be checked without a browser, a
 // login, or the preview. These cover the evaluation card in particular, which no browser test can
@@ -203,10 +205,49 @@ test('tidak ada kebocoran undefined atau [object Object] di layar mana pun', () 
     ['dashboard', dashboard()],
     ['students', studentsView()],
     ['curriculum', curriculumView()],
-    ['team', teamView()]
+    ['team', teamView()],
+    ['home', homeMenu('Rumah Belajar Contoh')]
   ]) {
     assert.ok(!html.includes('undefined'), name + ' memuat undefined');
     assert.ok(!html.includes('[object Object]'), name + ' memuat [object Object]');
     assert.ok(!html.includes('NaN'), name + ' memuat NaN');
   }
+});
+
+test('menu utama HP: kartu guru, kartu pemilik, dan tombol yang dikenali main.js', () => {
+  loadSampleState();
+  const guru = homeMenu('Rumah Belajar Contoh');
+  // Empat kartu, tidak lebih: Tim pengajar bukan milik guru.
+  assert.equal(count(guru, 'class="home-card'), 4);
+  for (const view of ['sessions', 'dashboard', 'students', 'curriculum'])
+    assert.match(guru, new RegExp('data-view="' + view + '"'), view + ' punya kartunya sendiri');
+  assert.ok(!guru.includes('data-view="team"'), 'guru tidak membuka Tim pengajar');
+  // Kartu melintang adalah pekerjaan harian guru.
+  assert.match(guru, /class="home-card wide" data-view="sessions"/);
+  // Aksi memakai atribut yang sudah ditangani main.js, bukan penangan baru.
+  assert.match(guru, /data-action="logout"/);
+  assert.match(guru, /data-action="password"/);
+
+  state.role = 'owner';
+  const pemilik = homeMenu('Rumah Belajar Contoh');
+  assert.equal(count(pemilik, 'class="home-card'), 4);
+  assert.match(pemilik, /class="home-card wide" data-view="team"/, 'pemilik mengurus tim');
+  assert.ok(!pemilik.includes('data-view="sessions"'), 'pemilik tidak membuka kelas');
+});
+
+test('menu utama HP: slogan berganti tiap 30 menit, doa sekali sehari', () => {
+  loadSampleState();
+  // Potongan setengah jam yang sama selalu memberi slogan yang sama.
+  const jam9 = Date.parse('2026-09-13T09:00:00Z');
+  assert.equal(sloganOfTheMoment(jam9), sloganOfTheMoment(jam9 + 29 * 60000));
+  // Sepanjang sehari harus ada lebih dari satu slogan, kalau tidak perputarannya percuma.
+  const sehari = new Set();
+  for (let i = 0; i < 48; i++) sehari.add(sloganOfTheMoment(jam9 + i * 1800000));
+  assert.ok(sehari.size > 1, 'slogan tidak pernah berganti');
+  for (const s of sehari) assert.ok(slogans.includes(s), 'slogan di luar daftar');
+
+  const [arab, arti, sumber] = doaOfTheDay();
+  assert.equal(doas.filter(d => d[0] === arab).length, 1, 'doa harus dari daftar');
+  assert.ok(arti.length > 10 && sumber.length > 3);
+  assert.match(homeMenu('Rumah Belajar Contoh'), new RegExp('dir="rtl"'));
 });

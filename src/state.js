@@ -83,6 +83,71 @@ export const reminders = [
 ];
 export const reminderOfTheDay = () =>
   reminders[Math.floor(Date.parse(localDate()) / 86400000) % reminders.length];
+// Menu utama di layar HP membawa dua teks berganti. Keduanya konstanta di sini, bukan di view,
+// karena view hanya menyusun HTML.
+export const slogans = [
+  'Amanah yang dijaga melahirkan nilai,<br>nilai yang nyata menumbuhkan kepercayaan.',
+  'Dipercaya satu keluarga hari ini,<br>karena amanah kemarin ditunaikan.',
+  'Nilai anak bukan angka semata,<br>itu amanah yang sedang kita jawab.',
+  'Kepercayaan datang perlahan,<br>dari amanah yang ditepati berulang kali.',
+  'Mengajar dengan amanah,<br>menilai dengan jujur, dipercaya selamanya.',
+  'Yang orang tua titipkan adalah anaknya,<br>yang mereka nilai adalah kesungguhan kita.',
+  'Amanah kecil hari ini<br>adalah kepercayaan besar tahun depan.',
+  'Jaga amanahnya, rawat nilainya,<br>kepercayaan akan menemukan jalannya.'
+];
+// Satu slogan per potongan 30 menit, dipilih dari nomor potongannya, bukan Math.random(): layar
+// yang dibuka berkali-kali dalam setengah jam yang sama menampilkan kalimat yang sama.
+export const sloganOfTheMoment = (now = Date.now()) =>
+  slogans[Math.abs((Math.sin(Math.floor(now / 1800000)) * 10000) | 0) % slogans.length];
+// [arab, arti, sumber]
+export const doas = [
+  [
+    'رَبِّ زِدْنِي عِلْمًا وَارْزُقْنِي فَهْمًا',
+    'Ya Tuhanku, tambahkanlah ilmu kepadaku dan karuniakanlah aku pemahaman.',
+    'Doa sebelum mengajar'
+  ],
+  [
+    'رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي',
+    'Ya Tuhanku, lapangkanlah dadaku dan mudahkanlah urusanku.',
+    'QS. Thaha: 25–26'
+  ],
+  [
+    'وَاحْلُلْ عُقْدَةً مِنْ لِسَانِي يَفْقَهُوا قَوْلِي',
+    'Lepaskanlah kekakuan lidahku, supaya mereka mengerti perkataanku.',
+    'QS. Thaha: 27–28'
+  ],
+  [
+    'اللَّهُمَّ انْفَعْنِي بِمَا عَلَّمْتَنِي وَعَلِّمْنِي مَا يَنْفَعُنِي',
+    'Ya Allah, berilah manfaat atas apa yang Engkau ajarkan kepadaku, dan ajarkanlah aku apa yang bermanfaat bagiku.',
+    'HR. Tirmidzi'
+  ],
+  [
+    'رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ',
+    'Ya Tuhan kami, jadikanlah anak keturunan kami penyejuk mata.',
+    'QS. Al-Furqan: 74'
+  ],
+  [
+    'اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ',
+    'Ya Allah, tolonglah aku untuk mengingat-Mu, bersyukur kepada-Mu, dan beribadah dengan baik kepada-Mu.',
+    'HR. Abu Dawud'
+  ],
+  [
+    'اللَّهُمَّ بَارِكْ لَنَا فِيمَا رَزَقْتَنَا',
+    'Ya Allah, berkahilah kami pada apa yang Engkau rezekikan kepada kami.',
+    'Doa keberkahan rezeki'
+  ]
+];
+// Doa berganti sekali sehari, seperti reminderOfTheDay: satu doa layak ditemani sepanjang hari.
+export const doaOfTheDay = () => doas[Math.floor(Date.parse(localDate()) / 86400000) % doas.length];
+// Kunci layar untuk kartu menu utama. Namanya diambil dari sini, bukan ditulis ulang di view,
+// supaya scripts/check-imports.mjs tidak salah mengira 'dashboard' adalah fungsi yang lupa diimpor.
+export const homeKeys = {
+  kelas: 'sessions',
+  ringkasan: 'dashboard',
+  siswa: 'students',
+  kurikulum: 'curriculum',
+  tim: 'team'
+};
 export const characterLabels = {
   kemandirian: 'Kemandirian',
   tanggung_jawab: 'Tanggung jawab',

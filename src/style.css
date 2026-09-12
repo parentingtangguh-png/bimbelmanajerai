@@ -1880,3 +1880,243 @@ dialog::backdrop {
     width: 100%;
   }
 }
+
+/* Menu utama layar HP (views/home.js). Di layar lebar sidebar sudah jadi menu, jadi bagian ini
+   hanya hidup di bawah 620px; markupnya tetap dikirim supaya tidak ada pengukuran lebar di JS. */
+.home {
+  display: none;
+}
+@media (max-width: 620px) {
+  .at-home .sidebar,
+  .at-home .topbar,
+  .at-home .reminder,
+  .at-home .content,
+  /* Hanya kaki halaman aplikasi, bukan .home-doa yang juga sebuah <footer>. */
+  .at-home .workspace > footer {
+    display: none;
+  }
+  .at-home .workspace {
+    margin-left: 0;
+    width: 100%;
+  }
+  .home {
+    display: block;
+    position: relative;
+    overflow-x: hidden;
+    padding: 18px 14px 32px;
+  }
+  .home > *:not(.home-leaf) {
+    position: relative;
+    z-index: 1;
+  }
+  /* Daun besar sebagai latar, menembus tepi kanan. Aturan .growth-art umum di blok 620px
+     menempelkannya ke sudut kartu sambutan, jadi di sini semuanya ditulis ulang. */
+  .home-leaf {
+    position: absolute;
+    top: 78px;
+    right: -58px;
+    width: 230px;
+    height: 210px;
+    opacity: 0.16;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .home .growth-art {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: auto;
+    bottom: auto;
+    width: 250px;
+    height: 220px;
+    min-width: 0;
+    margin: 0;
+    transform-origin: 0 0;
+    transform: scale(0.92) translate(-22px, 5px);
+  }
+  .home-mark .growth-art {
+    transform: scale(0.2) translate(-22px, 5px);
+  }
+  .home-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .home-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+  }
+  .home-mark {
+    position: relative;
+    width: 44px;
+    height: 42px;
+    flex: none;
+  }
+  .home-brand strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .home-brand small {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .home-corner {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .home-teacher {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+  }
+  /* Bulat seperti lingkaran ilustrasi guru, tapi merah: satu-satunya tombol di layar ini yang
+     mengeluarkan guru dari aplikasi. */
+  .home-keluar {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #4a2228;
+    color: #ff8080;
+    font-size: 16px;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+  }
+  .home-hello {
+    margin: 0 0 5px;
+    font-size: 24px;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+  }
+  .home-date {
+    margin: 0 0 12px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  /* Satu-satunya teks serif di aplikasi: motto dibaca sebagai renungan, bukan keterangan sistem.
+     Bayangannya menjaga huruf tetap terbaca saat jatuh di atas kelopak daun. */
+  .home-motto {
+    margin: 6px 0 22px;
+    text-align: center;
+  }
+  .home-motto p {
+    margin: 0;
+    font-family: 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+    font-style: italic;
+    font-size: 17.5px;
+    line-height: 1.65;
+    color: #d7b35d;
+    text-shadow:
+      0 0 10px #0d0f0d,
+      0 0 4px #0d0f0d;
+  }
+  .home-label {
+    margin-bottom: 10px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: #9a7f45;
+  }
+  .home-menu {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .home-card {
+    display: block;
+    width: 100%;
+    min-height: 112px;
+    padding: 15px 14px;
+    text-align: left;
+    background: #171a17;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    color: var(--ink);
+  }
+  .home-card.wide {
+    grid-column: 1 / -1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+  }
+  .home-ico {
+    width: 38px;
+    height: 38px;
+    margin-bottom: 12px;
+    border-radius: 11px;
+    background: var(--cream);
+    color: #d7b35d;
+    display: grid;
+    place-items: center;
+  }
+  .home-ico svg {
+    display: block;
+  }
+  .home-card.wide .home-ico {
+    margin: 0;
+    flex: none;
+  }
+  .home-card b {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: #fffdf7;
+  }
+  .home-card span {
+    display: block;
+    margin-top: 3px;
+    font-size: 12px;
+    line-height: 1.35;
+    color: var(--muted);
+  }
+  /* footer global memakai flex dan font 9px; .home-doa harus melepaskan diri dari keduanya. */
+  .home-doa {
+    display: block;
+    max-width: none;
+    padding: 18px 0 0;
+    font-size: 12.5px;
+    color: var(--ink);
+    margin-top: 22px;
+    border-top: 1px solid var(--line);
+    text-align: center;
+  }
+  .home-doa .ar {
+    margin: 0 0 6px;
+    font-size: 21px;
+    line-height: 1.9;
+    color: #d7b35d;
+  }
+  .home-doa .id {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+  .home-doa .sumber {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+  }
+  .home-doa .sandi,
+  .home-sandi {
+    margin-top: 14px;
+    border: 0;
+    background: none;
+    font-size: 12.5px;
+    color: #9a7f45;
+  }
+}
