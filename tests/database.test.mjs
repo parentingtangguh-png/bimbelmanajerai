@@ -468,6 +468,24 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   await as(teacher,'select finalize_competency_evaluation($1,$2::jsonb,$3,$4::jsonb)',[y.rid,JSON.stringify(subjects.map(subject=>({subject,rating:'MB',note:'Bukti'}))),'Sudah dievaluasi',kosong]);
   await assert.rejects(as(teacher,'select delete_class($1)',[y.cid]),/sudah punya evaluasi tersimpan/);
  });
+ await t.test('tidak ada bidang yang indikatornya menggambarkan tujuan level lain',async()=>{
+  // Penjaga umum, dibuat setelah indikator Matematika 6-14 ketahuan milik level berikutnya.
+  // Peta cakupan hanya menghitung jumlah indikator, jadi pergeseran isi lolos begitu saja.
+  // Indikator ke-3 adalah simpul yang memang menunjuk ke depan, jadi hanya indikator 1-2 diperiksa:
+  // keduanya harus berbagi kata dengan tujuan levelnya sendiri. Ambangnya sengaja tegas — nol
+  // kesamaan dengan tujuan sendiri padahal ada kesamaan dengan tujuan berikutnya — supaya tidak
+  // menyalakan alarm palsu untuk level bertetangga yang wajar memakai kata serupa.
+  const stop=new Set('dan atau yang dengan pada dari untuk serta dalam anak guru misalnya bukan hanya lalu bila sebagai satu dua tiga empat lima minimal soal kali sampai tanpa lebih tidak sudah belum akan menjadi setiap semua bagian kata benda gambar'.split(' '));
+  const kata=s=>new Set(String(s||'').toLowerCase().replace(/[^a-z0-9.\s]/g,' ').split(/\s+/).filter(w=>w.length>3&&!stop.has(w)));
+  const skor=(a,b)=>[...a].filter(w=>b.has(w)).length;
+  const bidang=['reading','writing','listening','speaking','ipas','math'];
+  const rows=(await admin(`select level,${bidang.map(b=>`${b},${b}_indicators`).join(',')} from curriculum order by level`)).rows;
+  for(const b of bidang)for(let i=0;i<rows.length-1;i++){
+   const inti=kata(rows[i][`${b}_indicators`].slice(0,2).join(' '));
+   const sendiri=skor(inti,kata(rows[i][b])),berikutnya=skor(inti,kata(rows[i+1][b]));
+   assert.ok(!(sendiri===0&&berikutnya>0),`${b} level ${rows[i].level}: indikator 1-2 tidak berbagi kata dengan tujuan levelnya sendiri, tetapi berbagi dengan tujuan level ${rows[i+1].level} — kemungkinan indikatornya terpasang di level yang salah`);
+  }
+ });
  await t.test('indikator Matematika menempel pada tujuan levelnya sendiri',async()=>{
   // Peta cakupan lama hanya menghitung jumlah indikator, jadi lolos meski isinya milik level lain:
   // Level 6 menampilkan tujuan "sampai 100" dengan indikator "sampai 1.000". Jangkar di bawah ini

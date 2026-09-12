@@ -90,7 +90,10 @@ Indikator **lengkap**: 16 level × 6 bidang wajib (Menyimak, Berbicara, Membaca,
 
 ## Indikator harus menempel pada tujuan levelnya sendiri
 - Ditemukan 12 Sep 2026 lewat smoke test: **indikator Matematika level 6–14 adalah milik level lain** — kartu Level 6 menampilkan tujuan "tambah-kurang sampai 100" bersama indikator "sampai 1.000". Guru menilai anak satu tingkat terlalu sulit, dan simpul spiral berbintang menahan kenaikan atas hal yang belum menjadi tujuan level itu. Level 1–5, 15, 16 dan semua bidang lain tidak terkena. Sudah diperbaiki di `20260912070000_math_indicators_realign.sql`.
-- Peta cakupan lama **lolos meski bug-nya ada**, karena hanya menghitung jumlah indikator. Sekarang ada tes jangkar di `tests/database.test.mjs` yang mengunci kata kunci wajib pada indikator pertama tiap level Matematika 6–16, dan memastikan simpul spiral level N menyebut Level N+1. Terbukti gagal pada data lama.
+- Peta cakupan lama **lolos meski bug-nya ada**, karena hanya menghitung jumlah indikator. Sekarang ada dua penjaga di `tests/database.test.mjs`, keduanya terbukti gagal pada data lama:
+  1. **Penjaga umum, semua bidang**: indikator 1–2 wajib berbagi kata dengan tujuan levelnya sendiri. Ambangnya tegas — nol kesamaan dengan tujuan sendiri padahal ada dengan tujuan berikutnya — supaya level bertetangga yang wajar memakai kata serupa tidak menyalakan alarm palsu. Indikator ke-3 dikecualikan karena simpul memang menunjuk ke depan.
+  2. **Jangkar Matematika**: kata kunci wajib pada indikator pertama level 6–16, plus simpul level N menyebut Level N+1.
+- Diperiksa menyeluruh 12 Sep 2026 setelah perbaikan: 16 level × 6 bidang inti + English, semua simpul menunjuk indikator yang ada, semua teks simpul menyebut level berikutnya, English `_key=0` di semua level, dan **tidak ada bidang lain yang bergeser**. Yang tidak bisa diperiksa mesin: mutu pedagogisnya — apakah indikatornya teramati, wajar untuk usianya, dan layak dinilai. Itu ranah pemilik.
 - Aturannya: indikator 1–2 menguji **tujuan level itu**, indikator ke-3 adalah **simpul** yang menjembatani ke tujuan level berikutnya. Kalau menambah indikator bidang lain, ikuti pola ini dan tambahkan jangkarnya ke tes.
 
 ## Rapor AI (`supabase/functions/generate-learning`)
