@@ -113,8 +113,8 @@ export function teacherStudentsView() {
         'unscheduled'
       )
     : '';
-  const buttons =
-    '<div class="button-row"><button class="secondary" data-action="new-schedule">＋ Buat sesi jadwal</button><button class="primary" data-action="new-student">＋ Tambah siswa</button></div>';
+  // Creating a schedule lives on Ruang kelas; this screen only assigns children to one.
+  const buttons = '<button class="primary" data-action="new-student">＋ Tambah siswa</button>';
   const head = heading(
     'SETIAP ANAK UNIK',
     'Kenali, lalu dampingi.',

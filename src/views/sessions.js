@@ -26,7 +26,14 @@ export function sessionsView() {
       ''
     );
   }
-  return `${heading('RUANG KELAS', 'Siap belajar bersama?', 'Satu tema, satu panduan multigrade, dan bukti perkembangan individual.', '<button class="primary" data-action="new-session">＋ Mulai sesi kelas</button>')}<div class="panel">${
+  const buttons = `<div class="button-row"><button class="secondary" data-action="new-schedule">＋ Buat sesi jadwal</button><button class="primary" data-action="new-session">＋ Mulai sesi kelas</button></div>`;
+  const head = heading(
+    'RUANG KELAS',
+    'Siap belajar bersama?',
+    'Satu tema, satu panduan multigrade, dan bukti perkembangan individual.',
+    buttons
+  );
+  return `${head}<div class="panel">${
     state.classes
       .map(x => {
         const rr = state.records.filter(r => r.session_id === x.id);

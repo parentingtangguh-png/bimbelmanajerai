@@ -24,8 +24,10 @@ export function notify(text, error = false) {
   clearTimeout(messageTimer);
   messageTimer = setTimeout(() => el.remove(), 6500);
 }
+// A screen may leave the subtitle out; an empty <p> would still take its margin.
 export function heading(kicker, title, subtitle, button = '') {
-  return `<div class="page-heading"><div><div class="eyebrow">${kicker}</div><h1>${title}</h1><p>${subtitle}</p></div>${button}</div>`;
+  const sub = subtitle ? `<p>${subtitle}</p>` : '';
+  return `<div class="page-heading"><div><div class="eyebrow">${kicker}</div><h1>${title}</h1>${sub}</div>${button}</div>`;
 }
 export function meter(label, current, baseline, target) {
   return `<div class="meter"><div><span>${label}</span><strong>Level ${current} <small>/ ${target}</small></strong></div><progress value="${progress(current, baseline, target)}" max="100"></progress><small>Mulai level ${baseline} · ${progress(current, baseline, target)}% menuju target</small></div>`;

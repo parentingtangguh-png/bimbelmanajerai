@@ -70,7 +70,7 @@ function greetingBand(state) {
   return heading(
     'HARI BARU, KESEMPATAN BARU',
     `Halo, ${h(state.name.split(' ')[0])} <span class="wave">✳</span>`,
-    'Mari temani langkah kecil yang berarti hari ini.',
+    '',
     '<button class="primary" data-action="new-session">＋ Mulai sesi kelas</button>'
   );
 }

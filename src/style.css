@@ -321,7 +321,9 @@ button {
   font-size: 12px;
   margin-bottom: 0;
 }
-.page-heading > .primary {
+/* A screen heading carries either one button or a .button-row of them; both look the same. */
+.page-heading > .primary,
+.page-heading > .button-row > .primary {
   font-size: 12px;
 }
 .wave {
@@ -1234,7 +1236,9 @@ hr {
     margin-bottom: 22px;
   }
   .page-heading > .primary,
-  .page-heading > .secondary {
+  .page-heading > .secondary,
+  .page-heading > .button-row > .primary,
+  .page-heading > .button-row > .secondary {
     flex-shrink: 0;
     font-size: 11px;
     padding: 11px 13px;
