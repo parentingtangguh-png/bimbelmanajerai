@@ -88,6 +88,11 @@ Indikator **lengkap**: 16 level × 6 bidang wajib (Menyimak, Berbicara, Membaca,
 - Kartu evaluasi menampilkan tujuan level, indikator yang bisa dicentang, saran penilaian otomatis ("2 dari 3 → MB", hanya saran), dan baris riwayat "pernah terlihat di sesi sebelumnya".
 - Busur antar fase: Fondasi menirukan → memegang satuan lebih besar; Fase A mengerjakan → memilih dan memeriksa; Fase B satu sumber → beberapa sumber dan bersedia berubah oleh bukti; Fase C menimbang dan memutuskan sendiri lalu mempertanggungjawabkannya.
 
+## Indikator harus menempel pada tujuan levelnya sendiri
+- Ditemukan 12 Sep 2026 lewat smoke test: **indikator Matematika level 6–14 adalah milik level lain** — kartu Level 6 menampilkan tujuan "tambah-kurang sampai 100" bersama indikator "sampai 1.000". Guru menilai anak satu tingkat terlalu sulit, dan simpul spiral berbintang menahan kenaikan atas hal yang belum menjadi tujuan level itu. Level 1–5, 15, 16 dan semua bidang lain tidak terkena. Sudah diperbaiki di `20260912070000_math_indicators_realign.sql`.
+- Peta cakupan lama **lolos meski bug-nya ada**, karena hanya menghitung jumlah indikator. Sekarang ada tes jangkar di `tests/database.test.mjs` yang mengunci kata kunci wajib pada indikator pertama tiap level Matematika 6–16, dan memastikan simpul spiral level N menyebut Level N+1. Terbukti gagal pada data lama.
+- Aturannya: indikator 1–2 menguji **tujuan level itu**, indikator ke-3 adalah **simpul** yang menjembatani ke tujuan level berikutnya. Kalau menambah indikator bidang lain, ikuti pola ini dan tambahkan jangkarnya ke tes.
+
 ## Rapor AI (`supabase/functions/generate-learning`)
 - Rapor **tidak lagi menerima `panduan_kelas`**. Dulu seluruh panduan (~10.000 karakter) dikirim untuk pesan 200 kata: boros, dan menjadi sumber karangan — panduan memuat aktivitas semua kelompok, jadi model mengklaim anak melakukan hal yang tidak pernah dicatat guru. Sumber kebenaran satu-satunya adalah `tujuan`, `kriteria`, dan `catatan_bukti` pada target. Masukan turun 12.534 → 2.274 karakter (**−82%**), `max_tokens` 1000 → 700.
 - Draf ditempel ke WhatsApp, yang **tidak mengenal `**tebal**`** — bintangnya tampil apa adanya. Prompt meminta teks biasa, dan `stripMarkdown` membuang sisa markdown yang lolos. Panduan kelas **tetap** boleh markdown.

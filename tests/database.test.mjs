@@ -468,6 +468,20 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   await as(teacher,'select finalize_competency_evaluation($1,$2::jsonb,$3,$4::jsonb)',[y.rid,JSON.stringify(subjects.map(subject=>({subject,rating:'MB',note:'Bukti'}))),'Sudah dievaluasi',kosong]);
   await assert.rejects(as(teacher,'select delete_class($1)',[y.cid]),/sudah punya evaluasi tersimpan/);
  });
+ await t.test('indikator Matematika menempel pada tujuan levelnya sendiri',async()=>{
+  // Peta cakupan lama hanya menghitung jumlah indikator, jadi lolos meski isinya milik level lain:
+  // Level 6 menampilkan tujuan "sampai 100" dengan indikator "sampai 1.000". Jangkar di bawah ini
+  // mengunci kata kunci yang wajib ada pada indikator pertama tiap level.
+  const jangkar={6:'sampai 100',7:'ratusan',8:'perkalian sebagai kelompok',9:'fakta perkalian',10:'berpembilang satu',11:'10.000',12:'senilai',13:'pecahan atau desimal',14:'rasio dan skala',15:'aljabar',16:'belum pernah'};
+  const rows=(await admin('select level, math_indicators->>0 as pertama, math_spiral as spiral from curriculum where level between 6 and 16 order by level')).rows;
+  for(const r of rows){
+    assert.ok(r.pertama.toLowerCase().includes(jangkar[r.level].toLowerCase()),`Matematika level ${r.level}: indikator pertama tidak menyebut "${jangkar[r.level]}" — cek apakah indikator bergeser ke level lain`);
+    if(r.level<16)assert.ok(r.spiral.includes(`Level ${r.level+1}`),`simpul spiral level ${r.level} harus menjelaskan tuntutan Level ${r.level+1}`);
+  }
+  // Level 6 pernah memuat indikator Level 7; pastikan tidak kembali.
+  const enam=(await admin("select math_indicators::text as t from curriculum where level=6")).rows[0].t;
+  assert.ok(!enam.includes('1.000'),'indikator Level 6 tidak boleh bicara sampai 1.000');
+ });
  await t.test('tabel potret kompetensi tertutup untuk pengguna',async()=>{
   // Dua lapis: tidak ada izin tabel, dan RLS menyala tanpa satu pun kebijakan.
   assert.equal((await db.query("select has_table_privilege('authenticated','public.session_competency_snapshots','select') as boleh")).rows[0].boleh,false);
