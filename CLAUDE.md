@@ -46,9 +46,10 @@ Berkas ini menggambarkan **keadaan sekarang**, bukan riwayat. Kalau sesuatu di s
 - Kode diformat **Prettier** (`.prettierrc.json`, lebar 110). Jalankan `npx prettier --write` setelah mengedit.
 
 ## Menguji
-- `npm test` → `scripts/check-imports.mjs` lebih dulu, lalu 40 tes Node: domain, database (PGlite menjalankan semua migrasi), dan **render**.
+- `npm test` → `scripts/check-imports.mjs` lebih dulu, lalu 41 tes Node: domain, database (PGlite menjalankan semua migrasi), dan **render**.
 - `tests/render.test.mjs` memanggil fungsi layar langsung dengan data contoh `tests/fixtures/sample-state.mjs` — tanpa browser, tanpa login. **Inilah satu-satunya tes yang menjangkau kartu evaluasi.** Kalau menambah fitur di layar mana pun, tambahkan tesnya di sini.
 - `npx playwright test` hanya menguji layar login (aplikasi memuat, tanpa galat, tidak meluber di 390px). Lebih dari itu tidak mungkin tanpa akun.
+- **Playwright rapuh pada server dingin.** Vite dingin butuh ~10 dtk sampai layar login tampil, sedangkan `toBeVisible` menyerah di 5 dtk; setelah banyak berkas diedit pernah sampai ~20 dtk dan tesnya gagal dengan halaman masih "Memuat…". Itu waktu, bukan kode. Sebelum menuduh kode: jalankan sekali lagi, atau hidupkan dev server dulu supaya Playwright memakainya (`reuseExistingServer:true`) — lalu pastikan server itu memuat kode terbaru.
 - `admin()` di tes database = setup data tanpa peran pengguna.
 
 ## Resep perintah singkat
@@ -95,4 +96,6 @@ Indikator **lengkap**: 16 level × 6 bidang wajib (Menyimak, Berbicara, Membaca,
 - Ganti kata sandi: tombol ⚿ di kartu akun (sidebar) → `db.auth.updateUser`. Minimal 8 karakter, diketik dua kali. **Claude tidak pernah mengetikkan kata sandi pengguna.**
 - Karena pratinjau dihapus, Claude **tidak bisa memeriksa tampilan di balik login sendirian**. Bila perlu, minta pengguna login di pane browser, lalu periksa lewat `mcp__Claude_Browser__*`. Jangan mengubah data produksi; bila terpaksa mencoba (mis. mencentang indikator), **kembalikan seperti semula** dan buktikan dengan query.
 - Berkas tidak dilacak yang **bukan** buatan Claude: `scripts/.tmp-inspect-hafsah.ps1`, `scripts/.tmp-run-hafsah-scenario.ps1` — jangan di-commit.
-- Yang masih terbuka (hanya bila pengguna meminta): baris terpanjang tersisa ~1.339 di `views/sessions.js` dan ~1.007 di `views/dashboard.js`; opacity motif tunas di HP (0,4) menunggu penilaian pengguna; baris siswa di dasbor menampilkan rata-rata Bahasa Indonesia sehingga ketimpangan antar bidang tersembunyi.
+- Yang masih terbuka (hanya bila pengguna meminta): baris terpanjang tersisa ~922 di `views/students.js`; opacity motif tunas di HP (0,4) menunggu penilaian pengguna; baris siswa di dasbor menampilkan rata-rata Bahasa Indonesia sehingga ketimpangan antar bidang tersembunyi. Teks `'Koneksi Supabase belum diatur. Pratinjau tampilan tersedia dengan data contoh.'` di `loginForm()` masih menjanjikan pratinjau yang sudah dihapus — perlu ditulis ulang.
+- Empat berkas sudah dipecah jadi fungsi kecil 12 Sep 2026: `views/sessions.js` (max 434), `views/dashboard.js` (366), `views/team.js` (199), `src/main.js` (346). Rangka aplikasi di main.js sekarang `sidebar`/`navButtons`/`accountCard`/`topbar`/`loginStory`/`loginForm`/`passwordForm`/`curriculumFieldset`.
+- Cara membuktikan perombakan tanpa perubahan tampilan: `node scripts/render-screens.mjs` sebelum/sesudah harus md5 sama. Untuk `main.js` skrip itu tidak menjangkau — layar login dibuktikan dengan membandingkan `document.querySelector('main.login').outerHTML` di pane browser sebelum dan sesudah.

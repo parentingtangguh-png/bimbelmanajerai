@@ -139,8 +139,108 @@ async function loadUser(user) {
   state.role = member.role;
   await refresh();
 }
+function passwordForm() {
+  const intro = `<p class="muted">Kata sandi baru minimal 8 karakter. Setelah diganti, sesi di perangkat lain tetap berjalan sampai Anda keluar dari sana.</p>`;
+  const baru = field(
+    'Kata sandi baru',
+    'password',
+    'password',
+    '',
+    'required minlength="8" autocomplete="new-password"'
+  );
+  const ulangi = field(
+    'Ulangi kata sandi baru',
+    'confirm',
+    'password',
+    '',
+    'required minlength="8" autocomplete="new-password"'
+  );
+  return `<form data-form="password">${intro}${baru}${ulangi}<button class="primary full">Simpan kata sandi baru</button></form>`;
+}
+
+// One subject inside the owner's curriculum editor: the goal, its indicators, which of them is the
+// spiral node, why the next level needs it, and what counts as evidence.
+function curriculumFieldset(k, c) {
+  const goal = area('Tujuan kompetensi', k, c[k], 'required maxlength="2000"');
+  const indicators = area(
+    'Indikator (satu per baris, maksimal 6)',
+    `${k}_indicators`,
+    indicatorsOf(c, k).join('\n'),
+    'maxlength="3000"'
+  );
+  const key = field(
+    'Nomor indikator simpul spiral (0 bila tidak ada)',
+    `${k}_key`,
+    'number',
+    String(Number(c[`${k}_key`] || 0)),
+    'min="0" max="6"'
+  );
+  const spiral = area(
+    'Simpul spiral menuju level berikutnya',
+    `${k}_spiral`,
+    c[`${k}_spiral`] || '',
+    'maxlength="2000"'
+  );
+  const criteria = area(
+    'Bukti keberhasilan',
+    `${k}_criteria`,
+    c[`${k}_criteria`],
+    'required maxlength="2000"'
+  );
+  return `<fieldset class="curriculum-edit"><h3>${h(subjectLabels[k])}</h3>${goal}${indicators}${key}${spiral}${criteria}</fieldset>`;
+}
+
+// The chrome around every screen: the sidebar that switches screens and the bar that names the
+// current one. Neither depends on which screen is showing, apart from the active nav item.
+function navButtons(nav) {
+  return nav
+    .map(
+      k =>
+        `<button class="nav-item ${state.view === k ? 'active' : ''}" data-view="${k}"><span aria-hidden="true">${icons[k]}</span>${labels[k]}${k === 'sessions' ? '<i>→</i>' : ''}</button>`
+    )
+    .join('');
+}
+
+function accountCard() {
+  const who = `<span class="avatar">${h(state.name.slice(0, 1))}</span><div><strong>${h(state.name)}</strong><small>${state.role === 'owner' ? 'Pemilik' : 'Guru pengajar'}</small></div>`;
+  const actions = `<button title="Ganti kata sandi" aria-label="Ganti kata sandi" data-action="password">⚿</button><button title="Keluar" aria-label="Keluar" data-action="logout">↗</button>`;
+  return `<div class="account">${who}${actions}</div>`;
+}
+
+function sidebar(nav) {
+  const brand = `<a href="#" class="brand" data-view="dashboard">b<span>·</span><div>${ORG_NAME}<small>Ruang tumbuh bersama</small></div></a>`;
+  const note = `<div class="sidebar-note"><span>✳</span><p>Setiap kemajuan<br>layak dirayakan.</p><small>Satu anak, satu perjalanan.</small></div>`;
+  return `<aside class="sidebar">${brand}<div class="nav-label">RUANG KERJA</div><nav>${navButtons(nav)}</nav>${note}${accountCard()}</aside>`;
+}
+
+function topbar() {
+  const today = new Intl.DateTimeFormat('id-ID', { dateStyle: 'long', timeZone: 'Asia/Jakarta' }).format(
+    new Date()
+  );
+  const actions = `<div class="top-actions"><button data-action="refresh" title="Muat ulang data" aria-label="Muat ulang data">↻</button><button data-action="logout" aria-label="Keluar akun">Keluar ↗</button></div>`;
+  return `<header class="topbar"><span>${ORG_NAME} <span class="slash">/</span> ${labels[state.view]}</span><span class="date">${today}</span>${actions}</header>`;
+}
+
+// The login screen is a story column beside the form. The story is fixed; only the form reacts to
+// whether Supabase is reachable at all.
+function loginStory() {
+  const brand = `<div class="brand">b<span>·</span> ${ORG_NAME}</div>`;
+  const pitch = `<div class="eyebrow">RUANG TUMBUH BERSAMA</div><h1>Langkah kecil.<br><em>Kemajuan berarti.</em></h1><p>Lebih dekat dengan setiap anak.<br>Lebih tenang menjalani hari mengajar.</p>`;
+  const card = `<div class="story-card"><span class="sprout">✳</span><div><strong>Setiap anak punya jalannya.</strong><p>Materi personal · Evaluasi adaptif · Kabar baik untuk keluarga</p></div></div>`;
+  return `<section class="login-story">${brand}<div>${pitch}${card}</div><small>Dibangun untuk guru yang peduli.</small></section>`;
+}
+
+function loginForm() {
+  const warning = !configured
+    ? '<div class="notice">Koneksi Supabase belum diatur. Pratinjau tampilan tersedia dengan data contoh.</div>'
+    : '';
+  const inputs = `${field('Email terdaftar', 'email', 'email', '', 'required autocomplete="email"')}${field('Kata sandi', 'password', 'password', '', 'required minlength="8" autocomplete="current-password"')}`;
+  const buttons = `<button class="primary full" ${configured ? '' : 'disabled'}>Masuk ke ruang belajar →</button><button type="button" class="text-btn full" data-action="register" ${configured ? '' : 'disabled'}>Aktivasi akun yang sudah didaftarkan pemilik</button>`;
+  return `<section class="login-form"><div class="login-box"><span class="pill">RUMAH BELAJAR / 02</span><h2>Selamat datang kembali</h2><p class="muted">Masuk untuk melanjutkan perjalanan belajar anak.</p>${warning}<form id="login-form">${inputs}${buttons}</form><p class="fine">Akses hanya untuk pemilik dan guru terdaftar.</p></div></section>`;
+}
+
 function login() {
-  root.innerHTML = `<main class="login"><section class="login-story"><div class="brand">b<span>·</span> ${ORG_NAME}</div><div><div class="eyebrow">RUANG TUMBUH BERSAMA</div><h1>Langkah kecil.<br><em>Kemajuan berarti.</em></h1><p>Lebih dekat dengan setiap anak.<br>Lebih tenang menjalani hari mengajar.</p><div class="story-card"><span class="sprout">✳</span><div><strong>Setiap anak punya jalannya.</strong><p>Materi personal · Evaluasi adaptif · Kabar baik untuk keluarga</p></div></div></div><small>Dibangun untuk guru yang peduli.</small></section><section class="login-form"><div class="login-box"><span class="pill">RUMAH BELAJAR / 02</span><h2>Selamat datang kembali</h2><p class="muted">Masuk untuk melanjutkan perjalanan belajar anak.</p>${!configured ? '<div class="notice">Koneksi Supabase belum diatur. Pratinjau tampilan tersedia dengan data contoh.</div>' : ''}<form id="login-form">${field('Email terdaftar', 'email', 'email', '', 'required autocomplete="email"')}${field('Kata sandi', 'password', 'password', '', 'required minlength="8" autocomplete="current-password"')}<button class="primary full" ${configured ? '' : 'disabled'}>Masuk ke ruang belajar →</button><button type="button" class="text-btn full" data-action="register" ${configured ? '' : 'disabled'}>Aktivasi akun yang sudah didaftarkan pemilik</button></form><p class="fine">Akses hanya untuk pemilik dan guru terdaftar.</p></div></section></main>`;
+  root.innerHTML = `<main class="login">${loginStory()}${loginForm()}</main>`;
 }
 // Re-rendering replaces the whole page, so keep unsaved classroom inputs and the scroll position.
 const drafts = new Map();
@@ -193,7 +293,7 @@ function render() {
     state.role === 'owner'
       ? ['dashboard', 'students', 'team', 'curriculum']
       : ['dashboard', 'students', 'sessions', 'curriculum'];
-  root.innerHTML = `<div class="shell"><aside class="sidebar"><a href="#" class="brand" data-view="dashboard">b<span>·</span><div>${ORG_NAME}<small>Ruang tumbuh bersama</small></div></a><div class="nav-label">RUANG KERJA</div><nav>${nav.map(k => `<button class="nav-item ${state.view === k ? 'active' : ''}" data-view="${k}"><span aria-hidden="true">${icons[k]}</span>${labels[k]}${k === 'sessions' ? '<i>→</i>' : ''}</button>`).join('')}</nav><div class="sidebar-note"><span>✳</span><p>Setiap kemajuan<br>layak dirayakan.</p><small>Satu anak, satu perjalanan.</small></div><div class="account"><span class="avatar">${h(state.name.slice(0, 1))}</span><div><strong>${h(state.name)}</strong><small>${state.role === 'owner' ? 'Pemilik' : 'Guru pengajar'}</small></div><button title="Ganti kata sandi" aria-label="Ganti kata sandi" data-action="password">⚿</button><button title="Keluar" aria-label="Keluar" data-action="logout">↗</button></div></aside><main class="workspace"><header class="topbar"><span>${ORG_NAME} <span class="slash">/</span> ${labels[state.view]}</span><span class="date">${new Intl.DateTimeFormat('id-ID', { dateStyle: 'long', timeZone: 'Asia/Jakarta' }).format(new Date())}</span><div class="top-actions"><button data-action="refresh" title="Muat ulang data" aria-label="Muat ulang data">↻</button><button data-action="logout" aria-label="Keluar akun">Keluar ↗</button></div></header>${
+  root.innerHTML = `<div class="shell">${sidebar(nav)}<main class="workspace">${topbar()}${
     state.role === 'teacher'
       ? (() => {
           const [lead, rest] = reminderOfTheDay();
@@ -305,11 +405,7 @@ document.addEventListener('click', async e => {
       state.active = null;
       return render();
     }
-    if (action === 'password')
-      return modal(
-        'Ganti kata sandi',
-        `<form data-form="password"><p class="muted">Kata sandi baru minimal 8 karakter. Setelah diganti, sesi di perangkat lain tetap berjalan sampai Anda keluar dari sana.</p>${field('Kata sandi baru', 'password', 'password', '', 'required minlength="8" autocomplete="new-password"')}${field('Ulangi kata sandi baru', 'confirm', 'password', '', 'required minlength="8" autocomplete="new-password"')}<button class="primary full">Simpan kata sandi baru</button></form>`
-      );
+    if (action === 'password') return modal('Ganti kata sandi', passwordForm());
     if (action === 'new-member')
       return modal(
         'Daftarkan guru',
@@ -319,7 +415,7 @@ document.addEventListener('click', async e => {
       const c = state.curriculum.find(c => c.level === Number(id));
       return modal(
         `Kurikulum level ${id}`,
-        `<form data-form="curriculum" data-id="${id}">${subjects.map(k => `<fieldset class="curriculum-edit"><h3>${h(subjectLabels[k])}</h3>${area('Tujuan kompetensi', k, c[k], 'required maxlength="2000"')}${area('Indikator (satu per baris, maksimal 6)', `${k}_indicators`, indicatorsOf(c, k).join('\n'), 'maxlength="3000"')}${field('Nomor indikator simpul spiral (0 bila tidak ada)', `${k}_key`, 'number', String(Number(c[`${k}_key`] || 0)), 'min="0" max="6"')}${area('Simpul spiral menuju level berikutnya', `${k}_spiral`, c[`${k}_spiral`] || '', 'maxlength="2000"')}${area('Bukti keberhasilan', `${k}_criteria`, c[`${k}_criteria`], 'required maxlength="2000"')}</fieldset>`).join('')}<button class="primary">Simpan kurikulum</button></form>`
+        `<form data-form="curriculum" data-id="${id}">${subjects.map(k => curriculumFieldset(k, c)).join('')}<button class="primary">Simpan kurikulum</button></form>`
       );
     }
     if (action === 'copy') {

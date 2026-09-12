@@ -67,15 +67,37 @@ export function dashboard() {
 
 // The four bands of the teacher dashboard, so one can be changed without rereading the rest.
 function greetingBand(state) {
-  return `${heading('HARI BARU, KESEMPATAN BARU', `Halo, ${h(state.name.split(' ')[0])} <span class="wave">✳</span>`, 'Mari temani langkah kecil yang berarti hari ini.', '<button class="primary" data-action="new-session">＋ Mulai sesi kelas</button>')}`;
+  return heading(
+    'HARI BARU, KESEMPATAN BARU',
+    `Halo, ${h(state.name.split(' ')[0])} <span class="wave">✳</span>`,
+    'Mari temani langkah kecil yang berarti hari ini.',
+    '<button class="primary" data-action="new-session">＋ Mulai sesi kelas</button>'
+  );
+}
+
+// The welcome band is a copy column beside a decorative one. The motif is purely ornamental, so
+// it is kept apart from the words that a teacher actually reads.
+function welcomeCopy() {
+  return `<div><span class="pill light">BELAJAR SESUAI RITME ANAK</span><h2>Bukan siapa yang paling cepat.<br>Melainkan siapa yang terus bertumbuh.</h2><p>Kenali minatnya, dampingi prosesnya, rayakan kemajuannya.</p><button data-view="students">Lihat perjalanan siswa <span>↗</span></button></div>`;
+}
+
+function growthArt() {
+  return `<div class="growth-art" aria-hidden="true"><div class="orbit"></div><span class="petal p1"></span><span class="petal p2"></span><span class="petal p3"></span><span class="stem"></span><span class="art-label">TUMBUH DENGAN CARANYA</span></div>`;
 }
 
 function welcomeBand() {
-  return `<section class="welcome"><div><span class="pill light">BELAJAR SESUAI RITME ANAK</span><h2>Bukan siapa yang paling cepat.<br>Melainkan siapa yang terus bertumbuh.</h2><p>Kenali minatnya, dampingi prosesnya, rayakan kemajuannya.</p><button data-view="students">Lihat perjalanan siswa <span>↗</span></button></div><div class="growth-art" aria-hidden="true"><div class="orbit"></div><span class="petal p1"></span><span class="petal p2"></span><span class="petal p3"></span><span class="stem"></span><span class="art-label">TUMBUH DENGAN CARANYA</span></div></section>`;
+  return `<section class="welcome">${welcomeCopy()}${growthArt()}</section>`;
+}
+
+// Every tile in the band is the same shape, so it is written once and filled four times.
+function statTile(label, icon, list, caption, tone = '') {
+  const count = list.length.toString().padStart(2, '0');
+  return `<div class="stat${tone}"><span>${label} <i>${icon}</i></span><strong>${count}</strong><small>${caption}</small></div>`;
 }
 
 function statBand(active, today, sum, interventions) {
-  return `<div class="stats"><div class="stat"><span>Siswa aktif <i>◉</i></span><strong>${active.length.toString().padStart(2, '0')}</strong><small>Perjalanan yang kita dampingi</small></div><div class="stat"><span>Sesi hari ini <i>▤</i></span><strong>${today.length.toString().padStart(2, '0')}</strong><small>Ruang untuk belajar bersama</small></div><div class="stat"><span>Siap ujian sumatif <i>✧</i></span><strong>${sum.length.toString().padStart(2, '0')}</strong><small>Target belajar sudah tercapai</small></div>${state.role === 'owner' ? `<div class="stat warm"><span>Butuh perhatian <i>♡</i></span><strong>${interventions.length.toString().padStart(2, '0')}</strong><small>Mari dampingi lebih dekat</small></div>` : ''}</div>`;
+  const warm = state.role === 'owner';
+  return `<div class="stats">${statTile('Siswa aktif', '◉', active, 'Perjalanan yang kita dampingi')}${statTile('Sesi hari ini', '▤', today, 'Ruang untuk belajar bersama')}${statTile('Siap ujian sumatif', '✧', sum, 'Target belajar sudah tercapai')}${warm ? statTile('Butuh perhatian', '♡', interventions, 'Mari dampingi lebih dekat', ' warm') : ''}</div>`;
 }
 
 function panelBand(active, interventions, sum) {
@@ -87,6 +109,23 @@ function journeyPanel(active, interventions, sum) {
   return `<div class="dashboard-grid"><section class="panel"><div class="panel-heading"><h2>Perjalanan belajar</h2><button class="text-btn" data-view="students">Semua siswa →</button></div>${active.length ? active.slice(0, 5).map(studentRow).join('') : empty('Perjalanan dimulai di sini', 'Tambahkan siswa pertama untuk mulai mendampingi belajarnya.')}</section>`;
 }
 
+// Three kinds of note can land in the right column. Each builds its own article so one can be
+// reworded without rereading the others; the HTML is what the single template produced before.
+function interventionNote(a) {
+  return `<article class="attention-item"><span class="badge amber">Pendampingan khusus</span><h3>${h(state.students.find(s => s.id === a.student_id)?.name)}</h3><p>Tiga kali mengulang di level yang sama. Tinjau pendekatan belajar dan diskusikan dengan guru.</p></article>`;
+}
+
+function encouragementNote() {
+  return `<article class="attention-item"><span class="badge green">Langkah hari ini</span><h3>Mulai dari rasa ingin tahu</h3><p>Gunakan minat anak sebagai pintu masuk sebelum mengenalkan tantangan baru.</p></article>`;
+}
+
+function summativeNote(sum) {
+  if (!sum.length) return '';
+  return `<article class="attention-item"><span class="badge green">Siap sumatif</span><h3>${sum.length} siswa mencapai target</h3><p>Buka profil siswa untuk mencatat hasil ujian akhir.</p></article>`;
+}
+
 function notesPanel(active, interventions, sum) {
-  return `<section class="panel attention"><div class="panel-heading"><h2>Catatan untuk Anda</h2><span>✧</span></div>${state.role === 'owner' && interventions.length ? interventions.map(a => `<article class="attention-item"><span class="badge amber">Pendampingan khusus</span><h3>${h(state.students.find(s => s.id === a.student_id)?.name)}</h3><p>Tiga kali mengulang di level yang sama. Tinjau pendekatan belajar dan diskusikan dengan guru.</p></article>`).join('') : '<article class="attention-item"><span class="badge green">Langkah hari ini</span><h3>Mulai dari rasa ingin tahu</h3><p>Gunakan minat anak sebagai pintu masuk sebelum mengenalkan tantangan baru.</p></article>'}${sum.length ? `<article class="attention-item"><span class="badge green">Siap sumatif</span><h3>${sum.length} siswa mencapai target</h3><p>Buka profil siswa untuk mencatat hasil ujian akhir.</p></article>` : ''}<div class="quote">“Kemajuan kecil tetaplah kemajuan.”<small>Pengingat untuk hari ini</small></div></section></div>`;
+  const showIntervention = state.role === 'owner' && interventions.length;
+  const notes = showIntervention ? interventions.map(a => interventionNote(a)).join('') : encouragementNote();
+  return `<section class="panel attention"><div class="panel-heading"><h2>Catatan untuk Anda</h2><span>✧</span></div>${notes}${summativeNote(sum)}<div class="quote">“Kemajuan kecil tetaplah kemajuan.”<small>Pengingat untuk hari ini</small></div></section></div>`;
 }

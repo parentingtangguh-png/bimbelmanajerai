@@ -12,6 +12,7 @@ import { sessionsView } from '../src/views/sessions.js';
 import { dashboard } from '../src/views/dashboard.js';
 import { studentsView } from '../src/views/students.js';
 import { curriculumView } from '../src/views/curriculum.js';
+import { teamView } from '../src/views/team.js';
 import { state } from '../src/state.js';
 
 const out = process.argv[2] || 'screens.html';
@@ -25,6 +26,7 @@ state.active = null;
 add('sessionsView (daftar sesi)', sessionsView());
 add('dashboard', dashboard());
 add('studentsView', studentsView());
+add('teamView', teamView());
 add('curriculumView (per untaian)', curriculumView());
 state.curriculumTab = 'level';
 add('curriculumView (per level)', curriculumView());

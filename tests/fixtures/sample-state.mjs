@@ -45,6 +45,13 @@ export function loadSampleState() {
         math_target: 4
       }
     ],
+    // The three branches of the team screen: the owner (no button), an active teacher, and a
+    // deactivated one.
+    members: [
+      { name: 'Pemilik Contoh', email: 'pemilik@contoh.test', role: 'owner', active: true },
+      { name: 'Guru Contoh', email: 'guru@contoh.test', role: 'teacher', active: true },
+      { name: 'Guru Cuti', email: 'cuti@contoh.test', role: 'teacher', active: false }
+    ],
     classes: [
       {
         id: SESSION,
@@ -90,8 +97,20 @@ export function loadSampleState() {
     ],
     assessments: [
       { session_student_id: 'rec-1', subject: 'reading', level_snapshot: 1, rating: null, evidence_note: '' },
-      { session_student_id: 'rec-1', subject: 'math', level_snapshot: 1, rating: 'MB', evidence_note: 'Catatan.' },
-      { session_student_id: 'rec-2', subject: 'writing', level_snapshot: 4, rating: 'T', evidence_note: 'Sudah.' }
+      {
+        session_student_id: 'rec-1',
+        subject: 'math',
+        level_snapshot: 1,
+        rating: 'MB',
+        evidence_note: 'Catatan.'
+      },
+      {
+        session_student_id: 'rec-2',
+        subject: 'writing',
+        level_snapshot: 4,
+        rating: 'T',
+        evidence_note: 'Sudah.'
+      }
     ],
     observations: [
       {
@@ -119,16 +138,53 @@ export function loadSampleState() {
       }
     ],
     competencies: [
-      { student_id: 'anak-1', subject: 'reading', baseline: 1, current_level: 1, target: 4, evidence_count: 1, repeat_count: 0, intervention: false, required: true, active: true },
-      { student_id: 'anak-1', subject: 'math', baseline: 1, current_level: 1, target: 4, evidence_count: 0, repeat_count: 0, intervention: false, required: true, active: true },
-      { student_id: 'anak-2', subject: 'writing', baseline: 4, current_level: 4, target: 4, evidence_count: 2, repeat_count: 0, intervention: false, required: true, active: true }
+      {
+        student_id: 'anak-1',
+        subject: 'reading',
+        baseline: 1,
+        current_level: 1,
+        target: 4,
+        evidence_count: 1,
+        repeat_count: 0,
+        intervention: false,
+        required: true,
+        active: true
+      },
+      {
+        student_id: 'anak-1',
+        subject: 'math',
+        baseline: 1,
+        current_level: 1,
+        target: 4,
+        evidence_count: 0,
+        repeat_count: 0,
+        intervention: false,
+        required: true,
+        active: true
+      },
+      {
+        student_id: 'anak-2',
+        subject: 'writing',
+        baseline: 4,
+        current_level: 4,
+        target: 4,
+        evidence_count: 2,
+        repeat_count: 0,
+        intervention: false,
+        required: true,
+        active: true
+      }
     ],
     curriculum: [
       {
         level: 1,
         reading: 'Mengenali 8 huruf vokal dan konsonan.',
         reading_criteria: 'Terlihat dalam dua kegiatan berbeda.',
-        reading_indicators: ['Menunjuk huruf yang benar.', 'Menyebutkan bunyi huruf.', 'Memilih benda berawal bunyi sama.'],
+        reading_indicators: [
+          'Menunjuk huruf yang benar.',
+          'Menyebutkan bunyi huruf.',
+          'Memilih benda berawal bunyi sama.'
+        ],
         reading_key: 3,
         reading_spiral: 'Level 2 menggabungkan bunyi menjadi suku kata.',
         math: 'Menghitung benda 1-5.',
@@ -176,7 +232,11 @@ export function loadSampleState() {
         math_spiral: '',
         writing: 'Menulis 2 kalimat sederhana.',
         writing_criteria: 'Dua kesempatan.',
-        writing_indicators: ['Menulis dua kalimat.', 'Memberi spasi antar kata.', 'Menutup kalimat dengan titik.'],
+        writing_indicators: [
+          'Menulis dua kalimat.',
+          'Memberi spasi antar kata.',
+          'Menutup kalimat dengan titik.'
+        ],
         writing_key: 3,
         writing_spiral: 'Level 5 menulis paragraf tiga kalimat.',
         listening: 'Menyimak cerita pendek.',
