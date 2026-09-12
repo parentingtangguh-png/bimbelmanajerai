@@ -154,23 +154,6 @@ function competencyMeter(c) {
   const label = `<div><strong>${h(subjectLabels[c.subject])}</strong><span>Level ${c.current_level} · ${phaseOf(c.current_level)}${c.required ? '' : ' · pengayaan'}</span></div>`;
   return `<div class="competency-meter">${label}<progress value="${phasePct(c.current_level)}" max="100"></progress><small>${status}</small></div>`;
 }
-export function competencyTargetsForm(s) {
-  const rows = activeCompetenciesFor(s.id);
-  if (!rows.length) return '';
-  const intro = `<h3>Target per kompetensi</h3><p class="muted">Empat elemen Bahasa Indonesia, Matematika, dan IPAS wajib. English Exposure tetap pengayaan.</p>`;
-  const inputs = rows
-    .map(c =>
-      field(
-        subjectLabels[c.subject],
-        `target_${c.subject}`,
-        'number',
-        c.target,
-        `required min="${c.current_level}" max="16"`
-      )
-    )
-    .join('');
-  return `<form data-form="competency-targets" data-id="${s.id}">${intro}<div class="form-grid">${inputs}</div><button class="secondary">Simpan target kompetensi</button></form>`;
-}
 export function levelMeaning(kind, level) {
   const n = Number(level);
   const c = state.curriculum.find(x => x.level === n);
