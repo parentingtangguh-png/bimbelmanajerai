@@ -232,7 +232,7 @@ function loginStory() {
 
 function loginForm() {
   const warning = !configured
-    ? '<div class="notice">Koneksi Supabase belum diatur. Pratinjau tampilan tersedia dengan data contoh.</div>'
+    ? '<div class="notice">Koneksi Supabase belum diatur, jadi belum ada yang bisa masuk. Periksa berkas config.json atau variabel VITE_SUPABASE_URL dan VITE_SUPABASE_PUBLISHABLE_KEY.</div>'
     : '';
   const inputs = `${field('Email terdaftar', 'email', 'email', '', 'required autocomplete="email"')}${field('Kata sandi', 'password', 'password', '', 'required minlength="8" autocomplete="current-password"')}`;
   const buttons = `<button class="primary full" ${configured ? '' : 'disabled'}>Masuk ke ruang belajar →</button><button type="button" class="text-btn full" data-action="register" ${configured ? '' : 'disabled'}>Aktivasi akun yang sudah didaftarkan pemilik</button>`;

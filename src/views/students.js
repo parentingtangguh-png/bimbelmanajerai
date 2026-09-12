@@ -20,7 +20,9 @@ export function studentRow(s) {
     current: s.reading_level,
     target: s.reading_target
   };
-  return `<button class="student-row" data-action="student" data-id="${s.id}"><span class="avatar pastel">${h(s.name[0])}</span><div class="student-info"><strong>${h(s.name)}</strong><small>${h(s.interest || 'Minat belum diisi')}</small></div><div class="mini-progress"><small>Bahasa Indonesia <b>Level ${bi.current}</b> · ${phaseShort(bi.current)}</small><progress value="${phasePct(bi.current)}" max="100"></progress></div><span class="row-arrow">→</span></button>`;
+  const who = `<span class="avatar pastel">${h(s.name[0])}</span><div class="student-info"><strong>${h(s.name)}</strong><small>${h(s.interest || 'Minat belum diisi')}</small></div>`;
+  const bar = `<div class="mini-progress"><small>Bahasa Indonesia <b>Level ${bi.current}</b> · ${phaseShort(bi.current)}</small><progress value="${phasePct(bi.current)}" max="100"></progress></div>`;
+  return `<button class="student-row" data-action="student" data-id="${s.id}">${who}${bar}<span class="row-arrow">→</span></button>`;
 }
 export function ownerStudentsView() {
   const list = state.students.filter(s => s.name.toLowerCase().includes(state.filter.toLowerCase()));
@@ -49,7 +51,20 @@ export function ownerStudentsView() {
       return `<tr data-action="student" data-id="${s.id}" tabindex="0"><td><strong>${h(s.name)}</strong><small>${h(s.parent_name || '')}</small></td>${cell(bi.current, bi.target)}${cell(s.math_level, s.math_target)}${ipas ? cell(ipas.current_level, ipas.target) : '<td class="num">—</td>'}<td class="teachers">${h(teachers(s.id))}</td><td>${status}</td></tr>`;
     })
     .join('');
-  return `${heading('DATA UMUM SISWA', 'Ringkasan siswa.', `${state.students.length} siswa · ${active} aktif · ${attention} perlu perhatian. Klik baris untuk membuka profil.`)}<div class="toolbar"><input id="student-search" type="search" placeholder="Cari nama siswa…" aria-label="Cari siswa" value="${h(state.filter)}"><span>${list.length} ditampilkan</span></div>${rows ? `<div class="panel table-wrap"><table class="owner-students"><thead><tr><th>Siswa</th><th class="num">B. Indonesia</th><th class="num">Matematika</th><th class="num">IPAS</th><th>Guru pendamping</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>` : empty('Belum ada siswa', 'Siswa baru ditambahkan oleh guru dan akan tampil di sini.')}`;
+  const head = heading(
+    'DATA UMUM SISWA',
+    'Ringkasan siswa.',
+    `${state.students.length} siswa · ${active} aktif · ${attention} perlu perhatian. Klik baris untuk membuka profil.`
+  );
+  const table = rows
+    ? `<div class="panel table-wrap"><table class="owner-students"><thead><tr><th>Siswa</th><th class="num">B. Indonesia</th><th class="num">Matematika</th><th class="num">IPAS</th><th>Guru pendamping</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`
+    : empty('Belum ada siswa', 'Siswa baru ditambahkan oleh guru dan akan tampil di sini.');
+  return `${head}${searchToolbar(`${list.length} ditampilkan`)}${table}`;
+}
+
+// The same search box tops both versions of the screen; only the tally beside it differs.
+function searchToolbar(tally) {
+  return `<div class="toolbar"><input id="student-search" type="search" placeholder="Cari nama siswa…" aria-label="Cari siswa" value="${h(state.filter)}"><span>${tally}</span></div>`;
 }
 export function teacherStudentsView() {
   const list = state.students.filter(s => s.name.toLowerCase().includes(state.filter.toLowerCase()));
@@ -100,7 +115,18 @@ export function teacherStudentsView() {
     : '';
   const buttons =
     '<div class="button-row"><button class="secondary" data-action="new-schedule">＋ Buat sesi jadwal</button><button class="primary" data-action="new-student">＋ Tambah siswa</button></div>';
-  return `${heading('SETIAP ANAK UNIK', 'Kenali, lalu dampingi.', 'Siswa dikelompokkan menurut sesi jadwal rutin Anda.', buttons)}<div class="toolbar"><input id="student-search" type="search" placeholder="Cari nama siswa…" aria-label="Cari siswa" value="${h(state.filter)}"><span>${state.students.length} siswa · ${state.schedules.length} sesi jadwal</span></div>${state.students.length ? sections + looseSection + inactiveSection || empty('Tidak ditemukan', 'Tidak ada siswa dengan nama itu.') : empty('Belum ada siswa', 'Tambahkan siswa pertama Anda untuk mulai mendampingi belajarnya.')}`;
+  const head = heading(
+    'SETIAP ANAK UNIK',
+    'Kenali, lalu dampingi.',
+    'Siswa dikelompokkan menurut sesi jadwal rutin Anda.',
+    buttons
+  );
+  const tally = `${state.students.length} siswa · ${state.schedules.length} sesi jadwal`;
+  const body = state.students.length
+    ? sections + looseSection + inactiveSection ||
+      empty('Tidak ditemukan', 'Tidak ada siswa dengan nama itu.')
+    : empty('Belum ada siswa', 'Tambahkan siswa pertama Anda untuk mulai mendampingi belajarnya.');
+  return `${head}${searchToolbar(tally)}${body}`;
 }
 export function studentsView() {
   return state.role === 'owner' ? ownerStudentsView() : teacherStudentsView();
@@ -110,20 +136,40 @@ export function competencyMeters(s) {
   if (!rows.length)
     return `${meter('Bahasa Indonesia', s.reading_level, s.reading_baseline, s.reading_target)}${meter('Matematika', s.math_level, s.math_baseline, s.math_target)}`;
   const order = ['listening', 'speaking', 'reading', 'writing', 'math', 'ipas', 'english'];
-  return `<div class="competency-list">${order
+  const bars = order
     .map(code => rows.find(c => c.subject === code))
     .filter(Boolean)
-    .map(
-      c =>
-        `<div class="competency-meter"><div><strong>${h(subjectLabels[c.subject])}</strong><span>Level ${c.current_level} · ${phaseOf(c.current_level)}${c.required ? '' : ' · pengayaan'}</span></div><progress value="${phasePct(c.current_level)}" max="100"></progress><small>${c.current_level >= c.target ? (c.target >= 16 ? 'Level tertinggi tercapai' : 'Akhir fase tercapai · menunggu ujian sumatif') : `${phasePct(c.current_level)}% fase · ${c.evidence_count}/2 bukti menuju kenaikan berikutnya`}${c.intervention ? ' · perlu ditinjau' : ''}</small></div>`
-    )
-    .join('')}</div>`;
+    .map(c => competencyMeter(c))
+    .join('');
+  return `<div class="competency-list">${bars}</div>`;
+}
+
+// One subject's bar. The line underneath says either that the phase is done and waiting on the
+// summative, or how far along it is and how much evidence the next level still needs.
+function competencyMeter(c) {
+  const atTarget =
+    c.target >= 16 ? 'Level tertinggi tercapai' : 'Akhir fase tercapai · menunggu ujian sumatif';
+  const onTheWay = `${phasePct(c.current_level)}% fase · ${c.evidence_count}/2 bukti menuju kenaikan berikutnya`;
+  const status = `${c.current_level >= c.target ? atTarget : onTheWay}${c.intervention ? ' · perlu ditinjau' : ''}`;
+  const label = `<div><strong>${h(subjectLabels[c.subject])}</strong><span>Level ${c.current_level} · ${phaseOf(c.current_level)}${c.required ? '' : ' · pengayaan'}</span></div>`;
+  return `<div class="competency-meter">${label}<progress value="${phasePct(c.current_level)}" max="100"></progress><small>${status}</small></div>`;
 }
 export function competencyTargetsForm(s) {
   const rows = activeCompetenciesFor(s.id);
-  return rows.length
-    ? `<form data-form="competency-targets" data-id="${s.id}"><h3>Target per kompetensi</h3><p class="muted">Empat elemen Bahasa Indonesia, Matematika, dan IPAS wajib. English Exposure tetap pengayaan.</p><div class="form-grid">${rows.map(c => field(subjectLabels[c.subject], `target_${c.subject}`, 'number', c.target, `required min="${c.current_level}" max="16"`)).join('')}</div><button class="secondary">Simpan target kompetensi</button></form>`
-    : '';
+  if (!rows.length) return '';
+  const intro = `<h3>Target per kompetensi</h3><p class="muted">Empat elemen Bahasa Indonesia, Matematika, dan IPAS wajib. English Exposure tetap pengayaan.</p>`;
+  const inputs = rows
+    .map(c =>
+      field(
+        subjectLabels[c.subject],
+        `target_${c.subject}`,
+        'number',
+        c.target,
+        `required min="${c.current_level}" max="16"`
+      )
+    )
+    .join('');
+  return `<form data-form="competency-targets" data-id="${s.id}">${intro}<div class="form-grid">${inputs}</div><button class="secondary">Simpan target kompetensi</button></form>`;
 }
 export function levelMeaning(kind, level) {
   const n = Number(level);
@@ -155,7 +201,23 @@ export function levelFields(s, edit, owner) {
     ['sd5', 'SD kelas 5'],
     ['sd6', 'SD kelas 6']
   ];
-  return `${edit ? '' : select('Perkiraan fase / kelas sekolah', 'phase', phases, '')}<div class="notice level-guide"><strong>Arti level</strong><br>1–4 Fondasi (belum SD) · 5–8 Fase A (SD 1–2) · 9–12 Fase B (SD 3–4) · 13–16 Fase C (SD 5–6).<br>Guru cukup menentukan titik awal sesuai hasil diagnostik; level adalah posisi kemampuan anak, bukan kelas sekolah. Target mengalir otomatis: akhir fase anak saat ini, lalu pindah ke fase berikutnya setelah anak lulus ujian sumatif fase itu. Titik awal Bahasa Indonesia juga dipakai untuk Menyimak, Berbicara, IPAS, dan English Exposure.</div><div class="form-grid">${pick(baseLabel('Level awal Bahasa Indonesia'), 'reading_baseline', s.reading_baseline || 1, 'bi')}${pick(baseLabel('Level awal Matematika'), 'math_baseline', s.math_baseline || 1, 'math')}</div>`;
+  const phasePicker = edit ? '' : select('Perkiraan fase / kelas sekolah', 'phase', phases, '');
+  const bi = pick(
+    baseLabel('Level awal Bahasa Indonesia'),
+    'reading_baseline',
+    s.reading_baseline || 1,
+    'bi'
+  );
+  const math = pick(baseLabel('Level awal Matematika'), 'math_baseline', s.math_baseline || 1, 'math');
+  return `${phasePicker}${levelGuide()}<div class="form-grid">${bi}${math}</div>`;
+}
+
+// Why a teacher only ever sets a starting point: the level is where the child is, not which school
+// year they are in, and the target moves itself once a phase is passed.
+function levelGuide() {
+  const ladder = `1–4 Fondasi (belum SD) · 5–8 Fase A (SD 1–2) · 9–12 Fase B (SD 3–4) · 13–16 Fase C (SD 5–6).`;
+  const how = `Guru cukup menentukan titik awal sesuai hasil diagnostik; level adalah posisi kemampuan anak, bukan kelas sekolah. Target mengalir otomatis: akhir fase anak saat ini, lalu pindah ke fase berikutnya setelah anak lulus ujian sumatif fase itu. Titik awal Bahasa Indonesia juga dipakai untuk Menyimak, Berbicara, IPAS, dan English Exposure.`;
+  return `<div class="notice level-guide"><strong>Arti level</strong><br>${ladder}<br>${how}</div>`;
 }
 export function studentActionsSection(s) {
   const openSession = state.records.some(r => r.student_id === s.id && !r.finalized_at);
@@ -180,39 +242,62 @@ export function studentForm(s = {}) {
   const lockTargets = edit;
   modal(
     edit ? h(s.name) : 'Siswa baru',
-    `<form data-form="student" data-id="${s.id || ''}"><fieldset ${canCreate ? '' : 'disabled'}><div class="form-grid">${field('Nama anak', 'name', 'text', s.name, 'required maxlength="120"')}${field('Sapaan orang tua', 'parent_name', 'text', s.parent_name, 'required maxlength="120"')}${field('Nomor WhatsApp', 'phone', 'tel', s.phone)}${field('Minat / hobi', 'interest', 'text', s.interest, 'required maxlength="300"')}</div>${area('Hasil diagnostik awal', 'diagnostic', s.diagnostic, 'maxlength="3000"')}${area('Catatan gaya belajar', 'learning_notes', s.learning_notes, 'maxlength="3000"')}${levelFields(s, edit, owner)}${edit ? `<p class="muted">${owner ? 'Profil ini hanya dapat dibaca. Perubahan dilakukan oleh guru pendamping.' : 'Target mengalir otomatis per fase. Lihat kemajuan tiap bidang di bawah.'}</p>` : ''}</fieldset>${canCreate ? '<button class="primary full">Simpan profil siswa</button>' : ''}</form>${
-      edit
-        ? `<hr><h3>Perjalanan kompetensi</h3>${competencyMeters(s)}<div class="notice">Karakter tidak diberi level. Guru mencatat perilaku yang tampak dalam konteks kegiatan.</div>${!owner ? `<hr>${studentActionsSection(s)}` : ''}${
-            !owner && ready(s) && s.status === 'Aktif'
-              ? `<hr><form data-form="summative" data-id="${s.id}"><h3>Ujian sumatif akhir fase</h3><p class="muted">Semua bidang inti sudah mencapai akhir fasenya. Lulus fase membuka fase berikutnya; lulus di akhir Fase C berarti lulus dari rumah belajar.</p>${field('Nilai sumatif (1–100)', 'score', 'number', '', 'required min="1" max="100"')}${select(
-                  'Keputusan guru',
-                  'pass',
-                  [
-                    ['false', 'Perlu pendampingan lanjutan'],
-                    [
-                      'true',
-                      activeCompetenciesFor(s.id)
-                        .filter(c => c.required)
-                        .every(c => c.target >= 16)
-                        ? 'Lulus (akhir Fase C)'
-                        : 'Lulus fase — lanjut ke fase berikutnya'
-                    ]
-                  ],
-                  'false'
-                )}<button class="primary">Simpan hasil sumatif</button></form>`
-              : ''
-          }<hr><h3>Riwayat evaluasi</h3>${
-            state.records
-              .filter(r => r.student_id === s.id && r.finalized_at)
-              .sort((a, b) => b.finalized_at.localeCompare(a.finalized_at))
-              .map(
-                r =>
-                  `<p class="history">${h(state.classes.find(c => c.id === r.session_id)?.date || r.finalized_at.slice(0, 10))} · ${h(r.attendance)} · <strong>${h(r.grade || 'Tanpa nilai')}</strong><br><small>${h(r.anecdote)}</small></p>`
-              )
-              .join('') || '<p class="muted">Belum ada evaluasi tersimpan.</p>'
-          }`
-        : ''
-    }`
+    `${profileForm(s, edit, owner, canCreate)}${edit ? studentDetails(s, owner) : ''}`
+  );
+}
+
+// The profile itself. The owner sees the same fields but cannot submit them, so the whole fieldset
+// is disabled rather than the screen being written twice.
+function profileForm(s, edit, owner, canCreate) {
+  const grid = `<div class="form-grid">${field('Nama anak', 'name', 'text', s.name, 'required maxlength="120"')}${field('Sapaan orang tua', 'parent_name', 'text', s.parent_name, 'required maxlength="120"')}${field('Nomor WhatsApp', 'phone', 'tel', s.phone)}${field('Minat / hobi', 'interest', 'text', s.interest, 'required maxlength="300"')}</div>`;
+  const notes = `${area('Hasil diagnostik awal', 'diagnostic', s.diagnostic, 'maxlength="3000"')}${area('Catatan gaya belajar', 'learning_notes', s.learning_notes, 'maxlength="3000"')}`;
+  const hint = edit
+    ? `<p class="muted">${owner ? 'Profil ini hanya dapat dibaca. Perubahan dilakukan oleh guru pendamping.' : 'Target mengalir otomatis per fase. Lihat kemajuan tiap bidang di bawah.'}</p>`
+    : '';
+  const save = canCreate ? '<button class="primary full">Simpan profil siswa</button>' : '';
+  return `<form data-form="student" data-id="${s.id || ''}"><fieldset ${canCreate ? '' : 'disabled'}>${grid}${notes}${levelFields(s, edit, owner)}${hint}</fieldset>${save}</form>`;
+}
+
+// Everything below the profile, shown only for a child who already exists.
+function studentDetails(s, owner) {
+  const meters = `<hr><h3>Perjalanan kompetensi</h3>${competencyMeters(s)}<div class="notice">Karakter tidak diberi level. Guru mencatat perilaku yang tampak dalam konteks kegiatan.</div>`;
+  const actions = !owner ? `<hr>${studentActionsSection(s)}` : '';
+  const summative = !owner && ready(s) && s.status === 'Aktif' ? summativeForm(s) : '';
+  return `${meters}${actions}${summative}<hr><h3>Riwayat evaluasi</h3>${evaluationHistory(s)}`;
+}
+
+// Offered only once every core subject has reached the end of its phase. Passing at the end of
+// Phase C is graduation, so the wording of the choice changes there.
+function summativeForm(s) {
+  const graduating = activeCompetenciesFor(s.id)
+    .filter(c => c.required)
+    .every(c => c.target >= 16);
+  const decision = select(
+    'Keputusan guru',
+    'pass',
+    [
+      ['false', 'Perlu pendampingan lanjutan'],
+      ['true', graduating ? 'Lulus (akhir Fase C)' : 'Lulus fase — lanjut ke fase berikutnya']
+    ],
+    'false'
+  );
+  const intro = `<h3>Ujian sumatif akhir fase</h3><p class="muted">Semua bidang inti sudah mencapai akhir fasenya. Lulus fase membuka fase berikutnya; lulus di akhir Fase C berarti lulus dari rumah belajar.</p>`;
+  const score = field('Nilai sumatif (1–100)', 'score', 'number', '', 'required min="1" max="100"');
+  return `<hr><form data-form="summative" data-id="${s.id}">${intro}${score}${decision}<button class="primary">Simpan hasil sumatif</button></form>`;
+}
+
+function historyLine(r) {
+  const when = h(state.classes.find(c => c.id === r.session_id)?.date || r.finalized_at.slice(0, 10));
+  return `<p class="history">${when} · ${h(r.attendance)} · <strong>${h(r.grade || 'Tanpa nilai')}</strong><br><small>${h(r.anecdote)}</small></p>`;
+}
+
+function evaluationHistory(s) {
+  return (
+    state.records
+      .filter(r => r.student_id === s.id && r.finalized_at)
+      .sort((a, b) => b.finalized_at.localeCompare(a.finalized_at))
+      .map(r => historyLine(r))
+      .join('') || '<p class="muted">Belum ada evaluasi tersimpan.</p>'
   );
 }
 export function scheduleForm(sc = {}) {
@@ -220,6 +305,37 @@ export function scheduleForm(sc = {}) {
   const active = state.students.filter(s => s.status === 'Aktif');
   modal(
     sc.id ? 'Ubah sesi jadwal' : 'Sesi jadwal baru',
-    `<form data-form="schedule" data-id="${sc.id || ''}">${field('Nama sesi', 'name', 'text', sc.name || '', 'required maxlength="60" placeholder="Sesi Pagi"')}<div class="form-grid">${field('Jam mulai', 'start_time', 'time', sc.start_time?.slice(0, 5) || '', 'required')}${field('Jam selesai', 'end_time', 'time', sc.end_time?.slice(0, 5) || '', 'required')}</div><p class="muted schedule-hint" id="schedule-duration">${durationText(sc.start_time, sc.end_time)}</p><h3>Anak di sesi ini</h3>${active.map(s => `<label class="check"><input type="checkbox" name="student" value="${s.id}" ${members.has(s.id) ? 'checked' : ''}>${h(s.name)}</label>`).join('') || '<p>Belum ada siswa aktif.</p>'}<button class="primary full">Simpan sesi jadwal</button>${sc.id ? `<button type="button" class="text-btn full" data-action="delete-schedule" data-id="${sc.id}">Hapus sesi jadwal</button>` : ''}</form>`
+    `<form data-form="schedule" data-id="${sc.id || ''}">${scheduleTimeFields(sc)}<h3>Anak di sesi ini</h3>${scheduleRoster(active, members)}<button class="primary full">Simpan sesi jadwal</button>${scheduleDeleteButton(sc)}</form>`
   );
+}
+
+// Name and hours. The duration line is rewritten by main.js as the teacher edits the two times.
+function scheduleTimeFields(sc) {
+  const name = field(
+    'Nama sesi',
+    'name',
+    'text',
+    sc.name || '',
+    'required maxlength="60" placeholder="Sesi Pagi"'
+  );
+  const start = field('Jam mulai', 'start_time', 'time', sc.start_time?.slice(0, 5) || '', 'required');
+  const end = field('Jam selesai', 'end_time', 'time', sc.end_time?.slice(0, 5) || '', 'required');
+  const hint = `<p class="muted schedule-hint" id="schedule-duration">${durationText(sc.start_time, sc.end_time)}</p>`;
+  return `${name}<div class="form-grid">${start}${end}</div>${hint}`;
+}
+
+function scheduleRoster(active, members) {
+  return (
+    active
+      .map(
+        s =>
+          `<label class="check"><input type="checkbox" name="student" value="${s.id}" ${members.has(s.id) ? 'checked' : ''}>${h(s.name)}</label>`
+      )
+      .join('') || '<p>Belum ada siswa aktif.</p>'
+  );
+}
+
+function scheduleDeleteButton(sc) {
+  if (!sc.id) return '';
+  return `<button type="button" class="text-btn full" data-action="delete-schedule" data-id="${sc.id}">Hapus sesi jadwal</button>`;
 }
