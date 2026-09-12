@@ -37,7 +37,8 @@ Baca file ini dulu sebelum mengubah apa pun. Pengguna (pemilik bimbel) berkomuni
 - `supabase db query` dengan SQL multi-baris sampai kosong → tulis SQL dalam **satu baris**. Multi-statement hanya mengembalikan hasil terakhir.
 - Pernah muncul byte NUL di `main.js` akibat edit; setelah edit besar cek: `$b=[IO.File]::ReadAllBytes('src/main.js'); @($b | ? {$_ -eq 0}).Count` harus 0. Untuk mengganti baris sangat panjang, pakai skrip Node dengan penanda awal/akhir.
 - CSS aplikasi memberi `display` ke `label`, jadi atribut `hidden` dipaksa lewat `[hidden]{display:none!important}` (`src/student-form.css`).
-- `src/main.js` masih memuat fungsi versi lama (`studentsView`, `recordCard`, dll.) yang ditimpa oleh versi `V2` di bagian bawah — edit versi V2.
+- Fungsi versi lama dan penimpaan `V2` sudah **dihapus** (12 Sep 2026). Kini satu nama = satu fungsi; tidak ada lagi versi bayangan yang harus diingat.
+- Data kurikulum untuk mode pratinjau ada di `src/demo-curriculum.js`, dimuat **hanya saat pratinjau dibuka** (`import()` dinamis). Jangan pindahkan kembali ke `src/main.js`: isinya 77 KB dan akan ikut diunduh semua guru.
 - Batas email Supabase bawaan kecil ("email rate limit exceeded"). Guru baru: daftarkan email di Tim pengajar dulu, lalu pemilik membuat user di Supabase Dashboard → Authentication → Add user dengan **Auto Confirm**. Ini alur tetap, bukan jalan darurat: pengguna memutuskan **tidak memasang SMTP sendiri** (12 Sep 2026). Jangan tawarkan lagi.
 
 ## Keadaan kurikulum (per 12 Sep 2026) — sudah selesai
