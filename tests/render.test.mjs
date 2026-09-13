@@ -343,7 +343,31 @@ test('tambah siswa hanya identitas; tes diagnostik memuat catatan dan level awal
   // Minat hilang juga dari profil anak yang sudah ada, tapi catatan dan levelnya tetap bisa dibuka.
   const profil = openModal(studentForm, state.students[0]);
   assert.ok(!profil.includes('name="interest"'));
-  assert.match(profil, /name="diagnostic"/);
+  // Profil pilot: hasil diagnostik, pilihan level awal, dan tampilan per bidang lama tidak ditampilkan.
+  for (const n of ['diagnostic', 'reading_baseline', 'math_baseline', 'phase'])
+    assert.ok(!profil.includes('name="' + n + '"'), n + ' tidak ada di profil');
+  for (const lama of [
+    'Arti level',
+    'Perjalanan kompetensi',
+    'Karakter tidak diberi level',
+    'Target mengalir otomatis',
+    'tidak ikut sesi kelas'
+  ])
+    assert.ok(!profil.includes(lama), lama + ' sudah dihapus');
+  assert.match(profil, /name="learning_notes"/);
+  assert.ok(
+    profil.includes(
+      '<h3>Level saat ini</h3><p><strong>Level 1 — Aku Siap Belajar</strong></p><p class="muted">Anak mulai nyaman.</p>'
+    )
+  );
+  // Alya punya sesi terbuka di contoh; tanpa sesi itu, kalimat status yang baru tampil.
+  const records = state.records;
+  state.records = [];
+  assert.match(
+    openModal(studentForm, state.students[0]),
+    /Anak nonaktif tidak bisa dimasukkan ke sesi kelas/
+  );
+  state.records = records;
 });
 
 test('tes diagnostik: pilih anak dan satu level, dengan saran dari kelas formal', () => {
@@ -527,7 +551,10 @@ test('status tes di daftar siswa, profil, dan sesi kelas', () => {
   assert.match(diagnosticResultSection(alya), /terkunci karena anak sudah mengikuti kelas/);
   assert.equal(diagnosticResultSection(state.students.find(s => s.id === 'anak-2')), '', 'anak belum dites');
   // Profil: hasil diagnostik hanya dibaca, diisi oleh Tes Diagnostik.
-  assert.match(openModal(studentForm, alya), /name="diagnostic" rows="3" readonly/);
+  assert.ok(
+    !openModal(studentForm, alya).includes('name="diagnostic"'),
+    'ringkasan teks tidak ditampilkan di profil'
+  );
   // Pemilik tidak menerima baris tes dari database, jadi bagiannya tidak muncul.
   state.diagnosticTests = [];
   assert.ok(!openModal(studentForm, alya).includes('Hasil tes diagnostik'));
@@ -537,6 +564,11 @@ test('status tes di daftar siswa, profil, dan sesi kelas', () => {
   state.view = 'students';
   const daftar = studentsView();
   assert.match(daftar, /class="status-tes">Belum lulus Level 2</);
+  assert.ok(
+    daftar.includes('<small><b>Level 1 — Aku Siap Belajar</b></small>'),
+    'baris siswa memakai nama level pilot'
+  );
+  assert.ok(!daftar.includes('Bahasa Indonesia <b>Level'));
   assert.equal(count(daftar, 'Belum tes diagnostik'), 1);
 
   // Sesi kelas: anak yang belum dites tidak bisa dicentang.

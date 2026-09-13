@@ -43,7 +43,7 @@ import {
 import { field, select, area, empty, notify, heading, meter, modal } from './ui.js';
 import { curriculumView } from './views/curriculum.js';
 import { sessionsView, newSession } from './views/sessions.js';
-import { studentsView, levelMeaning, studentForm, scheduleForm } from './views/students.js';
+import { studentsView, studentForm, scheduleForm } from './views/students.js';
 import { diagnosticForm } from './views/diagnostic.js';
 import { diagnosticOutcome, diagnosticSummary, diagnosticPayload, runFromSaved } from './diagnostic.js';
 import { dashboard } from './views/dashboard.js';
@@ -647,16 +647,6 @@ document.addEventListener('change', e => {
     form.querySelector('[data-age]').textContent = age ? 'Usia ' + age : 'Usia dihitung otomatis';
     return;
   }
-  if (form?.dataset.form !== 'student' || !form.elements.reading_baseline) return;
-  const els = form.elements;
-  const levels = ['reading_baseline', 'math_baseline'];
-  if (e.target.name === 'phase' && startPresets[e.target.value])
-    for (const n of levels) if (!els[n].disabled) els[n].value = String(startPresets[e.target.value]);
-  for (const n of levels)
-    form.querySelector(`[data-meaning="${n}"]`).textContent = levelMeaning(
-      n.startsWith('math') ? 'math' : 'bi',
-      els[n].value
-    );
 });
 // "＋ Tema lain…" reveals a free-text theme name; any listed theme hides it again.
 document.addEventListener('change', e => {

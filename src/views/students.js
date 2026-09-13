@@ -34,7 +34,7 @@ export function studentRow(s) {
       ? `<small class="status-tes">${h(s.diagnostic_status)}</small>`
       : '';
   const who = `<span class="avatar pastel">${h(s.name[0])}</span><div class="student-info"><strong>${h(s.name)}</strong>${note}</div>`;
-  const bar = `<div class="mini-progress"><small>Bahasa Indonesia <b>Level ${bi.current}</b> · ${phaseShort(bi.current)}</small><progress value="${phasePct(bi.current)}" max="100"></progress></div>`;
+  const bar = `<div class="mini-progress"><small><b>${h(levelName(bi.current))}</b></small><progress value="${phasePct(bi.current)}" max="100"></progress></div>`;
   return `<button class="student-row" data-action="student" data-id="${s.id}">${who}${bar}<span class="row-arrow">→</span></button>`;
 }
 export function ownerStudentsView() {
@@ -111,87 +111,29 @@ export function teacherStudentsView() {
 export function studentsView() {
   return state.role === 'owner' ? ownerStudentsView() : teacherStudentsView();
 }
-export function competencyMeters(s) {
-  const rows = activeCompetenciesFor(s.id);
-  if (!rows.length)
-    return `${meter('Bahasa Indonesia', s.reading_level, s.reading_baseline, s.reading_target)}${meter('Matematika', s.math_level, s.math_baseline, s.math_target)}`;
-  const order = ['listening', 'speaking', 'reading', 'writing', 'math', 'ipas', 'english'];
-  const bars = order
-    .map(code => rows.find(c => c.subject === code))
-    .filter(Boolean)
-    .map(c => competencyMeter(c))
-    .join('');
-  return `<div class="competency-list">${bars}</div>`;
+// Nama level pilot dari kurikulum, misalnya "Level 2 — Aku Mulai Mengenal".
+export function levelName(level) {
+  const lv = state.curriculumLevels.find(x => x.level === Number(level));
+  return `Level ${level}${lv ? ` — ${lv.title}` : ''}`;
 }
 
-// One subject's bar. The line underneath says either that the phase is done and waiting on the
-// summative, or how far along it is and how much evidence the next level still needs.
-function competencyMeter(c) {
-  const atTarget =
-    c.target >= 16 ? 'Level tertinggi tercapai' : 'Akhir fase tercapai · menunggu ujian sumatif';
-  const onTheWay = `${phasePct(c.current_level)}% fase · ${c.evidence_count}/2 bukti menuju kenaikan berikutnya`;
-  const status = `${c.current_level >= c.target ? atTarget : onTheWay}${c.intervention ? ' · perlu ditinjau' : ''}`;
-  const label = `<div><strong>${h(subjectLabels[c.subject])}</strong><span>Level ${c.current_level} · ${phaseOf(c.current_level)}${c.required ? '' : ' · pengayaan'}</span></div>`;
-  return `<div class="competency-meter">${label}<progress value="${phasePct(c.current_level)}" max="100"></progress><small>${status}</small></div>`;
-}
-export function levelMeaning(kind, level) {
-  const n = Number(level);
-  const c = state.curriculum.find(x => x.level === n);
-  const clip = t => (t && t.length > 170 ? t.slice(0, 167) + '…' : t || '—');
-  if (!c) return `${phaseOf(n)}. Lihat menu Kurikulum untuk tujuan lengkap level ini.`;
-  return kind === 'math'
-    ? `${phaseOf(n)} · Matematika: ${clip(c.math)}`
-    : `${phaseOf(n)} · Membaca: ${clip(c.reading)} · Menulis: ${clip(c.writing)}`;
-}
-export function levelFields(s, edit, owner, phase = '') {
-  const correctable = edit && !owner && !state.records.some(r => r.student_id === s.id);
-  const lockBase = edit && !correctable;
-  const pick = (label, name, value, kind) =>
-    `<div>${select(label, name, levelOptions, String(value), lockBase ? 'disabled' : 'required')}<small class="level-meaning" data-meaning="${name}">${h(levelMeaning(kind, value))}</small></div>`;
-  const baseLabel = label =>
-    lockBase
-      ? `${label} (terkunci)`
-      : correctable
-        ? `${label} (bisa dikoreksi sampai anak ikut kelas)`
-        : label;
-  const phases = [
-    ['', 'Pilih untuk mengisi level otomatis…'],
-    ['fondasi', 'Belum SD (Fondasi)'],
-    ['sd1', 'SD kelas 1'],
-    ['sd2', 'SD kelas 2'],
-    ['sd3', 'SD kelas 3'],
-    ['sd4', 'SD kelas 4'],
-    ['sd5', 'SD kelas 5'],
-    ['sd6', 'SD kelas 6']
-  ];
-  const phasePicker = edit ? '' : select('Perkiraan fase / kelas sekolah', 'phase', phases, phase);
-  const bi = pick(
-    baseLabel('Level awal Bahasa Indonesia'),
-    'reading_baseline',
-    s.reading_baseline || 1,
-    'bi'
-  );
-  const math = pick(baseLabel('Level awal Matematika'), 'math_baseline', s.math_baseline || 1, 'math');
-  return `${phasePicker}${levelGuide()}<div class="form-grid">${bi}${math}</div>`;
+// Level anak saat ini beserta deskriptornya, pengganti batang kompetensi per bidang selama pilot.
+export function currentLevelSection(s) {
+  const lv = state.curriculumLevels.find(x => x.level === Number(s.reading_level));
+  const desc = lv ? `<p class="muted">${h(lv.description)}</p>` : '';
+  return `<hr><h3>Level saat ini</h3><p><strong>${h(levelName(s.reading_level))}</strong></p>${desc}`;
 }
 
-// Why a teacher only ever sets a starting point: the level is where the child is, not which school
-// year they are in, and the target moves itself once a phase is passed.
-function levelGuide() {
-  const ladder = `1–4 Fondasi (belum SD) · 5–8 Fase A (SD 1–2) · 9–12 Fase B (SD 3–4) · 13–16 Fase C (SD 5–6).`;
-  const how = `Guru cukup menentukan titik awal sesuai hasil diagnostik; level adalah posisi kemampuan anak, bukan kelas sekolah. Target mengalir otomatis: akhir fase anak saat ini, lalu pindah ke fase berikutnya setelah anak lulus ujian sumatif fase itu. Titik awal Bahasa Indonesia juga dipakai untuk Menyimak, Berbicara, IPAS, dan English Exposure.`;
-  return `<div class="notice level-guide"><strong>Arti level</strong><br>${ladder}<br>${how}</div>`;
-}
 export function studentActionsSection(s) {
   const openSession = state.records.some(r => r.student_id === s.id && !r.finalized_at);
   const status =
     s.status === 'Lulus'
       ? '<p class="muted">Siswa ini sudah lulus melalui ujian sumatif.</p>'
       : s.status !== 'Aktif'
-        ? `<p class="muted">Siswa ini non-aktif: tidak ikut sesi kelas, tetapi riwayat belajarnya tetap tersimpan.</p><button type="button" class="secondary" data-action="toggle-student" data-active="true" data-id="${s.id}">Aktifkan kembali</button>`
+        ? `<p class="muted">Siswa ini non-aktif: tidak bisa dimasukkan ke sesi kelas, tetapi riwayat belajarnya tetap tersimpan.</p><button type="button" class="secondary" data-action="toggle-student" data-active="true" data-id="${s.id}">Aktifkan kembali</button>`
         : openSession
           ? '<p class="muted">Siswa ini masih punya sesi kelas yang belum dievaluasi. Selesaikan evaluasinya dulu sebelum menonaktifkan.</p><button type="button" class="secondary danger" disabled>Nonaktifkan siswa ini</button>'
-          : `<p class="muted">Untuk anak yang berhenti atau cuti. Anak tidak ikut sesi kelas, riwayat belajarnya tetap tersimpan, dan bisa diaktifkan kembali kapan saja.</p><button type="button" class="secondary danger" data-action="toggle-student" data-active="false" data-id="${s.id}">Nonaktifkan siswa ini</button>`;
+          : `<p class="muted">Untuk anak yang berhenti atau cuti. Anak nonaktif tidak bisa dimasukkan ke sesi kelas; riwayatnya tetap tersimpan dan bisa diaktifkan kembali kapan saja.</p><button type="button" class="secondary danger" data-action="toggle-student" data-active="false" data-id="${s.id}">Nonaktifkan siswa ini</button>`;
   const remove = state.records.some(r => r.student_id === s.id)
     ? '<p class="muted">Siswa ini sudah pernah ikut kelas, jadi tidak bisa dihapus agar riwayat belajarnya tetap tersimpan. Gunakan Nonaktifkan bila anak berhenti.</p>'
     : `<p class="muted">Hanya untuk data yang salah input atau ganda. Siswa yang belum pernah ikut kelas dihapus permanen beserta level dan keanggotaan sesi jadwalnya.</p><button type="button" class="secondary danger" data-action="delete-student" data-id="${s.id}">Hapus siswa ini</button>`;
@@ -225,21 +167,22 @@ function gradeField(s) {
 }
 function profileForm(s, edit, owner, canCreate) {
   const grid = `<div class="form-grid">${field('Nama anak', 'name', 'text', s.name, 'required maxlength="120"')}${field('Nama panggilan', 'nickname', 'text', s.nickname, 'maxlength="60" placeholder="Boleh dikosongkan"')}${field('Sapaan orang tua', 'parent_name', 'text', s.parent_name, 'required maxlength="120"')}${field('Nomor WhatsApp', 'phone', 'tel', s.phone)}${birthField(s)}${gradeField(s)}</div>`;
-  const notes = `${area('Hasil diagnostik awal', 'diagnostic', s.diagnostic, 'readonly title="Diisi otomatis oleh Tes Diagnostik"')}${area('Catatan gaya belajar', 'learning_notes', s.learning_notes, 'maxlength="3000"')}`;
-  const hint = edit
-    ? `<p class="muted">${owner ? 'Profil ini hanya dapat dibaca. Perubahan dilakukan oleh guru pendamping.' : 'Target mengalir otomatis per fase. Lihat kemajuan tiap bidang di bawah.'}</p>`
-    : '';
+  const notes = area('Catatan gaya belajar', 'learning_notes', s.learning_notes, 'maxlength="3000"');
+  const hint =
+    edit && owner
+      ? '<p class="muted">Profil ini hanya dapat dibaca. Perubahan dilakukan oleh guru pendamping.</p>'
+      : '';
   // Siswa baru cukup identitasnya; catatan dan level awal diisi lewat Tes Diagnostik, kapan saja.
   const save = canCreate
     ? `<button class="primary full">${edit ? 'Simpan profil siswa' : 'Simpan siswa'}</button>`
     : '';
-  const rest = edit ? `${notes}${levelFields(s, edit, owner)}${hint}` : '';
+  const rest = edit ? `${notes}${hint}` : '';
   return `<form data-form="student" data-id="${s.id || ''}"><fieldset ${canCreate ? '' : 'disabled'}>${grid}${rest}</fieldset>${save}</form>`;
 }
 
 // Everything below the profile, shown only for a child who already exists.
 function studentDetails(s, owner) {
-  const meters = `<hr><h3>Perjalanan kompetensi</h3>${competencyMeters(s)}<div class="notice">Karakter tidak diberi level. Guru mencatat perilaku yang tampak dalam konteks kegiatan.</div>`;
+  const meters = currentLevelSection(s);
   const actions = !owner ? `<hr>${studentActionsSection(s)}` : '';
   const summative = !owner && ready(s) && s.status === 'Aktif' ? summativeForm(s) : '';
   return `${diagnosticResultSection(s)}${meters}${actions}${summative}<hr><h3>Riwayat evaluasi</h3>${evaluationHistory(s)}`;
