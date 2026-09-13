@@ -13,7 +13,14 @@ import {
 // select diimpor karena scripts/check-imports.mjs mencocokkan kata, termasuk .select() milik Supabase.
 import { field, select, notify, modal } from './ui.js';
 import { curriculumView } from './views/curriculum.js';
-import { sessionsView } from './views/sessions.js';
+import {
+  sessionsView,
+  scheduleForm,
+  kidsSummary,
+  indicatorRows,
+  themeForMeeting,
+  scheduleValues
+} from './views/sessions.js';
 import { studentsView, studentForm } from './views/students.js';
 import { diagnosticForm } from './views/diagnostic.js';
 import { diagnosticOutcome, diagnosticPayload } from './diagnostic.js';
@@ -65,7 +72,9 @@ async function refresh() {
     curriculumIndicators,
     curriculumThemes,
     diagnosticTests,
-    diagnosticResults
+    diagnosticResults,
+    classSchedules,
+    classScheduleStudents
   ] = await Promise.all([
     allRows('students', 'name'),
     result(db.from('curriculum_phases').select('*').order('sort_order')),
@@ -73,9 +82,13 @@ async function refresh() {
     result(db.from('curriculum_level_indicators').select('*').order('level').order('number')),
     result(db.from('curriculum_themes').select('*').order('number')),
     allRows('diagnostic_tests', 'id'),
-    allRows('diagnostic_results', 'test_id')
+    allRows('diagnostic_results', 'test_id'),
+    allRows('class_schedules', 'id'),
+    allRows('class_schedule_students', 'schedule_id')
   ]);
   Object.assign(state, {
+    classSchedules,
+    classScheduleStudents,
     students,
     curriculumPhases,
     curriculumLevels,
@@ -312,6 +325,8 @@ document.addEventListener('click', async e => {
       keepDraft();
       return diagnosticForm();
     }
+    if (action === 'new-schedule') return modal('Buat jadwal', scheduleForm());
+    if (action === 'edit-schedule') return modal('Ubah jadwal', scheduleForm(scheduleValues(id), id));
     if (action === 'password') return modal('Ganti kata sandi', passwordForm());
     if (action === 'new-member')
       return modal(
@@ -319,6 +334,12 @@ document.addEventListener('click', async e => {
         `<form data-form="member">${field('Nama guru', 'name', 'text', '', 'required maxlength="120"')}${field('Email guru', 'email', 'email', '', 'required')}<button class="primary full">Daftarkan email guru</button></form>`
       );
     b.disabled = true;
+    if (action === 'delete-schedule') {
+      if (!confirm('Hapus jadwal ini? Siswa dan tanggalnya ikut terhapus dari jadwal.')) return;
+      await result(db.rpc('delete_schedule', { p_schedule: id }));
+      await refresh();
+      return notify('Jadwal dihapus.');
+    }
     if (action === 'delete-student') {
       const s = state.students.find(x => x.id === id);
       if (
@@ -375,6 +396,20 @@ document.addEventListener('click', async e => {
 });
 document.addEventListener('change', e => {
   const form = e.target.form;
+  // Nomor pertemuan memilihkan tema yang berlaku; guru tetap bisa menggantinya.
+  if (form?.dataset.form === 'schedule' && e.target.name === 'meeting') {
+    const t = themeForMeeting(Number(e.target.value));
+    if (t) form.elements.theme.value = String(t.number);
+    return;
+  }
+  // Memilih siswa memperbarui ringkasan dan dropdown indikator per siswa di tempat, tanpa menutup daftar.
+  if (form?.dataset.form === 'schedule' && e.target.name === 'students') {
+    const f = new FormData(form);
+    const ids = f.getAll('students');
+    form.querySelector('[data-kids-summary]').textContent = kidsSummary(ids);
+    form.querySelector('[data-indicators]').outerHTML = indicatorRows(new Set(ids), Object.fromEntries(f));
+    return;
+  }
   if (form?.dataset.form === 'diagnostic-start' && e.target.name === 'student')
     return diagnosticForm(e.target.value);
   // Setiap nilai yang dipilih langsung disimpan sementara, jadi tes yang terhenti tidak kehilangan jawaban.
@@ -482,6 +517,19 @@ document.addEventListener('submit', async e => {
         );
         dropDraft(s.id);
         state.diagnostic = null;
+        break;
+      }
+      case 'schedule': {
+        const ids = f.getAll('students');
+        if (!ids.length) throw new Error('Pilih minimal satu siswa.');
+        const payload = {
+          meeting_number: Number(v.meeting),
+          theme_number: Number(v.theme),
+          scheduled_date: v.date,
+          scheduled_time: v.time || '',
+          students: ids.map(sid => ({ student_id: sid, indicator_number: Number(v['indicator_' + sid]) }))
+        };
+        await result(db.rpc('save_schedule', { p_schedule: id || null, p_payload: payload }));
         break;
       }
       case 'password': {

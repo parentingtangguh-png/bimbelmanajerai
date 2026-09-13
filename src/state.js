@@ -19,6 +19,9 @@ export const initialState = () => ({
   curriculumThemes: [],
   diagnosticTests: [],
   diagnosticResults: [],
+  // Jadwal kelas pilot dan siswa di tiap jadwal (level saat dijadwalkan + satu indikator).
+  classSchedules: [],
+  classScheduleStudents: [],
   // Tes Diagnostik yang sedang berjalan: { student, level, answers, reviewed, note }.
   diagnostic: null,
   // Tes yang belum disimpan di perangkat ini, per anak (dibaca main.js dari localStorage).

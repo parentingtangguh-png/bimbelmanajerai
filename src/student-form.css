@@ -120,6 +120,69 @@
   background: #2c2616;
   font-weight: 600;
 }
+.schedule-section {
+  margin: 18px 0;
+}
+.schedule-card {
+  margin: 10px 0;
+}
+.schedule-card p {
+  margin: 6px 0;
+}
+/* Jadwal pertemuan: daftar siswa berupa baris centang yang ringkas. */
+.schedule-field {
+  margin: 0 0 14px;
+}
+.schedule-label {
+  display: block;
+  margin-bottom: 6px;
+}
+.schedule-kids summary {
+  padding: 12px 14px;
+  border: 1px solid rgba(127, 127, 127, 0.35);
+  border-radius: 12px;
+  cursor: pointer;
+}
+.schedule-kids-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 6px;
+}
+.schedule-kid {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid rgba(127, 127, 127, 0.35);
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 400;
+}
+.schedule-kid input {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--green);
+}
+.schedule-kid span {
+  display: inline;
+}
+.schedule-kid:has(input:checked) {
+  border-color: var(--green);
+  background: #2c2616;
+}
+.schedule-kid:has(input:disabled) {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.schedule-cp {
+  margin-top: -4px;
+  font-size: 13px;
+}
 .diagnostic-result h3 {
   margin: 8px 0 4px;
 }

@@ -12,7 +12,7 @@ import {
   testStatus,
   levelName
 } from '../src/state.js';
-import { sessionsView } from '../src/views/sessions.js';
+import { sessionsView, scheduleForm, kidsSummary, scheduleValues } from '../src/views/sessions.js';
 import { dashboard } from '../src/views/dashboard.js';
 import { studentsView, studentForm, diagnosticResultSection } from '../src/views/students.js';
 import { diagnosticForm } from '../src/views/diagnostic.js';
@@ -64,11 +64,55 @@ test('ringkasan: siswa aktif, sudah dan belum dites, sebaran level', () => {
   assert.match(dashboard(), /Guru aktif/);
 });
 
-test('ruang kelas lama sudah tidak ada; layar menunjuk ke Data siswa', () => {
+test('ruang kelas: formulir jadwal — siswa, tema, indikator per siswa dari levelnya, pertemuan, tanggal', () => {
+  loadSampleState();
+  state.role = 'teacher';
   const html = sessionsView();
-  assert.match(html, /Ruang kelas pilot sedang disiapkan/);
-  assert.match(html, /data-view="students"/);
+  assert.match(html, /data-action="new-schedule"/);
   assert.ok(!/data-action="new-session"|evaluasi|kehadiran/i.test(html));
+  const f = scheduleForm();
+  assert.ok(!/name="phase"|name="level"/.test(f), 'tanpa dropdown CP dan level');
+  assert.equal(count(f, '>Pertemuan '), 192);
+  const urut = ['name="students"', 'name="theme"', 'data-indicators', 'name="meeting"', 'name="date"'].map(x => f.indexOf(x));
+  assert.ok(urut.every(i => i >= 0));
+  assert.deepEqual(urut, [...urut].sort((a, b) => a - b), 'siswa dulu, lalu tema, indikator, pertemuan, tanggal');
+  assert.match(f, /<summary data-kids-summary>Pilih siswa…<\/summary>/);
+  assert.match(f, /Indikator muncul setelah siswa dipilih/);
+  assert.match(kidsSummary(['anak-1']), /^1 siswa: /);
+  assert.match(f, /<option value="1" selected>Tema 1/, 'tema mengikuti pertemuan');
+  assert.match(f, /value="anak-2"[^>]*disabled/, 'belum dites tidak bisa dipilih');
+  assert.ok(!f.includes('value="anak-3"'), 'anak nonaktif tidak tampil');
+  const lanjut = scheduleForm({ meeting: '30', changed: 'meeting', students: ['anak-1', 'anak-2'] });
+  assert.match(lanjut, /<option value="30" selected>/);
+  assert.match(lanjut, /<option value="2" selected>Tema 2/, 'pertemuan 30 → Tema 2');
+  assert.ok(lanjut.indexOf('Tema 1 ') < lanjut.indexOf('Tema 2 '), 'tema urut');
+  assert.match(lanjut, /value="anak-1" checked/);
+  assert.match(lanjut, /Alya Contoh · Level 2<select name="indicator_anak-1"/, 'indikator ikut level Alya');
+  assert.match(lanjut, /<option value="1" selected>1\. Menyebutkan nama huruf vokal/);
+  assert.ok(!lanjut.includes('indicator_anak-2'), 'anak belum dites tidak mendapat indikator');
+  assert.match(f, /<option value="1" selected>Pertemuan 1</, 'tanpa jadwal: pertemuan 1');
+  assert.match(html, /Belum ada jadwal/);
+
+  // Jadwal tersimpan: akan datang / selesai, pertemuan berikutnya otomatis, ubah terisi.
+  state.classSchedules = [
+    { id: 'j1', meeting_number: 3, theme_number: 1, scheduled_date: '2026-09-20', scheduled_time: '15:00:00', completed_at: null },
+    { id: 'j0', meeting_number: 2, theme_number: 1, scheduled_date: '2026-09-10', scheduled_time: null, completed_at: '2026-09-10T09:00:00Z' }
+  ];
+  state.classScheduleStudents = [{ schedule_id: 'j1', student_id: 'anak-1', level: 2, indicator_number: 1 }];
+  const daftar = sessionsView();
+  assert.ok(daftar.indexOf('Akan datang') < daftar.indexOf('Pertemuan 3') && daftar.indexOf('Selesai') < daftar.indexOf('Pertemuan 2'));
+  assert.match(daftar, /15\.00|15:00/);
+  assert.match(daftar, /Tema 1 — Aku Bisa Bercerita · 1 siswa/);
+  assert.match(daftar, /data-action="edit-schedule" data-id="j1"/);
+  assert.ok(!daftar.includes('data-id="j0"'), 'jadwal selesai dikunci');
+  assert.match(scheduleForm(), /<option value="4" selected>Pertemuan 4</, 'pertemuan berikutnya otomatis');
+  const ubah = scheduleForm(scheduleValues('j1'), 'j1');
+  assert.match(ubah, /data-form="schedule" data-id="j1"/);
+  assert.match(ubah, /value="anak-1" checked/);
+  assert.match(ubah, /<option value="3" selected>Pertemuan 3</);
+  assert.match(ubah, /name="time" type="time" value="15:00"/);
+  state.role = 'owner';
+  assert.ok(!sessionsView().includes('new-schedule'), 'pemilik tidak membuat jadwal');
 });
 
 test('daftar siswa guru dan pemilik memakai status tes dan level pilot', () => {
