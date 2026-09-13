@@ -184,8 +184,10 @@ function profileForm(s, edit, owner, canCreate) {
 function studentDetails(s, owner) {
   const meters = currentLevelSection(s);
   const actions = !owner ? `<hr>${studentActionsSection(s)}` : '';
-  const summative = !owner && ready(s) && s.status === 'Aktif' ? summativeForm(s) : '';
-  return `${diagnosticResultSection(s)}${meters}${actions}${summative}<hr><h3>Riwayat evaluasi</h3>${evaluationHistory(s)}`;
+  // Ujian sumatif disembunyikan selama pilot Fondasi (keputusan pemilik 13 Sep 2026): aturan lama
+  // menganggap anak yang MULAI di Level 4 sudah menyelesaikan fase. summativeForm dan RPC
+  // complete_summative sengaja dibiarkan untuk dipakai lagi di tempat lain.
+  return `${diagnosticResultSection(s)}${meters}${actions}<hr><h3>Riwayat evaluasi</h3>${evaluationHistory(s)}`;
 }
 
 // Hasil Tes Diagnostik per indikator. Pemilik tidak menerima baris ini dari database, jadi bagian ini

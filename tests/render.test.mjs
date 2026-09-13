@@ -343,6 +343,18 @@ test('tambah siswa hanya identitas; tes diagnostik memuat catatan dan level awal
   // Minat hilang juga dari profil anak yang sudah ada, tapi catatan dan levelnya tetap bisa dibuka.
   const profil = openModal(studentForm, state.students[0]);
   assert.ok(!profil.includes('name="interest"'));
+  // Ujian sumatif lama disembunyikan selama pilot, termasuk untuk anak yang levelnya sudah di akhir fase.
+  {
+    const records = state.records;
+    state.records = [];
+    state.competencies.forEach(c => (c.current_level = c.target));
+    const akhir = openModal(studentForm, state.students[0]);
+    assert.ok(
+      !akhir.includes('data-form="summative"') && !akhir.includes('Ujian sumatif'),
+      'tanpa formulir sumatif'
+    );
+    state.records = records;
+  }
   // Profil pilot: hasil diagnostik, pilihan level awal, dan tampilan per bidang lama tidak ditampilkan.
   for (const n of ['diagnostic', 'reading_baseline', 'math_baseline', 'phase'])
     assert.ok(!profil.includes('name="' + n + '"'), n + ' tidak ada di profil');
