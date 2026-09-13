@@ -12,9 +12,7 @@ import {
   phaseShort,
   phasePct,
   levelOptions,
-  startPresets,
   schoolGrades,
-  gradePhase,
   schoolYearOf,
   ageText
 } from '../state.js';
@@ -275,44 +273,6 @@ function evaluationHistory(s) {
       .sort((a, b) => b.finalized_at.localeCompare(a.finalized_at))
       .map(r => historyLine(r))
       .join('') || '<p class="muted">Belum ada evaluasi tersimpan.</p>'
-  );
-}
-// Tes Diagnostik berdiri sendiri dan bisa dibuka kapan saja, tapi hanya untuk anak aktif yang belum
-// dites. Level awal hanya bisa diubah sebelum anak ikut kelas pertama (correct_student_baseline), jadi
-// untuk anak yang telanjur ikut kelas, hasil tesnya tetap tersimpan sementara levelnya terkunci.
-export function diagnosticForm(studentId = '') {
-  const waiting = state.students.filter(needsDiagnostic);
-  if (!waiting.length)
-    return modal(
-      'Tes Diagnostik',
-      state.students.some(x => x.status === 'Aktif')
-        ? empty('Semua anak sudah dites', 'Tes diagnostik hanya untuk anak aktif yang belum pernah dites.')
-        : empty(
-            'Belum ada siswa aktif',
-            'Tambahkan siswa lebih dulu, lalu jalankan tes diagnostiknya kapan saja.'
-          )
-    );
-  const chosen = waiting.find(s => s.id === studentId) || waiting[0];
-  const kids = waiting.map(s => [s.id, s.name]);
-  const who = select('Anak yang dites', 'student', kids, chosen.id, 'required');
-  const notes = `${area('Hasil diagnostik awal', 'diagnostic', chosen.diagnostic, 'required maxlength="3000"')}${area('Catatan gaya belajar', 'learning_notes', chosen.learning_notes, 'maxlength="3000"')}`;
-  const locked = state.records.some(r => r.student_id === chosen.id);
-  modal(
-    'Tes Diagnostik',
-    `<form data-form="diagnostic">${who}${notes}${diagnosticLevels(chosen, locked)}<button class="primary full">Simpan hasil tes</button></form>`
-  );
-}
-function diagnosticLevels(s, locked) {
-  if (locked)
-    return `<p class="muted">${h(s.name)} sudah pernah ikut kelas, jadi level awalnya terkunci. Hasil tes tetap tersimpan sebagai catatan.</p>${levelFields(s, true, false)}`;
-  // Anak yang belum ikut kelas langsung diberi titik awal dari kelas formalnya; guru tinggal mengoreksi.
-  const phase = gradePhase(s.school_grade);
-  const start = phase ? startPresets[phase] : null;
-  return levelFields(
-    start ? { ...s, reading_baseline: start, math_baseline: start } : s,
-    false,
-    false,
-    phase
   );
 }
 export function scheduleForm(sc = {}) {

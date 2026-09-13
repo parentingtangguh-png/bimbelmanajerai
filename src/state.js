@@ -29,6 +29,8 @@ export const initialState = () => ({
   filter: '',
   schedules: [],
   scheduleStudents: [],
+  // Tes Diagnostik yang sedang berjalan: { student, start, results, order, draft }.
+  diagnostic: null,
   // The class list keeps every session ever taught. Only the latest are shown until asked.
   allSessions: false
 });

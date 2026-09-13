@@ -93,10 +93,23 @@ Ikuti Alur kerja langkah 3–4. Jangan pernah push tanpa persetujuan lebih dulu.
 - **Fase Fondasi jadi pilot.** Kurikulum barunya disetujui pemilik kata demi kata dan dipasang di `20260913030000_fondasi_pilot_curriculum.sql`:
   - Tabel `curriculum_phases` (CP), `curriculum_levels` (judul + deskripsi), `curriculum_level_indicators` (8 per level; kolom area bernama `domain`, karena kata `area` memicu `check-imports`), dan `curriculum_themes` (8 tema × 24 pertemuan).
   - Level milik anak secara utuh. Anggota membaca, pemilik hanya bisa UPDATE teks; baris ditambah lewat migrasi.
-  - Tab Kurikulum menampilkan CP → kartu level → tabel tema. Editor kurikulum lama dihapus dari `main.js`.
+  - Deskriptor tema (`20260913040000_theme_descriptors.sql`): `description`, `focus_areas`, `focus_indicators` (`text[]` berisi `L<level>-<nomor>`; tes menolak kode yang tidak ada di kurikulum), `character_focus`, `english_words`.
+  - Tab Kurikulum menampilkan CP → kartu level → daftar tema yang bisa dibuka (`themeDetail`, kode indikator fokus diterjemahkan ke teksnya).
+  - Deploy GitHub Actions pernah tersangkut *Queued* ±40 menit (#72, 13 Sep 2026) padahal status GitHub normal. Obatnya: pemilik membatalkan (Cancel workflow) lalu Re-run all jobs dari akun GitHub-nya; `gh` tidak terpasang, jadi Claude tidak bisa melakukannya. Editor kurikulum lama dihapus dari `main.js`.
   - Tabel `curriculum` lama (kosong) masih dibaca kartu evaluasi, `levelMeaning`, dan rapor AI.
 - Rancangan alur pilot dari pemilik (belum dibangun): tema menurut nomor pertemuan; lembar aktivitas per pertemuan (pembuka + English phrase, aktivitas utama dengan tugas otomatis per level anak, penutup + checklist karakter); guru memilih yang hadir lalu menandai pertemuan selesai. Belum diputuskan: cara naik level, sumber isi 192 lembar, cara menghitung nomor pertemuan, 5 butir checklist karakter, dan rapor.
-- Tes Diagnostik (instrumen tugas penentu bertahap) **ditunda** sampai kurikulum baru jadi, karena diturunkan darinya.
+- **Tes Diagnostik pilot Fondasi — kerangka disetujui pemilik 13 Sep 2026, belum dipasang di aplikasi:**
+  - Tes perorangan ±20–25 menit. Tiap indikator 1–8 punya satu tugas + ukuran; hasil ✓ Tercapai / ◐ Dengan bantuan / ✗ Belum.
+  - **Titik mulai dipilih bebas oleh guru** (L1–4); kelas formal hanya ditampilkan sebagai saran (Belum sekolah→1, TK A→2, TK B→3, SD→4).
+  - **Tuntas** = indikator 1–6 minimal 5 ✓ dan tanpa ✗. English (7) dan Karakter (8) dicatat, **tidak menentukan level**.
+  - Tuntas → naik; belum tuntas → level itu jadi level awal; bila titik mulai belum tuntas, turun sampai level terendah yang belum tuntas.
+  - Tuntas Level 4 → level awal 4 dengan catatan "melampaui Fondasi".
+  - Bahan tes: satu set tetap, disetujui pemilik, **tanpa berkas cetak**. Tugas, bahan, dan ukuran tampil di modal.
+  - Kode:
+    - `src/diagnostic.js` (murni): `diagnosticTasks`, `levelComplete`, `diagnosticPlan`, `diagnosticSummary`, `suggestedStart`.
+    - `src/views/diagnostic.js`: modal tiga langkah `diagnostic-start` → `diagnostic-level` → `diagnostic`. Jawaban disimpan di `state.diagnostic`; tombol Kembali memindahkan jawaban ke `draft` sebagai isian awal.
+    - Menyimpan memanggil `correct_student_baseline(level, level)` **lebih dulu**, lalu `update_student_profile` dengan ringkasan di `diagnostic`. Tanpa migrasi.
+  - Level awal pilot memakai kolom level lama (`reading_baseline` = `math_baseline` = level Fondasi); kartu evaluasi per bidang belum dirancang ulang.
 - Bagian di bawah menggambarkan kurikulum **lama** yang sudah dihapus; perbarui setelah kurikulum baru dipasang.
 
 ## Keadaan kurikulum lama (sudah dihapus)

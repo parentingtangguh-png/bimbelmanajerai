@@ -43,7 +43,9 @@ import {
 import { field, select, area, empty, notify, heading, meter, modal } from './ui.js';
 import { curriculumView } from './views/curriculum.js';
 import { sessionsView, newSession } from './views/sessions.js';
-import { studentsView, levelMeaning, studentForm, scheduleForm, diagnosticForm } from './views/students.js';
+import { studentsView, levelMeaning, studentForm, scheduleForm } from './views/students.js';
+import { diagnosticForm } from './views/diagnostic.js';
+import { diagnosticPlan, diagnosticSummary } from './diagnostic.js';
 import { dashboard } from './views/dashboard.js';
 import { homeMenu, homeTop, homeDoa, homeNav, leafArt } from './views/home.js';
 import { teamView } from './views/team.js';
@@ -379,6 +381,20 @@ document.addEventListener('click', async e => {
     }
     if (action === 'diagnostic-test') {
       if (state.role !== 'teacher') return notify('Tes diagnostik dilakukan oleh guru.', true);
+      state.diagnostic = null;
+      return diagnosticForm();
+    }
+    if (action === 'diagnostic-restart') {
+      state.diagnostic = null;
+      return diagnosticForm();
+    }
+    // Kembali membuka ulang level terakhir yang diuji; jawabannya disimpan sebagai isian awal.
+    if (action === 'diagnostic-back') {
+      const run = state.diagnostic;
+      if (!run?.order.length) return diagnosticForm();
+      const last = run.order.pop();
+      run.draft = { ...run.draft, [last]: run.results[last] };
+      delete run.results[last];
       return diagnosticForm();
     }
     if (action === 'new-session') return newSession();
@@ -544,7 +560,7 @@ document.addEventListener('click', async e => {
 // Student form: a grade preset fills the starting levels, and the meaning text follows the choice.
 document.addEventListener('change', e => {
   const form = e.target.form;
-  if (form?.dataset.form === 'diagnostic' && e.target.name === 'student')
+  if (form?.dataset.form === 'diagnostic-start' && e.target.name === 'student')
     return diagnosticForm(e.target.value);
   // Form siswa baru tidak punya level, jadi usia diperbarui sebelum pemeriksaan level di bawah.
   if (e.target.name === 'birth_date' && form?.dataset.form === 'student') {
@@ -552,7 +568,7 @@ document.addEventListener('change', e => {
     form.querySelector('[data-age]').textContent = age ? 'Usia ' + age : 'Usia dihitung otomatis';
     return;
   }
-  if (!['student', 'diagnostic'].includes(form?.dataset.form) || !form.elements.reading_baseline) return;
+  if (form?.dataset.form !== 'student' || !form.elements.reading_baseline) return;
   const els = form.elements;
   const levels = ['reading_baseline', 'math_baseline'];
   if (e.target.name === 'phase' && startPresets[e.target.value])
@@ -670,9 +686,43 @@ document.addEventListener('submit', async e => {
         }
         break;
       }
+      // Tes Diagnostik berjalan bertahap di dalam modal; dua langkah pertama belum menyimpan apa pun.
+      case 'diagnostic-start': {
+        if (!state.students.some(x => x.id === v.student)) throw new Error('Pilih anak yang dites.');
+        state.diagnostic = { student: v.student, start: Number(v.start), results: {}, order: [], draft: {} };
+        return diagnosticForm();
+      }
+      case 'diagnostic-level': {
+        const run = state.diagnostic;
+        const level = Number(id);
+        run.results[level] = Object.fromEntries(
+          [1, 2, 3, 4, 5, 6, 7, 8].filter(n => v['i' + n]).map(n => [n, v['i' + n]])
+        );
+        if (!run.order.includes(level)) run.order.push(level);
+        return diagnosticForm();
+      }
       case 'diagnostic': {
-        const s = state.students.find(x => x.id === v.student);
-        if (!s) throw new Error('Pilih anak yang dites.');
+        const run = state.diagnostic;
+        const s = state.students.find(x => x.id === id);
+        if (!run || !s || run.student !== s.id)
+          throw new Error('Tes diagnostik tidak ditemukan. Mulai ulang tesnya.');
+        const plan = diagnosticPlan(run.start, run.results);
+        if (!plan.final) throw new Error('Masih ada level yang belum dinilai.');
+        // Level awal disimpan lebih dulu: hasil diagnostik yang terisi menandai anak sudah dites, jadi
+        // tanda itu tidak boleh muncul bila penyimpanan level gagal.
+        if (!state.records.some(r => r.student_id === s.id))
+          await result(
+            db.rpc('correct_student_baseline', { p_student: s.id, p_reading: plan.final, p_math: plan.final })
+          );
+        const summary = diagnosticSummary({
+          date: new Date().toLocaleDateString('id-ID'),
+          grade: s.school_grade,
+          start: run.start,
+          order: run.order,
+          results: run.results,
+          plan,
+          note: v.note
+        });
         await result(
           db.rpc('update_student_profile', {
             p_student: s.id,
@@ -685,20 +735,12 @@ document.addEventListener('submit', async e => {
               birth_date: s.birth_date,
               school_grade: s.school_grade,
               school_year: s.school_year,
-              diagnostic: v.diagnostic.trim(),
-              learning_notes: v.learning_notes
+              diagnostic: summary,
+              learning_notes: v.learning_notes || ''
             }
           })
         );
-        // Pilihan level yang terkunci tidak ikut terkirim; anak yang sudah ikut kelas hanya menyimpan catatan.
-        if (v.reading_baseline && !state.records.some(r => r.student_id === s.id))
-          await result(
-            db.rpc('correct_student_baseline', {
-              p_student: s.id,
-              p_reading: Number(v.reading_baseline),
-              p_math: Number(v.math_baseline)
-            })
-          );
+        state.diagnostic = null;
         break;
       }
       case 'session': {

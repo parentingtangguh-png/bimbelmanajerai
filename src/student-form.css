@@ -21,3 +21,98 @@
   font-size: 12px;
   line-height: 1.45;
 }
+
+/* Tes Diagnostik pilot: kartu tugas per indikator, pilihan nilai, dan ringkasan hasil. */
+.diagnostic-who {
+  margin: 0 0 6px;
+}
+.diagnostic-rules {
+  margin: 10px 0;
+}
+.diagnostic-rules summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.diagnostic-rules p {
+  line-height: 1.6;
+}
+.diagnostic-task {
+  margin: 12px 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(127, 127, 127, 0.3);
+  border-radius: 12px;
+  min-width: 0;
+}
+.diagnostic-task legend {
+  padding: 0 6px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+.diagnostic-task legend .badge {
+  font-size: 10px;
+  font-weight: 400;
+}
+.diagnostic-task dl {
+  margin: 6px 0 10px;
+}
+.diagnostic-task dl > div {
+  margin-top: 6px;
+}
+.diagnostic-task dt {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.diagnostic-task dd {
+  margin: 2px 0 0;
+  line-height: 1.5;
+}
+.diagnostic-ratings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.diagnostic-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 6px 10px;
+  border: 1px solid rgba(127, 127, 127, 0.35);
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 400;
+}
+/* Global input rules make inputs tall and wide; a radio needs its own small size. */
+.diagnostic-rating input {
+  flex: 0 0 auto;
+  width: 17px;
+  height: 17px;
+  min-height: 17px;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--green);
+}
+.diagnostic-rating span {
+  display: inline;
+  white-space: nowrap;
+  font-size: 13px;
+}
+.diagnostic-rating:has(input:checked) {
+  border-color: var(--green);
+  background: #2c2616;
+  font-weight: 600;
+}
+.diagnostic-result h3 {
+  margin: 8px 0 4px;
+}
+.diagnostic-summary {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.55;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(127, 127, 127, 0.12);
+}
