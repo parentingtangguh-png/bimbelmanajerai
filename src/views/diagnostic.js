@@ -74,6 +74,7 @@ function diagnosticRules() {
   const items = [
     ['⏱', '±20–25 menit, satu anak, sebagai permainan.'],
     ['✓◐✗', 'Nilai tiap tugas: Tercapai, Dengan bantuan, Belum.'],
+    ['✎', 'Huruf, angka, dan kata ditulis besar di kertas atau papan.'],
     ['★', '<strong>Tuntas</strong> = nomor 1–6: minimal 5 ✓, tanpa ✗.'],
     ['↕', 'Tuntas → naik level. Belum → itulah level awal.'],
     ['✋', 'Jangan mengajari. Contoh sekali boleh, dicatat ◐.'],

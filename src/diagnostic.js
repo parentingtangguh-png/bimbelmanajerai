@@ -21,7 +21,7 @@ export const diagnosticTasks = {
       success: 'Bertahan sampai tugas terakhir; meninggalkan meja paling banyak 1 kali.'
     },
     2: {
-      task: 'Saat anak sibuk bermain, panggil namanya 3 kali dari samping.',
+      task: 'Saat anak sibuk bermain, panggil namanya 3 kali dari samping atau belakang, di luar pandangan anak.',
       material: '—',
       success: 'Menoleh atau menjawab 2 dari 3.'
     },
@@ -31,13 +31,13 @@ export const diagnosticTasks = {
       success: '4 dari 5 benar.'
     },
     4: {
-      task: 'Tunjukkan 3 kartu bentuk yang satu berbeda: "Mana yang tidak sama?" Ulangi 4 kali.',
-      material: 'Kartu bentuk: ● ● ▲ · ■ ■ ● · ▲ ▲ ■ · ● ■ ■',
+      task: 'Tunjukkan satu baris berisi 3 bentuk yang satu berbeda: "Mana yang tidak sama?" Ulangi untuk 4 baris.',
+      material: 'Gambar besar di kertas, 4 baris: ● ● ▲ · ■ ■ ● · ▲ ▲ ■ · ● ■ ■',
       success: '3 dari 4 benar.'
     },
     5: {
-      task: 'Contohkan garis tegak, garis datar, dan lingkaran; anak menirukan di pasir atau udara.',
-      material: 'Nampan pasir atau kertas.',
+      task: 'Contohkan garis tegak, garis datar, dan lingkaran; anak menirukan di udara dengan jari, lalu di kertas.',
+      material: 'Kertas HVS dan krayon besar.',
       success: '2 dari 3 bentuk dikenali.'
     },
     6: {
@@ -58,13 +58,14 @@ export const diagnosticTasks = {
   },
   2: {
     1: {
-      task: 'Kartu vokal diacak; tunjuk satu per satu dan minta anak menyebut namanya.',
-      material: 'Kartu A · I · U · E · O',
+      task: 'Tunjuk huruf vokal secara acak dan minta anak menyebut namanya.',
+      material: 'Tulis besar di kertas atau papan: A · I · U · E · O',
       success: '4 dari 5 benar.'
     },
     2: {
-      task: 'Cocokkan kartu huruf dengan gambar yang berawal huruf itu.',
-      material: 'Kartu B · S · M; gambar bola · buku · sapi · sepatu · mata · meja.',
+      task: 'Letakkan benda di meja; anak mencocokkan tiap huruf dengan benda yang berawal huruf itu.',
+      material:
+        'Tulis besar: B · S · M. Benda nyata: bola · buku · sendok · sepatu · meja · mata (tunjuk mata sendiri).',
       success: '4 dari 6 cocok.'
     },
     3: {
@@ -73,8 +74,8 @@ export const diagnosticTasks = {
       success: 'Keduanya benar.'
     },
     4: {
-      task: 'Kartu angka diacak: "Tunjuk angka …" dengan urutan 7 · 3 · 10 · 1 · 5 · 8 · 2 · 9 · 4 · 6.',
-      material: 'Kartu angka 1–10.',
+      task: '"Tunjuk angka …" dengan urutan 7 · 3 · 10 · 1 · 5 · 8 · 2 · 9 · 4 · 6.',
+      material: 'Tulis besar dan acak di kertas atau papan: angka 1–10.',
       success: '8 dari 10 benar.'
     },
     5: {
@@ -93,15 +94,15 @@ export const diagnosticTasks = {
       success: '2 dari 3 disebut dalam bahasa Inggris.'
     },
     8: {
-      task: 'Diamati; di akhir minta anak merapikan kartu.',
+      task: 'Diamati; di akhir minta anak merapikan alat tes.',
       material: '—',
       success: 'Dicatat saja.'
     }
   },
   3: {
     1: {
-      task: 'Anak membaca kartu suku kata yang diacak.',
-      material: 'ba · bi · bu · be · bo · ma · si · ku · te · lo',
+      task: 'Tunjuk suku kata secara acak; anak membacanya.',
+      material: 'Tulis besar di kertas atau papan: ba · bi · bu · be · bo · ma · si · ku · te · lo',
       success: '8 dari 10 terbaca.'
     },
     2: {
@@ -110,8 +111,8 @@ export const diagnosticTasks = {
       success: '4 dari 5 pasang terbaca.'
     },
     3: {
-      task: 'Anak menyusun dua kartu suku kata menjadi kata, lalu membacanya.',
-      material: 'bu + ku · ba + ju · ma + ta · sa + pi · ka + ki',
+      task: 'Tulis dua suku kata terpisah; anak menggabungkannya menjadi kata dan membacanya.',
+      material: 'Tulis besar: bu + ku · ba + ju · ma + ta · sa + pi · ka + ki',
       success: '4 dari 5 benar.'
     },
     4: {
@@ -130,8 +131,8 @@ export const diagnosticTasks = {
       success: '4 dari 5 benar.'
     },
     7: {
-      task: 'Ciptakan situasi: mainan dipegang guru (I want…), pilih gambar kesukaan (I like…), tutup botol sulit dibuka (help me please).',
-      material: 'Mainan; gambar kucing · es krim · bola · bunga; botol bertutup rapat.',
+      task: 'Ciptakan situasi: mainan dipegang guru (I want…), memilih benda kesukaan dari 3 benda (I like…), wadah yang tidak bisa dibuka anak (help me please).',
+      material: 'Mainan; 3 benda (misalnya bola, buku, krayon); toples dengan tutup diputar kencang.',
       success: '2 dari 3 diucapkan sendiri.'
     },
     8: {
@@ -142,13 +143,15 @@ export const diagnosticTasks = {
   },
   4: {
     1: {
-      task: 'Anak membaca kartu kata.',
-      material: 'buku · sapi · meja · topi · roda · kelapa · sepeda · kereta · sepatu · boneka',
+      task: 'Tunjuk kata satu per satu; anak membacanya.',
+      material:
+        'Tulis besar di kertas atau papan: buku · sapi · meja · topi · roda · kelapa · sepeda · kereta · sepatu · boneka',
       success: '8 dari 10 terbaca.'
     },
     2: {
-      task: 'Anak membaca kartu kalimat.',
-      material: 'Ibu beli roti. · Adik minum susu. · Bola itu merah. · Ayah baca buku. · Kita main di taman.',
+      task: 'Tunjuk kalimat satu per satu; anak membacanya.',
+      material:
+        'Tulis besar, satu kalimat per baris: Ibu beli roti. · Adik minum susu. · Bola itu merah. · Ayah baca buku. · Kita main di taman.',
       success: '4 dari 5 terbaca utuh tanpa mengeja per suku kata.'
     },
     3: {
@@ -157,13 +160,14 @@ export const diagnosticTasks = {
       success: 'Semua huruf lengkap dan terbaca guru.'
     },
     4: {
-      task: 'Anak menulis satu kalimat tentang gambar; guru boleh mengeja kata yang ditanya.',
-      material: 'Gambar anak memberi makan kucing.',
+      task: 'Anak menulis satu kalimat tentang benda di meja atau kegiatannya hari ini; guru boleh mengeja kata yang ditanya.',
+      material: 'Kertas dan pensil.',
       success: '1 kalimat minimal 3 kata terbaca.'
     },
     5: {
-      task: 'Urutkan 5 kartu angka; lalu tunjuk yang lebih besar dari tiap pasangan.',
-      material: 'Urutkan 3 · 17 · 9 · 12 · 20; pasangan 12 & 15 · 19 & 11 · 8 & 18 · 14 & 13.',
+      task: 'Anak mengurutkan 5 angka dengan menunjuk dari terkecil; lalu menunjuk yang lebih besar dari tiap pasangan.',
+      material:
+        'Tulis besar dan acak. Urutkan 3 · 17 · 9 · 12 · 20; pasangan 12 & 15 · 19 & 11 · 8 & 18 · 14 & 13.',
       success: 'Urutan benar dan 3 dari 4 pasangan benar.'
     },
     6: {

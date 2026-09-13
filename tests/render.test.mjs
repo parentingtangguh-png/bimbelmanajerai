@@ -426,6 +426,12 @@ test('instrumen diagnostik lengkap dan aturan naik-turun level sesuai keputusan 
     for (let n = 1; n <= 8; n++) {
       const t = diagnosticTasks[l][n];
       assert.ok(t && t.task && t.material && t.success, 'tugas L' + l + '-' + n + ' belum lengkap');
+      // Semua tugas bisa di dalam ruangan tanpa kartu cetak: bahan visual ditulis guru di kertas/papan.
+      const teks = (t.task + ' ' + t.material).toLowerCase();
+      assert.ok(
+        !/kartu|pasir|gambar (bola|kucing|anak)/.test(teks),
+        'L' + l + '-' + n + ' masih butuh kartu cetak atau pasir'
+      );
     }
   const T = { 1: 'T', 2: 'T', 3: 'T', 4: 'T', 5: 'T', 6: 'T' };
   assert.equal(levelComplete(T), true);
