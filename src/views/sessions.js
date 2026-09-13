@@ -16,6 +16,7 @@ import {
 } from '../state.js';
 import { field, select, area, empty, heading, modal } from '../ui.js';
 import { escapeHtml as h, waLink, localDate } from '../domain.js';
+import { needsDiagnostic } from './students.js';
 export function sessionsView() {
   const c = state.classes.find(c => c.id === state.active);
   if (c) {
@@ -169,9 +170,10 @@ export function newSession() {
   );
   const roster =
     available
-      .map(
-        s =>
-          `<label class="check"><input type="checkbox" name="student" value="${s.id}">${h(s.name)} <small>Bahasa Indonesia ${s.reading_level} · Matematika ${s.math_level}</small></label>`
+      .map(s =>
+        needsDiagnostic(s)
+          ? `<label class="check"><input type="checkbox" name="student" value="${s.id}" disabled>${h(s.name)} <small>Tes diagnostik dulu</small></label>`
+          : `<label class="check"><input type="checkbox" name="student" value="${s.id}">${h(s.name)} <small>Bahasa Indonesia ${s.reading_level} · Matematika ${s.math_level}</small></label>`
       )
       .join('') ||
     '<p>Belum ada siswa tersedia. Tambahkan siswa atau selesaikan sesi yang masih terbuka.</p>';

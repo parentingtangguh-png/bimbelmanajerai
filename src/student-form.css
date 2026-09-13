@@ -218,3 +218,8 @@
 .diagnostic-edits {
   margin: 8px 0 12px;
 }
+.diagnostic-focus {
+  margin: 4px 0 12px;
+  padding-left: 18px;
+  line-height: 1.5;
+}

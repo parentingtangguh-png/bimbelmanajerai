@@ -98,28 +98,18 @@ Ikuti Alur kerja langkah 3–4. Jangan pernah push tanpa persetujuan lebih dulu.
   - Deploy GitHub Actions pernah tersangkut *Queued* ±40 menit (#72, 13 Sep 2026) padahal status GitHub normal. Obatnya: pemilik membatalkan (Cancel workflow) lalu Re-run all jobs dari akun GitHub-nya; `gh` tidak terpasang, jadi Claude tidak bisa melakukannya. Editor kurikulum lama dihapus dari `main.js`.
   - Tabel `curriculum` lama (kosong) masih dibaca kartu evaluasi, `levelMeaning`, dan rapor AI.
 - Rancangan alur pilot dari pemilik (belum dibangun): tema menurut nomor pertemuan; lembar aktivitas per pertemuan (pembuka + English phrase, aktivitas utama dengan tugas otomatis per level anak, penutup + checklist karakter); guru memilih yang hadir lalu menandai pertemuan selesai. Belum diputuskan: cara naik level, sumber isi 192 lembar, cara menghitung nomor pertemuan, 5 butir checklist karakter, dan rapor.
-- **Tes Diagnostik pilot Fondasi — kerangka disetujui pemilik 13 Sep 2026, belum dipasang di aplikasi:**
-  - Tes perorangan ±20–25 menit. Tiap indikator 1–8 punya satu tugas + ukuran; hasil ✓ Tercapai / ◐ Dengan bantuan / ✗ Belum.
-  - **Titik mulai dipilih bebas oleh guru** (L1–4); kelas formal hanya ditampilkan sebagai saran (Belum sekolah→1, TK A→2, TK B→3, SD→4).
-  - **Tuntas** = indikator 1–6 minimal 5 ✓ dan tanpa ✗. English (7) dan Karakter (8) dicatat, **tidak menentukan level**.
-  - Tuntas → naik; belum tuntas → level itu jadi level awal; bila titik mulai belum tuntas, turun sampai level terendah yang belum tuntas.
-  - Tuntas Level 4 → level awal 4 dengan catatan "melampaui Fondasi".
-  - Bahan tes: satu set tetap, disetujui pemilik, **tanpa berkas cetak**. Tugas, bahan, dan ukuran tampil di modal.
-  - **Jeda dan revisi** (`20260913060000_diagnostic_revision.sql`):
-    - Jawaban tes yang belum disimpan tersimpan di localStorage `bimbel.diagnostic.<user id>`, per anak, setiap kali nilai dipilih. Tes bisa dilanjutkan di perangkat yang sama.
-    - Hasil tersimpan bisa **direvisi** oleh guru pendamping, hanya **sebelum anak ikut kelas pertama**; level awal dihitung ulang. Hanya hasil terakhir yang disimpan, dengan `revised_at`.
-    - `save_diagnostic` menangani simpan pertama dan revisi. `diagnosticPath` memangkas level di luar jalur saat nilai berubah.
-  - Keputusan tambahan: **satu tes per anak** (bisa direvisi, lihat di atas); pemilik hanya melihat ringkasan level awal (tanpa hasil per indikator); anak yang sudah ikut kelas tetap boleh dites, levelnya tidak berubah.
-  - Tugas diamati sepanjang tes (L1-1 dan semua indikator 8) tampil di bagian paling bawah tiap level.
-  - Migrasi `20260913050000_diagnostic_tasks_and_results.sql`:
-    - **Tugas menempel pada indikator**: kolom `diagnostic_task`, `diagnostic_material`, `diagnostic_success`, `diagnostic_observe` di `curriculum_level_indicators`. Tidak ada lagi data tugas di kode.
-    - **Hasil per indikator**: tabel `diagnostic_tests` (unik per siswa) dan `diagnostic_results` (menyalin `indicator_text`). Keduanya dibaca guru pendamping lewat RLS `can_teach(...) and not is_owner()`; tidak ada izin tulis langsung.
-    - `save_diagnostic(uuid,int,jsonb,text,text,text)` menyimpan semuanya dalam satu transaksi dan **menghitung ulang jalur tes serta level awal** di database (`diagnostic_level_complete`). Ringkasan wajib memuat `Level awal: N` hasil hitungan database.
-  - Kode:
-    - `src/diagnostic.js` (murni): `taskOrder`, `diagnosticPayload`, `levelComplete`, `diagnosticPlan`, `diagnosticSummary`, `suggestedStart`. Aturan yang sama dijaga dua kali: di sini untuk tampilan, di `save_diagnostic` untuk menolak.
-    - `src/views/diagnostic.js`: modal tiga langkah `diagnostic-start` → `diagnostic-level` → `diagnostic`. Jawaban disimpan di `state.diagnostic`; tombol Kembali memindahkan jawaban ke `draft` sebagai isian awal.
-    - Hasil tes tampil di profil siswa (`diagnosticResultSection`); tugas tiap indikator tampil di tab Kurikulum (`indicatorTest`).
-  - Level awal pilot memakai kolom level lama (`reading_baseline` = `math_baseline` = level Fondasi); kartu evaluasi per bidang belum dirancang ulang.
+- **Tes Diagnostik pilot Fondasi — satu level per tes** (keputusan pemilik 13 Sep 2026, menggantikan jalur naik-turun otomatis):
+  - Guru memilih anak dan **satu level** (kelas formal hanya saran: Belum sekolah→1, TK A→2, TK B→3, SD→4), menilai 8 tugas (✓ Tercapai / ◐ Dengan bantuan atau kurang satu dari ukuran / ✗ Belum), lalu menyimpan.
+  - **Lulus** = indikator 1–6 semuanya ✓. English (7) dan Karakter (8) hanya dicatat. Lulus Level X → level awal X+1 (Level 4 tetap 4, melampaui Fondasi); belum lulus → level awal X.
+  - Status di data siswa `students.diagnostic_status`: "Lulus Level X" / "Belum lulus Level X" (tes lama beberapa level: "Level awal N"). Pemilik ikut melihat status ini, tidak melihat hasil per indikator.
+  - **Satu tes per anak.** Guru pendamping boleh **merevisi** sebelum anak ikut kelas pertama (`revised_at`, hanya hasil terakhir disimpan).
+  - **Anak tanpa status tes tidak bisa masuk sesi kelas**: trigger `require_diagnostic_before_class` pada `session_students`, dan checkbox anak di form sesi dinonaktifkan ("Tes diagnostik dulu"). Tes database menandai siswa ujinya sudah dites lewat trigger khusus tes `test_mark_tested` (dimatikan dengan `test.untested`).
+  - Tugas, bahan, ukuran, dan penanda "diamati sepanjang tes" menempel pada indikator (`curriculum_level_indicators.diagnostic_*`); tugas yang diamati sepanjang tes tampil paling bawah. Bahan tanpa berkas cetak.
+  - Hasil per indikator di `diagnostic_tests` (unik per siswa; `tested_level`, `passed`) dan `diagnostic_results` (menyalin `indicator_text`), dibaca guru pendamping lewat RLS `can_teach(...) and not is_owner()`.
+  - `save_diagnostic(uuid,int,jsonb,text,text,text)` (`p_start` = level yang dites) menyimpan semuanya dalam satu transaksi, **menghitung ulang hasil** di database, dan menolak ringkasan tanpa `Level awal: N` yang benar. Migrasi: `…050000_diagnostic_tasks_and_results`, `…060000_diagnostic_revision`, `…070000_diagnostic_single_level`.
+  - Jawaban yang belum disimpan tersimpan di localStorage `bimbel.diagnostic.<user id>` per anak; tes bisa dijeda dan dilanjutkan di perangkat yang sama. Simpanan versi lama (beberapa level) dibuang saat dibuka.
+  - Kode: `src/diagnostic.js` (murni: `diagnosticOutcome`, `focusIndicators`, `diagnosticPayload`, `runFromSaved`, `diagnosticSummary`, `suggestedStart`, `taskOrder`); `src/views/diagnostic.js` (langkah `diagnostic-start` → `diagnostic-level` → hasil `diagnostic`, dibedakan `run.reviewed`); hasil di profil (`diagnosticResultSection`); kolom "Hasil diagnostik awal" di profil kini hanya dibaca.
+  - Level awal pilot memakai kolom level lama (`reading_baseline` = `math_baseline`); kartu evaluasi per bidang belum dirancang ulang, jadi hasil per indikator belum dipakai di kelas.
 - Bagian di bawah menggambarkan kurikulum **lama** yang sudah dihapus; perbarui setelah kurikulum baru dipasang.
 
 ## Keadaan kurikulum lama (sudah dihapus)

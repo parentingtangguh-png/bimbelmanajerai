@@ -2299,3 +2299,7 @@ dialog::backdrop {
   font-size: 11px;
   color: var(--muted);
 }
+.student-info small.status-tes {
+  color: var(--green);
+  font-weight: 600;
+}

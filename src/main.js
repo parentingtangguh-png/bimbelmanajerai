@@ -45,13 +45,7 @@ import { curriculumView } from './views/curriculum.js';
 import { sessionsView, newSession } from './views/sessions.js';
 import { studentsView, levelMeaning, studentForm, scheduleForm } from './views/students.js';
 import { diagnosticForm } from './views/diagnostic.js';
-import {
-  diagnosticPlan,
-  diagnosticSummary,
-  diagnosticPayload,
-  diagnosticPath,
-  runFromSaved
-} from './diagnostic.js';
+import { diagnosticOutcome, diagnosticSummary, diagnosticPayload, runFromSaved } from './diagnostic.js';
 import { dashboard } from './views/dashboard.js';
 import { homeMenu, homeTop, homeDoa, homeNav, leafArt } from './views/home.js';
 import { teamView } from './views/team.js';
@@ -194,9 +188,7 @@ function dropDraft(studentId) {
   delete drafts[studentId];
   writeDrafts(drafts);
 }
-const hasAnswers = run =>
-  Boolean(run) &&
-  [run.results, run.draft].some(group => Object.values(group || {}).some(a => Object.keys(a || {}).length));
+const hasAnswers = run => Boolean(run) && Object.keys(run.answers || {}).length > 0;
 
 function passwordForm() {
   const intro = `<p class="muted">Kata sandi baru minimal 8 karakter. Setelah diganti, sesi di perangkat lain tetap berjalan sampai Anda keluar dari sana.</p>`;
@@ -429,7 +421,11 @@ document.addEventListener('click', async e => {
     }
     if (action === 'diagnostic-resume') {
       const run = readDrafts()[id];
-      if (!run) return notify('Tes sementara tidak ditemukan di perangkat ini.', true);
+      // Simpanan dari versi tes lama (beberapa level) tidak bisa dilanjutkan.
+      if (!run?.level) {
+        dropDraft(id);
+        return notify('Tes sementara ini dari versi lama dan tidak bisa dilanjutkan. Mulai tes baru.', true);
+      }
       state.diagnostic = run;
       return diagnosticForm();
     }
@@ -450,17 +446,11 @@ document.addEventListener('click', async e => {
       if (run?.revision) return document.querySelector('#modal').close();
       return diagnosticForm();
     }
-    // Kembali membuka ulang level terakhir yang diuji; jawabannya disimpan sebagai isian awal.
-    if (action === 'diagnostic-back' || action === 'diagnostic-edit-level') {
-      const run = state.diagnostic;
-      if (!run?.order.length) return diagnosticForm();
-      const stop = action === 'diagnostic-back' ? run.order[run.order.length - 1] : Number(id);
-      while (run.order.includes(stop)) {
-        const last = run.order.pop();
-        run.draft = { ...run.draft, [last]: run.results[last] };
-        delete run.results[last];
-      }
-      keepDraft(run);
+    // Dari halaman hasil kembali ke kartu tugas, dengan semua nilai tetap terisi.
+    if (action === 'diagnostic-back') {
+      if (!state.diagnostic) return diagnosticForm();
+      state.diagnostic.reviewed = false;
+      keepDraft();
       return diagnosticForm();
     }
     // Revisi hanya sebelum kelas pertama; save_diagnostic menjaga aturan yang sama.
@@ -471,7 +461,7 @@ document.addEventListener('click', async e => {
       const test = state.diagnosticTests.find(t => t.student_id === id);
       if (!test) return notify('Hasil tes diagnostik tidak ditemukan.', true);
       const saved = readDrafts()[id];
-      state.diagnostic = saved?.revision ? saved : runFromSaved(test, state.diagnosticResults);
+      state.diagnostic = saved?.revision && saved.level ? saved : runFromSaved(test, state.diagnosticResults);
       keepDraft();
       return diagnosticForm();
     }
@@ -643,11 +633,7 @@ document.addEventListener('change', e => {
   // Setiap nilai yang dipilih langsung disimpan sementara, jadi tes yang terhenti tidak kehilangan jawaban.
   if (form?.dataset.form === 'diagnostic-level' && /^i\d$/.test(e.target.name) && state.diagnostic) {
     const run = state.diagnostic;
-    const level = Number(form.dataset.id);
-    run.draft = {
-      ...run.draft,
-      [level]: { ...(run.draft?.[level] || {}), [e.target.name.slice(1)]: e.target.value }
-    };
+    run.answers = { ...run.answers, [e.target.name.slice(1)]: e.target.value };
     return keepDraft(run);
   }
   if (form?.dataset.form === 'diagnostic-start' && e.target.name === 'start') {
@@ -782,20 +768,22 @@ document.addEventListener('submit', async e => {
       // Tes Diagnostik berjalan bertahap di dalam modal; dua langkah pertama belum menyimpan apa pun.
       case 'diagnostic-start': {
         if (!state.students.some(x => x.id === v.student)) throw new Error('Pilih anak yang dites.');
-        state.diagnostic = { student: v.student, start: Number(v.start), results: {}, order: [], draft: {} };
+        state.diagnostic = {
+          student: v.student,
+          level: Number(v.start),
+          answers: {},
+          reviewed: false,
+          note: ''
+        };
         keepDraft();
         return diagnosticForm();
       }
       case 'diagnostic-level': {
         const run = state.diagnostic;
-        const level = Number(id);
-        const answers = Object.fromEntries(
+        run.answers = Object.fromEntries(
           [1, 2, 3, 4, 5, 6, 7, 8].filter(n => v['i' + n]).map(n => [n, v['i' + n]])
         );
-        run.draft = { ...run.draft, [level]: answers };
-        // Nilai yang berubah bisa mengubah jalur; level di luar jalur baru keluar dari hasil tapi tetap
-        // menjadi isian awal kalau jalurnya kembali melewatinya.
-        Object.assign(run, diagnosticPath(run.start, { ...run.results, [level]: answers }));
+        run.reviewed = true;
         keepDraft(run);
         return diagnosticForm();
       }
@@ -804,24 +792,22 @@ document.addEventListener('submit', async e => {
         const s = state.students.find(x => x.id === id);
         if (!run || !s || run.student !== s.id)
           throw new Error('Tes diagnostik tidak ditemukan. Mulai ulang tesnya.');
-        const plan = diagnosticPlan(run.start, run.results);
-        if (!plan.final) throw new Error('Masih ada level yang belum dinilai.');
-        // save_diagnostic menyimpan hasil per indikator, level awal, dan ringkasan dalam satu transaksi,
-        // dan menghitung ulang level awal sendiri dari nilai yang dikirim.
+        if (!diagnosticOutcome(run.level, run.answers).complete)
+          throw new Error('Indikator 1–6 belum semuanya dinilai.');
+        // save_diagnostic menyimpan hasil per indikator, level awal, status, dan ringkasan dalam satu
+        // transaksi, dan menghitung ulang hasilnya sendiri dari nilai yang dikirim.
         const summary = diagnosticSummary({
           date: new Date().toLocaleDateString('id-ID'),
           grade: s.school_grade,
-          start: run.start,
-          order: run.order,
-          results: run.results,
-          plan,
+          level: run.level,
+          answers: run.answers,
           note: v.note
         });
         await result(
           db.rpc('save_diagnostic', {
             p_student: s.id,
-            p_start: run.start,
-            p_results: diagnosticPayload(run.order, run.results),
+            p_start: run.level,
+            p_results: diagnosticPayload(run.level, run.answers),
             p_summary: summary,
             p_note: v.note || '',
             p_learning_notes: v.learning_notes || ''

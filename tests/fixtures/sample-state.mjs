@@ -24,6 +24,7 @@ export function loadSampleState() {
         school_year: '2026/2027',
         status: 'Aktif',
         diagnostic: 'Mengenali huruf vokal',
+        diagnostic_status: 'Belum lulus Level 2',
         learning_notes: 'Senang belajar lewat gambar',
         reading_baseline: 1,
         reading_level: 1,
@@ -330,6 +331,8 @@ export function loadSampleState() {
         student_id: 'anak-1',
         tested_on: '2026-09-13',
         start_level: 2,
+        tested_level: 2,
+        passed: false,
         final_level: 2,
         beyond: false,
         level_locked: false,
@@ -338,8 +341,7 @@ export function loadSampleState() {
     ],
     diagnosticResults: [
       { test_id: 'tes-1', level: 2, indicator_number: 2, rating: 'N', indicator_text: 'Mencocokkan huruf' },
-      { test_id: 'tes-1', level: 2, indicator_number: 1, rating: 'T', indicator_text: 'Vokal saat dites' },
-      { test_id: 'tes-1', level: 1, indicator_number: 1, rating: 'B', indicator_text: 'Mengikuti sesi' }
+      { test_id: 'tes-1', level: 2, indicator_number: 1, rating: 'T', indicator_text: 'Vokal saat dites' }
     ],
     curriculumThemes: [
       { number: 2, phase_code: 'fondasi', name: 'Aku Bisa Menghitung', first_meeting: 25, last_meeting: 48 },

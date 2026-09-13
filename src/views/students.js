@@ -18,9 +18,9 @@ import {
 } from '../state.js';
 import { field, select, area, empty, heading, meter, modal } from '../ui.js';
 import { escapeHtml as h, progress, minutesBetween, durationPattern } from '../domain.js';
-// "Sudah dites" berarti hasil diagnostik terisi: kolom itu wajib di modal Tes Diagnostik, jadi tidak
-// butuh kolom penanda baru di database.
-export const needsDiagnostic = s => s.status === 'Aktif' && !String(s.diagnostic || '').trim();
+// "Sudah dites" = diagnostic_status terisi ("Lulus Level X" / "Belum lulus Level X"). Kolom itu hanya
+// diisi save_diagnostic, dan database menolak anak tanpa status masuk sesi kelas.
+export const needsDiagnostic = s => s.status === 'Aktif' && !String(s.diagnostic_status || '').trim();
 export function studentRow(s) {
   const bi = areaProgress(s, ['listening', 'speaking', 'reading', 'writing']) || {
     current: s.reading_level,
@@ -28,7 +28,11 @@ export function studentRow(s) {
   };
   // Minat tidak lagi ditanyakan. Yang ditandai adalah anak aktif yang belum dites: level awalnya masih
   // Level 1 sementara, dan terkunci selamanya begitu anak ikut kelas pertama.
-  const note = needsDiagnostic(s) ? '<small class="belum-tes">Belum tes diagnostik</small>' : '';
+  const note = needsDiagnostic(s)
+    ? '<small class="belum-tes">Belum tes diagnostik</small>'
+    : s.diagnostic_status
+      ? `<small class="status-tes">${h(s.diagnostic_status)}</small>`
+      : '';
   const who = `<span class="avatar pastel">${h(s.name[0])}</span><div class="student-info"><strong>${h(s.name)}</strong>${note}</div>`;
   const bar = `<div class="mini-progress"><small>Bahasa Indonesia <b>Level ${bi.current}</b> · ${phaseShort(bi.current)}</small><progress value="${phasePct(bi.current)}" max="100"></progress></div>`;
   return `<button class="student-row" data-action="student" data-id="${s.id}">${who}${bar}<span class="row-arrow">→</span></button>`;
@@ -221,7 +225,7 @@ function gradeField(s) {
 }
 function profileForm(s, edit, owner, canCreate) {
   const grid = `<div class="form-grid">${field('Nama anak', 'name', 'text', s.name, 'required maxlength="120"')}${field('Nama panggilan', 'nickname', 'text', s.nickname, 'maxlength="60" placeholder="Boleh dikosongkan"')}${field('Sapaan orang tua', 'parent_name', 'text', s.parent_name, 'required maxlength="120"')}${field('Nomor WhatsApp', 'phone', 'tel', s.phone)}${birthField(s)}${gradeField(s)}</div>`;
-  const notes = `${area('Hasil diagnostik awal', 'diagnostic', s.diagnostic, 'maxlength="3000"')}${area('Catatan gaya belajar', 'learning_notes', s.learning_notes, 'maxlength="3000"')}`;
+  const notes = `${area('Hasil diagnostik awal', 'diagnostic', s.diagnostic, 'readonly title="Diisi otomatis oleh Tes Diagnostik"')}${area('Catatan gaya belajar', 'learning_notes', s.learning_notes, 'maxlength="3000"')}`;
   const hint = edit
     ? `<p class="muted">${owner ? 'Profil ini hanya dapat dibaca. Perubahan dilakukan oleh guru pendamping.' : 'Target mengalir otomatis per fase. Lihat kemajuan tiap bidang di bawah.'}</p>`
     : '';
@@ -263,7 +267,11 @@ export function diagnosticResultSection(s) {
     })
     .join('');
   const locked = test.level_locked ? ' · level tidak diubah (sudah ikut kelas)' : '';
-  const head = `<p class="muted">${h(test.tested_on)} · mulai Level ${test.start_level} → level awal <strong>Level ${test.final_level}</strong>${test.beyond ? ' (melampaui Fondasi)' : ''}${locked}</p>`;
+  const verdict =
+    test.passed === null || test.passed === undefined
+      ? `mulai Level ${test.start_level}`
+      : `<strong>${test.passed ? 'Lulus' : 'Belum lulus'} Level ${test.tested_level}</strong>`;
+  const head = `<p class="muted">${h(test.tested_on)} · ${verdict} → mulai belajar <strong>Level ${test.final_level}</strong>${test.beyond ? ' (melampaui Fondasi)' : ''}${locked}</p>`;
   const note = test.note ? `<p><strong>Catatan:</strong> ${h(test.note)}</p>` : '';
   const revised = test.revised_at
     ? `<p class="muted">Direvisi ${h(new Date(test.revised_at).toLocaleDateString('id-ID'))}</p>`
