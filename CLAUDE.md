@@ -12,6 +12,26 @@ Berkas ini menggambarkan **keadaan sekarang**, bukan riwayat. Kalau sesuatu di s
 - **Satu bimbel, satu pemasangan.** Bukan multi-tenant dan tidak akan dibagikan ke bimbel lain.
 - **Belum diluncurkan.** Data yang ada adalah akun tim dan siswa percobaan milik guru Hafsah.
 
+## ▶ Mulai di sini: status terakhir (13 Sep 2026, akhir sesi)
+**Sudah di produksi** (commit `c56153d`, migrasi terakhir `20260913080000_pilot_only_architecture.sql`, Edge Function `generate-learning` sudah dihapus dari Supabase):
+- Arsitektur pilot saja (lihat bagian berikut). Semua tes, build, dan Playwright hijau saat deploy.
+- Data produksi: 6 akun di `access_list` + 6 `profiles`; 5 siswa percobaan milik guru **Hafsah Isykarima**, semuanya sudah dites diagnostik (8 nilai per anak): Aisyah Putri Rahmawati L1, Muhammad Fathan Alfarizi L2, Khansa Nabila Azzahra L3, Doni Saputra L4, Rafa Arkana Pratama L4 (semua "Belum lulus" di level yang dites). Nomor WA kosong kecuali Doni.
+
+**Belum dilakukan — kerjakan ini lebih dulu di sesi baru:**
+1. **Uji jalur simpan di aplikasi yang sudah login** (semua RPC siswa dan tes ditulis ulang di migrasi terakhir; tes otomatis tidak menjangkau tombol simpan). Minta pengguna login di pane browser (`preview_start` nama `bimbel-dev`, port 5173), lalu bersama pengguna:
+   a. Tambah siswa percobaan → harus "Level belum ditentukan" + tanda "Belum tes diagnostik".
+   b. Tes diagnostik siswa itu → simpan → status & level berubah.
+   c. Revisi hasil tes → simpan → `revised_at` terisi.
+   d. Simpan profil siswa lama tanpa mengubah apa pun → level & tes tetap.
+   e. Hapus siswa percobaan → baris tesnya ikut hilang.
+   Periksa tiap langkah dengan query baca saja. Kalau ada yang gagal, perbaiki dan minta izin deploy.
+2. Setelah itu tanyakan pengguna mau lanjut ke mana. Kandidat yang sudah dibahas (jangan dikerjakan tanpa diminta):
+   - **Alur kelas pilot** (terbesar; keputusan yang belum ada tercantum di Aturan bisnis → Ruang kelas).
+   - Saran perbaikan tes diagnostik (lihat Catatan lain → Yang masih terbuka).
+   - Bersihkan data percobaan sebelum peluncuran.
+
+**Riwayat singkat hari ini** (supaya tidak mengulang diskusi): kurikulum lama dihapus → kurikulum pilot Fondasi dipasang (CP, 4 level, 32 indikator, 8 tema + deskriptor) → instrumen tes diagnostik disusun dan direvisi berkali-kali bersama pengguna (bahan tanpa cetak, aturan tanda ◐, tugas pengamatan di bawah) → aturan tes berubah dari jalur naik-turun beberapa level menjadi **satu level per tes** → tampilan lama disembunyikan dari profil → pengguna memutuskan **aplikasi belum diluncurkan, jadi arsitektur lama dihapus total** kecuali akun dan data siswa Hafsah.
+
 ## Arsitektur sekarang (13 Sep 2026: arsitektur lama dihapus total)
 Migrasi `20260913080000_pilot_only_architecture.sql` menghapus semua struktur lama: kurikulum 7 bidang × 16 level, level per bidang (`reading_*`/`math_*`), `student_competencies`, alarm, sesi kelas, kehadiran, evaluasi, observasi, centang indikator, potret, sesi jadwal, tema bebas, ujian sumatif, pekerjaan AI, dan Edge Function `generate-learning` (kodenya dihapus dari repo). **Jangan menghidupkan kembali struktur itu**; alur kelas pilot dirancang dari nol.
 
@@ -96,8 +116,10 @@ Yang tersisa (dan dijaga tes `struktur lama sudah tidak ada`):
 ## Catatan lain
 - Ganti kata sandi: tombol ⚿ di kartu akun / tombol di doa HP. **Claude tidak pernah mengetikkan kata sandi pengguna.**
 - Claude **tidak bisa memeriksa tampilan di balik login sendirian**; minta pengguna login di pane browser. Jangan mengubah data produksi tanpa izin; kalau terpaksa mencoba, kembalikan dan buktikan dengan query.
-- Berkas tidak dilacak yang **bukan** buatan Claude: `scripts/.tmp-inspect-hafsah.ps1`, `scripts/.tmp-run-hafsah-scenario.ps1` (merujuk arsitektur lama). `.gitignore` mengabaikan `scripts/.tmp-*` dan `.claude/`.
+- Berkas lokal tidak dilacak git (bukan acuan): `scripts/.tmp-inspect-hafsah.ps1`, `scripts/.tmp-run-hafsah-scenario.ps1` (bukan buatan Claude), `scripts/run-smoke-ai.local.ps1` dan `scripts/bootstrap-owner.sql` (lama). Ketiganya yang `.ps1` merujuk arsitektur/AI lama dan tidak lagi berfungsi. `.gitignore` mengabaikan `scripts/.tmp-*` dan `.claude/`.
 - Rahasia Anthropic untuk Edge Function lama mungkin masih tersimpan di Supabase (Project Settings → Edge Functions → Secrets); tidak dipakai lagi.
+- Dokumen lain: `README.md` dan `PANDUAN_SETUP.md` sudah disesuaikan dengan arsitektur pilot. `Cetak_Biru_Final_Bimbel_Manager.md` dan `docs/mockups/` adalah **arsip rancangan awal** (Google Sheets/AppSheet, level 1–10, mockup per-level) — tidak berlaku, jangan dijadikan acuan.
+- Migrasi lama di `supabase/migrations/` tetap disimpan sebagai riwayat (Supabase mencatatnya); isinya membangun lalu dihapus oleh migrasi terakhir. Jangan menyunting atau menghapus migrasi yang sudah diterapkan; perubahan selalu lewat migrasi baru.
 - Yang masih terbuka (hanya bila pengguna meminta):
   - Saran penilaian terhadap tes diagnostik (13 Sep 2026): pilihan "uji Level X+1 dulu" setelah lulus; ukuran L1-1 tidak cocok untuk tes ±8 menit; ◐ untuk ukuran yang bukan hitungan; uji coba dengan anak sungguhan; tombol "Tes diagnostik sekarang" setelah menambah siswa.
   - Alur kelas pilot (lihat Aturan bisnis).

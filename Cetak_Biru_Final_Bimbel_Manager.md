@@ -1,3 +1,5 @@
+> ⚠ **Arsip rancangan awal — tidak berlaku.** Aplikasi sekarang memakai Supabase dan kurikulum pilot Fase Fondasi. Acuan terkini: CLAUDE.md dan README.md.
+
 # 🎓 CETAK BIRU FINAL: BIMBEL MANAGER CLOUD-BASED
 ### Sistem Manajemen Pembelajaran Adaptif Massal Berbasis AI (*Adaptive Mass-Learning Management System*)
 

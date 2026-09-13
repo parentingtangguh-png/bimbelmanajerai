@@ -14,11 +14,11 @@ Proyek: `bimbelmanajerai` / `ypofmienpffbpgrwpclm`. Login browser dan CLI merupa
 ## 2. Database
 
 ```powershell
-npx.cmd --yes supabase@latest db push --linked --dry-run
-npx.cmd --yes supabase@latest db push --linked
+npx --no-install supabase db push --dry-run
+npx --no-install supabase db push --yes
 ```
 
-Jangan menjalankan `db reset` di produksi. Migrasi bersifat bertambah: riwayat Karakter dan Pendidikan Pancasila lama diarsipkan sebagai jalur nonaktif, bukan dihapus.
+Pastikan dry-run hanya menampilkan migrasi baru. Jangan menjalankan `db reset` di produksi, dan jangan menyunting migrasi yang sudah diterapkan: perubahan selalu lewat migrasi baru. Migrasi `20260913080000_pilot_only_architecture.sql` menghapus arsitektur lama; yang tersisa hanya akun, siswa, kurikulum pilot, dan tes diagnostik.
 
 ## 3. Pemilik pertama
 
@@ -30,32 +30,26 @@ values ('email-pemilik@example.com','Pemilik Bimbel','owner',true)
 on conflict(email) do nothing;
 ```
 
-Buka aplikasi, isi email dan kata sandi pilihan sendiri, pilih **Aktivasi akun yang sudah didaftarkan pemilik**, lalu konfirmasi email. Setelah itu gunakan **Masuk ke ruang belajar**. Jangan memberikan kata sandi kepada pengembang.
+Buka aplikasi, isi email dan kata sandi pilihan sendiri, pilih **Guru baru? Aktifkan akun yang sudah didaftarkan pemilik**, lalu konfirmasi email. Jangan memberikan kata sandi kepada pengembang.
 
-Jika akun Auth sudah ada sebelum skema dipasang, tambahkan profil melalui SQL Editor menggunakan `id` dari `auth.users`. Akun baru setelah migrasi dibuatkan profil otomatis.
+## 4. Guru baru
 
-## 4. URL autentikasi
+1. Pemilik mendaftarkan nama dan email guru di **Tim pengajar**.
+2. Akun guru dibuat lewat **Supabase Dashboard → Authentication → Add user** dengan **Auto Confirm** (tidak memakai SMTP sendiri).
+3. Trigger menolak akun yang emailnya belum didaftarkan di Tim pengajar.
+
+## 5. URL autentikasi
 
 Di **Authentication → URL Configuration**:
 
 - Site URL: `https://parentingtangguh-png.github.io/bimbelmanajerai/`
 - Redirect URLs: URL di atas dan `http://127.0.0.1:5173/`
 
-Sign-up email/password harus aktif. Trigger menolak email yang tidak terdaftar dalam daftar akses. Gunakan SMTP sendiri bila kuota email bawaan tidak mencukupi.
+## 6. Konfigurasi browser
 
-## 5. Konfigurasi browser
+`public/config.json` hanya berisi URL proyek dan **publishable key**. Nilai ini boleh disimpan di GitHub. Variabel `VITE_SUPABASE_URL` dan `VITE_SUPABASE_PUBLISHABLE_KEY` dapat menimpa konfigurasi file. Jangan menaruh secret pada variabel berawalan `VITE_`.
 
-`public/config.json` hanya berisi URL proyek dan **publishable key**. Nilai ini boleh disimpan di GitHub. `scripts/configure-public.ps1` mengambil konfigurasi tanpa mencetak atau menyimpan secret key. Variabel `VITE_SUPABASE_URL` dan `VITE_SUPABASE_PUBLISHABLE_KEY` dapat menimpa konfigurasi file. Jangan menaruh secret pada variabel berawalan `VITE_`.
-
-## 6. AI
-
-Di **Edge Functions → Secrets**, simpan `ANTHROPIC_API_KEY` dengan API key Anthropic yang memiliki saldo. Opsional: `ANTHROPIC_MODEL`, dengan default `claude-haiku-4-5-20251001`. Simpan langsung melalui dashboard dan jangan masukkan ke chat atau commit Git.
-
-```powershell
-npx.cmd --yes supabase@latest functions deploy generate-learning --project-ref ypofmienpffbpgrwpclm
-```
-
-`verify_jwt=false` disengaja untuk kompatibilitas signing key. Setiap permintaan tetap diverifikasi melalui `auth.getUser(token)`, kemudian diperiksa kembali oleh RLS dan keanggotaan aktif. Secret Anthropic tidak masuk ke browser.
+Fitur AI lama (Edge Function `generate-learning`) sudah dihapus. Secret `ANTHROPIC_API_KEY` di **Edge Functions → Secrets**, bila masih ada, tidak dipakai lagi.
 
 ## 7. GitHub Pages
 
@@ -65,23 +59,17 @@ Repositori: `https://github.com/parentingtangguh-png/bimbelmanajerai`.
 2. Push ke `main` dan tunggu workflow **Publish Bimbel Manager** selesai.
 3. Buka `https://parentingtangguh-png.github.io/bimbelmanajerai/`.
 
+Kalau workflow tertahan lama di status *Queued*, buka tab **Actions**, pilih workflow itu, **Cancel workflow**, lalu **Re-run all jobs**.
+
 Hanya build aplikasi yang dipublikasikan; data siswa berada di Supabase. Jangan commit CSV siswa, token, `.env`, atau `venv/`.
 
-## 8. Alur operasional guru
+## 8. Alur operasional (pilot)
 
-1. Pemilik menambah siswa, diagnostik, baseline, serta target level 1–16.
-2. Pemilik mendaftarkan email guru dan menugaskan siswa.
-3. Guru membuka **Ruang kelas**, lalu memilih tanggal, durasi 60/75/90 menit, tema, dan siswa.
-4. Sistem memilih dua target untuk 60/75 menit atau tiga target untuk 90 menit. Targetnya sama bagi kelas, tetapi level dan tugasnya berbeda sesuai posisi siswa.
-5. Sistem membentuk maksimal tiga kelompok kompetensi. Kelompok bukan kelas sekolah dan dapat berubah pada sesi berikutnya.
-6. Guru memeriksa kehadiran, lalu membuat satu **Panduan kelas bersama**. Panduan berisi alur waktu, kartu kelompok, English Exposure yang menyatu dengan tema, asesmen, dan titik observasi karakter.
-7. Di akhir kelas, guru menilai setiap target dengan **Belum tampak**, **Mulai berkembang**, atau **Tercapai**. Dua bukti Tercapai pada kesempatan berbeda menaikkan kompetensi satu level.
-8. Guru boleh mencatat respons English Exposure. Perkembangannya tersimpan, tetapi tidak menghalangi kelulusan.
-9. Guru memilih karakter yang terlihat dan menulis konteksnya. Karakter tidak diberi nilai atau level.
-10. Setelah evaluasi disimpan, guru membuat, memeriksa, dan mengirim draf kabar orang tua melalui WhatsApp.
-11. Pemilik mencatat hasil sumatif setelah menyimak, berbicara, membaca, menulis, Matematika, dan IPAS mencapai target.
-
-Siswa Sakit, Izin, atau Alfa tidak memerlukan panduan AI dan tidak mendapatkan kenaikan level. Perubahan kehadiran akan mengosongkan panduan kelas agar dapat dibuat kembali berdasarkan siswa yang benar-benar hadir.
+1. Pemilik mendaftarkan guru di **Tim pengajar**.
+2. Guru menambah siswa di **Data siswa → ＋ Tambah siswa**: nama, panggilan, sapaan orang tua, WhatsApp, tanggal lahir, kelas formal. Level anak belum ditentukan.
+3. Guru menjalankan **Tes Diagnostik**: pilih anak dan satu level (saran dari kelas formal), nilai delapan tugas, lihat hasil, simpan. Tes bisa dijeda dan dilanjutkan di perangkat yang sama, dan hasilnya bisa direvisi dari profil siswa.
+4. Hasil: "Lulus Level X" (mulai belajar Level X+1) atau "Belum lulus Level X" (mulai belajar Level X), dengan daftar indikator yang perlu dilatih.
+5. **Ruang kelas** sedang disiapkan untuk kurikulum pilot.
 
 ## Pemecahan masalah
 
@@ -89,10 +77,8 @@ Siswa Sakit, Izin, atau Alfa tidak memerlukan panduan AI dan tidak mendapatkan k
 | --- | --- |
 | Access token not provided | Login CLI kembali. |
 | Cannot find project ref | Jalankan `supabase link`. |
-| Email belum didaftarkan | Pemilik menambahkan email ke daftar akses. |
-| Guru tidak melihat siswa | Periksa keaktifan akun dan penugasan siswa. |
-| AI belum aktif | Atur secret Anthropic dan pastikan saldo tersedia. |
-| AI sedang berlangsung | Tunggu; pekerjaan macet dapat dicoba lagi setelah tiga menit. |
-| Panduan tidak sesuai kehadiran | Simpan ulang kehadiran, lalu buat panduan kelas kembali. |
+| Email belum didaftarkan | Pemilik menambahkan email ke Tim pengajar. |
+| Guru tidak melihat siswa | Periksa keaktifan akun guru; siswa hanya terlihat oleh guru yang menambahkannya. |
+| Aplikasi keluar sendiri sesaat setelah migrasi | Tunggu beberapa detik sampai API mengenal skema baru, lalu login lagi. |
 | Konfirmasi email salah alamat | Periksa Site URL dan Redirect URLs. |
-| Perubahan belum terlihat | Muat ulang data atau halaman. |
+| Perubahan belum terlihat | Muat ulang halaman; pastikan workflow GitHub Actions sudah selesai. |
