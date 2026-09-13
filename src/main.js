@@ -326,7 +326,10 @@ document.addEventListener('click', async e => {
       return diagnosticForm();
     }
     if (action === 'new-schedule') return modal('Buat jadwal', scheduleForm());
-    if (action === 'open-schedule') return modal('Pertemuan', meetingSheet(id));
+    // Tambah sesi ke hari yang sama: tanggal dan nomor pertemuan mengikuti sesi yang sudah ada.
+    if (action === 'add-session')
+      return modal('Tambah sesi', scheduleForm({ ...scheduleValues(id), time: '', fixedDate: true }));
+    if (action === 'open-schedule') return modal('Sesi', meetingSheet(id));
     if (action === 'edit-schedule') return modal('Ubah jadwal', scheduleForm(scheduleValues(id), id));
     if (action === 'password') return modal('Ganti kata sandi', passwordForm());
     if (action === 'new-member')
@@ -529,14 +532,12 @@ document.addEventListener('submit', async e => {
           if (!students.length) throw new Error('Pilih minimal satu siswa yang hadir.');
           if (students.some(s => !s.result))
             throw new Error('Beri setiap siswa yang hadir Lulus atau Belum.');
-          if (!confirm('Tandai pertemuan selesai? Hasilnya tidak bisa diubah lagi.')) return;
+          if (!confirm('Tandai sesi selesai? Hasilnya tidak bisa diubah lagi.')) return;
         }
         await result(db.rpc('save_meeting', { p_schedule: id, p_students: students, p_finish: finish }));
         document.querySelector('#modal')?.close();
         await refresh();
-        notify(
-          finish ? 'Pertemuan ditandai selesai.' : 'Tersimpan sementara. Bisa diubah lagi sebelum selesai.'
-        );
+        notify(finish ? 'Sesi ditandai selesai.' : 'Tersimpan sementara. Bisa diubah lagi sebelum selesai.');
         return;
       }
       case 'password': {

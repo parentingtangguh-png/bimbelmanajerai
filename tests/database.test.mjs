@@ -180,73 +180,81 @@ test('PostgreSQL: akun, siswa, kurikulum pilot, dan tes diagnostik',async t=>{
   await as(teacher,'select delete_student($1)',[kid]);
   assert.equal((await admin('select count(*)::int n from diagnostic_tests where student_id=$1',[kid])).rows[0].n,0);
  });
- await t.test('kelas pilot: satu jadwal terbuka; pertemuan, tema, dan indikator otomatis; guru hanya memilih siswa hadir dan Lulus/Belum',async()=>{
+ await t.test('kelas pilot: pertemuan per hari dengan beberapa sesi; tema dan indikator otomatis; satu anak satu sesi per hari',async()=>{
   const lvl=(level,r)=>JSON.stringify(r.map((rating,i)=>({level,number:i+1,rating})));
   const dites=async(level,who=teacher)=>{const id=await buat(who);await as(who,'select save_diagnostic($1,$2,$3::jsonb,$4)',[id,level,lvl(level,['N','T','T','T','T','T']),'']);return id;};
-  const a1=await dites(1),a4=await dites(4),belum=await buat(),milikLain=await dites(2,stranger);
-  const muat=(extra={})=>JSON.stringify({meeting_number:9,theme_number:5,scheduled_date:'2026-09-15',scheduled_time:'15:00',...extra});
-  const jadwal=(who=teacher,p=muat(),id=null)=>as(who,'select save_schedule($1,$2::jsonb) as id',[id,p]);
+  const a1=await dites(1),a4=await dites(4),a2=await dites(2),belum=await buat(),milikLain=await dites(2,stranger);
+  const sesi=(date,time='08:00',who=teacher,id=null)=>as(who,'select save_schedule($1,$2::jsonb) as id',[id,JSON.stringify({meeting_number:9,theme_number:5,scheduled_date:date,scheduled_time:time})]).then(r=>r.rows[0].id);
   const isi=(sid,rows,finish=false,who=teacher)=>as(who,'select save_meeting($1,$2::jsonb,$3)',[sid,JSON.stringify(rows),finish]);
   const baris=async sid=>(await admin('select student_id,level,indicator_number,result from class_schedule_students where schedule_id=$1 order by level',[sid])).rows.map(r=>[r.student_id,r.level,r.indicator_number,r.result]);
   const info=async x=>(await admin('select meeting_number m,theme_number t,scheduled_date::text d,scheduled_time::text j,completed_at from class_schedules where id=$1',[x])).rows[0];
-  const satuPertemuan=async(results)=>{const id=(await jadwal()).rows[0].id;await isi(id,results,true);return id;};
-  // Jadwal: hanya tanggal dan jam; nomor dan tema otomatis; isian nomor/tema diabaikan.
-  await assert.rejects(jadwal(owner),/guru pengajar/,'pemilik tidak membuat jadwal');
-  await assert.rejects(jadwal(teacher,muat({scheduled_date:''})),/Tanggal wajib/);
+  // Jadwal: guru hanya mengisi tanggal dan jam.
+  await assert.rejects(sesi('2026-09-15','08:00',owner),/guru pengajar/,'pemilik tidak membuat jadwal');
+  await assert.rejects(sesi(''),/Tanggal wajib/);
   assert.equal((await admin('select count(*)::int n from class_schedules')).rows[0].n,0,'gagal tidak meninggalkan data');
-  const id1=(await jadwal()).rows[0].id;
-  let j=await info(id1);
-  assert.deepEqual([j.m,j.t,j.d,j.j,j.completed_at],[1,1,'2026-09-15','15:00:00',null]);
-  await assert.rejects(jadwal(),/Selesaikan Pertemuan 1 lebih dulu sebelum membuat jadwal berikutnya/,'hanya satu jadwal terbuka');
-  await jadwal(teacher,muat({scheduled_date:'2026-09-16',scheduled_time:''}),id1);
-  j=await info(id1);
-  assert.deepEqual([j.m,j.t,j.d,j.j],[1,1,'2026-09-16',null],'ubah hanya tanggal dan jam');
-  assert.equal((await as(owner,'select * from class_schedules where id=$1',[id1])).rows.length,1);
+  // Hari 1 (15 Sep): dua sesi, nomor dan tema sama.
+  const h1s1=await sesi('2026-09-15','08:00'),h1s2=await sesi('2026-09-15','10:00');
+  let j=await info(h1s1);assert.deepEqual([j.m,j.t,j.d,j.j],[1,1,'2026-09-15','08:00:00'],'isian nomor/tema diabaikan');
+  assert.deepEqual([(await info(h1s2)).m,(await info(h1s2)).t],[1,1],'sesi di tanggal yang sama berbagi pertemuan');
+  await assert.rejects(sesi('2026-09-16'),/Selesaikan semua sesi Pertemuan 1 lebih dulu/,'hari berikutnya menunggu semua sesi selesai');
+  await assert.rejects(sesi('2026-09-16','08:00',teacher,h1s1),/punya sesi lain/,'tanggal sesi tidak bisa dipindah bila harinya punya sesi lain');
+  await sesi('2026-09-15','08:30',teacher,h1s1);
+  assert.equal((await info(h1s1)).j,'08:30:00','ubah jam');
+  assert.equal((await as(owner,'select * from class_schedules where id=$1',[h1s1])).rows.length,1);
   assert.equal((await as(stranger,'select * from class_schedules')).rows.length,0);
   await assert.rejects(as(teacher,'insert into class_schedules(teacher_id,meeting_number,theme_number,scheduled_date) values($1,50,1,current_date)',[teacher]),/permission denied|row-level security/i);
-  await assert.rejects(jadwal(stranger,muat(),id1),/Jadwal tidak tersedia/);
+  await assert.rejects(sesi('2026-09-15','08:00',stranger,h1s1),/Jadwal tidak tersedia/);
   assert.equal((await db.query("select has_function_privilege('authenticated','public.current_indicator(uuid)','execute') as ok")).rows[0].ok,false,'fungsi bantu bukan RPC');
-  // Isi pertemuan: level dan indikator dihitung database; isian indikator diabaikan.
-  await assert.rejects(isi(id1,[],false,owner),/guru pengajar/);
-  await assert.rejects(isi(id1,[],false,stranger),/tidak tersedia/);
-  await assert.rejects(isi(id1,[{student_id:belum}]),/sudah dites diagnostik/);
-  await assert.rejects(isi(id1,[{student_id:milikLain}]),/tidak tersedia/,'siswa guru lain');
-  await assert.rejects(isi(id1,[{student_id:a1},{student_id:a1}]),/lebih dari sekali/);
-  await assert.rejects(isi(id1,[{student_id:a1,result:'absen'}]),/Lulus atau Belum/);
-  await isi(id1,[{student_id:a1,indicator_number:5,result:'lulus'},{student_id:a4}]);
-  assert.deepEqual(await baris(id1),[[a1,1,1,'lulus'],[a4,4,1,null]],'simpan sementara, indikator 1 otomatis');
-  assert.equal((await info(id1)).completed_at,null);
-  await assert.rejects(isi(id1,[],true),/minimal satu siswa/);
-  await assert.rejects(isi(id1,[{student_id:a1,result:'lulus'},{student_id:a4}],true),/Lulus atau Belum/,'semua wajib dinilai');
-  await isi(id1,[{student_id:a1,result:'lulus'},{student_id:a4,result:'belum'}],true);
-  assert.notEqual((await info(id1)).completed_at,null);
-  await assert.rejects(isi(id1,[{student_id:a1,result:'belum'}]),/sudah ditandai selesai/,'tanpa koreksi');
-  await assert.rejects(jadwal(teacher,muat(),id1),/sudah selesai/);
-  await assert.rejects(as(teacher,'select delete_schedule($1)',[id1]),/sudah selesai/);
-  assert.equal((await as(owner,'select result from class_schedule_students where schedule_id=$1',[id1])).rows.length,2,'pemilik membaca hasil');
-  // Pertemuan 2: Aisyah maju ke indikator 2 (lulus), Doni tetap 1 (belum); siswa yang tidak hadir tidak berubah.
-  const id2=(await jadwal()).rows[0].id;
-  assert.equal((await info(id2)).m,2);
-  await isi(id2,[{student_id:a1,result:'belum'},{student_id:a4,result:'lulus'}],true);
-  assert.deepEqual(await baris(id2),[[a1,1,2,'belum'],[a4,4,1,'lulus']]);
-  // Aisyah lulus 2..6 → setelah 6 lulus tetap di indikator 6 (sampai naik level dikonfirmasi).
-  for(let n=2;n<=6;n++)await satuPertemuan([{student_id:a1,result:'lulus'}]);
-  const idAkhir=await satuPertemuan([{student_id:a1,result:'belum'}]);
-  assert.deepEqual(await baris(idAkhir),[[a1,1,6,'belum']],'setelah 1–6 lulus tetap indikator 6, bukan 7');
-  const nAkhir=(await info(idAkhir)).m;
-  assert.equal(nAkhir,8);
-  // Tema otomatis mengikuti nomor: pertemuan 25 → Tema 2.
+  // Isi sesi: siswa hadir dan Lulus/Belum; level dan indikator dihitung database.
+  await assert.rejects(isi(h1s1,[],false,owner),/guru pengajar/);
+  await assert.rejects(isi(h1s1,[],false,stranger),/tidak tersedia/);
+  await assert.rejects(isi(h1s1,[{student_id:belum}]),/sudah dites diagnostik/);
+  await assert.rejects(isi(h1s1,[{student_id:milikLain}]),/tidak tersedia/,'siswa guru lain');
+  await assert.rejects(isi(h1s1,[{student_id:a1},{student_id:a1}]),/lebih dari sekali/);
+  await assert.rejects(isi(h1s1,[{student_id:a1,result:'absen'}]),/Lulus atau Belum/);
+  await isi(h1s1,[{student_id:a1,indicator_number:5,result:'lulus'},{student_id:a4}]);
+  assert.deepEqual(await baris(h1s1),[[a1,1,1,'lulus'],[a4,4,1,null]],'simpan sementara, indikator 1 otomatis');
+  await assert.rejects(isi(h1s2,[{student_id:a1}]),/sudah ikut sesi lain di tanggal yang sama/,'satu anak satu sesi per hari');
+  await isi(h1s2,[{student_id:a2,result:'lulus'}],true);
+  assert.notEqual((await info(h1s2)).completed_at,null,'sesi 2 boleh selesai lebih dulu dari sesi 1 di hari yang sama');
+  await assert.rejects(sesi('2026-09-16'),/Selesaikan semua sesi Pertemuan 1/);
+  await assert.rejects(isi(h1s1,[],true),/minimal satu siswa/);
+  await assert.rejects(isi(h1s1,[{student_id:a1,result:'lulus'},{student_id:a4}],true),/Lulus atau Belum/,'semua wajib dinilai');
+  await isi(h1s1,[{student_id:a1,result:'lulus'},{student_id:a4,result:'belum'}],true);
+  await assert.rejects(isi(h1s1,[{student_id:a1,result:'belum'}]),/sudah ditandai selesai/,'tanpa koreksi');
+  await assert.rejects(sesi('2026-09-15','09:00',teacher,h1s1),/sudah selesai/);
+  assert.equal((await as(owner,'select result from class_schedule_students where schedule_id=$1',[h1s1])).rows.length,2,'pemilik membaca hasil');
+  // Hari 2: nomor 2; tanggal harus setelah hari terakhir; sesi di hari lama tidak bisa ditambah lagi.
+  await assert.rejects(sesi('2026-09-14'),/harus setelah pertemuan terakhir/);
+  const h2=await sesi('2026-09-16');
+  assert.deepEqual([(await info(h2)).m,(await info(h2)).t],[2,1]);
+  await assert.rejects(sesi('2026-09-15'),/harus setelah pertemuan terakhir/,'tidak menambah sesi ke hari lama');
+  await assert.rejects(as(teacher,'select delete_schedule($1)',[h1s1]),/sudah selesai/);
+  await isi(h2,[{student_id:a1,result:'belum'},{student_id:a4,result:'lulus'}],true);
+  assert.deepEqual(await baris(h2),[[a1,1,2,'belum'],[a4,4,1,'lulus']],'lulus maju, belum tetap');
+  // Pindah tanggal sesi tunggal di hari terakhir yang belum selesai.
+  const h3=await sesi('2026-09-17');
+  await sesi('2026-09-18','08:00',teacher,h3);
+  assert.equal((await info(h3)).d,'2026-09-18');
+  await assert.rejects(sesi('2026-09-16','08:00',teacher,h3),/setelah pertemuan sebelumnya/);
+  await as(teacher,'select delete_schedule($1)',[h3]);
+  // Aisyah lulus 2..6 → setelah 6 lulus tetap di indikator 6.
+  for(let n=2;n<=6;n++){const x=await sesi(`2026-10-${String(n).padStart(2,'0')}`);await isi(x,[{student_id:a1,result:'lulus'}],true);}
+  const akhir=await sesi('2026-10-10');
+  await isi(akhir,[{student_id:a1,result:'belum'}],true);
+  assert.deepEqual(await baris(akhir),[[a1,1,6,'belum']],'setelah 1–6 lulus tetap indikator 6');
+  assert.equal((await info(akhir)).m,8);
+  // Tema mengikuti nomor: pertemuan 25 → Tema 2.
   await admin('update class_schedules set meeting_number=meeting_number+16 where teacher_id=$1',[teacher]);
-  const id25=(await jadwal()).rows[0].id;
-  assert.deepEqual([(await info(id25)).m,(await info(id25)).t],[25,2]);
-  // Jadwal terbuka bisa dihapus; batas 192.
-  await assert.rejects(as(stranger,'select delete_schedule($1)',[id25]),/tidak tersedia/);
-  await as(teacher,'select delete_schedule($1)',[id25]);
-  await admin('update class_schedules set meeting_number=192 where id=$1',[idAkhir]);
-  await assert.rejects(jadwal(),/Semua 192 pertemuan/);
+  const h25=await sesi('2026-10-11');
+  assert.deepEqual([(await info(h25)).m,(await info(h25)).t],[25,2]);
+  await assert.rejects(as(stranger,'select delete_schedule($1)',[h25]),/tidak tersedia/);
+  await as(teacher,'select delete_schedule($1)',[h25]);
+  await admin('update class_schedules set meeting_number=192 where id=$1',[akhir]);
+  await assert.rejects(sesi('2026-10-12'),/Semua 192 pertemuan/);
   // Menghapus siswa ikut mengeluarkannya dari pertemuan.
   await as(teacher,'select delete_student($1)',[a4]);
-  assert.deepEqual((await baris(id1)).map(r=>r[0]),[a1]);
+  assert.deepEqual((await baris(h1s1)).map(r=>r[0]),[a1]);
  });
  await t.test('guru nonaktif kehilangan akses',async()=>{
   await as(owner,"update access_list set active=false where email='guru@test.invalid'");

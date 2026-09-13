@@ -66,7 +66,7 @@ test('ringkasan: siswa aktif, sudah dan belum dites, sebaran level', () => {
   assert.match(dashboard(), /Guru aktif/);
 });
 
-test('ruang kelas: jadwal hanya tanggal/jam; pertemuan, tema, dan indikator otomatis; guru memilih siswa hadir dan Lulus/Belum', () => {
+test('ruang kelas: pertemuan per hari dengan sesi; guru hanya mengisi tanggal/jam, siswa hadir, dan Lulus/Belum', () => {
   loadSampleState();
   state.role = 'teacher';
   const html = sessionsView();
@@ -74,72 +74,83 @@ test('ruang kelas: jadwal hanya tanggal/jam; pertemuan, tema, dan indikator otom
   assert.match(html, /Belum ada jadwal/);
   assert.ok(!/data-action="new-session"|evaluasi|kehadiran/i.test(html));
   const f = scheduleForm();
-  assert.ok(!/<select|name="students"|name="theme"|name="meeting"/.test(f), 'jadwal tanpa pilihan pertemuan, tema, siswa');
-  assert.match(f, /name="date"/);
+  assert.ok(!/<select|name="students"|name="theme"|name="meeting"/.test(f), 'tanpa pilihan pertemuan, tema, siswa');
+  assert.match(f, /name="date" type="date"/);
   assert.match(f, /name="time"/);
-  assert.match(f, /<strong>Pertemuan 1<\/strong> · Tema 1 — Aku Bisa Bercerita/, 'pertemuan dan tema otomatis');
+  assert.match(f, /<strong>Pertemuan 1<\/strong> · Tema 1 — Aku Bisa Bercerita/);
 
-  // Jadwal tersimpan: satu terbuka; tombol Buat jadwal hilang selama ada yang terbuka.
+  // Hari 25 selesai (satu sesi); hari 26 punya dua sesi, satu terbuka.
   state.classSchedules = [
-    { id: 'j0', meeting_number: 25, theme_number: 2, scheduled_date: '2026-09-10', scheduled_time: null, completed_at: '2026-09-10T09:00:00Z' }
+    { id: 'j0', meeting_number: 25, theme_number: 2, scheduled_date: '2026-09-10', scheduled_time: null, completed_at: '2026-09-10T09:00:00Z' },
+    { id: 's2', meeting_number: 26, theme_number: 2, scheduled_date: '2026-09-20', scheduled_time: '10:00:00', completed_at: null },
+    { id: 's1', meeting_number: 26, theme_number: 2, scheduled_date: '2026-09-20', scheduled_time: '08:00:00', completed_at: '2026-09-20T02:00:00Z' }
   ];
-  state.classScheduleStudents = [];
-  assert.match(sessionsView(), /data-action="new-schedule"/, 'tidak ada jadwal terbuka: boleh buat');
-  assert.match(scheduleForm(), /<strong>Pertemuan 26<\/strong> · Tema 2 — Aku Bisa Menghitung/, 'pertemuan berikutnya dan temanya');
-  state.classSchedules.push({ id: 'j1', meeting_number: 26, theme_number: 2, scheduled_date: '2026-09-20', scheduled_time: '15:00:00', completed_at: null });
+  state.classScheduleStudents = [
+    { schedule_id: 's1', student_id: 'anak-1', level: 2, indicator_number: 1, result: 'lulus' }
+  ];
   let daftar = sessionsView();
-  assert.ok(!daftar.includes('data-action="new-schedule"'), 'ada jadwal terbuka: tanpa Buat jadwal');
-  assert.match(daftar, /Jadwal berikutnya bisa dibuat setelah pertemuan ini ditandai selesai/);
-  assert.ok(daftar.indexOf('Akan datang') < daftar.indexOf('Pertemuan 26') && daftar.indexOf('Selesai') < daftar.indexOf('Pertemuan 25'));
-  assert.match(daftar, /15:00/);
-  assert.match(daftar, /Tema 2 — Aku Bisa Menghitung · siswa dipilih saat kelas/);
-  assert.match(daftar, /data-action="open-schedule" data-id="j1">Buka/);
+  assert.ok(!daftar.includes('data-action="new-schedule"'), 'ada sesi terbuka: tanpa Buat jadwal');
+  assert.match(daftar, /semua sesi ditandai selesai/);
+  assert.ok(daftar.indexOf('Pertemuan terakhir') < daftar.indexOf('Pertemuan 26') && daftar.indexOf('Sebelumnya') < daftar.indexOf('Pertemuan 25'));
+  assert.match(daftar, /Pertemuan 26<\/strong><p>Tema 2 — Aku Bisa Menghitung/);
+  assert.ok(daftar.indexOf('Sesi 1</strong> · 08:00') < daftar.indexOf('Sesi 2</strong> · 10:00'), 'sesi urut menurut jam');
+  assert.match(daftar, /Sesi 1<\/strong> · 08:00 · 1 siswa · selesai/);
+  assert.match(daftar, /Sesi 2<\/strong> · 10:00 · belum dimulai/);
+  assert.match(daftar, /data-action="add-session" data-id="s2"|data-action="add-session" data-id="s1"/);
+  assert.match(daftar, /data-action="open-schedule" data-id="s2">Buka/);
+  assert.match(daftar, /data-action="delete-schedule" data-id="s2"/);
   assert.match(daftar, /data-action="open-schedule" data-id="j0">Lihat/);
-  assert.match(daftar, /data-action="delete-schedule" data-id="j1"/);
-  assert.ok(!/data-action="(edit|delete)-schedule" data-id="j0"/.test(daftar), 'jadwal selesai dikunci');
-  const ubah = scheduleForm(scheduleValues('j1'), 'j1');
-  assert.match(ubah, /data-form="schedule" data-id="j1"/);
-  assert.match(ubah, /<strong>Pertemuan 26<\/strong>/);
-  assert.match(ubah, /name="time" type="time" value="15:00"/);
+  assert.ok(!/data-action="(edit|delete)-schedule" data-id="(j0|s1)"/.test(daftar), 'sesi selesai dikunci');
+  assert.equal(count(daftar, 'data-action="add-session"'), 1, 'tambah sesi hanya di pertemuan terakhir');
+  // Tambah sesi: tanggal tetap; ubah sesi di hari bersesi banyak: tanggal tidak bisa diganti.
+  const tambah = scheduleForm({ ...scheduleValues('s1'), time: '', fixedDate: true });
+  assert.match(tambah, /<strong>Pertemuan 26<\/strong>/);
+  assert.match(tambah, /type="hidden" name="date" value="2026-09-20"/);
+  assert.match(tambah, />Tambah sesi</);
+  const ubah = scheduleForm(scheduleValues('s2'), 's2');
+  assert.match(ubah, /data-form="schedule" data-id="s2"/);
+  assert.match(ubah, /type="hidden" name="date"/, 'hari punya dua sesi: tanggal terkunci');
+  assert.match(ubah, /name="time" type="time" value="10:00"/);
+  assert.match(scheduleForm(scheduleValues('j0'), 'j0'), /name="date" type="date"/, 'sesi tunggal: tanggal bisa diubah');
 
-  // Lembar pertemuan: pilih siswa hadir; indikator tampil sebagai teks (tanpa dropdown); Lulus/Belum.
-  let lembar = meetingSheet('j1');
-  assert.match(lembar, /data-form="meeting" data-id="j1"/);
-  assert.match(lembar, /<summary data-kids-summary>Pilih siswa yang hadir…<\/summary>/);
+  // Lembar sesi 2: anak yang sudah ikut sesi 1 hari ini tidak bisa dipilih.
+  let lembar = meetingSheet('s2');
+  assert.match(lembar, /data-form="meeting" data-id="s2"/);
+  assert.match(lembar, /Pertemuan 26 · Sesi 2 · 10:00 · Tema 2/);
+  assert.match(lembar, /value="anak-1"[^>]*disabled><span>Alya Contoh <small class="muted">Level 2 · sudah di Sesi 1 hari ini/);
   assert.match(lembar, /value="anak-2"[^>]*disabled/, 'belum dites tidak bisa dipilih');
   assert.ok(!lembar.includes('value="anak-3"'), 'anak nonaktif tidak tampil');
   assert.match(lembar, /name="finish" value="0">Simpan sementara</);
-  assert.match(lembar, /name="finish" value="1">Tandai pertemuan selesai</);
+  assert.match(lembar, /name="finish" value="1">Tandai sesi selesai</);
   assert.ok(!/absen|Tidak hadir|<select/.test(lembar), 'tanpa Tidak hadir dan tanpa dropdown');
+  const lihat = meetingSheet('s1');
+  assert.ok(!lihat.includes('<form'), 'sesi selesai hanya dilihat');
+  assert.match(lihat, /<strong>Lulus<\/strong>/);
+
+  // Baris siswa: indikator otomatis dari pertemuan selesai; antrean 1–6; siap naik.
+  const alya = state.students[0];
   const baris = meetingRows(new Set(['anak-1', 'anak-2']), { 'r_anak-1': 'belum' });
-  assert.match(baris, /Alya Contoh · Level 2<\/legend><p class="muted">Indikator 1\. Menyebutkan nama huruf vokal/);
+  assert.match(baris, /Alya Contoh · Level 2<\/legend><p class="muted">Indikator 2\. /, 'lulus indikator 1 → 2');
   assert.match(baris, /name="r_anak-1" value="belum" checked/);
   assert.ok(!baris.includes('r_anak-2'), 'anak belum dites tidak dinilai');
   assert.match(kidsSummary(['anak-1']), /^1 siswa: /);
-  state.classScheduleStudents = [{ schedule_id: 'j1', student_id: 'anak-1', level: 2, indicator_number: 1, result: 'lulus' }];
-  lembar = meetingSheet('j1');
-  assert.match(lembar, /value="anak-1" checked/);
-  assert.match(lembar, /name="r_anak-1" value="lulus" checked/, 'simpan sementara terisi lagi');
-  assert.match(sessionsView(), /1 siswa \(sementara\)/);
-
-  // Indikator berganti otomatis dari pertemuan selesai; antrean 1–6; setelah 6 lulus tetap 6 dan siap naik.
-  const alya = state.students[0];
-  assert.equal(suggestedIndicator(alya), 1);
-  state.classScheduleStudents.push({ schedule_id: 'j0', student_id: 'anak-1', level: 2, indicator_number: 1, result: 'lulus' });
-  assert.deepEqual(passedIndicators('anak-1', 2), [1], 'yang sementara (j1) tidak dihitung');
-  assert.equal(suggestedIndicator(alya), 2, 'lulus 1 → indikator 2');
-  assert.ok(!readyToLevelUp(alya));
+  assert.deepEqual(passedIndicators('anak-1', 2), [1]);
+  state.classScheduleStudents.push({ schedule_id: 's2', student_id: 'anak-1', level: 2, indicator_number: 2, result: 'lulus' });
+  assert.equal(suggestedIndicator(alya), 2, 'sesi yang belum selesai tidak dihitung');
   for (const n of [2, 3, 4, 5, 6])
     state.classScheduleStudents.push({ schedule_id: 'j0', student_id: 'anak-1', level: 2, indicator_number: n, result: 'lulus' });
-  assert.equal(suggestedIndicator(alya), 6, 'semua 1–6 lulus → tetap 6, bukan 7');
+  assert.equal(suggestedIndicator(alya), 6, 'semua 1–6 lulus → tetap 6');
   assert.ok(readyToLevelUp(alya));
   assert.match(meetingRows(new Set(['anak-1'])), /siap naik/);
-  const lihat = meetingSheet('j0');
-  assert.ok(!lihat.includes('<form'), 'pertemuan selesai hanya dilihat');
-  assert.match(lihat, /<strong>Lulus<\/strong>/);
   assert.match(passedSection(alya), /Indikator yang sudah lulus[\s\S]*✓<\/span> 1\. Menyebutkan nama huruf vokal/);
+
+  // Semua sesi selesai: Buat jadwal muncul lagi untuk hari berikutnya.
+  state.classSchedules.find(c => c.id === 's2').completed_at = '2026-09-20T04:00:00Z';
+  daftar = sessionsView();
+  assert.match(daftar, /data-action="new-schedule"/);
+  assert.match(scheduleForm(), /<strong>Pertemuan 27<\/strong>/);
   state.role = 'owner';
-  assert.ok(!sessionsView().includes('new-schedule'), 'pemilik tidak membuat jadwal');
+  assert.ok(!/new-schedule|add-session/.test(sessionsView()), 'pemilik tidak membuat jadwal');
 });
 
 test('daftar siswa guru dan pemilik memakai status tes dan level pilot', () => {

@@ -129,6 +129,11 @@
 .schedule-card p {
   margin: 6px 0;
 }
+.schedule-session {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(127, 127, 127, 0.25);
+}
 /* Jadwal pertemuan: daftar siswa berupa baris centang yang ringkas. */
 .schedule-field {
   margin: 0 0 14px;

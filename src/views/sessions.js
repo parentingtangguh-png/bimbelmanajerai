@@ -1,19 +1,48 @@
-// Ruang kelas pilot. Guru hanya menentukan tanggal/jam jadwal, siswa yang hadir, dan Lulus/Belum.
-// Nomor pertemuan, tema, level, dan indikator otomatis (dijaga save_schedule dan save_meeting).
-// Hanya satu jadwal terbuka; bisa disimpan sementara, lalu ditandai selesai (final, tanpa koreksi).
+// Ruang kelas pilot. Pertemuan dihitung per hari mengajar: satu hari bisa punya beberapa sesi yang berbagi
+// nomor pertemuan dan tema. Guru hanya mengisi tanggal/jam sesi, memilih siswa yang hadir (satu anak satu
+// sesi per hari), dan Lulus/Belum. Nomor pertemuan, tema, level, dan indikator otomatis (dijaga
+// save_schedule dan save_meeting). Hari berikutnya baru bisa dijadwalkan setelah semua sesi hari terakhir
+// selesai. Tiap sesi bisa disimpan sementara, lalu ditandai selesai (final, tanpa koreksi).
 import { state, testFor, suggestedIndicator, readyToLevelUp } from '../state.js';
 import { heading, empty, field } from '../ui.js';
 import { escapeHtml as h, localDate } from '../domain.js';
 
 export const MEETINGS = 192;
 
-const openSchedule = () => state.classSchedules.find(c => !c.completed_at);
+const dateText = d =>
+  new Intl.DateTimeFormat('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  }).format(new Date(`${d}T00:00:00`));
+
+const rowsOf = id => state.classScheduleStudents.filter(x => x.schedule_id === id);
+const timeText = c => (c.scheduled_time ? String(c.scheduled_time).slice(0, 5) : '');
+const lastNumber = () => Math.max(0, ...state.classSchedules.map(c => c.meeting_number));
+
+// Sesi dalam satu pertemuan, urut menurut jam (tanpa jam di akhir), lalu waktu dibuat.
+export function sessionsOf(number) {
+  return state.classSchedules
+    .filter(c => c.meeting_number === number)
+    .sort(
+      (a, b) =>
+        (timeText(a) || '99').localeCompare(timeText(b) || '99') ||
+        String(a.created_at || '').localeCompare(String(b.created_at || ''))
+    );
+}
+export const sessionIndex = c => sessionsOf(c.meeting_number).findIndex(x => x.id === c.id) + 1;
+
+function themeLabel(number) {
+  const t = state.curriculumThemes.find(x => x.number === number);
+  return `Tema ${number}${t ? ` — ${h(t.name)}` : ''}`;
+}
 
 export function sessionsView() {
   const teacher = state.role === 'teacher';
-  const open = openSchedule();
+  const open = state.classSchedules.some(c => !c.completed_at);
   const button =
-    teacher && !open && nextMeeting() <= MEETINGS
+    teacher && !open && lastNumber() < MEETINGS
       ? '<button class="primary" data-action="new-schedule">＋ Buat jadwal</button>'
       : '';
   const intro = heading('RUANG KELAS', 'Jadwal pertemuan.', '', button);
@@ -27,50 +56,51 @@ export function sessionsView() {
           : 'Jadwal dibuat oleh guru pengajar.'
       )
     );
-  const byDate = (a, b) =>
-    `${a.scheduled_date} ${a.scheduled_time || ''}`.localeCompare(
-      `${b.scheduled_date} ${b.scheduled_time || ''}`
-    );
-  const upcoming = state.classSchedules.filter(c => !c.completed_at).sort(byDate);
-  const done = state.classSchedules.filter(c => c.completed_at).sort((a, b) => byDate(b, a));
-  const section = (title, list, emptyText) =>
-    `<section class="schedule-section"><h3>${title}</h3>${list.length ? list.map(scheduleCard).join('') : `<p class="muted">${emptyText}</p>`}</section>`;
-  return `${intro}${section('Akan datang', upcoming, 'Tidak ada jadwal yang akan datang.')}${section('Selesai', done, 'Belum ada pertemuan yang selesai.')}`;
+  const numbers = [...new Set(state.classSchedules.map(c => c.meeting_number))].sort((a, b) => b - a);
+  const [latest, ...older] = numbers;
+  const note = open
+    ? '<p class="muted">Pertemuan berikutnya bisa dijadwalkan setelah semua sesi ditandai selesai.</p>'
+    : '';
+  const done = older.length
+    ? older.map(dayCard).join('')
+    : '<p class="muted">Belum ada pertemuan sebelumnya.</p>';
+  return `${intro}<section class="schedule-section"><h3>Pertemuan terakhir</h3>${dayCard(latest)}${note}</section><section class="schedule-section"><h3>Sebelumnya</h3>${done}</section>`;
 }
 
-const dateText = d =>
-  new Intl.DateTimeFormat('id-ID', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric'
-  }).format(new Date(`${d}T00:00:00`));
-
-const rowsOf = id => state.classScheduleStudents.filter(x => x.schedule_id === id);
-
-function scheduleHead(c) {
-  const theme = state.curriculumThemes.find(t => t.number === c.theme_number);
-  const time = c.scheduled_time ? ` · ${h(String(c.scheduled_time).slice(0, 5))}` : '';
-  return { time, theme: `Tema ${c.theme_number}${theme ? ` — ${h(theme.name)}` : ''}` };
+// Satu hari mengajar: tanggal, nomor pertemuan, tema, lalu daftar sesinya.
+export function dayCard(number) {
+  const list = sessionsOf(number);
+  const first = list[0];
+  const latest = number === lastNumber();
+  const teacher = state.role === 'teacher';
+  const add =
+    teacher && latest
+      ? `<div class="button-row"><button type="button" class="secondary" data-action="add-session" data-id="${first.id}">＋ Tambah sesi</button></div>`
+      : '';
+  return `<article class="panel schedule-card"><strong>${h(dateText(first.scheduled_date))} · Pertemuan ${number}</strong><p>${themeLabel(first.theme_number)}</p>${list.map(sessionRow).join('')}${add}</article>`;
 }
 
-export function scheduleCard(c) {
-  const { time, theme } = scheduleHead(c);
+export function sessionRow(c) {
   const kids = rowsOf(c.id);
   const names = kids
     .map(k => state.students.find(s => s.id === k.student_id))
     .filter(Boolean)
     .map(s => h(s.nickname || s.name))
     .join(', ');
-  const who = kids.length
-    ? `${kids.length} siswa${c.completed_at ? '' : ' (sementara)'}`
-    : 'siswa dipilih saat kelas';
+  const status = c.completed_at
+    ? `${kids.length} siswa · selesai`
+    : kids.length
+      ? `${kids.length} siswa (sementara)`
+      : 'belum dimulai';
+  const time = timeText(c) ? ` · ${h(timeText(c))}` : '';
+  const teacher = state.role === 'teacher';
+  const latest = c.meeting_number === lastNumber();
   const actions = c.completed_at
-    ? `<div class="button-row"><button type="button" class="secondary" data-action="open-schedule" data-id="${c.id}">Lihat</button></div>`
-    : state.role === 'teacher'
-      ? `<div class="button-row"><button type="button" class="primary" data-action="open-schedule" data-id="${c.id}">Buka</button><button type="button" class="secondary" data-action="edit-schedule" data-id="${c.id}">Ubah</button><button type="button" class="secondary" data-action="delete-schedule" data-id="${c.id}">Hapus</button></div><p class="muted">Jadwal berikutnya bisa dibuat setelah pertemuan ini ditandai selesai.</p>`
+    ? `<button type="button" class="secondary" data-action="open-schedule" data-id="${c.id}">Lihat</button>`
+    : teacher
+      ? `<button type="button" class="primary" data-action="open-schedule" data-id="${c.id}">Buka</button><button type="button" class="secondary" data-action="edit-schedule" data-id="${c.id}">Ubah</button>${latest ? `<button type="button" class="secondary" data-action="delete-schedule" data-id="${c.id}">Hapus</button>` : ''}`
       : '';
-  return `<article class="panel schedule-card"><strong>${h(dateText(c.scheduled_date))}${time} · Pertemuan ${c.meeting_number}</strong><p>${theme} · ${who}</p>${names ? `<p class="muted">${names}</p>` : ''}${actions}</article>`;
+  return `<div class="schedule-session"><p><strong>Sesi ${sessionIndex(c)}</strong>${time} · ${status}</p>${names ? `<p class="muted">${names}</p>` : ''}${actions ? `<div class="button-row">${actions}</div>` : ''}</div>`;
 }
 
 export const RESULTS = [
@@ -81,13 +111,24 @@ export const RESULTS = [
 // Siswa yang bisa ikut kelas: aktif dan sudah punya level dari tes diagnostik.
 const ready = s => s.status === 'Aktif' && !!testFor(s.id) && !!s.pilot_level;
 
+// Sesi lain di tanggal yang sama yang sudah memuat siswa ini (satu anak satu sesi per hari).
+function otherSessionOf(studentId, c) {
+  const other = state.classSchedules.find(
+    x =>
+      x.id !== c.id &&
+      x.scheduled_date === c.scheduled_date &&
+      rowsOf(x.id).some(r => r.student_id === studentId)
+  );
+  return other ? sessionIndex(other) : 0;
+}
+
 // Teks ringkas dropdown siswa: nama siswa terpilih, atau ajakan memilih.
 export function kidsSummary(ids) {
   const names = state.students.filter(s => new Set(ids).has(s.id)).map(s => s.nickname || s.name);
   return names.length ? `${names.length} siswa: ${names.join(', ')}` : 'Pilih siswa yang hadir…';
 }
 
-// Nilai lembar pertemuan dari yang tersimpan sementara.
+// Nilai lembar sesi dari yang tersimpan sementara.
 export function meetingValues(id) {
   const rows = rowsOf(id);
   const v = { students: rows.map(r => r.student_id) };
@@ -116,13 +157,13 @@ export function meetingRows(picked, v = {}) {
   return `<div class="schedule-field" data-meeting-rows>${body}</div>`;
 }
 
-// Lembar pertemuan. Belum selesai: pilih siswa hadir dan Lulus/Belum; Simpan sementara atau Tandai selesai.
+// Lembar sesi. Belum selesai: pilih siswa hadir dan Lulus/Belum; Simpan sementara atau Tandai selesai.
 // Sudah selesai: hanya ditampilkan.
 export function meetingSheet(id, v = null) {
   const c = state.classSchedules.find(x => x.id === id);
   if (!c) return '<p class="muted">Jadwal tidak ditemukan.</p>';
-  const { time, theme } = scheduleHead(c);
-  const head = `<p class="muted">${h(dateText(c.scheduled_date))}${time} · Pertemuan ${c.meeting_number} · ${theme}</p>`;
+  const time = timeText(c) ? ` · ${h(timeText(c))}` : '';
+  const head = `<p class="muted">${h(dateText(c.scheduled_date))} · Pertemuan ${c.meeting_number} · Sesi ${sessionIndex(c)}${time} · ${themeLabel(c.theme_number)}</p>`;
   if (c.completed_at || state.role !== 'teacher') {
     const list = rowsOf(id)
       .map(x => {
@@ -134,7 +175,7 @@ export function meetingSheet(id, v = null) {
         return `<fieldset class="diagnostic-task"><legend>${h(s ? s.name : 'Siswa')} · Level ${x.level}</legend><p class="muted">Indikator ${x.indicator_number}. ${h(ind ? ind.text : '')}</p><p><strong>${label}</strong></p></fieldset>`;
       })
       .join('');
-    const status = c.completed_at ? '' : '<p class="muted">Pertemuan belum selesai.</p>';
+    const status = c.completed_at ? '' : '<p class="muted">Sesi belum selesai.</p>';
     return `${head}${status}${list || '<p class="muted">Belum ada siswa.</p>'}`;
   }
   const values = v || meetingValues(id);
@@ -142,45 +183,50 @@ export function meetingSheet(id, v = null) {
   const kids = state.students
     .filter(s => s.status === 'Aktif')
     .map(s => {
-      const tag = ready(s) ? `Level ${s.pilot_level}` : 'Belum tes diagnostik';
-      return `<label class="schedule-kid"><input type="checkbox" name="students" value="${s.id}" ${picked.has(s.id) ? 'checked' : ''} ${ready(s) ? '' : 'disabled'}><span>${h(s.name)} <small class="muted">${tag}</small></span></label>`;
+      const other = otherSessionOf(s.id, c);
+      const blocked = !ready(s) || other;
+      const tag = !ready(s)
+        ? 'Belum tes diagnostik'
+        : other
+          ? `Level ${s.pilot_level} · sudah di Sesi ${other} hari ini`
+          : `Level ${s.pilot_level}`;
+      return `<label class="schedule-kid"><input type="checkbox" name="students" value="${s.id}" ${picked.has(s.id) && !blocked ? 'checked' : ''} ${blocked ? 'disabled' : ''}><span>${h(s.name)} <small class="muted">${tag}</small></span></label>`;
     })
     .join('');
   const kidBlock = kids
     ? `<div class="schedule-field"><span class="schedule-label">Siswa yang hadir</span><details class="schedule-kids"><summary data-kids-summary>${h(kidsSummary(picked))}</summary><div class="schedule-kids-list">${kids}</div></details></div>`
     : '<p class="muted">Belum ada siswa aktif.</p>';
-  const buttons = `<div class="button-row"><button class="secondary" name="finish" value="0">Simpan sementara</button><button class="primary" name="finish" value="1">Tandai pertemuan selesai</button></div>`;
-  return `<form data-form="meeting" data-id="${h(id)}">${head}${kidBlock}${meetingRows(picked, values)}<p class="muted">Simpan sementara bisa diubah lagi. Setelah ditandai selesai, pertemuan dikunci dan indikator siswa yang lulus berganti otomatis.</p>${buttons}</form>`;
+  const buttons = `<div class="button-row"><button class="secondary" name="finish" value="0">Simpan sementara</button><button class="primary" name="finish" value="1">Tandai sesi selesai</button></div>`;
+  return `<form data-form="meeting" data-id="${h(id)}">${head}${kidBlock}${meetingRows(picked, values)}<p class="muted">Simpan sementara bisa diubah lagi. Setelah ditandai selesai, sesi dikunci dan indikator siswa yang lulus berganti otomatis.</p>${buttons}</form>`;
 }
 
-// Nomor pertemuan berikutnya untuk guru ini: satu setelah nomor terbesar di jadwalnya.
-export function nextMeeting() {
-  return Math.max(0, ...state.classSchedules.map(c => c.meeting_number)) + 1;
-}
+// Nomor pertemuan berikutnya (hari baru).
+export const nextMeeting = () => lastNumber() + 1;
 
-// Nilai formulir jadwal tersimpan, untuk diubah.
+// Nilai formulir sesi tersimpan, untuk diubah.
 export function scheduleValues(id) {
   const c = state.classSchedules.find(x => x.id === id);
   if (!c) return {};
-  return {
-    meeting: c.meeting_number,
-    date: c.scheduled_date,
-    time: c.scheduled_time ? String(c.scheduled_time).slice(0, 5) : ''
-  };
+  return { meeting: c.meeting_number, date: c.scheduled_date, time: timeText(c) };
 }
 
 // Tema yang berlaku untuk nomor pertemuan.
 export const themeForMeeting = n =>
   state.curriculumThemes.find(t => n >= t.first_meeting && n <= t.last_meeting);
 
-// Formulir jadwal: hanya tanggal dan jam; pertemuan dan tema ditampilkan sebagai keterangan.
+// Formulir sesi. Hari baru: tanggal + jam. Tambah sesi (v.date tetap): jam saja. Ubah: jam; tanggal hanya
+// bila sesi itu satu-satunya di harinya.
 export function scheduleForm(v = {}, id = '') {
   const meeting = Number(v.meeting) || nextMeeting();
   const t = themeForMeeting(meeting);
+  const fixedDate = v.fixedDate || (id && sessionsOf(meeting).length > 1);
   const info = `<p class="schedule-auto"><strong>Pertemuan ${meeting}</strong> · ${t ? `Tema ${t.number} — ${h(t.name)}` : 'Tema belum tersedia'}</p><p class="muted">Pertemuan, tema, dan indikator siswa berjalan otomatis.</p>`;
+  const date = fixedDate
+    ? `<input type="hidden" name="date" value="${h(v.date)}"><p><strong>${h(dateText(v.date))}</strong></p>`
+    : field('Tanggal', 'date', 'date', v.date || localDate(), 'required');
   return `<form data-form="schedule"${id ? ` data-id="${h(id)}"` : ''}>
 ${info}
-${field('Tanggal', 'date', 'date', v.date || localDate(), 'required')}
+${date}
 ${field('Jam', 'time', 'time', v.time || '', '')}
-<button class="primary full">Simpan jadwal</button></form>`;
+<button class="primary full">${v.fixedDate && !id ? 'Tambah sesi' : 'Simpan jadwal'}</button></form>`;
 }
