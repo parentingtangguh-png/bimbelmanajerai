@@ -8,6 +8,7 @@ import {
   DIAGNOSTIC_LEVELS,
   DECIDING,
   RATINGS,
+  RATING_RULE,
   diagnosticTasks,
   suggestedStart,
   levelComplete,
@@ -73,7 +74,9 @@ export function levelDescriptors(chosen) {
 function diagnosticRules() {
   const items = [
     ['⏱', '±20–25 menit, satu anak, sebagai permainan.'],
-    ['✓◐✗', 'Nilai tiap tugas: Tercapai, Dengan bantuan, Belum.'],
+    ['✓', 'Tercapai: memenuhi ukuran tanpa bantuan.'],
+    ['◐', 'Dengan bantuan: memenuhi setelah dibantu, atau kurang satu dari ukuran.'],
+    ['✗', 'Belum: lebih rendah dari itu.'],
     ['✎', 'Huruf, angka, dan kata ditulis besar di kertas atau papan.'],
     ['★', '<strong>Tuntas</strong> = nomor 1–6: minimal 5 ✓, tanpa ✗.'],
     ['↕', 'Tuntas → naik level. Belum → itulah level awal.'],
@@ -91,7 +94,8 @@ export function diagnosticLevelStep(s, run, level) {
   const trail = run.order.length
     ? `<p class="muted">Sudah diuji: ${run.order.map(l => `Level ${l} ${levelComplete(run.results[l]) ? 'tuntas' : 'belum tuntas'}`).join(' · ')}</p>`
     : '';
-  const head = `<p class="diagnostic-who"><strong>${h(s.name)}</strong> · Menguji Level ${level}${lv ? ` — ${h(lv.title)}` : ''}</p>${trail}`;
+  const legend = `<p class="muted diagnostic-legend">${RATING_RULE}</p>`;
+  const head = `<p class="diagnostic-who"><strong>${h(s.name)}</strong> · Menguji Level ${level}${lv ? ` — ${h(lv.title)}` : ''}</p>${trail}${legend}`;
   const cards = [1, 2, 3, 4, 5, 6, 7, 8]
     .map(n => diagnosticTaskCard(level, n, run.results[level]?.[n] || run.draft?.[level]?.[n]))
     .join('');

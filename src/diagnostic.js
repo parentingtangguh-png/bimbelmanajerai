@@ -10,6 +10,9 @@ export const RATINGS = [
   ['B', '◐', 'Dengan bantuan'],
   ['N', '✗', 'Belum']
 ];
+// Aturan pemberian tanda, sama untuk semua tugas yang memakai hitungan ("4 dari 5").
+export const RATING_RULE =
+  '✓ memenuhi ukuran tanpa bantuan · ◐ memenuhi setelah dibantu, atau kurang satu dari ukuran · ✗ lebih rendah dari itu';
 export const ratingMark = code => (RATINGS.find(r => r[0] === code) || [])[1] || '·';
 
 // Tugas penentu per indikator: apa yang dilakukan, bahan yang dipakai, dan kapan disebut tercapai.
@@ -43,7 +46,8 @@ export const diagnosticTasks = {
     6: {
       task: 'Mulai membilang "satu, dua…", anak melanjutkan.',
       material: '—',
-      success: 'Sampai lima berurutan, hanya dengan bantuan awalan.'
+      success:
+        'Sampai lima berurutan. Bantuan awalan "satu, dua…" tetap ✓; ◐ bila guru harus membilang bersama sampai lima.'
     },
     7: {
       task: 'Tanpa peragaan: "sit down", "stand up", "clap your hands".',
@@ -107,12 +111,13 @@ export const diagnosticTasks = {
     },
     2: {
       task: 'Sebut 5 huruf; anak menulis bentuk kapital dan kecilnya.',
-      material: 'A a · B b · D d · M m · S s; kertas dan pensil.',
+      material: 'Kertas dan pensil. Huruf yang disebut: A, B, D, M, S — jangan ditulis atau diperlihatkan.',
       success: '4 dari 5 pasang terbaca.'
     },
     3: {
-      task: 'Tulis dua suku kata terpisah; anak menggabungkannya menjadi kata dan membacanya.',
-      material: 'Tulis besar: bu + ku · ba + ju · ma + ta · sa + pi · ka + ki',
+      task: 'Letakkan dua potongan kertas suku kata dalam urutan tertukar; anak menyusunnya menjadi kata lalu membacanya.',
+      material:
+        'Tulis besar, satu suku kata per potongan kertas, disajikan tertukar: ku · bu → buku, ju · ba → baju, ta · ma → mata, pi · sa → sapi, ki · ka → kaki',
       success: '4 dari 5 benar.'
     },
     4: {

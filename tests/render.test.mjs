@@ -398,6 +398,11 @@ test('tes diagnostik: kartu tugas memakai teks indikator kurikulum, lalu hasil m
   assert.ok(!/name="i7" value="T"[^>]*required/.test(langkah), 'English tidak wajib');
   assert.equal(count(langkah, 'dicatat, tidak menentukan level'), 2);
   assert.match(langkah, /data-action="diagnostic-restart"/);
+  assert.match(
+    langkah,
+    /◐ memenuhi setelah dibantu, atau kurang satu dari ukuran/,
+    'aturan tanda tampil di tiap level'
+  );
 
   // Level 1 tuntas, Level 2 belum: level awal 2, dan ringkasannya siap disimpan.
   const tuntas = { 1: 'T', 2: 'T', 3: 'T', 4: 'T', 5: 'B', 6: 'T', 7: 'B', 8: 'T' };
@@ -441,6 +446,10 @@ test('instrumen diagnostik lengkap dan aturan naik-turun level sesuai keputusan 
   assert.equal(levelComplete({ ...T, 7: 'N', 8: 'N' }), true, 'English dan Karakter tidak menentukan');
   assert.equal(levelComplete({ 1: 'T' }), undefined, 'belum selesai dinilai');
   const X = { ...T, 1: 'N' };
+  // Perbaikan mutu soal: jawaban dikte tidak diperlihatkan, suku kata disajikan tertukar.
+  assert.match(diagnosticTasks[3][2].material, /jangan ditulis atau diperlihatkan/);
+  assert.match(diagnosticTasks[3][3].material, /ku · bu → buku/);
+  assert.match(diagnosticTasks[1][6].success, /tetap ✓/);
   assert.deepEqual(diagnosticPlan(3, {}), { test: 3 });
   assert.deepEqual(diagnosticPlan(3, { 3: T }), { test: 4 }, 'tuntas → naik');
   assert.deepEqual(diagnosticPlan(3, { 3: T, 4: X }), { final: 4, beyond: false });

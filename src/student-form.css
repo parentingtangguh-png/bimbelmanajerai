@@ -141,3 +141,8 @@
   font-size: 13px;
   line-height: 1.55;
 }
+.diagnostic-legend {
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 1.5;
+}
