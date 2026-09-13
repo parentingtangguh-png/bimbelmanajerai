@@ -12,10 +12,10 @@ Berkas ini menggambarkan **keadaan sekarang**, bukan riwayat. Kalau sesuatu di s
 - **Satu bimbel, satu pemasangan.** Bukan multi-tenant dan tidak akan dibagikan ke bimbel lain.
 
 ## Aturan bisnis yang sudah diputuskan pengguna
-- **Guru** mengelola siswanya sendiri: tambah siswa (otomatis milik guru pembuat), profil, status (Nonaktifkan/Aktifkan kembali), hapus siswa (hanya bila belum pernah ikut kelas dan tidak dibagi guru lain), sesi jadwal rutin, kelas, evaluasi, rapor, dan ujian sumatif.
+- **Guru** mengelola siswanya sendiri: tambah siswa (otomatis milik guru pembuat), Tes Diagnostik, profil, status (Nonaktifkan/Aktifkan kembali), hapus siswa (hanya bila belum pernah ikut kelas dan tidak dibagi guru lain), sesi jadwal rutin, kelas, evaluasi, rapor, dan ujian sumatif.
 - **Pemilik** hanya membaca data umum, mendaftarkan guru (Tim pengajar), dan mengedit kurikulum. Pemilik tidak membuka kelas, tidak menambah siswa, tidak menugaskan guru. Database menolak semua jalur tulis pemilik ke data siswa/kelas.
 - **Isolasi antar guru** wajib: RLS + RPC `security definer` yang memeriksa `can_teach` / `can_access_session`. Ada tes isolasi dua guru di `tests/database.test.mjs`.
-- **Level**: 16 level (1–4 Fondasi, 5–8 Fase A/SD 1–2, 9–12 Fase B/SD 3–4, 13–16 Fase C/SD 5–6). Guru hanya mengisi **titik awal**; bisa dikoreksi (`correct_student_baseline`) hanya sebelum anak ikut kelas pertama.
+- **Level**: 16 level (1–4 Fondasi, 5–8 Fase A/SD 1–2, 9–12 Fase B/SD 3–4, 13–16 Fase C/SD 5–6). Guru hanya mengisi **titik awal**, lewat Tes Diagnostik; bisa dikoreksi (`correct_student_baseline`) hanya sebelum anak ikut kelas pertama. Aturan ini tetap berlaku walau Tes Diagnostik bisa dijalankan kapan saja (lihat bagian Siswa dan Tes Diagnostik).
 - **Target mengalir per fase**: target = akhir fase level saat ini. Tidak ada input target manual. Lulus ujian sumatif fase memindahkan target ke akhir fase berikutnya; lulus di akhir Fase C = status Lulus.
 - Naik level: dua bukti "Tercapai" pada kesempatan berbeda. Alarm setelah 3 kali BT/MB berturut-turut.
 - **Indikator disusun per untaian, bukan per level.** Karena 16 level adalah satu spiral, indikator satu bidang ditulis menurun dari Level 1 sampai 16 agar kedalamannya bertambah konsisten. Jangan pernah mengarang indikator di kartu evaluasi: sumbernya selalu tabel `curriculum`.
@@ -26,7 +26,7 @@ Berkas ini menggambarkan **keadaan sekarang**, bukan riwayat. Kalau sesuatu di s
 - **Tidak memasang SMTP sendiri.** Guru baru dibuat lewat Supabase Dashboard → Authentication → Add user dengan **Auto Confirm**, setelah emailnya didaftarkan di Tim pengajar. Itu alur tetap, bukan jalan darurat.
 - **Tidak dibagikan ke bimbel lain.** Tidak perlu multi-tenant, halaman pemasangan, `install.sql`, atau nama bimbel yang bisa dikonfigurasi.
 - **Mode pratinjau dihapus** (12 Sep 2026). Tidak ada lagi cara masuk tanpa akun. Jangan menghidupkannya kembali tanpa diminta.
-- Penurunan jumlah siswa 24 → 8 pada 11 Sep 2026 **sengaja** dilakukan pengguna. Bukan insiden.
+- **13 Sep 2026 semua data dummy dihapus atas izin pengguna**: siswa, level per bidang, relasi siswa-guru, alarm, sesi kelas, kehadiran, evaluasi, observasi, pekerjaan AI, sesi jadwal beserta anggotanya, dan tema. `curriculum`, `profiles`, dan `access_list` utuh. Siswa yang ada sesudah itu adalah input pengguna sendiri. (Penurunan 24 → 8 pada 11 Sep juga sengaja.) Bukan insiden.
 - Mockup lama `docs/mockups/indicator-*.png` **usang** — memakai kerangka per-level yang ditolak pengguna.
 
 ## Alur kerja yang diharapkan pengguna
@@ -38,17 +38,18 @@ Berkas ini menggambarkan **keadaan sekarang**, bukan riwayat. Kalau sesuatu di s
 - Untuk pertanyaan data produksi gunakan query **baca saja**: `npx --no-install supabase db query --linked "<satu baris SQL>"`.
 
 ## Susunan kode
-- `src/main.js` (~28 KB) hanya sambungan: klien Supabase, login, `refresh`, `render`, dan semua penangan klik/submit.
-- Tiap layar punya berkasnya sendiri di `src/views/`: `dashboard.js`, `students.js`, `sessions.js`, `curriculum.js`, `team.js`.
+- `src/main.js` (~35 KB) hanya sambungan: klien Supabase, login, `refresh`, `render`, dan semua penangan klik/submit.
+- Tiap layar punya berkasnya sendiri di `src/views/`: `dashboard.js`, `students.js`, `sessions.js`, `curriculum.js`, `team.js`, dan `home.js` (menu utama, kepala, doa, dan navbar khusus HP).
 - Dipakai bersama: `src/state.js` (state + konstanta + pembaca data, **tanpa DOM**) dan `src/ui.js` (`field`, `select`, `area`, `empty`, `heading`, `meter`, `modal`, `notify`).
 - **Aturan yang menjaga semuanya tetap terpisah:** view hanya menyusun teks HTML. View tidak boleh memanggil `db`, `result`, `render`, atau `notify` — semua aksi lewat atribut `data-action`/`data-form` yang ditangani di `main.js`.
 - View menyusun HTML lewat fungsi kecil bernama (`cardHeading`, `attendanceForm`, `evaluationSection`, `reportSection`, `classGuide`, `statBand`, `journeyPanel`, …). Kalau menambah bagian, **buat fungsi baru** — jangan menyambung ke template yang sudah panjang.
 - Kode diformat **Prettier** (`.prettierrc.json`, lebar 110). Jalankan `npx prettier --write` setelah mengedit.
 
 ## Menguji
-- `npm test` → `scripts/check-imports.mjs` lebih dulu, lalu 47 tes Node: domain, database (PGlite menjalankan semua migrasi), dan **render**.
+- `npm test` → `scripts/check-imports.mjs` lebih dulu, lalu 56 tes Node: domain, database (PGlite menjalankan semua migrasi), dan **render**.
 - `tests/render.test.mjs` memanggil fungsi layar langsung dengan data contoh `tests/fixtures/sample-state.mjs` — tanpa browser, tanpa login. **Inilah satu-satunya tes yang menjangkau kartu evaluasi.** Kalau menambah fitur di layar mana pun, tambahkan tesnya di sini.
-- `npx playwright test` hanya menguji layar login (aplikasi memuat, tanpa galat, tidak meluber di 390px). Lebih dari itu tidak mungkin tanpa akun.
+- `npx playwright test` hanya menguji layar login (aplikasi memuat, tanpa galat, tidak meluber di 390px). Lebih dari itu tidak mungkin tanpa akun. Tesnya mencari teks login (`Assalamu’alaikum`, tombol `Masuk`, `Aktifkan akun`); kalau teks login diubah, perbarui tesnya.
+- ⚠ **Jalur simpan di `main.js` tidak dijangkau tes mana pun.** Tes render hanya menyusun HTML, tidak menekan tombol simpan. 13 Sep 2026 simpan profil siswa selalu ditolak ("Tanggal lahir wajib diisi") karena `main.js` hanya meneruskan enam kolom lama ke `update_student_profile`, sementara 56 tes hijau. Setiap perubahan pada payload RPC harus dicoba di aplikasi yang sudah login: simpan sungguhan, lalu periksa hasilnya dengan query baca saja.
 - **Playwright pernah rapuh pada server dingin** — sudah diperbaiki 12 Sep 2026 dengan menaikkan `timeout` ke 60 dtk dan `expect.timeout` ke 20 dtk di `playwright.config.js`. Vite dingin butuh ~10 dtk sampai layar login tampil, sedangkan `toBeVisible` bawaan menyerah di 5 dtk; halaman masih "Memuat…" lalu tes gagal padahal kodenya benar. Kalau gagal lagi: itu waktu, bukan kode — jalankan sekali lagi, atau hidupkan dev server dulu supaya Playwright memakainya (`reuseExistingServer:true`), lalu pastikan server itu memuat kode terbaru. Jangan turunkan lagi ambang batasnya.
 - `admin()` di tes database = setup data tanpa peran pengguna.
 
@@ -74,6 +75,12 @@ Ikuti Alur kerja langkah 3–4. Jangan pernah push tanpa persetujuan lebih dulu.
 ## Jebakan teknis (Windows PowerShell 5.1)
 - **`npm run build` hijau tidak membuktikan impor benar.** Bundler menggabungkan semua modul jadi satu lingkup, jadi nama yang lupa diimpor tetap ketemu; dev server (modul terpisah) baru melempar galat. Karena itu `npm test` menjalankan `scripts/check-imports.mjs` lebih dulu.
 - **Jangan tinggalkan dev server berjalan saat mengubah banyak berkas.** `playwright.config.js` memakai `reuseExistingServer:true`, jadi Playwright memakai server lama yang modulnya basi — tes gagal karena server, bukan kode. Pernah membuang waktu lama pada 12 Sep 2026. Periksa: `netstat -ano | findstr :5173`.
+- **Vite basi bisa menyajikan `style.css` kosong.** 13 Sep 2026, setelah belasan HMR beruntun, aplikasi tampil tanpa gaya sama sekali. Berkasnya sehat (UTF-8 valid, tanpa NUL), tapi `<style>` hasil suntikan Vite panjangnya 0. Obatnya: matikan server, hapus `node_modules/.vite`, lalu jalankan ulang. Jangan mengubah CSS untuk "memperbaikinya".
+- **`check-imports.mjs` mencocokkan kata, bukan rujukan.** Kata `dashboard` di dalam string atau kunci objek pun dianggap fungsi `dashboard` yang lupa diimpor. Karena itu `home.js` mengambil kunci layar dari `homeKeys` di `state.js`. Jangan melemahkan pemeriksanya.
+- **`<footer class="home-doa">` juga anak `.workspace`.** Aturan yang menyembunyikan kaki halaman aplikasi wajib `.workspace > footer:not(.home-doa)`. Tanpa `:not()`, doa hilang di semua tab; ini terjadi dua kali pada 13 Sep 2026. `footer` global juga memakai `display:flex` dan huruf 9px, jadi `.home-doa` menimpanya.
+- **Modal yang terbuka (`<dialog>`) ada di lapisan paling atas layar.** Elemen yang ditempel ke `body` tertutup olehnya. `notify()` menempel pesan ke `dialog[open]` bila ada; ikuti pola ini untuk elemen melayang lain.
+- **Skrip Python yang mengganti teks harus memakai `assert` untuk tiap penggantian.** Prettier memecah baris panjang, sehingga penanda yang disalin dari versi sebelum diformat tidak cocok lagi, dan `str.replace` gagal diam-diam. Blok CSS navbar pernah tidak terpasang karena hal ini.
+- Keluaran `supabase db query` diakhiri pemberitahuan versi CLI baru, jadi tidak bisa langsung di-`JSON.parse`. Buang stderr dan ambil baris `"rows"`.
 - Pesan commit: jangan pakai tanda kutip ganda di here-string; pakai `git commit -F <file>`.
 - Skrip bantu dengan tanda kutip/escape rumit sering gagal lewat heredoc bash — tulis berkas skripnya dengan tool Write, lalu jalankan dengan `node`.
 - `supabase db query` dengan SQL multi-baris mengembalikan kosong → tulis SQL **satu baris**. Multi-statement hanya mengembalikan hasil terakhir.
@@ -101,6 +108,7 @@ Indikator **lengkap**: 16 level × 6 bidang wajib (Menyimak, Berbicara, Membaca,
 - Draf ditempel ke WhatsApp, yang **tidak mengenal `**tebal**`** — bintangnya tampil apa adanya. Prompt meminta teks biasa, dan `stripMarkdown` membuang sisa markdown yang lolos. Panduan kelas **tetap** boleh markdown.
 - `FOREIGN` membuang aksara di luar Latin/tanda baca/emoji. Model kecil sesekali menyisipkan karakter asing — sebuah "ย" Thai pernah lolos ke rapor orang tua pada 12 Sep 2026. Prompt saja tidak cukup; ini penyaring deterministik. Regex ditulis dengan escape `\uXXXX` **sebagai teks** karena memuat karakter tak terlihat (ZWJ, variation selector); jangan menulisnya sebagai karakter literal.
 - Deploy terpisah dari frontend: `npx --no-install supabase functions deploy generate-learning`.
+- Fungsi ini masih membaca `interest` (minat) sebagai `minat`. Sejak 13 Sep 2026 minat tidak lagi ditanyakan, jadi nilainya selalu kosong. Fungsi ini juga belum memakai `nickname`. Belum diubah.
 - ⚠ **Edge Function tidak punya tes otomatis.** `npm test` tidak menyentuhnya sama sekali; Deno juga tidak terpasang lokal, jadi galat sintaks baru ketahuan saat deploy. Setelah mengubahnya, buat satu rapor sungguhan dan baca hasilnya.
 
 ## Mengoreksi dan membatalkan (12 Sep 2026)
@@ -119,9 +127,40 @@ Indikator **lengkap**: 16 level × 6 bidang wajib (Menyimak, Berbicara, Membaca,
 - Ganti kata sandi: tombol ⚿ di kartu akun (sidebar) → `db.auth.updateUser`. Minimal 8 karakter, diketik dua kali. **Claude tidak pernah mengetikkan kata sandi pengguna.**
 - Karena pratinjau dihapus, Claude **tidak bisa memeriksa tampilan di balik login sendirian**. Bila perlu, minta pengguna login di pane browser, lalu periksa lewat `mcp__Claude_Browser__*`. Jangan mengubah data produksi; bila terpaksa mencoba (mis. mencentang indikator), **kembalikan seperti semula** dan buktikan dengan query.
 - Berkas tidak dilacak yang **bukan** buatan Claude: `scripts/.tmp-inspect-hafsah.ps1`, `scripts/.tmp-run-hafsah-scenario.ps1`. Sejak 12 Sep 2026 `.gitignore` mengabaikan `scripts/.tmp-*` dan `.claude/`, jadi skrip coba-coba sekali pakai aman diberi awalan `.tmp-` — repo ini publik.
-- Yang masih terbuka (hanya bila pengguna meminta): baris terpanjang tersisa ~691 di `views/curriculum.js`; baris siswa di dasbor menampilkan rata-rata Bahasa Indonesia sehingga ketimpangan antar bidang tersembunyi; layar Kurikulum belum diperiksa untuk kenyamanan di HP.
+- Yang masih terbuka (hanya bila pengguna meminta):
+  - **Pengaturan anggota sesi jadwal tidak bisa dibuka dari mana pun.** Tombol Ubah dihapus dari tab Siswa atas permintaan pengguna. `scheduleForm` dan penangan `edit-schedule` masih ada. Usulan: pindahkan ke Ruang kelas, di dekat "＋ Buat sesi jadwal".
+  - Kolom "Hasil diagnostik awal" di **profil** siswa masih bisa diisi. Kalau diisi dari sana, tanda "Belum tes diagnostik" hilang tanpa Tes Diagnostik pernah dijalankan.
+  - Keterangan kelompok non-aktif masih menyebut "tidak ikut sesi kelas".
+  - Rapor AI: lihat bagian Rapor AI.
+  - Baris terpanjang tersisa ~691 karakter di `views/curriculum.js`.
+  - Baris siswa menampilkan rata-rata Bahasa Indonesia, sehingga ketimpangan antar bidang tersembunyi.
+  - Layar Kurikulum belum diperiksa untuk kenyamanan di HP.
 - Semua layar sudah dipecah jadi fungsi kecil 12 Sep 2026: `views/sessions.js` (max 434), `views/dashboard.js` (366), `views/students.js` (362), `src/main.js` (346), `views/team.js` (199). Rangka aplikasi di main.js sekarang `sidebar`/`navButtons`/`accountCard`/`topbar`/`loginStory`/`loginForm`/`passwordForm`/`curriculumFieldset`.
 - Cara membuktikan perombakan tanpa perubahan tampilan, tiga lapis sesuai jangkauannya:
   1. Layar biasa → `node scripts/render-screens.mjs` sebelum/sesudah harus md5 sama.
   2. Layar login di `main.js` → skrip itu tidak menjangkau; bandingkan `document.querySelector('main.login').outerHTML` di pane browser sebelum dan sesudah.
   3. `studentForm`/`scheduleForm` → keduanya menulis lewat `modal()` yang butuh DOM. Jalankan skrip sekali pakai yang memalsukan `globalThis.document = { querySelector: () => ({ set innerHTML(v){...}, showModal(){} }) }`, impor versi lama (`git show HEAD:src/views/students.js`) dan versi baru berdampingan, lalu bandingkan hasilnya untuk peran guru dan pemilik.
+
+## Tampilan HP (≤620px), 13 Sep 2026
+- **Aplikasi sudah bertema gelap emas.** `:root` pertama di `style.css` bertema terang, tapi blok "dark gold theme" di sekitar baris 1580 menimpanya: latar `#0d0f0d`, `--green` sebenarnya emas `#c79a3b`. Jangan menilai tema dari `:root` pertama; kesalahan ini pernah membuat Claude menawarkan pilihan terang/gelap yang tidak perlu.
+- Di bawah 620px sidebar dan topbar disembunyikan. Semua tab memakai `homeTop` (logo daun, nama bimbel, ilustrasi guru, tombol keluar merah) dan `homeDoa` (doa harian + ganti kata sandi). Logo di kepala adalah jalan pulang ke menu. Di atas 620px semua ini `display:none`; layar lebar tidak berubah (dibuktikan md5 `render-screens.mjs`).
+- **Menu utama** (`homeMenu`, hanya di view `dashboard`): sapaan Assalamu'alaikum, tanggal, slogan, daun samar sebagai latar, dan empat kartu. Guru: Ruang kelas (melintang), Ringkasan, Data siswa, Kurikulum (melintang). Pemilik: Tim pengajar menggantikan Ruang kelas.
+- **Navbar bawah** (`homeNav`): Ringkasan · Siswa · Ruang kelas · Kurikulum, dengan urutan dan nama sesuai permintaan pengguna. Untuk pemilik, posisi ketiga diisi Tim pengajar. Ikon Ringkasan sengaja rumah karena tujuannya menu. Tes render mengunci urutan ini.
+- **Slogan**: 8 kalimat amanah → nilai → kepercayaan, berganti per potongan 30 menit dari nomor potongannya (bukan `Math.random()`); timer belum ada, jadi slogan berganti saat layar digambar ulang. **Doa**: 7 doa `[arab, arti, sumber]`, berganti sekali sehari dengan rumus `reminderOfTheDay`. Teks doa sudah diperiksa dan diterima pengguna; jangan disunting tanpa diminta.
+- Pita pengingat harian (`.reminder`) disembunyikan di HP; di layar lebar tetap tampil.
+- Label kecil di atas judul tab (`.page-heading .eyebrow`) di HP 10,5px emas; sebelumnya 8px abu-abu dan hampir tak terbaca.
+- **Layar login di HP**: logo daun + nama bimbel, daun besar samar di belakang judul, satu permukaan gelap tanpa panel hijau, "Kemajuan berarti." dalam serif emas. Teks login (berlaku juga di layar lebar): judul form "Assalamu'alaikum", "Masuk dengan akun guru atau pemilik.", tombol "Masuk →", tautan "Guru baru? Aktifkan akun yang sudah didaftarkan pemilik". Label "RUANG TUMBUH BERSAMA" dan "RUMAH BELAJAR / 02" dihapus. Daun login dipotong di `.login` (sumbu x saja); kalau `.login-story` yang memotong, daun terpenggal.
+- Memeriksa tampilan HP tanpa login: skrip sekali pakai `scripts/.tmp-*.mjs` menyusun `homeMenu`/`homeTop`/`homeDoa`/`homeNav` dengan `style.css` sungguhan ke `public/.tmp-*.html`, lalu dibuka lewat dev server (halaman `file://` tidak bisa diubah lebar viewport-nya di pane). Layar login bisa dipotret Playwright dari konteks yang belum login tanpa memutus sesi pengguna di pane. Hapus berkas sementaranya sesudah dipakai.
+
+## Siswa dan Tes Diagnostik, 13 Sep 2026
+- **Tab Siswa hanya tentang anak**, tanpa jadwal atau kelas: satu kelompok "Profil siswa" untuk semua anak aktif, ditambah kelompok non-aktif & lulus. Subjudul, hitungan "N siswa · N sesi jadwal", pengelompokan per sesi, dan tombol Ubah dihapus.
+- **＋ Tambah siswa** (modal "Siswa baru", tombol "Simpan siswa"): nama anak*, nama panggilan, sapaan orang tua*, nomor WhatsApp, tanggal lahir*, kelas formal*. Siswa baru tersimpan di **Level 1 sementara**, karena level awal NOT NULL dan trigger langsung membuat baris `student_competencies`. **Minat / hobi tidak lagi ditanyakan** di form mana pun; kolomnya tetap ada dan dikirim sebagai `''`.
+- **Usia tidak disimpan**, dihitung dari tanggal lahir (`ageText` di `state.js`) supaya tidak basi. **Kelas formal disimpan bersama tahun ajarannya** (`school_year`, berganti 1 Juli WIB, `schoolYearOf`). Saat profil disimpan dengan kelas yang sama, tahun ajaran lama dipertahankan.
+- **Tes Diagnostik** adalah modal terpisah dengan tombolnya sendiri, dan bisa dibuka kapan saja. Modal ini hanya menawarkan anak **aktif yang belum dites**. Isinya: hasil diagnostik awal (wajib), catatan gaya belajar, perkiraan fase, dan level awal BI & Matematika, yang terisi dari kelas formal (`gradePhase` → `startPresets`). Anak yang telanjur ikut kelas tetap bisa dites, tapi levelnya terkunci dan hanya catatan yang disimpan.
+- **"Sudah dites" = `diagnostic` tidak kosong.** Tidak ada kolom penanda; karena itu hasil diagnostik wajib di modal tes. Anak aktif yang belum dites diberi tanda oranye "Belum tes diagnostik" (`needsDiagnostic`).
+- Migrasi `20260913010000_student_identity.sql`:
+  - Menambah `nickname`, `birth_date`, `school_grade` (daftar tetap: Belum sekolah, TK A, TK B, SD 1–6), dan `school_year` (`YYYY/YYYY` berurutan).
+  - Aturannya dipusatkan di `check_student_identity(jsonb)` dan dipakai `create_student` serta `update_student_profile`.
+  - Keduanya **mewajibkan** tanggal lahir (tidak di masa depan, tidak lebih dari 20 tahun lalu) dan kelas formal.
+  - Setiap pemanggil `update_student_profile` harus mengirim identitas lengkap.
+- Pemilik ditolak `create_student` oleh trigger `reject_owner_student_insert`, meski fungsinya `security definer`; ada tesnya. Jangan menambah pemeriksaan ganda di fungsi.
