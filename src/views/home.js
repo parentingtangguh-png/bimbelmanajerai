@@ -83,8 +83,8 @@ function navItem(key, ikon, teks) {
   return `<button class="home-nav-item${aktif}" data-view="${key}"${ariaAktif}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ikon}</svg><span>${teks}</span></button>`;
 }
 export function homeNav() {
-  const kedua = state.role === 'owner' ? homeKeys.tim : homeKeys.kelas;
-  return `<nav class="home-nav" aria-label="Pindah layar">${navItem(homeKeys.ringkasan, navIcons.beranda, 'Menu')}${navItem(kedua, navIcons[kedua], labels[kedua])}${navItem(homeKeys.siswa, navIcons[homeKeys.siswa], 'Siswa')}${navItem(homeKeys.kurikulum, navIcons[homeKeys.kurikulum], labels[homeKeys.kurikulum])}</nav>`;
+  const ketiga = state.role === 'owner' ? homeKeys.tim : homeKeys.kelas;
+  return `<nav class="home-nav" aria-label="Pindah layar">${navItem(homeKeys.ringkasan, navIcons.beranda, labels[homeKeys.ringkasan])}${navItem(homeKeys.siswa, navIcons[homeKeys.siswa], 'Siswa')}${navItem(ketiga, navIcons[ketiga], labels[ketiga])}${navItem(homeKeys.kurikulum, navIcons[homeKeys.kurikulum], labels[homeKeys.kurikulum])}</nav>`;
 }
 
 // Isi menu saja. Kepala dan doa dipasang main.js supaya tab lain ikut memakainya.

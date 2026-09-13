@@ -265,6 +265,12 @@ test('navbar HP: empat tujuan, menandai layar yang sedang dibuka, dan ikut peran
   assert.equal(count(guru, 'class="home-nav-item'), 4);
   for (const view of ['dashboard', 'sessions', 'students', 'curriculum'])
     assert.match(guru, new RegExp('data-view="' + view + '"'), view + ' ada di navbar');
+  // Urutan yang diminta pemilik: Ringkasan, Siswa, Ruang kelas, Kurikulum.
+  assert.deepEqual(
+    [...guru.matchAll(/data-view="(\w+)"/g)].map(m => m[1]),
+    ['dashboard', 'students', 'sessions', 'curriculum']
+  );
+  assert.match(guru, />Ringkasan<\/span>/, 'tujuan pertama bernama Ringkasan, bukan Menu');
   // Layar yang sedang dibuka ditandai, sekali saja.
   assert.equal(count(guru, 'aria-current="page"'), 1);
   assert.match(guru, /class="home-nav-item aktif" data-view="sessions"/);
