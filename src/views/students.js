@@ -167,7 +167,8 @@ function gradeField(s) {
 }
 function profileForm(s, edit, owner, canCreate) {
   const grid = `<div class="form-grid">${field('Nama anak', 'name', 'text', s.name, 'required maxlength="120"')}${field('Nama panggilan', 'nickname', 'text', s.nickname, 'maxlength="60" placeholder="Boleh dikosongkan"')}${field('Sapaan orang tua', 'parent_name', 'text', s.parent_name, 'required maxlength="120"')}${field('Nomor WhatsApp', 'phone', 'tel', s.phone)}${birthField(s)}${gradeField(s)}</div>`;
-  const notes = area('Catatan gaya belajar', 'learning_notes', s.learning_notes, 'maxlength="3000"');
+  // Catatan gaya belajar tidak lagi ditanyakan (keputusan pemilik 13 Sep 2026); isinya tetap tersimpan.
+  const notes = '';
   const hint =
     edit && owner
       ? '<p class="muted">Profil ini hanya dapat dibaca. Perubahan dilakukan oleh guru pendamping.</p>'

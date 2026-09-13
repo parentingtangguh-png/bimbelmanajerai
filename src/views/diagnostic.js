@@ -164,6 +164,6 @@ export function diagnosticResultStep(s, run, date = new Date().toLocaleDateStrin
     answers: run.answers,
     note: ''
   });
-  const notes = `${area('Catatan tes (opsional)', 'note', run.note || '', 'maxlength="1500" placeholder="Misalnya: membaca kalimat masih mengeja."')}${area('Catatan gaya belajar', 'learning_notes', s.learning_notes || '', 'maxlength="3000"')}`;
+  const notes = `${area('Catatan tes (opsional)', 'note', run.note || '', 'maxlength="1500" placeholder="Misalnya: membaca kalimat masih mengeja."')}`;
   return `<form data-form="diagnostic" data-id="${s.id}"><div class="diagnostic-result">${verdict}${notices}</div>${focusBlock}<h4>Ringkasan yang disimpan</h4><pre class="diagnostic-summary">${h(preview)}</pre>${notes}<div class="button-row"><button type="button" class="secondary" data-action="diagnostic-back">← Ubah nilai</button><button class="primary">${run.revision ? 'Simpan revisi' : 'Simpan hasil tes'}</button></div></form>`;
 }

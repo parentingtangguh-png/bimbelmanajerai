@@ -725,7 +725,7 @@ document.addEventListener('submit', async e => {
               ? before.school_year
               : schoolYearOf(),
           diagnostic: v.diagnostic ?? before?.diagnostic ?? '',
-          learning_notes: v.learning_notes ?? before?.learning_notes ?? '',
+          learning_notes: before?.learning_notes ?? '',
           reading_target: phaseEnd(v.reading_baseline || 1),
           math_target: phaseEnd(v.math_baseline || 1)
         };
@@ -800,7 +800,7 @@ document.addEventListener('submit', async e => {
             p_results: diagnosticPayload(run.level, run.answers),
             p_summary: summary,
             p_note: v.note || '',
-            p_learning_notes: v.learning_notes || ''
+            p_learning_notes: s.learning_notes || ''
           })
         );
         dropDraft(s.id);

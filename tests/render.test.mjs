@@ -367,7 +367,7 @@ test('tambah siswa hanya identitas; tes diagnostik memuat catatan dan level awal
     'tidak ikut sesi kelas'
   ])
     assert.ok(!profil.includes(lama), lama + ' sudah dihapus');
-  assert.match(profil, /name="learning_notes"/);
+  assert.ok(!profil.includes('name="learning_notes"'), 'catatan gaya belajar tidak ditanyakan');
   assert.ok(
     profil.includes(
       '<h3>Level saat ini</h3><p><strong>Level 1 — Aku Siap Belajar</strong></p><p class="muted">Anak mulai nyaman.</p>'
@@ -458,6 +458,7 @@ test('tes diagnostik: delapan kartu satu level, lalu hasil lulus atau belum lulu
   assert.match(hasil, /Level awal: 2/);
   assert.match(hasil, /Karakter: ✓/);
   assert.match(hasil, /bisa langsung dimasukkan ke sesi kelas/);
+  assert.ok(!hasil.includes('learning_notes') && !hasil.includes('gaya belajar'), 'catatan gaya belajar tidak ditanyakan');
   assert.match(hasil, /data-action="diagnostic-back">← Ubah nilai</);
   assert.match(hasil, />Simpan hasil tes</);
 
