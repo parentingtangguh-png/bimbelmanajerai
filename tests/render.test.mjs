@@ -356,6 +356,18 @@ test('tes diagnostik: pilih anak dan titik mulai bebas, dengan saran dari kelas 
   assert.match(tes, /<option value="4" selected>Level 4[^<]*\(saran\)/);
   for (const l of [1, 2, 3, 4]) assert.match(tes, new RegExp('<option value="' + l + '"'));
   assert.match(tes, /Guru bebas memilih level lain/);
+  // Deskriptor level ada di bawah pilihan titik mulai, di atas Cara tes; hanya milik level terpilih yang tampil.
+  assert.ok(
+    tes.indexOf('name="start"') < tes.indexOf('data-level-desc'),
+    'deskriptor di bawah pilihan level'
+  );
+  assert.ok(tes.indexOf('data-level-desc') < tes.indexOf('diagnostic-rules'), 'deskriptor di atas Cara tes');
+  assert.match(tes, /data-level-desc="1" hidden>Anak mulai nyaman.</);
+  assert.equal(count(tes, 'data-level-desc='), 2, 'satu per level yang ada di kurikulum');
+  assert.ok(
+    !/data-level-desc="d" >|data-level-desc="d"s*>/.test(tes),
+    'level terpilih (4) tidak ada di contoh, jadi tidak ada yang tampil'
+  );
   assert.ok(!tes.includes('name="reading_baseline"'), 'level awal tidak lagi dipilih manual');
 
   // Anak yang telanjur ikut kelas tetap bisa dites, tapi diberi tahu levelnya terkunci.

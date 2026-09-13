@@ -132,3 +132,12 @@
   border-radius: 10px;
   background: rgba(127, 127, 127, 0.12);
 }
+.diagnostic-level-desc {
+  margin: -4px 0 12px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--green);
+  border-radius: 0 8px 8px 0;
+  background: rgba(127, 127, 127, 0.1);
+  font-size: 13px;
+  line-height: 1.55;
+}

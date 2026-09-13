@@ -58,7 +58,16 @@ export function diagnosticStart(studentId = '') {
   const lock = hasClass(chosen.id)
     ? `<p class="muted">${h(chosen.name)} sudah pernah ikut kelas, jadi level awalnya terkunci. Hasil tes tetap tersimpan sebagai catatan.</p>`
     : '';
-  return `<form data-form="diagnostic-start">${kids}${info}${mulai}${diagnosticRules()}${lock}<button class="primary full">Mulai tes →</button></form>`;
+  return `<form data-form="diagnostic-start">${kids}${info}${mulai}${levelDescriptors(saran)}${diagnosticRules()}${lock}<button class="primary full">Mulai tes →</button></form>`;
+}
+
+// Deskriptor keempat level disusun sekaligus; main.js hanya menampilkan milik level yang dipilih.
+export function levelDescriptors(chosen) {
+  return DIAGNOSTIC_LEVELS.map(l => {
+    const lv = state.curriculumLevels.find(x => x.level === l);
+    if (!lv) return '';
+    return `<p class="diagnostic-level-desc" data-level-desc="${l}" ${l === chosen ? '' : 'hidden'}>${h(lv.description)}</p>`;
+  }).join('');
 }
 
 function diagnosticRules() {

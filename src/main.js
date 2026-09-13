@@ -562,6 +562,11 @@ document.addEventListener('change', e => {
   const form = e.target.form;
   if (form?.dataset.form === 'diagnostic-start' && e.target.name === 'student')
     return diagnosticForm(e.target.value);
+  if (form?.dataset.form === 'diagnostic-start' && e.target.name === 'start') {
+    for (const el of form.querySelectorAll('[data-level-desc]'))
+      el.hidden = el.dataset.levelDesc !== e.target.value;
+    return;
+  }
   // Form siswa baru tidak punya level, jadi usia diperbarui sebelum pemeriksaan level di bawah.
   if (e.target.name === 'birth_date' && form?.dataset.form === 'student') {
     const age = ageText(e.target.value);
