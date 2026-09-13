@@ -36,12 +36,14 @@ import {
   phaseEnd,
   phasePct,
   startPresets,
+  schoolYearOf,
+  ageText,
   levelOptions
 } from './state.js';
 import { field, select, area, empty, notify, heading, meter, modal } from './ui.js';
 import { curriculumView } from './views/curriculum.js';
 import { sessionsView, newSession } from './views/sessions.js';
-import { studentsView, levelMeaning, studentForm, scheduleForm } from './views/students.js';
+import { studentsView, levelMeaning, studentForm, scheduleForm, diagnosticForm } from './views/students.js';
 import { dashboard } from './views/dashboard.js';
 import { homeMenu, homeTop, homeDoa, homeNav, leafArt } from './views/home.js';
 import { teamView } from './views/team.js';
@@ -407,6 +409,10 @@ document.addEventListener('click', async e => {
       if (state.role !== 'teacher') return notify('Siswa baru ditambahkan oleh guru.', true);
       return studentForm();
     }
+    if (action === 'diagnostic-test') {
+      if (state.role !== 'teacher') return notify('Tes diagnostik dilakukan oleh guru.', true);
+      return diagnosticForm();
+    }
     if (action === 'new-session') return newSession();
     if (action === 'new-schedule') return scheduleForm();
     if (action === 'edit-schedule') return scheduleForm(state.schedules.find(x => x.id === id));
@@ -577,7 +583,15 @@ document.addEventListener('click', async e => {
 // Student form: a grade preset fills the starting levels, and the meaning text follows the choice.
 document.addEventListener('change', e => {
   const form = e.target.form;
-  if (form?.dataset.form !== 'student' || !form.elements.reading_baseline) return;
+  if (form?.dataset.form === 'diagnostic' && e.target.name === 'student')
+    return diagnosticForm(e.target.value);
+  // Form siswa baru tidak punya level, jadi usia diperbarui sebelum pemeriksaan level di bawah.
+  if (e.target.name === 'birth_date' && form?.dataset.form === 'student') {
+    const age = ageText(e.target.value);
+    form.querySelector('[data-age]').textContent = age ? 'Usia ' + age : 'Usia dihitung otomatis';
+    return;
+  }
+  if (!['student', 'diagnostic'].includes(form?.dataset.form) || !form.elements.reading_baseline) return;
   const els = form.elements;
   const levels = ['reading_baseline', 'math_baseline'];
   if (e.target.name === 'phase' && startPresets[e.target.value])
@@ -648,15 +662,26 @@ document.addEventListener('submit', async e => {
     }
     switch (form.dataset.form) {
       case 'student': {
+        const before = state.students.find(x => x.id === id);
+        // Minat tidak lagi ditanyakan, tapi kolomnya NOT NULL dan create_student tidak mengubah null
+        // menjadi teks kosong, jadi nilai lama (atau '') selalu dikirim.
         const payload = {
           name: v.name.trim(),
           parent_name: v.parent_name.trim(),
           phone: v.phone,
-          interest: v.interest,
-          diagnostic: v.diagnostic,
-          learning_notes: v.learning_notes,
-          reading_target: phaseEnd(v.reading_baseline),
-          math_target: phaseEnd(v.math_baseline)
+          interest: before?.interest || '',
+          nickname: (v.nickname || '').trim(),
+          birth_date: v.birth_date,
+          school_grade: v.school_grade,
+          // Tahun ajaran hanya diperbarui kalau kelasnya berubah; kalau tidak, tahun lamanya tetap berlaku.
+          school_year:
+            before && before.school_grade === v.school_grade && before.school_year
+              ? before.school_year
+              : schoolYearOf(),
+          diagnostic: v.diagnostic ?? before?.diagnostic ?? '',
+          learning_notes: v.learning_notes ?? before?.learning_notes ?? '',
+          reading_target: phaseEnd(v.reading_baseline || 1),
+          math_target: phaseEnd(v.math_baseline || 1)
         };
         if (id) {
           const { name, parent_name, phone, interest, diagnostic, learning_notes } = payload;
@@ -668,7 +693,6 @@ document.addEventListener('submit', async e => {
               p_payload: { name, parent_name, phone, interest, diagnostic, learning_notes }
             })
           );
-          const before = state.students.find(x => x.id === id);
           if (
             v.reading_baseline &&
             (Number(v.reading_baseline) !== before?.reading_baseline ||
@@ -682,12 +706,42 @@ document.addEventListener('submit', async e => {
               })
             );
         } else {
-          Object.assign(payload, {
-            reading_baseline: Number(v.reading_baseline),
-            math_baseline: Number(v.math_baseline)
-          });
+          // Level awal wajib ada saat siswa dibuat. Level 1 hanya sementara sampai guru menjalankan Tes
+          // Diagnostik, yang menggantinya lewat correct_student_baseline.
+          Object.assign(payload, { reading_baseline: 1, math_baseline: 1 });
           await result(db.rpc('create_student', { p_payload: payload }));
         }
+        break;
+      }
+      case 'diagnostic': {
+        const s = state.students.find(x => x.id === v.student);
+        if (!s) throw new Error('Pilih anak yang dites.');
+        await result(
+          db.rpc('update_student_profile', {
+            p_student: s.id,
+            p_payload: {
+              name: s.name,
+              parent_name: s.parent_name,
+              phone: s.phone,
+              interest: s.interest || '',
+              nickname: s.nickname || '',
+              birth_date: s.birth_date,
+              school_grade: s.school_grade,
+              school_year: s.school_year,
+              diagnostic: v.diagnostic.trim(),
+              learning_notes: v.learning_notes
+            }
+          })
+        );
+        // Pilihan level yang terkunci tidak ikut terkirim; anak yang sudah ikut kelas hanya menyimpan catatan.
+        if (v.reading_baseline && !state.records.some(r => r.student_id === s.id))
+          await result(
+            db.rpc('correct_student_baseline', {
+              p_student: s.id,
+              p_reading: Number(v.reading_baseline),
+              p_math: Number(v.math_baseline)
+            })
+          );
         break;
       }
       case 'session': {

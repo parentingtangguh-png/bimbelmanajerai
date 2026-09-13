@@ -252,6 +252,39 @@ export const phaseEnd = level => Math.min(16, Math.ceil(Math.max(1, Number(level
 export const phasePct = level => (((Math.max(1, Number(level) || 1) - 1) % 4) + 1) * 25;
 // Suggested starting level per school grade; levels are competency positions, so teachers may adjust.
 export const startPresets = { fondasi: 1, sd1: 5, sd2: 7, sd3: 9, sd4: 11, sd5: 13, sd6: 15 };
+// Kelas formal anak di sekolahnya. Urutan dan ejaannya sama dengan check di database.
+export const schoolGrades = ['Belum sekolah', 'TK A', 'TK B', 'SD 1', 'SD 2', 'SD 3', 'SD 4', 'SD 5', 'SD 6'];
+// Kelas formal menunjuk perkiraan titik awal di Tes Diagnostik, supaya guru tidak memilih dua kali.
+export const gradePhase = grade =>
+  /^SD [1-6]$/.test(grade)
+    ? 'sd' + grade.slice(3)
+    : schoolGrades.slice(0, 3).includes(grade)
+      ? 'fondasi'
+      : '';
+// Tahun ajaran berganti setiap Juli, dihitung di zona waktu bimbel.
+export function schoolYearOf(now = new Date()) {
+  const [y, m] = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Jakarta',
+    year: 'numeric',
+    month: 'numeric'
+  })
+    .formatToParts(now)
+    .filter(x => x.type !== 'literal')
+    .map(x => Number(x.value));
+  return m >= 7 ? `${y}/${y + 1}` : `${y - 1}/${y}`;
+}
+// Usia tidak disimpan: dihitung dari tanggal lahir supaya tidak pernah basi.
+export function ageText(birth, now = new Date()) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(birth || ''));
+  if (!m) return '';
+  const [by, bm, bd] = m.slice(1).map(Number);
+  let months = (now.getFullYear() - by) * 12 + (now.getMonth() + 1 - bm);
+  if (now.getDate() < bd) months--;
+  if (months < 0) return '';
+  const years = Math.floor(months / 12);
+  const rest = months % 12;
+  return years ? `${years} tahun${rest ? ` ${rest} bulan` : ''}` : `${rest} bulan`;
+}
 export const levelOptions = [...Array(16)].map((_, i) => [
   String(i + 1),
   `Level ${i + 1} · ${phaseOf(i + 1)}`

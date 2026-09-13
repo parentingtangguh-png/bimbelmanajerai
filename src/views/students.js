@@ -11,16 +11,27 @@ import {
   phaseOf,
   phaseShort,
   phasePct,
-  levelOptions
+  levelOptions,
+  startPresets,
+  schoolGrades,
+  gradePhase,
+  schoolYearOf,
+  ageText
 } from '../state.js';
 import { field, select, area, empty, heading, meter, modal } from '../ui.js';
 import { escapeHtml as h, progress, minutesBetween, durationPattern } from '../domain.js';
+// "Sudah dites" berarti hasil diagnostik terisi: kolom itu wajib di modal Tes Diagnostik, jadi tidak
+// butuh kolom penanda baru di database.
+export const needsDiagnostic = s => s.status === 'Aktif' && !String(s.diagnostic || '').trim();
 export function studentRow(s) {
   const bi = areaProgress(s, ['listening', 'speaking', 'reading', 'writing']) || {
     current: s.reading_level,
     target: s.reading_target
   };
-  const who = `<span class="avatar pastel">${h(s.name[0])}</span><div class="student-info"><strong>${h(s.name)}</strong><small>${h(s.interest || 'Minat belum diisi')}</small></div>`;
+  // Minat tidak lagi ditanyakan. Yang ditandai adalah anak aktif yang belum dites: level awalnya masih
+  // Level 1 sementara, dan terkunci selamanya begitu anak ikut kelas pertama.
+  const note = needsDiagnostic(s) ? '<small class="belum-tes">Belum tes diagnostik</small>' : '';
+  const who = `<span class="avatar pastel">${h(s.name[0])}</span><div class="student-info"><strong>${h(s.name)}</strong>${note}</div>`;
   const bar = `<div class="mini-progress"><small>Bahasa Indonesia <b>Level ${bi.current}</b> · ${phaseShort(bi.current)}</small><progress value="${phasePct(bi.current)}" max="100"></progress></div>`;
   return `<button class="student-row" data-action="student" data-id="${s.id}">${who}${bar}<span class="row-arrow">→</span></button>`;
 }
@@ -64,69 +75,36 @@ export function ownerStudentsView() {
 
 // The same search box tops both versions of the screen; only the tally beside it differs.
 function searchToolbar(tally) {
-  return `<div class="toolbar"><input id="student-search" type="search" placeholder="Cari nama siswa…" aria-label="Cari siswa" value="${h(state.filter)}"><span>${tally}</span></div>`;
+  const count = tally ? `<span>${tally}</span>` : '';
+  return `<div class="toolbar"><input id="student-search" type="search" placeholder="Cari nama siswa…" aria-label="Cari siswa" value="${h(state.filter)}">${count}</div>`;
 }
 export function teacherStudentsView() {
   const list = state.students.filter(s => s.name.toLowerCase().includes(state.filter.toLowerCase()));
-  const searching = !!state.filter.trim();
-  // Only active children belong to schedule groups; non-active and graduated ones get their own group.
+  // Tab Siswa hanya tentang anak, bukan jadwal: semua anak aktif berada dalam satu kelompok, dan
+  // anak non-aktif serta lulus di kelompoknya sendiri. Pengaturan sesi jadwal tidak ada di sini.
   const active = list.filter(s => s.status === 'Aktif');
   const inactive = list.filter(s => s.status !== 'Aktif');
-  const scheduled = new Set(
-    state.scheduleStudents
-      .filter(x => state.schedules.some(sc => sc.id === x.schedule_id))
-      .map(x => x.student_id)
-  );
-  const group = (title, meta, action, students, extra = '') =>
-    `<section class="panel schedule-group ${extra}"><div class="panel-heading"><div><h2>${title}</h2><p>${meta}</p></div>${action}</div>${students.length ? students.map(studentRow).join('') : '<p class="muted">Belum ada anak di sesi ini. Tekan Ubah untuk memilih anak.</p>'}</section>`;
-  const sections = state.schedules
-    .map(sc => {
-      const members = scheduleMembers(sc.id);
-      const kids = active.filter(s => members.has(s.id));
-      const activeCount = state.students.filter(s => s.status === 'Aktif' && members.has(s.id)).length;
-      if (searching && !kids.length) return '';
-      const mins = minutesBetween(sc.start_time, sc.end_time);
-      return group(
-        h(sc.name),
-        `${timeLabel(sc)} · ${mins} menit · pola ${durationPattern(mins)} menit · ${activeCount} anak`,
-        `<button class="secondary" data-action="edit-schedule" data-id="${sc.id}">Ubah</button>`,
-        kids
-      );
-    })
-    .join('');
-  const loose = active.filter(s => !scheduled.has(s.id));
+  const group = (title, meta, students, extra = '') => {
+    const sub = meta ? `<p>${meta}</p>` : '';
+    return `<section class="panel schedule-group ${extra}"><div class="panel-heading"><div><h2>${title}</h2>${sub}</div></div>${students.map(studentRow).join('')}</section>`;
+  };
+  const activeSection = active.length ? group('Profil siswa', '', active) : '';
   const inactiveSection = inactive.length
     ? group(
         'Siswa non-aktif &amp; lulus',
         `${inactive.length} anak · tidak ikut sesi kelas; riwayat belajarnya tetap tersimpan`,
-        '',
         inactive,
         'unscheduled'
       )
     : '';
-  const looseSection = loose.length
-    ? group(
-        'Belum masuk sesi',
-        `${loose.length} anak · masukkan ke sesi jadwal agar mudah dipilih saat membuka kelas`,
-        '',
-        loose,
-        'unscheduled'
-      )
-    : '';
-  // Creating a schedule lives on Ruang kelas; this screen only assigns children to one.
-  const buttons = '<button class="primary" data-action="new-student">＋ Tambah siswa</button>';
-  const head = heading(
-    'SETIAP ANAK UNIK',
-    'Kenali, lalu dampingi.',
-    'Siswa dikelompokkan menurut sesi jadwal rutin Anda.',
-    buttons
-  );
-  const tally = `${state.students.length} siswa · ${state.schedules.length} sesi jadwal`;
+  // Tes Diagnostik baru berupa tombol: fungsinya belum ditentukan, jadi belum ada penangannya di main.js.
+  const buttons =
+    '<div class="button-row stack"><button class="primary" data-action="new-student">＋ Tambah siswa</button><button class="secondary" data-action="diagnostic-test">Tes Diagnostik</button></div>';
+  const head = heading('SETIAP ANAK UNIK', 'Kenali, lalu dampingi.', '', buttons);
   const body = state.students.length
-    ? sections + looseSection + inactiveSection ||
-      empty('Tidak ditemukan', 'Tidak ada siswa dengan nama itu.')
+    ? activeSection + inactiveSection || empty('Tidak ditemukan', 'Tidak ada siswa dengan nama itu.')
     : empty('Belum ada siswa', 'Tambahkan siswa pertama Anda untuk mulai mendampingi belajarnya.');
-  return `${head}${searchToolbar(tally)}${body}`;
+  return `${head}${searchToolbar('')}${body}`;
 }
 export function studentsView() {
   return state.role === 'owner' ? ownerStudentsView() : teacherStudentsView();
@@ -163,7 +141,7 @@ export function levelMeaning(kind, level) {
     ? `${phaseOf(n)} · Matematika: ${clip(c.math)}`
     : `${phaseOf(n)} · Membaca: ${clip(c.reading)} · Menulis: ${clip(c.writing)}`;
 }
-export function levelFields(s, edit, owner) {
+export function levelFields(s, edit, owner, phase = '') {
   const correctable = edit && !owner && !state.records.some(r => r.student_id === s.id);
   const lockBase = edit && !correctable;
   const pick = (label, name, value, kind) =>
@@ -184,7 +162,7 @@ export function levelFields(s, edit, owner) {
     ['sd5', 'SD kelas 5'],
     ['sd6', 'SD kelas 6']
   ];
-  const phasePicker = edit ? '' : select('Perkiraan fase / kelas sekolah', 'phase', phases, '');
+  const phasePicker = edit ? '' : select('Perkiraan fase / kelas sekolah', 'phase', phases, phase);
   const bi = pick(
     baseLabel('Level awal Bahasa Indonesia'),
     'reading_baseline',
@@ -231,14 +209,30 @@ export function studentForm(s = {}) {
 
 // The profile itself. The owner sees the same fields but cannot submit them, so the whole fieldset
 // is disabled rather than the screen being written twice.
+// Usia ditampilkan di bawah tanggal lahir dan diperbarui main.js saat tanggalnya diubah.
+function birthField(s) {
+  const today = new Date().toISOString().slice(0, 10);
+  const age = ageText(s.birth_date);
+  return `<div>${field('Tanggal lahir', 'birth_date', 'date', s.birth_date || '', `required max="${today}"`)}<small class="field-hint" data-age>${age ? 'Usia ' + age : 'Usia dihitung otomatis'}</small></div>`;
+}
+// Kelas formal disimpan bersama tahun ajarannya; anak baru memakai tahun ajaran yang sedang berjalan.
+function gradeField(s) {
+  const options = [['', 'Pilih kelas…'], ...schoolGrades.map(g => [g, g])];
+  const year = s.school_year || schoolYearOf();
+  return `<div>${select('Kelas formal', 'school_grade', options, s.school_grade || '', 'required')}<small class="field-hint">Tahun ajaran ${h(year)}</small></div>`;
+}
 function profileForm(s, edit, owner, canCreate) {
-  const grid = `<div class="form-grid">${field('Nama anak', 'name', 'text', s.name, 'required maxlength="120"')}${field('Sapaan orang tua', 'parent_name', 'text', s.parent_name, 'required maxlength="120"')}${field('Nomor WhatsApp', 'phone', 'tel', s.phone)}${field('Minat / hobi', 'interest', 'text', s.interest, 'required maxlength="300"')}</div>`;
+  const grid = `<div class="form-grid">${field('Nama anak', 'name', 'text', s.name, 'required maxlength="120"')}${field('Nama panggilan', 'nickname', 'text', s.nickname, 'maxlength="60" placeholder="Boleh dikosongkan"')}${field('Sapaan orang tua', 'parent_name', 'text', s.parent_name, 'required maxlength="120"')}${field('Nomor WhatsApp', 'phone', 'tel', s.phone)}${birthField(s)}${gradeField(s)}</div>`;
   const notes = `${area('Hasil diagnostik awal', 'diagnostic', s.diagnostic, 'maxlength="3000"')}${area('Catatan gaya belajar', 'learning_notes', s.learning_notes, 'maxlength="3000"')}`;
   const hint = edit
     ? `<p class="muted">${owner ? 'Profil ini hanya dapat dibaca. Perubahan dilakukan oleh guru pendamping.' : 'Target mengalir otomatis per fase. Lihat kemajuan tiap bidang di bawah.'}</p>`
     : '';
-  const save = canCreate ? '<button class="primary full">Simpan profil siswa</button>' : '';
-  return `<form data-form="student" data-id="${s.id || ''}"><fieldset ${canCreate ? '' : 'disabled'}>${grid}${notes}${levelFields(s, edit, owner)}${hint}</fieldset>${save}</form>`;
+  // Siswa baru cukup identitasnya; catatan dan level awal diisi lewat Tes Diagnostik, kapan saja.
+  const save = canCreate
+    ? `<button class="primary full">${edit ? 'Simpan profil siswa' : 'Simpan siswa'}</button>`
+    : '';
+  const rest = edit ? `${notes}${levelFields(s, edit, owner)}${hint}` : '';
+  return `<form data-form="student" data-id="${s.id || ''}"><fieldset ${canCreate ? '' : 'disabled'}>${grid}${rest}</fieldset>${save}</form>`;
 }
 
 // Everything below the profile, shown only for a child who already exists.
@@ -281,6 +275,44 @@ function evaluationHistory(s) {
       .sort((a, b) => b.finalized_at.localeCompare(a.finalized_at))
       .map(r => historyLine(r))
       .join('') || '<p class="muted">Belum ada evaluasi tersimpan.</p>'
+  );
+}
+// Tes Diagnostik berdiri sendiri dan bisa dibuka kapan saja, tapi hanya untuk anak aktif yang belum
+// dites. Level awal hanya bisa diubah sebelum anak ikut kelas pertama (correct_student_baseline), jadi
+// untuk anak yang telanjur ikut kelas, hasil tesnya tetap tersimpan sementara levelnya terkunci.
+export function diagnosticForm(studentId = '') {
+  const waiting = state.students.filter(needsDiagnostic);
+  if (!waiting.length)
+    return modal(
+      'Tes Diagnostik',
+      state.students.some(x => x.status === 'Aktif')
+        ? empty('Semua anak sudah dites', 'Tes diagnostik hanya untuk anak aktif yang belum pernah dites.')
+        : empty(
+            'Belum ada siswa aktif',
+            'Tambahkan siswa lebih dulu, lalu jalankan tes diagnostiknya kapan saja.'
+          )
+    );
+  const chosen = waiting.find(s => s.id === studentId) || waiting[0];
+  const kids = waiting.map(s => [s.id, s.name]);
+  const who = select('Anak yang dites', 'student', kids, chosen.id, 'required');
+  const notes = `${area('Hasil diagnostik awal', 'diagnostic', chosen.diagnostic, 'required maxlength="3000"')}${area('Catatan gaya belajar', 'learning_notes', chosen.learning_notes, 'maxlength="3000"')}`;
+  const locked = state.records.some(r => r.student_id === chosen.id);
+  modal(
+    'Tes Diagnostik',
+    `<form data-form="diagnostic">${who}${notes}${diagnosticLevels(chosen, locked)}<button class="primary full">Simpan hasil tes</button></form>`
+  );
+}
+function diagnosticLevels(s, locked) {
+  if (locked)
+    return `<p class="muted">${h(s.name)} sudah pernah ikut kelas, jadi level awalnya terkunci. Hasil tes tetap tersimpan sebagai catatan.</p>${levelFields(s, true, false)}`;
+  // Anak yang belum ikut kelas langsung diberi titik awal dari kelas formalnya; guru tinggal mengoreksi.
+  const phase = gradePhase(s.school_grade);
+  const start = phase ? startPresets[phase] : null;
+  return levelFields(
+    start ? { ...s, reading_baseline: start, math_baseline: start } : s,
+    false,
+    false,
+    phase
   );
 }
 export function scheduleForm(sc = {}) {

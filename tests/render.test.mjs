@@ -4,11 +4,19 @@ import { loadSampleState, SESSION } from './fixtures/sample-state.mjs';
 import { state } from '../src/state.js';
 import { sessionsView } from '../src/views/sessions.js';
 import { dashboard } from '../src/views/dashboard.js';
-import { studentsView, scheduleForm } from '../src/views/students.js';
+import { studentsView, scheduleForm, studentForm, diagnosticForm } from '../src/views/students.js';
 import { curriculumView } from '../src/views/curriculum.js';
 import { teamView } from '../src/views/team.js';
 import { homeMenu, homeTop, homeDoa, homeNav } from '../src/views/home.js';
-import { slogans, doas, sloganOfTheMoment, doaOfTheDay } from '../src/state.js';
+import {
+  slogans,
+  doas,
+  sloganOfTheMoment,
+  doaOfTheDay,
+  ageText,
+  schoolYearOf,
+  gradePhase
+} from '../src/state.js';
 
 // The screens are plain functions that return HTML, so they can be checked without a browser, a
 // login, or the preview. These cover the evaluation card in particular, which no browser test can
@@ -110,7 +118,9 @@ test('ringkasan menghitung siswa aktif dan menampilkan barisnya', () => {
   const html = dashboard();
   assert.equal(count(html, 'class="student-row"'), 2);
   assert.match(html, /Alya Contoh/);
-  assert.match(html, /Minat belum diisi/, 'anak tanpa minat tetap terbaca');
+  // Bima belum punya hasil diagnostik, Alya sudah: hanya satu yang ditandai.
+  assert.equal(count(html, 'Belum tes diagnostik'), 1, 'anak yang belum dites ditandai');
+  assert.ok(!html.includes('Minat belum diisi'), 'minat tidak lagi ditanyakan');
 });
 
 test('daftar siswa dan kurikulum tersusun dari data yang sama', () => {
@@ -281,4 +291,72 @@ test('navbar HP: empat tujuan, menandai layar yang sedang dibuka, dan ikut peran
   assert.match(pemilik, /data-view="team"/, 'pemilik mengurus tim');
   assert.ok(!pemilik.includes('data-view="sessions"'), 'pemilik tidak membuka kelas');
   assert.equal(count(pemilik, 'aria-current="page"'), 1);
+});
+
+test('tambah siswa hanya identitas; tes diagnostik memuat catatan dan level awal', () => {
+  loadSampleState();
+  const baru = openModal(studentForm);
+  for (const n of ['name', 'nickname', 'parent_name', 'phone', 'birth_date', 'school_grade'])
+    assert.match(baru, new RegExp('name="' + n + '"'));
+  assert.match(baru, /name="birth_date"[^>]*required/, 'tanggal lahir wajib');
+  assert.match(baru, /name="school_grade"[^>]*required/, 'kelas formal wajib');
+  assert.ok(!/name="nickname"[^>]*required/.test(baru), 'nama panggilan tidak wajib');
+  assert.ok(!baru.includes('name="age"'), 'usia tidak diketik, dihitung');
+  for (const n of ['interest', 'diagnostic', 'learning_notes', 'phase', 'reading_baseline', 'math_baseline'])
+    assert.ok(!baru.includes('name="' + n + '"'), n + ' pindah ke tes diagnostik');
+  assert.match(baru, />Simpan siswa</, 'tambah siswa tidak lagi membuka tes diagnostik');
+
+  // Minat hilang juga dari profil anak yang sudah ada, tapi catatan dan levelnya tetap bisa dibuka.
+  const profil = openModal(studentForm, state.students[0]);
+  assert.ok(!profil.includes('name="interest"'));
+  assert.match(profil, /name="diagnostic"/);
+
+  // Hanya anak yang belum dites yang bisa dipilih: Alya sudah punya hasil diagnostik, Bima belum.
+  state.records = [];
+  const tes = openModal(diagnosticForm);
+  assert.match(tes, /data-form="diagnostic"/);
+  assert.match(tes, /value="anak-2"/);
+  assert.ok(!tes.includes('value="anak-1"'), 'anak yang sudah dites tidak ditawarkan lagi');
+  for (const n of ['diagnostic', 'learning_notes', 'phase', 'reading_baseline', 'math_baseline'])
+    assert.match(tes, new RegExp('name="' + n + '"'), n + ' ada di tes diagnostik');
+  assert.match(tes, /name="diagnostic"[^>]*required/, 'hasil diagnostik menandai anak sudah dites');
+
+  // Tes bisa dijalankan kapan saja: anak yang telanjur ikut kelas tetap bisa dites, levelnya terkunci.
+  state.records = [{ student_id: 'anak-2' }];
+  const terkunci = openModal(diagnosticForm, 'anak-2');
+  assert.match(terkunci, /value="anak-2"/);
+  assert.match(terkunci, /level awalnya terkunci/);
+  assert.match(terkunci, /name="reading_baseline"[^>]*disabled/);
+  assert.ok(!terkunci.includes('name="phase"'), 'tidak ada saran fase untuk level yang terkunci');
+
+  // Kalau semua anak sudah dites, modal menjelaskannya alih-alih menampilkan form kosong.
+  state.students.forEach(x => (x.diagnostic = 'sudah'));
+  assert.match(openModal(diagnosticForm), /Semua anak sudah dites/);
+  state.students = [];
+  assert.match(
+    openModal(diagnosticForm),
+    /Belum ada siswa aktif/,
+    'tanpa siswa bukan berarti semua sudah dites'
+  );
+});
+
+test('usia dihitung dari tanggal lahir, tahun ajaran berganti Juli, kelas formal mengisi titik awal', () => {
+  const hari = new Date(2026, 8, 13); // 13 September 2026
+  assert.equal(ageText('2020-05-10', hari), '6 tahun 4 bulan');
+  assert.equal(ageText('2020-09-14', hari), '5 tahun 11 bulan', 'belum ulang tahun bulan ini');
+  assert.equal(ageText('2026-03-13', hari), '6 bulan');
+  assert.equal(ageText('', hari), '');
+  assert.equal(ageText('2027-01-01', hari), '', 'tanggal di masa depan tidak menghasilkan usia');
+  assert.equal(schoolYearOf(new Date('2026-07-01T00:00:00+07:00')), '2026/2027');
+  assert.equal(schoolYearOf(new Date('2026-06-30T12:00:00+07:00')), '2025/2026');
+  assert.equal(gradePhase('SD 3'), 'sd3');
+  assert.equal(gradePhase('TK A'), 'fondasi');
+  assert.equal(gradePhase(''), '');
+
+  // Bima (SD 2) belum dites dan belum ikut kelas: Tes Diagnostik langsung menyarankan Level 7.
+  loadSampleState();
+  state.records = [];
+  const tes = openModal(diagnosticForm, 'anak-2');
+  assert.match(tes, /<option value="sd2" selected/);
+  assert.match(tes, /name="reading_baseline"[\s\S]*?<option value="7" selected/);
 });

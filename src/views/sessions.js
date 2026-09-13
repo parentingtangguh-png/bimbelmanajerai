@@ -238,7 +238,7 @@ function indicatorCheck(text, number, key, saved, before, disabled) {
 // The four pieces of a child card. Splitting them out is what lets one part be changed without
 // rereading the whole screen; the HTML is exactly what the single template produced before.
 function cardHeading(s, r, targetText, locked) {
-  return `<article class="panel session-card"><div class="panel-heading"><div><h2>${h(s.name)} <small>· Kelompok ${r.group_no || 1}</small></h2><p>${h(s.interest || 'Minat belum diisi')} · ${h(targetText)}</p></div><span class="badge ${locked ? 'green' : 'amber'}">${locked ? 'Evaluasi tersimpan' : 'Sesi berlangsung'}</span></div>`;
+  return `<article class="panel session-card"><div class="panel-heading"><div><h2>${h(s.name)} <small>· Kelompok ${r.group_no || 1}</small></h2><p>${h(targetText)}</p></div><span class="badge ${locked ? 'green' : 'amber'}">${locked ? 'Evaluasi tersimpan' : 'Sesi berlangsung'}</span></div>`;
 }
 
 function attendanceForm(r, locked) {

@@ -319,15 +319,30 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   assert.equal((await as(teacher,'select anecdote from session_students where id=$1',[a.rid])).rows[0].anecdote,'Catatan rahasia guru A');
   assert.equal((await as(teacher,'select count(*)::int as n from schedule_students where schedule_id=$1',[scheduleA])).rows[0].n,1);
  });
+ await t.test('guru membuat siswa dengan identitas lengkap; tanggal lahir dan kelas formal wajib',async()=>{
+  const baru=(extra={})=>JSON.stringify({name:'Hana',parent_name:'Bunda Hana',phone:'',reading_baseline:1,reading_target:4,math_baseline:1,math_target:4,nickname:'Fajar',birth_date:'2019-03-14',school_grade:'SD 1',school_year:'2026/2027',...extra});
+  const id=(await as(teacher,'select create_student($1::jsonb) as id',[baru()])).rows[0].id;
+  const s=(await as(teacher,'select * from students where id=$1',[id])).rows[0];
+  assert.deepEqual([s.nickname,s.birth_date.toISOString().slice(0,10),s.school_grade,s.school_year,s.interest],['Fajar','2019-03-14','SD 1','2026/2027','']);
+  assert.equal((await as(teacher,'select count(*)::int n from assignments where student_id=$1 and teacher_id=$2',[id,teacher])).rows[0].n,1);
+  await assert.rejects(as(teacher,'select create_student($1::jsonb)',[baru({birth_date:null})]),/Tanggal lahir wajib/);
+  await assert.rejects(as(teacher,'select create_student($1::jsonb)',[baru({birth_date:'2099-01-01'})]),/tidak masuk akal/);
+  await assert.rejects(as(teacher,'select create_student($1::jsonb)',[baru({school_grade:''})]),/Kelas formal/);
+  await assert.rejects(as(teacher,'select create_student($1::jsonb)',[baru({school_year:'2026'})]),/Tahun ajaran/);
+ });
  await t.test('guru dapat mengubah profil umum siswanya sendiri saja',async()=>{
   const kid=randomUUID();
   await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Fajar','Bunda Fajar',1,1,5,1,1,5)`,[kid]);
   await admin('insert into assignments values($1,$2)',[kid,teacher]);
-  const profile=(extra={})=>JSON.stringify({name:'Fajar Nugraha',parent_name:'Bunda Rina',phone:'0812-3456-7890',interest:'Robot',diagnostic:'Mengenal huruf',learning_notes:'Visual',...extra});
+  const profile=(extra={})=>JSON.stringify({name:'Fajar Nugraha',parent_name:'Bunda Rina',phone:'0812-3456-7890',interest:'Robot',diagnostic:'Mengenal huruf',learning_notes:'Visual',nickname:'Fajar',birth_date:'2019-03-14',school_grade:'SD 1',school_year:'2026/2027',...extra});
   await as(teacher,'select update_student_profile($1,$2::jsonb)',[kid,profile({reading_target:16,reading_level:9,reading_baseline:5})]);
   const s=(await as(teacher,'select * from students where id=$1',[kid])).rows[0];
   assert.deepEqual([s.name,s.parent_name,s.phone,s.interest,s.diagnostic,s.learning_notes],['Fajar Nugraha','Bunda Rina','0812-3456-7890','Robot','Mengenal huruf','Visual']);
   assert.deepEqual([s.status,s.reading_target,s.reading_level,s.reading_baseline],['Aktif',4,1,1]);
+  assert.deepEqual([s.nickname,s.birth_date.toISOString().slice(0,10),s.school_grade,s.school_year],['Fajar','2019-03-14','SD 1','2026/2027']);
+  await assert.rejects(as(teacher,'select update_student_profile($1,$2::jsonb)',[kid,profile({birth_date:''})]),/Tanggal lahir wajib/);
+  await assert.rejects(as(teacher,'select update_student_profile($1,$2::jsonb)',[kid,profile({school_grade:'Kelas 7'})]),/Kelas formal/);
+  await assert.rejects(as(teacher,'select update_student_profile($1,$2::jsonb)',[kid,profile({school_year:'2026/2028'})]),/Tahun ajaran/);
   await assert.rejects(as(stranger,'select update_student_profile($1,$2::jsonb)',[kid,profile({name:'Diambil alih'})]),/Akses ditolak/);
   await assert.rejects(as(teacher,'select update_student_profile($1,$2::jsonb)',[kid,profile({name:'  '})]),/Nama anak/);
   await assert.rejects(as(teacher,'select update_student_profile($1,$2::jsonb)',[kid,profile({phone:'<script>'})]),/Nomor WhatsApp/);
@@ -344,7 +359,7 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   const core=(await as(teacher,'select reading_target,math_target from students where id=$1',[kid])).rows[0];
   assert.deepEqual([core.reading_target,core.math_target],[4,4]);
   await assert.rejects(as(teacher,'select set_student_targets($1,$2::jsonb)',[kid,JSON.stringify({reading:9})]),/does not exist/);
-  const profile=(extra={})=>JSON.stringify({name:'Gita',parent_name:'Bunda Gita',...extra});
+  const profile=(extra={})=>JSON.stringify({name:'Gita',parent_name:'Bunda Gita',birth_date:'2018-07-01',school_grade:'SD 2',school_year:'2026/2027',...extra});
   await as(teacher,'select update_student_profile($1,$2::jsonb)',[kid,profile({status:'Non-Aktif'})]);
   assert.equal((await as(teacher,'select status from students where id=$1',[kid])).rows[0].status,'Non-Aktif');
   await assert.rejects(as(teacher,'select update_student_profile($1,$2::jsonb)',[kid,profile({status:'Lulus'})]),/kelulusan/);
@@ -400,10 +415,11 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   await assert.rejects(as(owner,'select set_student_active($1,false)',[kid]),/Akses ditolak/);
   await create(teacher,kid);
   await assert.rejects(as(teacher,'select set_student_active($1,false)',[kid]),/sesi yang masih terbuka/);
-  await assert.rejects(as(teacher,'select update_student_profile($1,$2::jsonb)',[kid,JSON.stringify({name:'Indra',parent_name:'Bunda Indra',status:'Non-Aktif'})]),/sesi yang masih terbuka/);
+  await assert.rejects(as(teacher,'select update_student_profile($1,$2::jsonb)',[kid,JSON.stringify({name:'Indra',parent_name:'Bunda Indra',nickname:'Fajar',birth_date:'2019-03-14',school_grade:'SD 1',school_year:'2026/2027',status:'Non-Aktif'})]),/sesi yang masih terbuka/);
   assert.equal(await status(),'Aktif');
  });
  await t.test('pemilik ditolak menambah siswa dan menjalankan kegiatan kelas',async()=>{
+  await assert.rejects(as(owner,'select create_student($1::jsonb)',[JSON.stringify({name:'X',parent_name:'Y',reading_baseline:1,reading_target:4,math_baseline:1,math_target:4,nickname:'Fajar',birth_date:'2019-03-14',school_grade:'SD 1',school_year:'2026/2027'})]),/agregat/);
   await assert.rejects(as(owner,`insert into students(name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values('X','Y',1,1,3,1,1,3)`),/row-level security|agregat/i);
   await assert.rejects(as(owner,"select create_class($1,current_date,'Pasar',$2::uuid[])",[randomUUID(),[other]]),/agregat/);
   const fresh=randomUUID();
