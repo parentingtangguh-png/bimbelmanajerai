@@ -33,6 +33,8 @@ export const initialState = () => ({
   scheduleStudents: [],
   // Tes Diagnostik yang sedang berjalan: { student, start, results, order, draft }.
   diagnostic: null,
+  // Tes yang belum disimpan di perangkat ini, per anak (dibaca main.js dari localStorage).
+  diagnosticDrafts: {},
   // The class list keeps every session ever taught. Only the latest are shown until asked.
   allSessions: false
 });

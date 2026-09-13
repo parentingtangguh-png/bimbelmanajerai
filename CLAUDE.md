@@ -105,7 +105,11 @@ Ikuti Alur kerja langkah 3–4. Jangan pernah push tanpa persetujuan lebih dulu.
   - Tuntas → naik; belum tuntas → level itu jadi level awal; bila titik mulai belum tuntas, turun sampai level terendah yang belum tuntas.
   - Tuntas Level 4 → level awal 4 dengan catatan "melampaui Fondasi".
   - Bahan tes: satu set tetap, disetujui pemilik, **tanpa berkas cetak**. Tugas, bahan, dan ukuran tampil di modal.
-  - Keputusan tambahan: **sekali tes per anak**; pemilik hanya melihat ringkasan level awal (tanpa hasil per indikator); anak yang sudah ikut kelas tetap boleh dites, levelnya tidak berubah.
+  - **Jeda dan revisi** (`20260913060000_diagnostic_revision.sql`):
+    - Jawaban tes yang belum disimpan tersimpan di localStorage `bimbel.diagnostic.<user id>`, per anak, setiap kali nilai dipilih. Tes bisa dilanjutkan di perangkat yang sama.
+    - Hasil tersimpan bisa **direvisi** oleh guru pendamping, hanya **sebelum anak ikut kelas pertama**; level awal dihitung ulang. Hanya hasil terakhir yang disimpan, dengan `revised_at`.
+    - `save_diagnostic` menangani simpan pertama dan revisi. `diagnosticPath` memangkas level di luar jalur saat nilai berubah.
+  - Keputusan tambahan: **satu tes per anak** (bisa direvisi, lihat di atas); pemilik hanya melihat ringkasan level awal (tanpa hasil per indikator); anak yang sudah ikut kelas tetap boleh dites, levelnya tidak berubah.
   - Tugas diamati sepanjang tes (L1-1 dan semua indikator 8) tampil di bagian paling bawah tiap level.
   - Migrasi `20260913050000_diagnostic_tasks_and_results.sql`:
     - **Tugas menempel pada indikator**: kolom `diagnostic_task`, `diagnostic_material`, `diagnostic_success`, `diagnostic_observe` di `curriculum_level_indicators`. Tidak ada lagi data tugas di kode.

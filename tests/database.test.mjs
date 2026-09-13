@@ -553,14 +553,26 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   await as(owner,"update curriculum_level_indicators set text='Teks baru' where level=2 and number=1");
   assert.equal((await admin('select indicator_text from diagnostic_results r join diagnostic_tests t on t.id=r.test_id where t.student_id=$1 and level=2 and indicator_number=1',[kid])).rows[0].indicator_text,asli);
   await as(owner,'update curriculum_level_indicators set text=$1 where level=2 and number=1',[asli]);
-  // Sekali saja.
-  await assert.rejects(simpan(teacher,kid,hasil,'Level awal: 3'),/sudah pernah dites/);
   // Guru pendamping membaca hasilnya; guru lain dan pemilik tidak.
   assert.equal((await as(teacher,'select * from diagnostic_results r join diagnostic_tests t on t.id=r.test_id where t.student_id=$1',[kid])).rows.length,14);
   assert.equal((await as(stranger,'select * from diagnostic_tests where student_id=$1',[kid])).rows.length,0);
   assert.equal((await as(owner,'select * from diagnostic_tests')).rows.length,0,'pemilik hanya melihat ringkasan di students');
   assert.equal((await as(owner,'select * from diagnostic_results')).rows.length,0);
   await assert.rejects(as(teacher,"insert into diagnostic_tests(student_id,teacher_id,start_level,final_level) values($1,$2,1,1)",[lain,teacher]),/permission denied|row-level security/);
+  // Revisi: tetap satu tes; hasil diganti, level awal dihitung ulang, tanggal revisi dicatat.
+  const revisi=[...lvl(2,[...T6,'B','T']),...lvl(3,['T','B','T','T','T','T']),...lvl(4,X6)];
+  await assert.rejects(simpan(stranger,kid,revisi,'Level awal: 4'),/guru pendamping/,'guru lain tidak merevisi');
+  await assert.rejects(simpan(owner,kid,revisi,'Level awal: 4'),/guru pendamping/,'pemilik tidak merevisi');
+  await assert.rejects(simpan(teacher,kid,revisi,'Level awal: 3'),/Ringkasan tidak sesuai/,'revisi juga dihitung ulang');
+  assert.equal((await simpan(teacher,kid,revisi,'Revisi · Level awal: 4')).rows[0].final,4);
+  const rev=(await admin('select count(*)::int as n,max(final_level) as f,bool_and(revised_at is not null) as r,max(teacher_id::text) as g from diagnostic_tests where student_id=$1',[kid])).rows[0];
+  assert.deepEqual([rev.n,rev.f,rev.r,rev.g],[1,4,true,teacher],'tetap satu tes, guru pengetes pertama tercatat');
+  assert.equal((await admin('select count(*)::int as n from diagnostic_results r join diagnostic_tests t on t.id=r.test_id where t.student_id=$1',[kid])).rows[0].n,20,'hanya hasil terakhir yang tersimpan');
+  assert.equal((await admin('select reading_baseline from students where id=$1',[kid])).rows[0].reading_baseline,4);
+  // Setelah anak ikut kelas, hasil tes terkunci.
+  await create(teacher,kid);
+  await assert.rejects(simpan(teacher,kid,hasil,'Level awal: 3'),/tidak bisa direvisi setelah anak mengikuti kelas/);
+  assert.equal((await admin('select final_level from diagnostic_tests where student_id=$1',[kid])).rows[0].final_level,4);
   // Turun: titik mulai 3 belum tuntas, Level 2 tuntas → level awal 3; tuntas sampai 4 → melampaui Fondasi.
   const turun=[...lvl(3,X6),...lvl(2,T6)];
   assert.equal((await as(stranger,'select save_diagnostic($1,3,$2::jsonb,$3,$4,$5) as final',[lain,JSON.stringify(turun),'Level awal: 3','',''])).rows[0].final,3);

@@ -9,6 +9,10 @@ import { diagnosticForm } from '../src/views/diagnostic.js';
 import {
   taskOrder,
   diagnosticPayload,
+  diagnosticPath,
+  runFromSaved,
+  draftProgress,
+  transitionNote,
   levelComplete,
   diagnosticPlan,
   diagnosticSummary,
@@ -407,7 +411,9 @@ test('tes diagnostik: kartu tugas memakai teks indikator kurikulum, lalu hasil m
   assert.match(langkah, /name="i6" value="T"\s+required/, 'indikator penentu wajib dinilai');
   assert.ok(!/name="i7" value="T"[^>]*required/.test(langkah), 'English tidak wajib');
   assert.equal(count(langkah, 'dicatat, tidak menentukan level'), 2);
-  assert.match(langkah, /data-action="diagnostic-restart"/);
+  assert.match(langkah, /data-action="diagnostic-restart">← Ulang dari awal</);
+  assert.match(langkah, />Selesai Level 1, lanjut →</, 'tombol tidak lagi terbaca seperti "naik level"');
+  assert.ok(!langkah.includes('diagnostic-transition'), 'level pertama tanpa pita perpindahan');
   assert.match(
     langkah,
     /◐ memenuhi setelah dibantu, atau kurang satu dari ukuran/,
@@ -430,7 +436,9 @@ test('tes diagnostik: kartu tugas memakai teks indikator kurikulum, lalu hasil m
   assert.match(hasil, /Level 1: ✓✓✓✓◐✓ \(English ◐\) → tuntas/);
   assert.match(hasil, /Level 2: ✓✗✓✓✓✓ \(English ·\) → belum tuntas/);
   assert.match(hasil, /name="note"/);
-  assert.match(hasil, /data-action="diagnostic-back"/);
+  assert.match(hasil, /data-action="diagnostic-edit-level" data-id="1">Ubah Level 1</);
+  assert.match(hasil, /data-action="diagnostic-edit-level" data-id="2">Ubah Level 2</);
+  assert.match(hasil, />Simpan hasil tes</);
   assert.ok(!hasil.includes('level awal tidak diubah'));
   state.records = [{ student_id: 'anak-2' }];
   assert.match(openModal(diagnosticForm), /level awal tidak diubah/);
@@ -460,6 +468,89 @@ test('hasil tes diagnostik per indikator tampil di profil guru; kurikulum menunj
   assert.match(kur, /<summary>Tes diagnostik <em>\(diamati sepanjang tes\)<\/em><\/summary>/);
   assert.ok(kur.includes('Panggil nama 3 kali &lt;di luar pandangan&gt;.'));
   assert.equal(count(kur, 'class="indicator-test"'), 8, 'hanya indikator yang punya tugas');
+});
+
+test('tes diagnostik bisa dijeda per anak, dilanjutkan, dan hasil tersimpan bisa direvisi', () => {
+  loadSampleState();
+  state.records = [];
+  const full = { 1: 'T', 2: 'T', 3: 'T', 4: 'T', 5: 'T', 6: 'T' };
+  const gagal = { ...full, 2: 'N' };
+  // Pita perpindahan menjelaskan kenapa level berikutnya muncul, naik maupun turun.
+  state.diagnostic = { student: 'anak-2', start: 1, results: { 1: full }, order: [1], draft: {} };
+  const naik = openModal(diagnosticForm);
+  assert.match(naik, /class="diagnostic-transition">✓ Level 1 tuntas — lanjut menguji Level 2/);
+  assert.match(naik, /data-action="diagnostic-back">← Kembali</);
+  assert.match(
+    transitionNote({ order: [3], results: { 3: gagal } }, 2),
+    /Level 3 belum tuntas — turun menguji Level 2/
+  );
+
+  // Tes yang belum selesai di perangkat ini ditawarkan untuk dilanjutkan atau dibuang.
+  state.diagnostic = null;
+  state.diagnosticDrafts = {
+    'anak-2': {
+      student: 'anak-2',
+      start: 3,
+      results: { 3: full },
+      order: [3],
+      draft: { 4: { 1: 'T', 2: 'B' } }
+    },
+    'anak-1': { student: 'anak-1', start: 1, results: {}, order: [], draft: {}, revision: true }
+  };
+  const mulai = openModal(diagnosticForm);
+  assert.match(mulai, /Tes belum selesai/);
+  assert.match(mulai, /Mulai Level 3 · Level 4, 2 dari 8 dinilai/);
+  assert.match(mulai, /data-action="diagnostic-resume" data-id="anak-2"/);
+  assert.match(mulai, /data-action="diagnostic-discard" data-id="anak-2"/);
+  assert.ok(!mulai.includes('data-id="anak-1"'), 'revisi tidak ditawarkan di daftar tes baru');
+  assert.match(mulai, /Memulai tes baru akan menggantinya/);
+  assert.deepEqual(draftProgress(state.diagnosticDrafts['anak-2']), { level: 4, rated: 2, done: false });
+
+  // Jalur dipangkas bila nilai berubah: Level 3 kini belum tuntas, jadi Level 4 keluar dari hasil.
+  assert.deepEqual(diagnosticPath(3, { 3: gagal, 4: full, 2: full }), {
+    order: [3, 2],
+    results: { 3: gagal, 2: full }
+  });
+  assert.deepEqual(diagnosticPath(3, { 3: full }), { order: [3], results: { 3: full } });
+
+  // Revisi: jawaban tersimpan disusun kembali menjadi jalur tes, catatan ikut terisi.
+  const rows = [
+    ...Object.entries(full).map(([n, r]) => ({
+      test_id: 't',
+      level: 2,
+      indicator_number: Number(n),
+      rating: r
+    })),
+    ...Object.entries(gagal).map(([n, r]) => ({
+      test_id: 't',
+      level: 3,
+      indicator_number: Number(n),
+      rating: r
+    })),
+    { test_id: 'lain', level: 1, indicator_number: 1, rating: 'N' }
+  ];
+  const run = runFromSaved({ id: 't', student_id: 'anak-1', start_level: 2, note: 'catatan lama' }, rows);
+  assert.deepEqual(run.order, [2, 3]);
+  assert.equal(run.revision, true);
+  assert.equal(run.note, 'catatan lama');
+  assert.equal(run.results[3][2], 'N');
+  state.diagnostic = run;
+  const revisi = openModal(diagnosticForm);
+  assert.match(revisi, /Revisi Tes Diagnostik/);
+  assert.match(revisi, />Simpan revisi</);
+  assert.match(revisi, />catatan lama</);
+  assert.match(revisi, /Revisi mengganti hasil tes sebelumnya/);
+
+  // Tombol revisi di profil: hanya guru, hanya sebelum anak ikut kelas.
+  loadSampleState();
+  const alya = state.students.find(x => x.id === 'anak-1');
+  state.records = [];
+  assert.match(diagnosticResultSection(alya), /data-action="diagnostic-revise" data-id="anak-1"/);
+  state.diagnosticTests[0].revised_at = '2026-09-14T02:00:00Z';
+  assert.match(diagnosticResultSection(alya), /Direvisi 14\/9\/2026/);
+  state.records = [{ student_id: 'anak-1' }];
+  assert.ok(!diagnosticResultSection(alya).includes('diagnostic-revise'));
+  assert.match(diagnosticResultSection(alya), /terkunci karena anak sudah mengikuti kelas/);
 });
 
 test('instrumen diagnostik lengkap dan aturan naik-turun level sesuai keputusan pemilik', () => {

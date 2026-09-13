@@ -45,7 +45,13 @@ import { curriculumView } from './views/curriculum.js';
 import { sessionsView, newSession } from './views/sessions.js';
 import { studentsView, levelMeaning, studentForm, scheduleForm } from './views/students.js';
 import { diagnosticForm } from './views/diagnostic.js';
-import { diagnosticPlan, diagnosticSummary, diagnosticPayload } from './diagnostic.js';
+import {
+  diagnosticPlan,
+  diagnosticSummary,
+  diagnosticPayload,
+  diagnosticPath,
+  runFromSaved
+} from './diagnostic.js';
 import { dashboard } from './views/dashboard.js';
 import { homeMenu, homeTop, homeDoa, homeNav, leafArt } from './views/home.js';
 import { teamView } from './views/team.js';
@@ -162,6 +168,36 @@ async function loadUser(user) {
   state.role = member.role;
   await refresh();
 }
+// Tes diagnostik yang belum disimpan tinggal di perangkat guru, per akun dan per anak, supaya tes bisa
+// dijeda, berpindah anak, lalu dilanjutkan. Browser yang menolak localStorage hanya kehilangan fitur jeda.
+const draftKey = () => 'bimbel.diagnostic.' + (state.user?.id || 'tamu');
+function readDrafts() {
+  try {
+    return JSON.parse(localStorage.getItem(draftKey()) || '{}') || {};
+  } catch {
+    return {};
+  }
+}
+function writeDrafts(drafts) {
+  state.diagnosticDrafts = drafts;
+  try {
+    localStorage.setItem(draftKey(), JSON.stringify(drafts));
+  } catch {
+    /* Simpanan sementara tidak tersedia; tes tetap berjalan selama modal terbuka. */
+  }
+}
+function keepDraft(run = state.diagnostic) {
+  if (run) writeDrafts({ ...readDrafts(), [run.student]: run });
+}
+function dropDraft(studentId) {
+  const drafts = readDrafts();
+  delete drafts[studentId];
+  writeDrafts(drafts);
+}
+const hasAnswers = run =>
+  Boolean(run) &&
+  [run.results, run.draft].some(group => Object.values(group || {}).some(a => Object.keys(a || {}).length));
+
 function passwordForm() {
   const intro = `<p class="muted">Kata sandi baru minimal 8 karakter. Setelah diganti, sesi di perangkat lain tetap berjalan sampai Anda keluar dari sana.</p>`;
   const baru = field(
@@ -388,19 +424,55 @@ document.addEventListener('click', async e => {
     if (action === 'diagnostic-test') {
       if (state.role !== 'teacher') return notify('Tes diagnostik dilakukan oleh guru.', true);
       state.diagnostic = null;
+      state.diagnosticDrafts = readDrafts();
       return diagnosticForm();
     }
+    if (action === 'diagnostic-resume') {
+      const run = readDrafts()[id];
+      if (!run) return notify('Tes sementara tidak ditemukan di perangkat ini.', true);
+      state.diagnostic = run;
+      return diagnosticForm();
+    }
+    if (action === 'diagnostic-discard') {
+      if (!confirm('Buang tes yang belum selesai ini? Jawabannya akan dihapus.')) return;
+      dropDraft(id);
+      return diagnosticForm();
+    }
+    // Ulang dari awal (atau batal revisi) menghapus jawaban, jadi guru diminta memastikan dulu.
     if (action === 'diagnostic-restart') {
+      const run = state.diagnostic;
+      const ask = run?.revision
+        ? 'Batalkan revisi? Hasil tes yang tersimpan tidak berubah.'
+        : 'Ulang dari awal? Jawaban tes anak ini akan dihapus.';
+      if (hasAnswers(run) && !confirm(ask)) return;
+      if (run) dropDraft(run.student);
       state.diagnostic = null;
+      if (run?.revision) return document.querySelector('#modal').close();
       return diagnosticForm();
     }
     // Kembali membuka ulang level terakhir yang diuji; jawabannya disimpan sebagai isian awal.
-    if (action === 'diagnostic-back') {
+    if (action === 'diagnostic-back' || action === 'diagnostic-edit-level') {
       const run = state.diagnostic;
       if (!run?.order.length) return diagnosticForm();
-      const last = run.order.pop();
-      run.draft = { ...run.draft, [last]: run.results[last] };
-      delete run.results[last];
+      const stop = action === 'diagnostic-back' ? run.order[run.order.length - 1] : Number(id);
+      while (run.order.includes(stop)) {
+        const last = run.order.pop();
+        run.draft = { ...run.draft, [last]: run.results[last] };
+        delete run.results[last];
+      }
+      keepDraft(run);
+      return diagnosticForm();
+    }
+    // Revisi hanya sebelum kelas pertama; save_diagnostic menjaga aturan yang sama.
+    if (action === 'diagnostic-revise') {
+      if (state.role !== 'teacher') return notify('Tes diagnostik direvisi oleh guru pendamping.', true);
+      if (state.records.some(r => r.student_id === id))
+        return notify('Hasil tes tidak bisa direvisi setelah anak mengikuti kelas.', true);
+      const test = state.diagnosticTests.find(t => t.student_id === id);
+      if (!test) return notify('Hasil tes diagnostik tidak ditemukan.', true);
+      const saved = readDrafts()[id];
+      state.diagnostic = saved?.revision ? saved : runFromSaved(test, state.diagnosticResults);
+      keepDraft();
       return diagnosticForm();
     }
     if (action === 'new-session') return newSession();
@@ -568,6 +640,16 @@ document.addEventListener('change', e => {
   const form = e.target.form;
   if (form?.dataset.form === 'diagnostic-start' && e.target.name === 'student')
     return diagnosticForm(e.target.value);
+  // Setiap nilai yang dipilih langsung disimpan sementara, jadi tes yang terhenti tidak kehilangan jawaban.
+  if (form?.dataset.form === 'diagnostic-level' && /^i\d$/.test(e.target.name) && state.diagnostic) {
+    const run = state.diagnostic;
+    const level = Number(form.dataset.id);
+    run.draft = {
+      ...run.draft,
+      [level]: { ...(run.draft?.[level] || {}), [e.target.name.slice(1)]: e.target.value }
+    };
+    return keepDraft(run);
+  }
   if (form?.dataset.form === 'diagnostic-start' && e.target.name === 'start') {
     for (const el of form.querySelectorAll('[data-level-desc]'))
       el.hidden = el.dataset.levelDesc !== e.target.value;
@@ -701,15 +783,20 @@ document.addEventListener('submit', async e => {
       case 'diagnostic-start': {
         if (!state.students.some(x => x.id === v.student)) throw new Error('Pilih anak yang dites.');
         state.diagnostic = { student: v.student, start: Number(v.start), results: {}, order: [], draft: {} };
+        keepDraft();
         return diagnosticForm();
       }
       case 'diagnostic-level': {
         const run = state.diagnostic;
         const level = Number(id);
-        run.results[level] = Object.fromEntries(
+        const answers = Object.fromEntries(
           [1, 2, 3, 4, 5, 6, 7, 8].filter(n => v['i' + n]).map(n => [n, v['i' + n]])
         );
-        if (!run.order.includes(level)) run.order.push(level);
+        run.draft = { ...run.draft, [level]: answers };
+        // Nilai yang berubah bisa mengubah jalur; level di luar jalur baru keluar dari hasil tapi tetap
+        // menjadi isian awal kalau jalurnya kembali melewatinya.
+        Object.assign(run, diagnosticPath(run.start, { ...run.results, [level]: answers }));
+        keepDraft(run);
         return diagnosticForm();
       }
       case 'diagnostic': {
@@ -740,6 +827,7 @@ document.addEventListener('submit', async e => {
             p_learning_notes: v.learning_notes || ''
           })
         );
+        dropDraft(s.id);
         state.diagnostic = null;
         break;
       }

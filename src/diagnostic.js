@@ -70,6 +70,53 @@ export function diagnosticPlan(start, results = {}) {
   return { final: 1, beyond: false };
 }
 
+// Level yang benar-benar dilalui jalur tes, dengan jawaban lengkapnya. Jawaban level lain dibuang dari
+// hasil (bukan dari isian awal), supaya perubahan nilai di level yang lebih awal tidak meninggalkan
+// level di luar jalur, yang akan ditolak save_diagnostic.
+export function diagnosticPath(start, results = {}) {
+  const order = [];
+  const kept = {};
+  for (let p = diagnosticPlan(start, kept); p.test; p = diagnosticPlan(start, kept)) {
+    if (levelComplete(results[p.test]) === undefined) break;
+    kept[p.test] = results[p.test];
+    order.push(p.test);
+  }
+  return { order, results: kept };
+}
+
+// Tes tersimpan dibuka lagi untuk direvisi: jawaban per indikator disusun kembali menjadi jalur tes.
+export function runFromSaved(test, rows) {
+  const results = {};
+  for (const r of rows.filter(x => x.test_id === test.id))
+    (results[r.level] ||= {})[r.indicator_number] = r.rating;
+  const path = diagnosticPath(test.start_level, results);
+  return {
+    student: test.student_id,
+    start: test.start_level,
+    ...path,
+    draft: results,
+    revision: true,
+    note: test.note || ''
+  };
+}
+
+// Posisi tes yang belum selesai, untuk tombol "Lanjutkan".
+export function draftProgress(run) {
+  const plan = diagnosticPlan(run.start, run.results || {});
+  if (!plan.test) return { level: null, rated: 0, done: true };
+  const answers = { ...(run.draft?.[plan.test] || {}), ...(run.results?.[plan.test] || {}) };
+  return { level: plan.test, rated: Object.keys(answers).length, done: false };
+}
+
+// Kalimat perpindahan level, supaya guru tahu kenapa level berikutnya muncul.
+export function transitionNote(run, level) {
+  const last = run.order[run.order.length - 1];
+  if (!last) return '';
+  return levelComplete(run.results[last])
+    ? `✓ Level ${last} tuntas — lanjut menguji Level ${level}. Tes berhenti di level pertama yang belum tuntas.`
+    : `Level ${last} belum tuntas — turun menguji Level ${level}, untuk memastikan level di bawahnya sudah tuntas.`;
+}
+
 // Ringkasan yang disimpan ke kolom diagnostic. Tidak pernah kosong, karena kolom itulah penanda
 // "sudah dites".
 export function diagnosticSummary({ date, grade, start, order, results, plan, note }) {

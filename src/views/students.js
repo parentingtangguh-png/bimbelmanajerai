@@ -265,7 +265,15 @@ export function diagnosticResultSection(s) {
   const locked = test.level_locked ? ' · level tidak diubah (sudah ikut kelas)' : '';
   const head = `<p class="muted">${h(test.tested_on)} · mulai Level ${test.start_level} → level awal <strong>Level ${test.final_level}</strong>${test.beyond ? ' (melampaui Fondasi)' : ''}${locked}</p>`;
   const note = test.note ? `<p><strong>Catatan:</strong> ${h(test.note)}</p>` : '';
-  return `<hr><h3>Hasil tes diagnostik</h3>${head}${tables}${note}`;
+  const revised = test.revised_at
+    ? `<p class="muted">Direvisi ${h(new Date(test.revised_at).toLocaleDateString('id-ID'))}</p>`
+    : '';
+  // Revisi hanya sebelum anak ikut kelas pertama, sama dengan aturan di save_diagnostic.
+  const canRevise = state.role === 'teacher' && !state.records.some(r => r.student_id === s.id);
+  const button = canRevise
+    ? `<button type="button" class="secondary" data-action="diagnostic-revise" data-id="${s.id}">Revisi hasil tes</button>`
+    : `<p class="muted">Hasil tes terkunci karena anak sudah mengikuti kelas.</p>`;
+  return `<hr><h3>Hasil tes diagnostik</h3>${head}${revised}${tables}${note}${button}`;
 }
 
 // Offered only once every core subject has reached the end of its phase. Passing at the end of
