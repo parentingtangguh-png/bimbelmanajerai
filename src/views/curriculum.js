@@ -35,12 +35,19 @@ export function levelCard(l) {
   const items = state.curriculumIndicators
     .filter(i => i.level === l.level)
     .sort((a, b) => a.number - b.number)
-    .map(i => `<li>${h(i.text)} <span class="badge">${h(i.domain)}</span></li>`)
+    .map(i => `<li>${h(i.text)} <span class="badge">${h(i.domain)}</span>${indicatorTest(i)}</li>`)
     .join('');
   const list = items
     ? `<ol class="indicator-list">${items}</ol>`
     : '<p class="muted">Indikator belum disusun untuk level ini.</p>';
   return `<article class="panel curriculum-card"><span class="badge green">LEVEL ${l.level}</span><h2>${h(l.title)}</h2><p>${h(l.description)}</p><h4>Indikator</h4>${list}</article>`;
+}
+
+// Cara indikator ini diuji di Tes Diagnostik, disimpan bersama indikatornya.
+export function indicatorTest(i) {
+  if (!i.diagnostic_task) return '';
+  const when = i.diagnostic_observe ? ' <em>(diamati sepanjang tes)</em>' : '';
+  return `<details class="indicator-test"><summary>Tes diagnostik${when}</summary><dl><div><dt>Tugas</dt><dd>${h(i.diagnostic_task)}</dd></div><div><dt>Bahan</dt><dd>${h(i.diagnostic_material)}</dd></div><div><dt>Tercapai bila</dt><dd>${h(i.diagnostic_success)}</dd></div></dl></details>`;
 }
 
 export function themeTable(themes) {

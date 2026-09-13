@@ -25,6 +25,8 @@ export const initialState = () => ({
   curriculumLevels: [],
   curriculumIndicators: [],
   curriculumThemes: [],
+  diagnosticTests: [],
+  diagnosticResults: [],
   active: null,
   filter: '',
   schedules: [],

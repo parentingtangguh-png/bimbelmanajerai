@@ -1,6 +1,7 @@
 // Tes Diagnostik pilot Fase Fondasi (disetujui pemilik 13 Sep 2026). Tanpa DOM dan tanpa jaringan:
-// isinya hanya instrumen tetap dan aturan yang memutuskan level awal, supaya bisa dites langsung.
-// Teks indikator tidak disalin ke sini; layar mengambilnya dari tabel curriculum_level_indicators.
+// isinya hanya aturan yang memutuskan level awal, supaya bisa dites langsung.
+// Tugas, bahan, dan ukuran tiap tugas tidak ada di sini: semuanya menempel pada indikatornya di tabel
+// curriculum_level_indicators (kolom diagnostic_*), supaya indikator dan cara mengujinya berubah bersama.
 
 export const DIAGNOSTIC_LEVELS = [1, 2, 3, 4];
 // Indikator 1-6 menentukan tuntas; 7 (English) dan 8 (Karakter) dicatat tanpa memindahkan level.
@@ -15,184 +16,25 @@ export const RATING_RULE =
   '✓ memenuhi ukuran tanpa bantuan · ◐ memenuhi setelah dibantu, atau kurang satu dari ukuran · ✗ lebih rendah dari itu';
 export const ratingMark = code => (RATINGS.find(r => r[0] === code) || [])[1] || '·';
 
-// Tugas penentu per indikator: apa yang dilakukan, bahan yang dipakai, dan kapan disebut tercapai.
-export const diagnosticTasks = {
-  1: {
-    1: {
-      task: 'Diamati sepanjang tes.',
-      material: '—',
-      success: 'Bertahan sampai tugas terakhir; meninggalkan meja paling banyak 1 kali.'
-    },
-    2: {
-      task: 'Saat anak sibuk bermain, panggil namanya 3 kali dari samping atau belakang, di luar pandangan anak.',
-      material: '—',
-      success: 'Menoleh atau menjawab 2 dari 3.'
-    },
-    3: {
-      task: '5 benda di meja. Minta anak menunjuk satu per satu: "Tunjuk sendok", dan seterusnya.',
-      material: 'Bola kecil, sendok, pensil, gelas plastik, buku.',
-      success: '4 dari 5 benar.'
-    },
-    4: {
-      task: 'Tunjukkan satu baris berisi 3 bentuk yang satu berbeda: "Mana yang tidak sama?" Ulangi untuk 4 baris.',
-      material: 'Gambar besar di kertas, 4 baris: ● ● ▲ · ■ ■ ● · ▲ ▲ ■ · ● ■ ■',
-      success: '3 dari 4 benar.'
-    },
-    5: {
-      task: 'Contohkan garis tegak, garis datar, dan lingkaran; anak menirukan di udara dengan jari, lalu di kertas.',
-      material: 'Kertas HVS dan krayon besar.',
-      success: '2 dari 3 bentuk dikenali.'
-    },
-    6: {
-      task: 'Mulai membilang "satu, dua…", anak melanjutkan.',
-      material: '—',
-      success:
-        'Sampai lima berurutan. Bantuan awalan "satu, dua…" tetap ✓; ◐ bila guru harus membilang bersama sampai lima.'
-    },
-    7: {
-      task: 'Tanpa peragaan: "sit down", "stand up", "clap your hands".',
-      material: '—',
-      success: '2 dari 3 dilakukan tanpa contoh gerak.'
-    },
-    8: {
-      task: 'Diamati sepanjang tes: mau duduk bersama, mencoba meski ragu, tidak mengganggu.',
-      material: '—',
-      success: 'Dicatat saja.'
-    }
-  },
-  2: {
-    1: {
-      task: 'Tunjuk huruf vokal secara acak dan minta anak menyebut namanya.',
-      material: 'Tulis besar di kertas atau papan: A · I · U · E · O',
-      success: '4 dari 5 benar.'
-    },
-    2: {
-      task: 'Letakkan benda di meja; anak mencocokkan tiap huruf dengan benda yang berawal huruf itu.',
-      material:
-        'Tulis besar: B · S · M. Benda nyata: bola · buku · sendok · sepatu · meja · mata (tunjuk mata sendiri).',
-      success: '4 dari 6 cocok.'
-    },
-    3: {
-      task: 'Hitung 7 kancing, lalu 10 kancing: "Ada berapa?"',
-      material: 'Kancing atau balok kecil.',
-      success: 'Keduanya benar.'
-    },
-    4: {
-      task: '"Tunjuk angka …" dengan urutan 7 · 3 · 10 · 1 · 5 · 8 · 2 · 9 · 4 · 6.',
-      material: 'Tulis besar dan acak di kertas atau papan: angka 1–10.',
-      success: '8 dari 10 benar.'
-    },
-    5: {
-      task: 'Anak melanjutkan pola merah-biru-merah-biru, lalu besar-kecil-besar-kecil.',
-      material: 'Kancing atau balok dua warna dan dua ukuran.',
-      success: 'Kedua pola benar.'
-    },
-    6: {
-      task: 'Amati cara anak memegang pensil saat menggambar bebas.',
-      material: 'Kertas dan pensil 2B.',
-      success: 'Pegangan jari (tiga jari), bukan kepalan.'
-    },
-    7: {
-      task: 'Tunjuk bola, buku, dan tas: "What is this?"',
-      material: 'Bola, buku, tas.',
-      success: '2 dari 3 disebut dalam bahasa Inggris.'
-    },
-    8: {
-      task: 'Diamati; di akhir minta anak merapikan alat tes.',
-      material: '—',
-      success: 'Dicatat saja.'
-    }
-  },
-  3: {
-    1: {
-      task: 'Tunjuk suku kata secara acak; anak membacanya.',
-      material: 'Tulis besar di kertas atau papan: ba · bi · bu · be · bo · ma · si · ku · te · lo',
-      success: '8 dari 10 terbaca.'
-    },
-    2: {
-      task: 'Sebut 5 huruf; anak menulis bentuk kapital dan kecilnya.',
-      material: 'Kertas dan pensil. Huruf yang disebut: A, B, D, M, S — jangan ditulis atau diperlihatkan.',
-      success: '4 dari 5 pasang terbaca.'
-    },
-    3: {
-      task: 'Letakkan dua potongan kertas suku kata dalam urutan tertukar; anak menyusunnya menjadi kata lalu membacanya.',
-      material:
-        'Tulis besar, satu suku kata per potongan kertas, disajikan tertukar: ku · bu → buku, ju · ba → baju, ta · ma → mata, pi · sa → sapi, ki · ka → kaki',
-      success: '4 dari 5 benar.'
-    },
-    4: {
-      task: 'Anak membilang maju 1–20, lalu mundur 20–1.',
-      material: '—',
-      success: 'Maju tanpa salah; mundur salah paling banyak 2.'
-    },
-    5: {
-      task: 'Dua kelompok kancing: "Mana yang lebih banyak?" atau "lebih sedikit?"',
-      material: 'Pasangan 6 & 9 · 4 & 3 · 8 & 5 · 2 & 7 · 10 & 6.',
-      success: '4 dari 5 benar.'
-    },
-    6: {
-      task: '"Ada 3 apel, ditambah 2. Jadi berapa?" dikerjakan dengan benda.',
-      material: '3 + 2 · 4 + 1 · 5 + 3 · 2 + 6 · 4 + 4; kancing.',
-      success: '4 dari 5 benar.'
-    },
-    7: {
-      task: 'Ciptakan situasi: mainan dipegang guru (I want…), memilih benda kesukaan dari 3 benda (I like…), wadah yang tidak bisa dibuka anak (help me please).',
-      material: 'Mainan; 3 benda (misalnya bola, buku, krayon); toples dengan tutup diputar kencang.',
-      success: '2 dari 3 diucapkan sendiri.'
-    },
-    8: {
-      task: 'Diamati sepanjang tes: mau membantu, berani menjawab, mendengarkan.',
-      material: '—',
-      success: 'Dicatat saja.'
-    }
-  },
-  4: {
-    1: {
-      task: 'Tunjuk kata satu per satu; anak membacanya.',
-      material:
-        'Tulis besar di kertas atau papan: buku · sapi · meja · topi · roda · kelapa · sepeda · kereta · sepatu · boneka',
-      success: '8 dari 10 terbaca.'
-    },
-    2: {
-      task: 'Tunjuk kalimat satu per satu; anak membacanya.',
-      material:
-        'Tulis besar, satu kalimat per baris: Ibu beli roti. · Adik minum susu. · Bola itu merah. · Ayah baca buku. · Kita main di taman.',
-      success: '4 dari 5 terbaca utuh tanpa mengeja per suku kata.'
-    },
-    3: {
-      task: 'Anak menulis namanya sendiri tanpa contoh.',
-      material: 'Kertas dan pensil.',
-      success: 'Semua huruf lengkap dan terbaca guru.'
-    },
-    4: {
-      task: 'Anak menulis satu kalimat tentang benda di meja atau kegiatannya hari ini; guru boleh mengeja kata yang ditanya.',
-      material: 'Kertas dan pensil.',
-      success: '1 kalimat minimal 3 kata terbaca.'
-    },
-    5: {
-      task: 'Anak mengurutkan 5 angka dengan menunjuk dari terkecil; lalu menunjuk yang lebih besar dari tiap pasangan.',
-      material:
-        'Tulis besar dan acak. Urutkan 3 · 17 · 9 · 12 · 20; pasangan 12 & 15 · 19 & 11 · 8 & 18 · 14 & 13.',
-      success: 'Urutan benar dan 3 dari 4 pasangan benar.'
-    },
-    6: {
-      task: 'Bermain toko dengan uang mainan.',
-      material:
-        'Roti 3.000 + susu 5.000 · Punya 10.000, beli 4.000 · Permen 2.000 + 6.000 + 1.000 · Punya 20.000, beli 15.000 · Buku 7.000 + pensil 5.000',
-      success: '4 dari 5 benar.'
-    },
-    7: {
-      task: '"What\'s your name? How old are you?"',
-      material: '—',
-      success: 'Menjawab "My name is…" dan "I am … years old".'
-    },
-    8: {
-      task: 'Diamati sepanjang tes: mengerjakan mandiri, bersikap hormat, siap memulai.',
-      material: '—',
-      success: 'Dicatat saja.'
-    }
-  }
-};
+// Tugas aktif dikerjakan lebih dulu; yang diamati sepanjang tes dinilai di bagian paling bawah.
+export function taskOrder(indicators, level) {
+  const own = indicators.filter(i => i.level === level).sort((a, b) => a.number - b.number);
+  return {
+    active: own.filter(i => !i.diagnostic_observe).map(i => i.number),
+    observed: own.filter(i => i.diagnostic_observe).map(i => i.number)
+  };
+}
+
+// Nilai yang dikirim ke save_diagnostic: satu baris per indikator yang dinilai, hanya level yang diuji.
+export function diagnosticPayload(order, results) {
+  return order.flatMap(level =>
+    Object.entries(results[level] || {}).map(([number, rating]) => ({
+      level,
+      number: Number(number),
+      rating
+    }))
+  );
+}
 
 // Saran titik mulai dari kelas formal. Guru bebas memilih level lain.
 export function suggestedStart(grade) {

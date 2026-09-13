@@ -238,7 +238,34 @@ function studentDetails(s, owner) {
   const meters = `<hr><h3>Perjalanan kompetensi</h3>${competencyMeters(s)}<div class="notice">Karakter tidak diberi level. Guru mencatat perilaku yang tampak dalam konteks kegiatan.</div>`;
   const actions = !owner ? `<hr>${studentActionsSection(s)}` : '';
   const summative = !owner && ready(s) && s.status === 'Aktif' ? summativeForm(s) : '';
-  return `${meters}${actions}${summative}<hr><h3>Riwayat evaluasi</h3>${evaluationHistory(s)}`;
+  return `${diagnosticResultSection(s)}${meters}${actions}${summative}<hr><h3>Riwayat evaluasi</h3>${evaluationHistory(s)}`;
+}
+
+// Hasil Tes Diagnostik per indikator. Pemilik tidak menerima baris ini dari database, jadi bagian ini
+// hanya muncul untuk guru pendamping.
+export function diagnosticResultSection(s) {
+  const test = state.diagnosticTests.find(t => t.student_id === s.id);
+  if (!test) return '';
+  const marks = { T: '✓', B: '◐', N: '✗' };
+  const rows = state.diagnosticResults.filter(r => r.test_id === test.id);
+  const levels = [...new Set(rows.map(r => r.level))].sort((a, b) => a - b);
+  const tables = levels
+    .map(l => {
+      const items = rows
+        .filter(r => r.level === l)
+        .sort((a, b) => a.indicator_number - b.indicator_number)
+        .map(
+          r =>
+            `<li><span class="diagnostic-mark">${marks[r.rating] || '·'}</span> ${r.indicator_number}. ${h(r.indicator_text)}</li>`
+        )
+        .join('');
+      return `<h4>Level ${l}</h4><ul class="diagnostic-result-list">${items}</ul>`;
+    })
+    .join('');
+  const locked = test.level_locked ? ' · level tidak diubah (sudah ikut kelas)' : '';
+  const head = `<p class="muted">${h(test.tested_on)} · mulai Level ${test.start_level} → level awal <strong>Level ${test.final_level}</strong>${test.beyond ? ' (melampaui Fondasi)' : ''}${locked}</p>`;
+  const note = test.note ? `<p><strong>Catatan:</strong> ${h(test.note)}</p>` : '';
+  return `<hr><h3>Hasil tes diagnostik</h3>${head}${tables}${note}`;
 }
 
 // Offered only once every core subject has reached the end of its phase. Passing at the end of

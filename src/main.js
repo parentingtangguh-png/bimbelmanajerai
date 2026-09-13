@@ -45,7 +45,7 @@ import { curriculumView } from './views/curriculum.js';
 import { sessionsView, newSession } from './views/sessions.js';
 import { studentsView, levelMeaning, studentForm, scheduleForm } from './views/students.js';
 import { diagnosticForm } from './views/diagnostic.js';
-import { diagnosticPlan, diagnosticSummary } from './diagnostic.js';
+import { diagnosticPlan, diagnosticSummary, diagnosticPayload } from './diagnostic.js';
 import { dashboard } from './views/dashboard.js';
 import { homeMenu, homeTop, homeDoa, homeNav, leafArt } from './views/home.js';
 import { teamView } from './views/team.js';
@@ -94,6 +94,8 @@ async function refresh() {
     curriculumLevels,
     curriculumIndicators,
     curriculumThemes,
+    diagnosticTests,
+    diagnosticResults,
     competencies,
     assessments,
     observations,
@@ -110,6 +112,8 @@ async function refresh() {
     result(db.from('curriculum_levels').select('*').order('level')),
     result(db.from('curriculum_level_indicators').select('*').order('level').order('number')),
     result(db.from('curriculum_themes').select('*').order('number')),
+    allRows('diagnostic_tests'),
+    allRows('diagnostic_results', 'test_id'),
     allRows('student_competencies', 'student_id'),
     allRows('session_assessments', 'session_student_id'),
     allRows('session_observations', 'session_student_id'),
@@ -130,6 +134,8 @@ async function refresh() {
     curriculumLevels,
     curriculumIndicators,
     curriculumThemes,
+    diagnosticTests,
+    diagnosticResults,
     competencies,
     assessments,
     observations,
@@ -713,12 +719,8 @@ document.addEventListener('submit', async e => {
           throw new Error('Tes diagnostik tidak ditemukan. Mulai ulang tesnya.');
         const plan = diagnosticPlan(run.start, run.results);
         if (!plan.final) throw new Error('Masih ada level yang belum dinilai.');
-        // Level awal disimpan lebih dulu: hasil diagnostik yang terisi menandai anak sudah dites, jadi
-        // tanda itu tidak boleh muncul bila penyimpanan level gagal.
-        if (!state.records.some(r => r.student_id === s.id))
-          await result(
-            db.rpc('correct_student_baseline', { p_student: s.id, p_reading: plan.final, p_math: plan.final })
-          );
+        // save_diagnostic menyimpan hasil per indikator, level awal, dan ringkasan dalam satu transaksi,
+        // dan menghitung ulang level awal sendiri dari nilai yang dikirim.
         const summary = diagnosticSummary({
           date: new Date().toLocaleDateString('id-ID'),
           grade: s.school_grade,
@@ -729,20 +731,13 @@ document.addEventListener('submit', async e => {
           note: v.note
         });
         await result(
-          db.rpc('update_student_profile', {
+          db.rpc('save_diagnostic', {
             p_student: s.id,
-            p_payload: {
-              name: s.name,
-              parent_name: s.parent_name,
-              phone: s.phone,
-              interest: s.interest || '',
-              nickname: s.nickname || '',
-              birth_date: s.birth_date,
-              school_grade: s.school_grade,
-              school_year: s.school_year,
-              diagnostic: summary,
-              learning_notes: v.learning_notes || ''
-            }
+            p_start: run.start,
+            p_results: diagnosticPayload(run.order, run.results),
+            p_summary: summary,
+            p_note: v.note || '',
+            p_learning_notes: v.learning_notes || ''
           })
         );
         state.diagnostic = null;

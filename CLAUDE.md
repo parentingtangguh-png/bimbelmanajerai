@@ -105,10 +105,16 @@ Ikuti Alur kerja langkah 3–4. Jangan pernah push tanpa persetujuan lebih dulu.
   - Tuntas → naik; belum tuntas → level itu jadi level awal; bila titik mulai belum tuntas, turun sampai level terendah yang belum tuntas.
   - Tuntas Level 4 → level awal 4 dengan catatan "melampaui Fondasi".
   - Bahan tes: satu set tetap, disetujui pemilik, **tanpa berkas cetak**. Tugas, bahan, dan ukuran tampil di modal.
+  - Keputusan tambahan: **sekali tes per anak**; pemilik hanya melihat ringkasan level awal (tanpa hasil per indikator); anak yang sudah ikut kelas tetap boleh dites, levelnya tidak berubah.
+  - Tugas diamati sepanjang tes (L1-1 dan semua indikator 8) tampil di bagian paling bawah tiap level.
+  - Migrasi `20260913050000_diagnostic_tasks_and_results.sql`:
+    - **Tugas menempel pada indikator**: kolom `diagnostic_task`, `diagnostic_material`, `diagnostic_success`, `diagnostic_observe` di `curriculum_level_indicators`. Tidak ada lagi data tugas di kode.
+    - **Hasil per indikator**: tabel `diagnostic_tests` (unik per siswa) dan `diagnostic_results` (menyalin `indicator_text`). Keduanya dibaca guru pendamping lewat RLS `can_teach(...) and not is_owner()`; tidak ada izin tulis langsung.
+    - `save_diagnostic(uuid,int,jsonb,text,text,text)` menyimpan semuanya dalam satu transaksi dan **menghitung ulang jalur tes serta level awal** di database (`diagnostic_level_complete`). Ringkasan wajib memuat `Level awal: N` hasil hitungan database.
   - Kode:
-    - `src/diagnostic.js` (murni): `diagnosticTasks`, `levelComplete`, `diagnosticPlan`, `diagnosticSummary`, `suggestedStart`.
+    - `src/diagnostic.js` (murni): `taskOrder`, `diagnosticPayload`, `levelComplete`, `diagnosticPlan`, `diagnosticSummary`, `suggestedStart`. Aturan yang sama dijaga dua kali: di sini untuk tampilan, di `save_diagnostic` untuk menolak.
     - `src/views/diagnostic.js`: modal tiga langkah `diagnostic-start` → `diagnostic-level` → `diagnostic`. Jawaban disimpan di `state.diagnostic`; tombol Kembali memindahkan jawaban ke `draft` sebagai isian awal.
-    - Menyimpan memanggil `correct_student_baseline(level, level)` **lebih dulu**, lalu `update_student_profile` dengan ringkasan di `diagnostic`. Tanpa migrasi.
+    - Hasil tes tampil di profil siswa (`diagnosticResultSection`); tugas tiap indikator tampil di tab Kurikulum (`indicatorTest`).
   - Level awal pilot memakai kolom level lama (`reading_baseline` = `math_baseline` = level Fondasi); kartu evaluasi per bidang belum dirancang ulang.
 - Bagian di bawah menggambarkan kurikulum **lama** yang sudah dihapus; perbarui setelah kurikulum baru dipasang.
 

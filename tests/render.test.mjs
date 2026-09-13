@@ -4,10 +4,11 @@ import { loadSampleState, SESSION } from './fixtures/sample-state.mjs';
 import { state } from '../src/state.js';
 import { sessionsView } from '../src/views/sessions.js';
 import { dashboard } from '../src/views/dashboard.js';
-import { studentsView, scheduleForm, studentForm } from '../src/views/students.js';
+import { studentsView, scheduleForm, studentForm, diagnosticResultSection } from '../src/views/students.js';
 import { diagnosticForm } from '../src/views/diagnostic.js';
 import {
-  diagnosticTasks,
+  taskOrder,
+  diagnosticPayload,
   levelComplete,
   diagnosticPlan,
   diagnosticSummary,
@@ -392,8 +393,17 @@ test('tes diagnostik: kartu tugas memakai teks indikator kurikulum, lalu hasil m
   assert.match(langkah, /data-form="diagnostic-level" data-id="1"/);
   assert.match(langkah, /Menguji Level 1 — Aku Siap Belajar/);
   assert.equal(count(langkah, 'class="diagnostic-task"'), 8, 'delapan kartu tugas');
+  // Pengamatan sepanjang tes (L1-1 dan Karakter) dipisah ke paling bawah, setelah semua tugas aktif.
+  const bawah = langkah.indexOf('Diamati sepanjang tes — nilai di akhir');
+  assert.ok(bawah > langkah.indexOf('name="i7"'), 'bagian pengamatan setelah tugas aktif terakhir');
+  assert.ok(
+    langkah.indexOf('name="i1"') > bawah && langkah.indexOf('name="i8"') > bawah,
+    'L1-1 dan L1-8 di bawah'
+  );
+  assert.ok(langkah.indexOf('name="i2"') < bawah);
   assert.match(langkah, /1\. Mengikuti sesi dari awal hingga selesai/, 'teks indikator dari kurikulum');
-  assert.match(langkah, /Bertahan sampai tugas terakhir/, 'ukuran tercapai dari instrumen');
+  assert.match(langkah, /Bertahan sampai tugas terakhir/, 'ukuran tercapai dibaca dari indikator kurikulum');
+  assert.ok(langkah.includes('&lt;di luar pandangan&gt;'), 'tugas dari database di-escape');
   assert.match(langkah, /name="i6" value="T"\s+required/, 'indikator penentu wajib dinilai');
   assert.ok(!/name="i7" value="T"[^>]*required/.test(langkah), 'English tidak wajib');
   assert.equal(count(langkah, 'dicatat, tidak menentukan level'), 2);
@@ -426,18 +436,33 @@ test('tes diagnostik: kartu tugas memakai teks indikator kurikulum, lalu hasil m
   assert.match(openModal(diagnosticForm), /level awal tidak diubah/);
 });
 
+test('hasil tes diagnostik per indikator tampil di profil guru; kurikulum menunjukkan tugasnya', () => {
+  loadSampleState();
+  const alya = state.students.find(s => s.id === 'anak-1');
+  const bagian = diagnosticResultSection(alya);
+  assert.match(bagian, /Hasil tes diagnostik/);
+  assert.match(bagian, /mulai Level 2 → level awal <strong>Level 2<\/strong>/);
+  assert.ok(bagian.indexOf('Level 1</h4>') < bagian.indexOf('Level 2</h4>'), 'level berurutan');
+  assert.ok(
+    bagian.indexOf('1. Vokal saat dites') < bagian.indexOf('2. Mencocokkan huruf'),
+    'indikator berurutan'
+  );
+  assert.match(bagian, /✗<\/span> 2\. Mencocokkan huruf/, 'kalimat indikator dari salinan saat dites');
+  assert.ok(bagian.includes('Masih &lt;mengeja&gt;'));
+  assert.equal(diagnosticResultSection(state.students.find(s => s.id === 'anak-2')), '', 'anak belum dites');
+  assert.match(openModal(studentForm, alya), /Hasil tes diagnostik/);
+  // Pemilik tidak menerima baris tes dari database, jadi bagiannya tidak muncul.
+  state.diagnosticTests = [];
+  assert.ok(!openModal(studentForm, alya).includes('Hasil tes diagnostik'));
+
+  loadSampleState();
+  const kur = curriculumView();
+  assert.match(kur, /<summary>Tes diagnostik <em>\(diamati sepanjang tes\)<\/em><\/summary>/);
+  assert.ok(kur.includes('Panggil nama 3 kali &lt;di luar pandangan&gt;.'));
+  assert.equal(count(kur, 'class="indicator-test"'), 8, 'hanya indikator yang punya tugas');
+});
+
 test('instrumen diagnostik lengkap dan aturan naik-turun level sesuai keputusan pemilik', () => {
-  for (const l of [1, 2, 3, 4])
-    for (let n = 1; n <= 8; n++) {
-      const t = diagnosticTasks[l][n];
-      assert.ok(t && t.task && t.material && t.success, 'tugas L' + l + '-' + n + ' belum lengkap');
-      // Semua tugas bisa di dalam ruangan tanpa kartu cetak: bahan visual ditulis guru di kertas/papan.
-      const teks = (t.task + ' ' + t.material).toLowerCase();
-      assert.ok(
-        !/kartu|pasir|gambar (bola|kucing|anak)/.test(teks),
-        'L' + l + '-' + n + ' masih butuh kartu cetak atau pasir'
-      );
-    }
   const T = { 1: 'T', 2: 'T', 3: 'T', 4: 'T', 5: 'T', 6: 'T' };
   assert.equal(levelComplete(T), true);
   assert.equal(levelComplete({ ...T, 6: 'B' }), true, 'lima ✓ dan satu ◐ masih tuntas');
@@ -446,10 +471,17 @@ test('instrumen diagnostik lengkap dan aturan naik-turun level sesuai keputusan 
   assert.equal(levelComplete({ ...T, 7: 'N', 8: 'N' }), true, 'English dan Karakter tidak menentukan');
   assert.equal(levelComplete({ 1: 'T' }), undefined, 'belum selesai dinilai');
   const X = { ...T, 1: 'N' };
-  // Perbaikan mutu soal: jawaban dikte tidak diperlihatkan, suku kata disajikan tertukar.
-  assert.match(diagnosticTasks[3][2].material, /jangan ditulis atau diperlihatkan/);
-  assert.match(diagnosticTasks[3][3].material, /ku · bu → buku/);
-  assert.match(diagnosticTasks[1][6].success, /tetap ✓/);
+  // Urutan tampil dan isi yang dikirim ke database.
+  loadSampleState();
+  assert.deepEqual(taskOrder(state.curriculumIndicators, 1), {
+    active: [2, 3, 4, 5, 6, 7],
+    observed: [1, 8]
+  });
+  assert.deepEqual(diagnosticPayload([3, 2], { 2: { 1: 'T' }, 3: { 2: 'N', 7: 'B' }, 4: { 1: 'T' } }), [
+    { level: 3, number: 2, rating: 'N' },
+    { level: 3, number: 7, rating: 'B' },
+    { level: 2, number: 1, rating: 'T' }
+  ]);
   assert.deepEqual(diagnosticPlan(3, {}), { test: 3 });
   assert.deepEqual(diagnosticPlan(3, { 3: T }), { test: 4 }, 'tuntas → naik');
   assert.deepEqual(diagnosticPlan(3, { 3: T, 4: X }), { final: 4, beyond: false });

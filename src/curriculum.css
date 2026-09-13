@@ -474,3 +474,25 @@ dialog .history small {
   margin-right: 4px;
   font-size: 10px;
 }
+.indicator-test {
+  margin: 4px 0 6px;
+  font-size: 12px;
+}
+.indicator-test summary {
+  cursor: pointer;
+  opacity: 0.8;
+}
+.indicator-test dl {
+  margin: 4px 0 0;
+}
+.indicator-test dt {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+.indicator-test dd {
+  margin: 0;
+  line-height: 1.5;
+}

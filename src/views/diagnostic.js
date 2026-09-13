@@ -9,7 +9,7 @@ import {
   DECIDING,
   RATINGS,
   RATING_RULE,
-  diagnosticTasks,
+  taskOrder,
   suggestedStart,
   levelComplete,
   diagnosticPlan,
@@ -96,9 +96,12 @@ export function diagnosticLevelStep(s, run, level) {
     : '';
   const legend = `<p class="muted diagnostic-legend">${RATING_RULE}</p>`;
   const head = `<p class="diagnostic-who"><strong>${h(s.name)}</strong> · Menguji Level ${level}${lv ? ` — ${h(lv.title)}` : ''}</p>${trail}${legend}`;
-  const cards = [1, 2, 3, 4, 5, 6, 7, 8]
-    .map(n => diagnosticTaskCard(level, n, run.results[level]?.[n] || run.draft?.[level]?.[n]))
-    .join('');
+  const card = n => diagnosticTaskCard(level, n, run.results[level]?.[n] || run.draft?.[level]?.[n]);
+  const { active, observed } = taskOrder(state.curriculumIndicators, level);
+  const watch = observed.length
+    ? `<h4 class="diagnostic-observe">Diamati sepanjang tes — nilai di akhir</h4>${observed.map(card).join('')}`
+    : '';
+  const cards = active.map(card).join('') + watch;
   const back = run.order.length
     ? '<button type="button" class="secondary" data-action="diagnostic-back">← Kembali</button>'
     : '<button type="button" class="secondary" data-action="diagnostic-restart">← Ganti anak / titik mulai</button>';
@@ -107,14 +110,13 @@ export function diagnosticLevelStep(s, run, level) {
 
 export function diagnosticTaskCard(level, n, value = '') {
   const ind = state.curriculumIndicators.find(i => i.level === level && i.number === n);
-  const t = diagnosticTasks[level]?.[n] || {};
   const deciding = DECIDING.includes(n);
   const options = RATINGS.map(
     ([code, mark, label]) =>
       `<label class="diagnostic-rating"><input type="radio" name="i${n}" value="${code}" ${value === code ? 'checked' : ''} ${deciding ? 'required' : ''}><span>${mark} ${label}</span></label>`
   ).join('');
   const tag = deciding ? '' : ' <span class="badge">dicatat, tidak menentukan level</span>';
-  return `<fieldset class="diagnostic-task"><legend>${n}. ${h(ind ? ind.text : 'Indikator belum tersedia')}${tag}</legend><dl><div><dt>Tugas</dt><dd>${h(t.task || '—')}</dd></div><div><dt>Bahan</dt><dd>${h(t.material || '—')}</dd></div><div><dt>Tercapai bila</dt><dd>${h(t.success || '—')}</dd></div></dl><div class="diagnostic-ratings">${options}</div></fieldset>`;
+  return `<fieldset class="diagnostic-task"><legend>${n}. ${h(ind ? ind.text : 'Indikator belum tersedia')}${tag}</legend><dl><div><dt>Tugas</dt><dd>${h(ind?.diagnostic_task || '—')}</dd></div><div><dt>Bahan</dt><dd>${h(ind?.diagnostic_material || '—')}</dd></div><div><dt>Tercapai bila</dt><dd>${h(ind?.diagnostic_success || '—')}</dd></div></dl><div class="diagnostic-ratings">${options}</div></fieldset>`;
 }
 
 // Langkah 3: keputusan dan simpan.

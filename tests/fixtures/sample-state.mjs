@@ -282,9 +282,64 @@ export function loadSampleState() {
       }
     ],
     curriculumIndicators: [
-      { level: 1, number: 2, text: 'Merespons ketika namanya dipanggil', domain: 'Bahasa lisan' },
-      { level: 1, number: 1, text: 'Mengikuti sesi dari awal hingga selesai', domain: 'Kesiapan belajar' },
+      ...[3, 4, 5, 6, 7].map(number => ({
+        level: 1,
+        number,
+        text: 'Indikator L1-' + number,
+        domain: number === 7 ? 'English' : 'Numerasi',
+        diagnostic_task: 'Tugas L1-' + number,
+        diagnostic_material: 'Bahan L1-' + number,
+        diagnostic_success: '4 dari 5 benar.',
+        diagnostic_observe: false
+      })),
+      {
+        level: 1,
+        number: 2,
+        text: 'Merespons ketika namanya dipanggil',
+        domain: 'Bahasa lisan',
+        diagnostic_task: 'Panggil nama 3 kali <di luar pandangan>.',
+        diagnostic_material: '—',
+        diagnostic_success: 'Menoleh 2 dari 3.',
+        diagnostic_observe: false
+      },
+      {
+        level: 1,
+        number: 1,
+        text: 'Mengikuti sesi dari awal hingga selesai',
+        domain: 'Kesiapan belajar',
+        diagnostic_task: 'Diamati sepanjang tes.',
+        diagnostic_material: '—',
+        diagnostic_success: 'Bertahan sampai tugas terakhir.',
+        diagnostic_observe: true
+      },
+      {
+        level: 1,
+        number: 8,
+        text: 'Mau duduk bersama (observasi guru)',
+        domain: 'Karakter',
+        diagnostic_task: 'Diamati sepanjang tes.',
+        diagnostic_material: '—',
+        diagnostic_success: 'Dicatat saja.',
+        diagnostic_observe: true
+      },
       { level: 2, number: 1, text: 'Menyebutkan nama huruf vokal <A>', domain: 'Literasi' }
+    ],
+    diagnosticTests: [
+      {
+        id: 'tes-1',
+        student_id: 'anak-1',
+        tested_on: '2026-09-13',
+        start_level: 2,
+        final_level: 2,
+        beyond: false,
+        level_locked: false,
+        note: 'Masih <mengeja>'
+      }
+    ],
+    diagnosticResults: [
+      { test_id: 'tes-1', level: 2, indicator_number: 2, rating: 'N', indicator_text: 'Mencocokkan huruf' },
+      { test_id: 'tes-1', level: 2, indicator_number: 1, rating: 'T', indicator_text: 'Vokal saat dites' },
+      { test_id: 'tes-1', level: 1, indicator_number: 1, rating: 'B', indicator_text: 'Mengikuti sesi' }
     ],
     curriculumThemes: [
       { number: 2, phase_code: 'fondasi', name: 'Aku Bisa Menghitung', first_meeting: 25, last_meeting: 48 },

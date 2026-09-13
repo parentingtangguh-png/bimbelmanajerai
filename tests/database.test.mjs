@@ -505,6 +505,71 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   assert.equal((await db.query("select relrowsecurity as on from pg_class where relname='session_competency_snapshots'")).rows[0].on,true);
   assert.equal((await db.query("select count(*)::int as n from pg_policies where tablename='session_competency_snapshots'")).rows[0].n,0);
  });
+ await t.test('tugas diagnostik menempel pada indikator Level 1-4',async()=>{
+  const rows=(await admin('select level,number,diagnostic_task,diagnostic_material,diagnostic_success,diagnostic_observe from curriculum_level_indicators where level between 1 and 4 order by level,number')).rows;
+  assert.equal(rows.length,32);
+  for(const r of rows){
+   for(const k of ['diagnostic_task','diagnostic_material','diagnostic_success'])assert.ok(r[k].trim().length>0,`L${r.level}-${r.number} belum punya ${k}`);
+   assert.ok(!/kartu|pasir/i.test(r.diagnostic_task+' '+r.diagnostic_material),`L${r.level}-${r.number} masih butuh kartu cetak atau pasir`);
+   // Karakter (8) dan L1-1 diamati sepanjang tes; tugas lain tidak.
+   assert.equal(r.diagnostic_observe,r.number===8||(r.level===1&&r.number===1),`L${r.level}-${r.number} penanda diamati`);
+   if(r.diagnostic_observe)assert.match(r.diagnostic_task,/sepanjang tes/);
+  }
+  const at=(l,n)=>rows.find(r=>r.level===l&&r.number===n);
+  assert.match(at(3,2).diagnostic_material,/jangan ditulis atau diperlihatkan/,'jawaban dikte tidak diperlihatkan');
+  assert.match(at(3,3).diagnostic_material,/ku · bu → buku/,'suku kata disajikan tertukar');
+  assert.match(at(1,6).diagnostic_success,/tetap ✓/);
+ });
+ await t.test('tes diagnostik tersimpan per indikator, sekali, dan level awal dihitung ulang database',async()=>{
+  const kid=randomUUID(),lain=randomUUID();
+  await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Citra','Bunda',1,1,4,1,1,4),($2,'Daffa','Ayah',1,1,4,1,1,4)`,[kid,lain]);
+  await admin('insert into assignments values($1,$2)',[kid,teacher]);
+  await admin('insert into assignments values($1,$2)',[lain,stranger]);
+  const lvl=(level,ratings)=>ratings.map((rating,i)=>({level,number:i+1,rating}));
+  const T6=['T','T','T','T','T','T'],X6=['T','N','T','T','T','T'];
+  // Mulai Level 2: L2 tuntas (plus English dan Karakter), L3 belum tuntas → level awal 3.
+  const hasil=[...lvl(2,[...T6,'B','T']),...lvl(3,X6)];
+  const simpan=(who,sid,res,summary,start=2)=>as(who,'select save_diagnostic($1,$2,$3::jsonb,$4,$5,$6) as final',[sid,start,JSON.stringify(res),summary,'catatan','gaya']);
+  await assert.rejects(simpan(owner,kid,hasil,'Level awal: 3'),/guru pendamping/,'pemilik ditolak');
+  await assert.rejects(simpan(stranger,kid,hasil,'Level awal: 3'),/guru pendamping/,'guru lain ditolak');
+  await assert.rejects(simpan(teacher,kid,hasil,'Level awal: 2'),/Ringkasan tidak sesuai/,'ringkasan harus memuat level hasil hitungan database');
+  await assert.rejects(simpan(teacher,kid,lvl(2,T6),'Level awal: 3'),/Level 3 belum selesai dinilai/,'jalur tes harus lengkap');
+  await assert.rejects(simpan(teacher,kid,[...hasil,...lvl(4,T6)],'Level awal: 3'),/di luar jalur tes/,'level yang tidak dilalui ditolak');
+  await assert.rejects(simpan(teacher,kid,[...hasil,{level:2,number:1,rating:'T'}],'Level awal: 3'),/lebih dari sekali/);
+  await assert.rejects(simpan(teacher,kid,[...lvl(2,[...T6,'X']),...lvl(3,X6)],'Level awal: 3'),/tidak dikenal/);
+  // Kegagalan di atas tidak meninggalkan apa pun.
+  assert.equal((await admin('select count(*)::int as n from diagnostic_tests where student_id=$1',[kid])).rows[0].n,0);
+  assert.equal((await simpan(teacher,kid,hasil,'Tes · Level awal: 3')).rows[0].final,3);
+  const s=(await admin('select reading_baseline,math_baseline,diagnostic,learning_notes from students where id=$1',[kid])).rows[0];
+  assert.deepEqual([s.reading_baseline,s.math_baseline,s.diagnostic,s.learning_notes],[3,3,'Tes · Level awal: 3','gaya']);
+  const tes=(await admin('select start_level,final_level,beyond,level_locked,note,teacher_id from diagnostic_tests where student_id=$1',[kid])).rows[0];
+  assert.deepEqual([tes.start_level,tes.final_level,tes.beyond,tes.level_locked,tes.note,tes.teacher_id],[2,3,false,false,'catatan',teacher]);
+  const rows=(await admin('select r.level,r.indicator_number,r.rating,r.indicator_text from diagnostic_results r join diagnostic_tests t on t.id=r.test_id where t.student_id=$1 order by 1,2',[kid])).rows;
+  assert.equal(rows.length,14);
+  assert.equal(rows.find(r=>r.level===3&&r.indicator_number===2).rating,'N');
+  // Kalimat indikator disalin, jadi tetap terbaca walau kurikulum diubah kemudian.
+  const asli=rows.find(r=>r.level===2&&r.indicator_number===1).indicator_text;
+  assert.match(asli,/huruf vokal/);
+  await as(owner,"update curriculum_level_indicators set text='Teks baru' where level=2 and number=1");
+  assert.equal((await admin('select indicator_text from diagnostic_results r join diagnostic_tests t on t.id=r.test_id where t.student_id=$1 and level=2 and indicator_number=1',[kid])).rows[0].indicator_text,asli);
+  await as(owner,'update curriculum_level_indicators set text=$1 where level=2 and number=1',[asli]);
+  // Sekali saja.
+  await assert.rejects(simpan(teacher,kid,hasil,'Level awal: 3'),/sudah pernah dites/);
+  // Guru pendamping membaca hasilnya; guru lain dan pemilik tidak.
+  assert.equal((await as(teacher,'select * from diagnostic_results r join diagnostic_tests t on t.id=r.test_id where t.student_id=$1',[kid])).rows.length,14);
+  assert.equal((await as(stranger,'select * from diagnostic_tests where student_id=$1',[kid])).rows.length,0);
+  assert.equal((await as(owner,'select * from diagnostic_tests')).rows.length,0,'pemilik hanya melihat ringkasan di students');
+  assert.equal((await as(owner,'select * from diagnostic_results')).rows.length,0);
+  await assert.rejects(as(teacher,"insert into diagnostic_tests(student_id,teacher_id,start_level,final_level) values($1,$2,1,1)",[lain,teacher]),/permission denied|row-level security/);
+  // Turun: titik mulai 3 belum tuntas, Level 2 tuntas → level awal 3; tuntas sampai 4 → melampaui Fondasi.
+  const turun=[...lvl(3,X6),...lvl(2,T6)];
+  assert.equal((await as(stranger,'select save_diagnostic($1,3,$2::jsonb,$3,$4,$5) as final',[lain,JSON.stringify(turun),'Level awal: 3','',''])).rows[0].final,3);
+  const k2=randomUUID();
+  await admin(`insert into students(id,name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values($1,'Eka','Ibu',1,1,4,1,1,4)`,[k2]);
+  await admin('insert into assignments values($1,$2)',[k2,teacher]);
+  assert.equal((await as(teacher,'select save_diagnostic($1,3,$2::jsonb,$3,$4,$5) as final',[k2,JSON.stringify([...lvl(3,T6),...lvl(4,T6)]),'Level awal: 4 (melampaui Fondasi)','',''])).rows[0].final,4);
+  assert.equal((await admin('select beyond from diagnostic_tests where student_id=$1',[k2])).rows[0].beyond,true);
+ });
  await t.test('guru nonaktif kehilangan akses',async()=>{
   await as(owner,"update access_list set active=false where email='guru@test.invalid'");
   assert.equal((await as(teacher,'select * from students')).rows.length,0);
