@@ -16,7 +16,7 @@ import { curriculumView } from './views/curriculum.js';
 import { sessionsView } from './views/sessions.js';
 import { studentsView, studentForm } from './views/students.js';
 import { diagnosticForm } from './views/diagnostic.js';
-import { diagnosticOutcome, diagnosticPayload, runFromSaved } from './diagnostic.js';
+import { diagnosticOutcome, diagnosticPayload } from './diagnostic.js';
 import { dashboard } from './views/dashboard.js';
 import { homeMenu, homeTop, homeDoa, homeNav, leafArt } from './views/home.js';
 import { teamView } from './views/team.js';
@@ -297,31 +297,18 @@ document.addEventListener('click', async e => {
       dropDraft(id);
       return diagnosticForm();
     }
-    // Ulang dari awal (atau batal revisi) menghapus jawaban, jadi guru diminta memastikan dulu.
+    // Ulang dari awal menghapus jawaban, jadi guru diminta memastikan dulu.
     if (action === 'diagnostic-restart') {
       const run = state.diagnostic;
-      const ask = run?.revision
-        ? 'Batalkan revisi? Hasil tes yang tersimpan tidak berubah.'
-        : 'Ulang dari awal? Jawaban tes anak ini akan dihapus.';
-      if (hasAnswers(run) && !confirm(ask)) return;
+      if (hasAnswers(run) && !confirm('Ulang dari awal? Jawaban tes anak ini akan dihapus.')) return;
       if (run) dropDraft(run.student);
       state.diagnostic = null;
-      if (run?.revision) return document.querySelector('#modal').close();
       return diagnosticForm();
     }
     // Dari halaman hasil kembali ke kartu tugas, dengan semua nilai tetap terisi.
     if (action === 'diagnostic-back') {
       if (!state.diagnostic) return diagnosticForm();
       state.diagnostic.reviewed = false;
-      keepDraft();
-      return diagnosticForm();
-    }
-    if (action === 'diagnostic-revise') {
-      if (state.role !== 'teacher') return notify('Tes diagnostik direvisi oleh guru pendamping.', true);
-      const test = state.diagnosticTests.find(t => t.student_id === id);
-      if (!test) return notify('Hasil tes diagnostik tidak ditemukan.', true);
-      const saved = readDrafts()[id];
-      state.diagnostic = saved?.revision && saved.level ? saved : runFromSaved(test, state.diagnosticResults);
       keepDraft();
       return diagnosticForm();
     }

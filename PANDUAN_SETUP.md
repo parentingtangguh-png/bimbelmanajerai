@@ -67,7 +67,7 @@ Hanya build aplikasi yang dipublikasikan; data siswa berada di Supabase. Jangan 
 
 1. Pemilik mendaftarkan guru di **Tim pengajar**.
 2. Guru menambah siswa di **Data siswa → ＋ Tambah siswa**: nama, panggilan, sapaan orang tua, WhatsApp, tanggal lahir, kelas formal. Level anak belum ditentukan.
-3. Guru menjalankan **Tes Diagnostik**: pilih anak dan satu level (saran dari kelas formal), nilai delapan tugas, lihat hasil, simpan. Tes bisa dijeda dan dilanjutkan di perangkat yang sama, dan hasilnya bisa direvisi dari profil siswa.
+3. Guru menjalankan **Tes Diagnostik**: pilih anak dan satu level (saran dari kelas formal), nilai delapan tugas, lihat hasil, simpan. Tes bisa dijeda dan dilanjutkan di perangkat yang sama, dan hasilnya final (tidak bisa direvisi; salah input diperbaiki dengan menghapus siswa lalu menambah ulang).
 4. Hasil: "Lulus Level X" (mulai belajar Level X+1) atau "Belum lulus Level X" (mulai belajar Level X), dengan daftar indikator yang perlu dilatih.
 5. **Ruang kelas** sedang disiapkan untuk kurikulum pilot.
 

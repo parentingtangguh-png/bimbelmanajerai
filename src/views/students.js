@@ -136,15 +136,8 @@ export function diagnosticResultSection(s) {
   const list = items ? `<ul class="diagnostic-result-list">${items}</ul>` : '';
   const beyond = test.passed && test.tested_level === 4 ? ' (melampaui Fondasi)' : '';
   const head = `<p class="muted">${h(test.tested_on)} · <strong>${h(testStatus(test))}</strong> → mulai belajar <strong>Level ${test.final_level}</strong>${beyond}</p>`;
-  const revised = test.revised_at
-    ? `<p class="muted">Direvisi ${h(new Date(test.revised_at).toLocaleDateString('id-ID'))}</p>`
-    : '';
   const note = test.note ? `<p><strong>Catatan:</strong> ${h(test.note)}</p>` : '';
-  const button =
-    state.role === 'teacher' && s.status === 'Aktif'
-      ? `<button type="button" class="secondary" data-action="diagnostic-revise" data-id="${s.id}">Revisi hasil tes</button>`
-      : '';
-  return `<hr><h3>Hasil tes diagnostik</h3>${head}${revised}${list}${note}${button}`;
+  return `<hr><h3>Hasil tes diagnostik</h3>${head}${list}${note}`;
 }
 
 // Level anak saat ini beserta deskriptornya dari kurikulum pilot.

@@ -13,20 +13,15 @@ Berkas ini menggambarkan **keadaan sekarang**, bukan riwayat. Kalau sesuatu di s
 - **Belum diluncurkan.** Data yang ada adalah akun tim dan siswa percobaan milik guru Hafsah.
 
 ## ▶ Mulai di sini: status terakhir (13 Sep 2026, akhir sesi)
-**Sudah di produksi** (commit `c56153d`, migrasi terakhir `20260913080000_pilot_only_architecture.sql`, Edge Function `generate-learning` sudah dihapus dari Supabase):
+**Sudah di produksi** (migrasi terakhir `20260913090000_diagnostic_no_revision.sql` — revisi tes dihapus; sebelumnya commit `c56153d` `20260913080000_pilot_only_architecture.sql`, Edge Function `generate-learning` sudah dihapus dari Supabase):
 - Arsitektur pilot saja (lihat bagian berikut). Semua tes, build, dan Playwright hijau saat deploy.
 - Data produksi: 6 akun di `access_list` + 6 `profiles`; 5 siswa percobaan milik guru **Hafsah Isykarima**, semuanya sudah dites diagnostik (8 nilai per anak): Aisyah Putri Rahmawati L1, Muhammad Fathan Alfarizi L2, Khansa Nabila Azzahra L3, Doni Saputra L4, Rafa Arkana Pratama L4 (semua "Belum lulus" di level yang dites). Nomor WA kosong kecuali Doni.
 
-**Belum dilakukan — kerjakan ini lebih dulu di sesi baru:**
-1. **Uji jalur simpan di aplikasi yang sudah login** (semua RPC siswa dan tes ditulis ulang di migrasi terakhir; tes otomatis tidak menjangkau tombol simpan). Minta pengguna login di pane browser (`preview_start` nama `bimbel-dev`, port 5173), lalu bersama pengguna:
-   a. Tambah siswa percobaan → harus "Level belum ditentukan" + tanda "Belum tes diagnostik".
-   b. Tes diagnostik siswa itu → simpan → status & level berubah.
-   c. Revisi hasil tes → simpan → `revised_at` terisi.
-   d. Simpan profil siswa lama tanpa mengubah apa pun → level & tes tetap.
-   e. Hapus siswa percobaan → baris tesnya ikut hilang.
-   Periksa tiap langkah dengan query baca saja. Kalau ada yang gagal, perbaiki dan minta izin deploy.
-2. Setelah itu tanyakan pengguna mau lanjut ke mana. Kandidat yang sudah dibahas (jangan dikerjakan tanpa diminta):
-   - **Alur kelas pilot** (terbesar; keputusan yang belum ada tercantum di Aturan bisnis → Ruang kelas).
+**Uji jalur simpan sudah lulus (13 Sep 2026, sesi kedua):** tambah siswa, tes, revisi, simpan profil tanpa perubahan, dan hapus siswa dicoba lewat tombol di aplikasi (akun Hafsah) dan dicocokkan dengan query; data Hafsah tidak berubah. Catatan: `confirm()` di pane browser otomatis dianggap Batal — untuk menguji hapus, timpa `window.confirm` sekali lewat JS setelah memastikan `data-id` tombol.
+
+**Berikutnya:**
+1. **Alur kelas pilot sudah dirancang** (Aturan bisnis → Ruang kelas, butir 1–8). Belum ada kode. Tanyakan pengguna apakah mulai membangun, dan jangan membahas aktivitas kelas/rapor sebelum diminta.
+2. Kandidat lain (jangan dikerjakan tanpa diminta):
    - Saran perbaikan tes diagnostik (lihat Catatan lain → Yang masih terbuka).
    - Bersihkan data percobaan sebelum peluncuran.
 
@@ -39,25 +34,34 @@ Yang tersisa (dan dijaga tes `struktur lama sudah tidak ada`):
 - **Tabel**: `access_list`, `profiles`, `assignments`, `students`, `curriculum_phases`, `curriculum_levels`, `curriculum_level_indicators`, `curriculum_themes`, `diagnostic_tests`, `diagnostic_results`.
 - **Fungsi**: `is_member`, `is_owner`, `can_teach`, `handle_new_user`, `check_student_identity`, `create_student`, `update_student_profile`, `set_student_active`, `delete_student`, `reject_owner_student_insert` (pemicu), `save_diagnostic`.
 - **students**: `id, name, parent_name, phone, status ('Aktif'|'Non-Aktif'), created_at, nickname, birth_date, school_grade, school_year, pilot_level`. `pilot_level` **kosong sampai tes diagnostik disimpan**, dan hanya diubah RPC.
-- **diagnostic_tests** (unik per siswa): `tested_level, passed, final_level, note, tested_on, revised_at, teacher_id`. Check `final_level` = lulus ? min(level+1, 4) : level. **"Sudah dites" = ada baris ini** — tidak ada kolom penanda lain, dan status "Lulus/Belum lulus Level X" diturunkan (`testStatus` di `state.js`).
+- **diagnostic_tests** (unik per siswa, final): `tested_level, passed, final_level, note, tested_on, teacher_id`. Check `final_level` = lulus ? min(level+1, 4) : level. **"Sudah dites" = ada baris ini** — tidak ada kolom penanda lain, dan status "Lulus/Belum lulus Level X" diturunkan (`testStatus` di `state.js`).
 - **diagnostic_results**: nilai T/B/N per indikator + salinan `indicator_text`.
 - Tulis langsung ke tabel ditolak (RLS tanpa kebijakan tulis); semua perubahan lewat RPC `security definer`.
 - `diagnostic_tests` dibaca guru pendamping **dan pemilik** (ringkasan); `diagnostic_results` hanya guru pendamping.
 
 ## Aturan bisnis yang sudah diputuskan pengguna
-- **Guru** mengelola siswanya sendiri: tambah siswa (otomatis milik guru pembuat), Tes Diagnostik dan revisinya, profil, Nonaktifkan/Aktifkan kembali, hapus siswa (tidak bila dibagi guru lain).
+- **Guru** mengelola siswanya sendiri: tambah siswa (otomatis milik guru pembuat), Tes Diagnostik (sekali, final), profil, Nonaktifkan/Aktifkan kembali, hapus siswa (tidak bila dibagi guru lain).
 - **Pemilik** hanya membaca data umum, mendaftarkan guru (Tim pengajar), dan membaca kurikulum. Database menolak pemilik menambah/mengubah siswa dan menyimpan tes.
 - **Isolasi antar guru** wajib: RLS + RPC yang memeriksa `can_teach`. Ada tesnya di `tests/database.test.mjs`.
 - **Kurikulum pilot** (disetujui pemilik kata demi kata): CP Fase Fondasi → 4 level (judul + deskripsi) → 8 indikator per level (area di kolom `domain`; nomor 7 English, nomor 8 Karakter "observasi guru") → 8 tema × 24 pertemuan dengan deskriptor. Level milik anak secara utuh, bukan per bidang. Perubahan isi kurikulum: **draf teks dulu**, tunggu persetujuan, lalu migrasi.
 - **Tes Diagnostik — satu level per tes**:
   - Guru memilih anak aktif yang belum dites dan **satu level** (kelas formal hanya saran: Belum sekolah→1, TK A→2, TK B→3, SD→4; deskriptor level tampil di bawah pilihan), menilai 8 tugas (✓ Tercapai / ◐ Dengan bantuan atau kurang satu dari ukuran / ✗ Belum), lalu menyimpan.
   - **Lulus** = indikator 1–6 semuanya ✓. English (7) dan Karakter (8) hanya dicatat. Lulus Level X → mulai Level X+1 (Level 4 tetap 4, "melampaui Fondasi"); belum lulus → mulai Level X.
-  - **Satu tes per anak.** Simpan ulang = **revisi** (hanya hasil terakhir, `revised_at`). Kunci "revisi hanya sebelum kelas pertama" ikut hilang bersama kelas lama; **pasang lagi di alur kelas pilot**.
+  - **Satu tes final per anak, tanpa revisi** (migrasi `20260913090000_diagnostic_no_revision.sql`): `save_diagnostic` menolak tes kedua, kolom `revised_at` dan tombol revisi sudah dihapus. Salah input → hapus siswa lalu tambah ulang.
   - Tugas, bahan, ukuran, dan penanda "diamati sepanjang tes" menempel pada indikator (`curriculum_level_indicators.diagnostic_*`). Tugas yang diamati sepanjang tes (L1-1 dan semua indikator 8) tampil paling bawah. **Tanpa berkas cetak**: huruf/angka/kata ditulis guru di kertas/papan, gambar diganti benda nyata. Kalimat indikator L2-2 tetap "gambar benda" meski tugasnya memakai benda nyata (keputusan pemilik).
   - Hasil dihitung ulang di `save_diagnostic`; aplikasi hanya menampilkan.
   - Jawaban yang belum disimpan tersimpan di localStorage `bimbel.diagnostic.<user id>` per anak (jeda, pindah anak, lanjutkan di perangkat yang sama).
 - **Catatan gaya belajar, minat, dan ringkasan teks diagnostik tidak lagi ada** (kolomnya sudah dihapus).
-- **Ruang kelas** sementara hanya halaman "sedang disiapkan". Rancangan pemilik (belum dibangun): tema menurut nomor pertemuan; lembar aktivitas per pertemuan (pembuka + English phrase, aktivitas utama dengan tugas otomatis per level anak, penutup + checklist karakter); guru memilih yang hadir lalu menandai pertemuan selesai. Belum diputuskan: cara naik level, kapan indikator dinilai, apakah hasil ✓ tes langsung dihitung, sumber isi 192 lembar, cara menghitung nomor pertemuan, butir checklist karakter, rapor, dan penjaga "belum dites tidak bisa ikut kelas".
+- **Ruang kelas** sementara hanya halaman "sedang disiapkan". **Rancangan alur kelas pilot (diputuskan pemilik 13 Sep 2026, belum dibangun)** — situasi acuan: 1 guru, ±5 anak beda level, satu tema, sesi 60 menit. Frekuensi pertemuan urusan guru; aplikasi tidak boleh berasumsi jadwal.
+  1. **Pertemuan** dihitung **per guru**, maju 1 saat guru **menandai pertemuan selesai** (bukan kalender), tidak pernah mundur.
+  2. **Tema** independen: hanya ditentukan nomor pertemuan (1–24 Tema 1, dst.) dan mewarnai pertemuan. Kolom `curriculum_themes.focus_indicators` **tidak dipakai** untuk memilih indikator anak (jangan dihapus tanpa draf + persetujuan).
+  3. **English (7) dan Karakter (8)** seperti tema: mewarnai setiap pertemuan, **dicatat** (usulan: satu catatan opsional per anak per pertemuan, bentuk belum dikonfirmasi), **tidak menentukan** perpindahan indikator atau kenaikan level.
+  4. **Indikator akademik 1–6**: tiap anak punya **satu indikator aktif** = nomor terkecil yang belum lulus di levelnya (**berurutan**, ditetapkan kurikulum). Di akhir kelas guru mengetuk **Lulus / Belum** untuk anak yang hadir (satu ketukan per anak, tanpa ◐). Lulus → indikator berikutnya; Belum → tetap. Anak selevel bisa berada di indikator berbeda.
+  5. **Naik level**: 1–6 lulus → aplikasi menandai **"siap naik"** → **guru mengonfirmasi** → indikator aktif mulai dari 1 di level baru; riwayat level lama disimpan.
+  6. **Tes diagnostik hanya menentukan level awal**, tidak terhubung ke kelas (nilai ✓ tes tidak dihitung). **Siswa baru wajib dites dulu**; yang belum dites tidak bisa dipilih hadir.
+  7. **Revisi tes diagnostik dihapus** (sudah di produksi, lihat Tes Diagnostik).
+  8. **Indikator ≠ aktivitas kelas.** Jangan menempelkan tugas/panduan latihan ke indikator. Layar tutup pertemuan hanya menampilkan kalimat indikator.
+  - Belum diputuskan (**jangan dibahas sebelum pengguna meminta**): aktivitas kelas (bentuk, sumber isi), rapor, bentuk pasti catatan English & karakter.
 
 ## Keputusan final — jangan ditawarkan lagi
 - **Tidak memasang SMTP sendiri.** Guru baru dibuat lewat Supabase Dashboard → Authentication → Add user dengan **Auto Confirm**, setelah emailnya didaftarkan di Tim pengajar.

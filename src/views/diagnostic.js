@@ -23,17 +23,14 @@ export function diagnosticForm(studentId = '') {
   if (!run) return modal('Tes Diagnostik', diagnosticStart(studentId));
   const s = state.students.find(x => x.id === run.student);
   if (!s) return modal('Tes Diagnostik', diagnosticStart());
-  modal(
-    run.revision ? 'Revisi Tes Diagnostik' : 'Tes Diagnostik',
-    run.reviewed ? diagnosticResultStep(s, run) : diagnosticLevelStep(s, run)
-  );
+  modal('Tes Diagnostik', run.reviewed ? diagnosticResultStep(s, run) : diagnosticLevelStep(s, run));
 }
 
 // Tes yang terhenti dan tersimpan sementara di perangkat ini, untuk anak yang masih menunggu dites.
 export function draftList(waiting) {
   const items = waiting
     .map(s => ({ s, run: state.diagnosticDrafts[s.id] }))
-    .filter(x => x.run && !x.run.revision)
+    .filter(x => x.run)
     .map(
       ({ s, run }) =>
         `<li><div><strong>${h(s.name)}</strong><small>Level ${run.level} · ${draftProgress(run)} dari 8 dinilai</small></div><div class="button-row"><button type="button" class="primary" data-action="diagnostic-resume" data-id="${s.id}">Lanjutkan</button><button type="button" class="secondary" data-action="diagnostic-discard" data-id="${s.id}">Buang</button></div></li>`
@@ -113,9 +110,7 @@ export function diagnosticLevelStep(s, run) {
   const watch = observed.length
     ? `<h4 class="diagnostic-observe">Diamati sepanjang tes — nilai di akhir</h4>${observed.map(card).join('')}`
     : '';
-  const back = run.revision
-    ? '<button type="button" class="secondary" data-action="diagnostic-restart">← Batal revisi</button>'
-    : '<button type="button" class="secondary" data-action="diagnostic-restart">← Ulang dari awal</button>';
+  const back = '<button type="button" class="secondary" data-action="diagnostic-restart">← Ulang dari awal</button>';
   return `<form data-form="diagnostic-level" data-id="${level}">${head}${active.map(card).join('')}${watch}<div class="button-row">${back}<button class="primary">Lihat hasil →</button></div></form>`;
 }
 
@@ -146,7 +141,7 @@ export function diagnosticResultStep(s, run) {
   const focusBlock = focus
     ? `<h4>Perlu dilatih lebih dulu</h4><ul class="diagnostic-focus">${focus}</ul>`
     : '';
-  const revision = run.revision ? '<p class="muted">Revisi mengganti hasil tes sebelumnya.</p>' : '';
+  const final = '<p class="muted">Hasil tes final dan tidak bisa diubah setelah disimpan.</p>';
   const marks = DECIDING.map(n => `${n} ${ratingMark(run.answers[n])}`).join(' · ');
   const summary = `<p class="muted diagnostic-marks">Nilai 1–6: ${marks} · English ${ratingMark(run.answers[7])} · Karakter ${ratingMark(run.answers[8])}</p>`;
   const note = area(
@@ -155,5 +150,5 @@ export function diagnosticResultStep(s, run) {
     run.note || '',
     'maxlength="1500" placeholder="Misalnya: membaca kalimat masih mengeja."'
   );
-  return `<form data-form="diagnostic" data-id="${s.id}"><div class="diagnostic-result">${verdict}${revision}</div>${summary}${focusBlock}${note}<div class="button-row"><button type="button" class="secondary" data-action="diagnostic-back">← Ubah nilai</button><button class="primary">${run.revision ? 'Simpan revisi' : 'Simpan hasil tes'}</button></div></form>`;
+  return `<form data-form="diagnostic" data-id="${s.id}"><div class="diagnostic-result">${verdict}${final}</div>${summary}${focusBlock}${note}<div class="button-row"><button type="button" class="secondary" data-action="diagnostic-back">← Ubah nilai</button><button class="primary">Simpan hasil tes</button></div></form>`;
 }

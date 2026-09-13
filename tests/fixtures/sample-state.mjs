@@ -117,8 +117,7 @@ export function loadSampleState() {
         tested_level: 2,
         passed: false,
         final_level: 2,
-        note: 'Masih <mengeja>',
-        revised_at: null
+        note: 'Masih <mengeja>'
       }
     ],
     diagnosticResults: [

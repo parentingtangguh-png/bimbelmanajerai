@@ -14,7 +14,7 @@ Catatan kerja lengkap untuk pengembang (dan Claude) ada di [CLAUDE.md](CLAUDE.md
 ## Fitur
 
 - Login pemilik dan guru berdasarkan email yang didaftarkan pemilik, dengan Row Level Security dan isolasi antar guru.
-- Guru menambah dan mengelola siswanya sendiri: identitas, Tes Diagnostik (bisa dijeda dan direvisi), status aktif/nonaktif, hapus.
+- Guru menambah dan mengelola siswanya sendiri: identitas, Tes Diagnostik (bisa dijeda; hasil final tanpa revisi), status aktif/nonaktif, hapus.
 - Pemilik membaca data umum siswa dan ringkasan tes, mendaftarkan guru, dan membaca kurikulum.
 - Ringkasan: siswa aktif, sudah/belum dites, dan sebaran level.
 - Tampilan khusus HP: menu utama, navbar bawah, doa harian.

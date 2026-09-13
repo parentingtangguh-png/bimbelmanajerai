@@ -30,7 +30,7 @@ test('PostgreSQL: akun, siswa, kurikulum pilot, dan tes diagnostik',async t=>{
   const kolom=(await admin("select column_name from information_schema.columns where table_schema='public' and table_name='students' order by ordinal_position")).rows.map(r=>r.column_name);
   assert.deepEqual(kolom,['id','name','parent_name','phone','status','created_at','nickname','birth_date','school_grade','school_year','pilot_level']);
   const tes=(await admin("select column_name from information_schema.columns where table_schema='public' and table_name='diagnostic_tests' order by ordinal_position")).rows.map(r=>r.column_name);
-  assert.deepEqual(tes,['id','student_id','teacher_id','tested_on','final_level','note','created_at','revised_at','tested_level','passed']);
+  assert.deepEqual(tes,['id','student_id','teacher_id','tested_on','final_level','note','created_at','tested_level','passed']);
  });
  await t.test('email tidak dikenal tidak bisa mendaftar',async()=>{await db.exec('reset role');await assert.rejects(db.query('insert into auth.users values($1,$2)',[randomUUID(),'unknown@test.invalid']),/belum didaftarkan/);});
  await t.test('fungsi pemicu tidak tersedia sebagai RPC pengguna',async()=>{
@@ -134,7 +134,7 @@ test('PostgreSQL: akun, siswa, kurikulum pilot, dan tes diagnostik',async t=>{
   assert.match(at(3,3).diagnostic_material,/ku · bu → buku/,'suku kata disajikan tertukar');
   assert.match(at(1,6).diagnostic_success,/tetap ✓/);
  });
- await t.test('tes diagnostik satu level: hasil dihitung database, satu tes per anak, simpan ulang = revisi',async()=>{
+ await t.test('tes diagnostik satu level: hasil dihitung database, satu tes final per anak tanpa revisi',async()=>{
   const kid=await buat(),lain=await buat(stranger),k4=await buat();
   const lvl=(level,ratings)=>ratings.map((rating,i)=>({level,number:i+1,rating}));
   const simpan=(who,sid,level,res,note='catatan')=>as(who,'select save_diagnostic($1,$2,$3::jsonb,$4) as final',[sid,level,JSON.stringify(res),note]);
@@ -149,8 +149,8 @@ test('PostgreSQL: akun, siswa, kurikulum pilot, dan tes diagnostik',async t=>{
   assert.equal((await admin('select count(*)::int n from diagnostic_tests where student_id=$1',[kid])).rows[0].n,0,'gagal tidak meninggalkan data');
   // Satu ◐ di indikator 1-6 = belum lulus → level awal = level yang dites. English/Karakter tidak menentukan.
   assert.equal((await simpan(teacher,kid,2,hampir)).rows[0].final,2);
-  let tes=(await admin('select tested_level,passed,final_level,note,revised_at,teacher_id from diagnostic_tests where student_id=$1',[kid])).rows[0];
-  assert.deepEqual([tes.tested_level,tes.passed,tes.final_level,tes.note,tes.revised_at,tes.teacher_id],[2,false,2,'catatan',null,teacher]);
+  let tes=(await admin('select tested_level,passed,final_level,note,teacher_id from diagnostic_tests where student_id=$1',[kid])).rows[0];
+  assert.deepEqual([tes.tested_level,tes.passed,tes.final_level,tes.note,tes.teacher_id],[2,false,2,'catatan',teacher]);
   assert.equal((await admin('select pilot_level from students where id=$1',[kid])).rows[0].pilot_level,2);
   assert.equal((await admin('select count(*)::int n from diagnostic_results r join diagnostic_tests t on t.id=r.test_id where t.student_id=$1',[kid])).rows[0].n,8);
   // Salinan kalimat indikator tetap walau kurikulum diubah.
@@ -165,12 +165,12 @@ test('PostgreSQL: akun, siswa, kurikulum pilot, dan tes diagnostik',async t=>{
   assert.equal((await as(owner,'select * from diagnostic_results')).rows.length,0,'pemilik tidak membaca hasil per indikator');
   await assert.rejects(as(teacher,"insert into diagnostic_tests(student_id,teacher_id,tested_level,passed,final_level) values($1,$2,1,true,2)",[lain,teacher]),/permission denied|row-level security/i);
   await assert.rejects(admin("update diagnostic_tests set final_level=4 where student_id=$1",[kid]),/final_level_rule/,'level awal harus sesuai hasil');
-  // Revisi: tetap satu tes; lulus Level 2 → level awal 3; tanggal revisi tercatat; hanya hasil terakhir.
-  assert.equal((await simpan(teacher,kid,2,lvl(2,['T','T','T','T','T','T','B']),'revisi')).rows[0].final,3);
-  tes=(await admin('select count(*) over() n,passed,final_level,revised_at is not null r from diagnostic_tests where student_id=$1',[kid])).rows[0];
-  assert.deepEqual([Number(tes.n),tes.passed,tes.final_level,tes.r],[1,true,3,true]);
-  assert.equal((await admin('select pilot_level from students where id=$1',[kid])).rows[0].pilot_level,3);
-  assert.equal((await admin('select count(*)::int n from diagnostic_results r join diagnostic_tests t on t.id=r.test_id where t.student_id=$1',[kid])).rows[0].n,7);
+  // Tanpa revisi: tes kedua ditolak; tes, level, dan nilai tetap.
+  await assert.rejects(simpan(teacher,kid,2,lvl(2,['T','T','T','T','T','T','B']),'revisi'),/sudah dites diagnostik/);
+  tes=(await admin('select count(*) over() n,passed,final_level,note from diagnostic_tests where student_id=$1',[kid])).rows[0];
+  assert.deepEqual([Number(tes.n),tes.passed,tes.final_level,tes.note],[1,false,2,'catatan']);
+  assert.equal((await admin('select pilot_level from students where id=$1',[kid])).rows[0].pilot_level,2);
+  assert.equal((await admin('select count(*)::int n from diagnostic_results r join diagnostic_tests t on t.id=r.test_id where t.student_id=$1',[kid])).rows[0].n,8);
   // Lulus Level 4 → tetap Level 4.
   assert.equal((await simpan(teacher,k4,4,lvl(4,['T','T','T','T','T','T']))).rows[0].final,4);
   // Anak nonaktif tidak dites.

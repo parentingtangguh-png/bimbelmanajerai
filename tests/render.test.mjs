@@ -21,7 +21,6 @@ import {
   diagnosticOutcome,
   diagnosticPayload,
   focusIndicators,
-  runFromSaved,
   draftProgress,
   suggestedStart
 } from '../src/diagnostic.js';
@@ -132,15 +131,13 @@ test('profil siswa: identitas, hasil tes, level saat ini, status, dan hapus', ()
   assert.match(profil, /data-action="toggle-student" data-active="false"/);
   assert.match(profil, /data-action="delete-student"/);
 
-  // Hasil tes: urut per indikator, kalimat dari salinan saat dites, catatan di-escape, bisa direvisi.
+  // Hasil tes: urut per indikator, kalimat dari salinan saat dites, catatan di-escape, tanpa revisi (hasil final).
   const bagian = diagnosticResultSection(alya);
   assert.match(bagian, /<strong>Belum lulus Level 2<\/strong> → mulai belajar <strong>Level 2<\/strong>/);
   assert.ok(bagian.indexOf('1. Vokal saat dites') < bagian.indexOf('2. Mencocokkan huruf'));
   assert.match(bagian, /✗<\/span> 2\. Mencocokkan huruf/);
   assert.ok(bagian.includes('Masih &lt;mengeja&gt;'));
-  assert.match(bagian, /data-action="diagnostic-revise" data-id="anak-1"/);
-  state.diagnosticTests[0].revised_at = '2026-09-14T02:00:00Z';
-  assert.match(diagnosticResultSection(alya), /Direvisi 14\/9\/2026/);
+  assert.ok(!/revis/i.test(profil), 'tidak ada revisi tes');
   assert.equal(diagnosticResultSection(state.students[1]), '', 'anak belum dites');
 
   const bima = openModal(studentForm, state.students[1]);
@@ -301,13 +298,13 @@ test('tes diagnostik: pilih anak dan satu level, dengan saran dari kelas formal'
 
   state.diagnosticDrafts = {
     'anak-2': { student: 'anak-2', level: 3, answers: { 1: 'T', 2: 'B' }, reviewed: false },
-    'anak-1': { student: 'anak-1', level: 1, answers: {}, revision: true }
+    'anak-1': { student: 'anak-1', level: 1, answers: {} }
   };
   const mulai = openModal(diagnosticForm);
   assert.match(mulai, /Tes belum selesai/);
   assert.match(mulai, /Level 3 · 2 dari 8 dinilai/);
   assert.match(mulai, /data-action="diagnostic-resume" data-id="anak-2"/);
-  assert.ok(!mulai.includes('data-id="anak-1"'), 'revisi tidak ditawarkan di daftar tes baru');
+  assert.ok(!mulai.includes('data-id="anak-1"'), 'anak yang sudah dites tidak ditawarkan');
 
   state.students = state.students.filter(s => s.id !== 'anak-2');
   assert.match(openModal(diagnosticForm), /Semua anak sudah dites/);
@@ -350,12 +347,8 @@ test('tes diagnostik: delapan kartu satu level, lalu hasil lulus atau belum lulu
   assert.match(belum, /BELUM LULUS LEVEL 1/);
   assert.match(belum, /Mulai belajar Level 1 — Aku Siap Belajar/);
   assert.match(belum, /<li>2\. Merespons ketika namanya dipanggil<\/li>/);
-
-  state.diagnostic = { ...runFromSaved(state.diagnosticTests[0], state.diagnosticResults), reviewed: true };
-  const revisi = openModal(diagnosticForm);
-  assert.match(revisi, /Revisi Tes Diagnostik/);
-  assert.match(revisi, />Simpan revisi</);
-  assert.ok(revisi.includes('Masih &lt;mengeja&gt;'));
+  assert.match(belum, /Hasil tes final dan tidak bisa diubah/);
+  assert.ok(!/revis/i.test(belum + langkah), 'tanpa revisi');
 });
 
 test('aturan hasil tes diagnostik satu level sesuai keputusan pemilik', () => {
@@ -394,18 +387,6 @@ test('aturan hasil tes diagnostik satu level sesuai keputusan pemilik', () => {
   ]);
   assert.equal(draftProgress({ answers: { 1: 'T', 8: 'B' } }), 2);
   assert.deepEqual(['Belum sekolah', 'TK A', 'TK B', 'SD 1'].map(suggestedStart), [1, 2, 3, 4]);
-  const rows = [
-    { test_id: 't', level: 2, indicator_number: 1, rating: 'N' },
-    { test_id: 'lain', level: 2, indicator_number: 2, rating: 'T' }
-  ];
-  assert.deepEqual(runFromSaved({ id: 't', student_id: 's', tested_level: 2, note: 'x' }, rows), {
-    student: 's',
-    level: 2,
-    answers: { 1: 'N' },
-    reviewed: false,
-    revision: true,
-    note: 'x'
-  });
   assert.equal(testStatus({ passed: true, tested_level: 3 }), 'Lulus Level 3');
   assert.equal(testStatus(undefined), '');
   loadSampleState();

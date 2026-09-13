@@ -19,7 +19,7 @@ export const initialState = () => ({
   curriculumThemes: [],
   diagnosticTests: [],
   diagnosticResults: [],
-  // Tes Diagnostik yang sedang berjalan: { student, level, answers, reviewed, revision, note }.
+  // Tes Diagnostik yang sedang berjalan: { student, level, answers, reviewed, note }.
   diagnostic: null,
   // Tes yang belum disimpan di perangkat ini, per anak (dibaca main.js dari localStorage).
   diagnosticDrafts: {}

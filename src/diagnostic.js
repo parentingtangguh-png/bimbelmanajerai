@@ -57,14 +57,5 @@ export function diagnosticPayload(level, answers = {}) {
   return Object.entries(answers).map(([number, rating]) => ({ level, number: Number(number), rating }));
 }
 
-// Tes tersimpan dibuka lagi untuk direvisi, dengan nilai dan catatannya.
-export function runFromSaved(test, rows) {
-  const level = test.tested_level;
-  const answers = {};
-  for (const r of rows.filter(x => x.test_id === test.id && x.level === level))
-    answers[r.indicator_number] = r.rating;
-  return { student: test.student_id, level, answers, reviewed: false, revision: true, note: test.note || '' };
-}
-
 // Berapa indikator yang sudah dinilai, untuk tombol "Lanjutkan".
 export const draftProgress = run => Object.keys(run.answers || {}).length;
