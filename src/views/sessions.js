@@ -1,5 +1,6 @@
-// Ruang kelas pilot, tahap 1: jadwal pertemuan per guru — siswa, tema, indikator per siswa (dari level
-// masing-masing), pertemuan, tanggal. Penandaan Lulus/Belum dan "pertemuan selesai" menyusul di tahap 2.
+// Ruang kelas pilot. Jadwal hanya berisi tema, nomor pertemuan (otomatis), tanggal, dan jam. Siswa tidak
+// terikat jadwal: saat kelas guru membuka jadwal, memilih siswa yang datang, indikator tiap siswa, dan
+// Lulus/Belum; bisa disimpan sementara, lalu ditandai selesai (final dan terkunci).
 import { state, testFor, suggestedIndicator } from '../state.js';
 import { heading, empty, field, select } from '../ui.js';
 import { escapeHtml as h, localDate } from '../domain.js';
@@ -16,7 +17,7 @@ export function sessionsView() {
       empty(
         'Belum ada jadwal',
         teacher
-          ? 'Buat jadwal: pilih siswa, tema, indikator tiap siswa, dan pertemuan.'
+          ? 'Buat jadwal: tema, tanggal, dan jam. Siswa dipilih saat kelas berlangsung.'
           : 'Jadwal dibuat oleh guru pengajar.'
       )
     );
@@ -39,15 +40,25 @@ const dateText = d =>
     year: 'numeric'
   }).format(new Date(`${d}T00:00:00`));
 
-export function scheduleCard(c) {
+const rowsOf = id => state.classScheduleStudents.filter(x => x.schedule_id === id);
+
+function scheduleHead(c) {
   const theme = state.curriculumThemes.find(t => t.number === c.theme_number);
-  const kids = state.classScheduleStudents.filter(x => x.schedule_id === c.id);
   const time = c.scheduled_time ? ` · ${h(String(c.scheduled_time).slice(0, 5))}` : '';
+  return { time, theme: `Tema ${c.theme_number}${theme ? ` — ${h(theme.name)}` : ''}` };
+}
+
+export function scheduleCard(c) {
+  const { time, theme } = scheduleHead(c);
+  const kids = rowsOf(c.id);
   const names = kids
     .map(k => state.students.find(s => s.id === k.student_id))
     .filter(Boolean)
     .map(s => h(s.nickname || s.name))
     .join(', ');
+  const who = kids.length
+    ? `${kids.length} siswa${c.completed_at ? '' : ' (sementara)'}`
+    : 'siswa dipilih saat kelas';
   const teacher = state.role === 'teacher';
   // Hanya jadwal terakhir yang bisa dihapus, supaya nomor pertemuan tidak berlubang.
   const last = c.meeting_number === Math.max(...state.classSchedules.map(x => x.meeting_number));
@@ -59,85 +70,36 @@ export function scheduleCard(c) {
     : teacher
       ? `<div class="button-row"><button type="button" class="primary" data-action="open-schedule" data-id="${c.id}">Buka</button><button type="button" class="secondary" data-action="edit-schedule" data-id="${c.id}">Ubah</button>${remove}</div>`
       : '';
-  return `<article class="panel schedule-card"><strong>${h(dateText(c.scheduled_date))}${time} · Pertemuan ${c.meeting_number}</strong><p>Tema ${c.theme_number}${theme ? ` — ${h(theme.name)}` : ''} · ${kids.length} siswa</p>${names ? `<p class="muted">${names}</p>` : ''}${actions}</article>`;
+  return `<article class="panel schedule-card"><strong>${h(dateText(c.scheduled_date))}${time} · Pertemuan ${c.meeting_number}</strong><p>${theme} · ${who}</p>${names ? `<p class="muted">${names}</p>` : ''}${actions}</article>`;
 }
 
 export const RESULTS = [
   ['lulus', 'Lulus'],
-  ['belum', 'Belum'],
-  ['absen', 'Tidak hadir']
+  ['belum', 'Belum']
 ];
 
-// Lembar pertemuan: saat kelas guru memberi setiap siswa Lulus / Belum / Tidak hadir lalu menandai selesai;
-// pertemuan yang sudah selesai hanya ditampilkan.
-export function meetingSheet(id) {
-  const c = state.classSchedules.find(x => x.id === id);
-  if (!c) return '<p class="muted">Jadwal tidak ditemukan.</p>';
-  const theme = state.curriculumThemes.find(t => t.number === c.theme_number);
-  const time = c.scheduled_time ? ` · ${h(String(c.scheduled_time).slice(0, 5))}` : '';
-  const head = `<p class="muted">${h(dateText(c.scheduled_date))}${time} · Pertemuan ${c.meeting_number} · Tema ${c.theme_number}${theme ? ` — ${h(theme.name)}` : ''}</p>`;
-  const open = !c.completed_at && state.role === 'teacher';
-  const rows = state.classScheduleStudents
-    .filter(x => x.schedule_id === id)
-    .map(x => {
-      const s = state.students.find(y => y.id === x.student_id);
-      const ind = state.curriculumIndicators.find(
-        i => i.level === x.level && i.number === x.indicator_number
-      );
-      const who = `<legend>${h(s ? s.name : 'Siswa')} · Level ${x.level}</legend><p class="muted">${x.indicator_number}. ${h(ind ? ind.text : 'Indikator')}</p>`;
-      if (!open) {
-        const label = (RESULTS.find(r => r[0] === x.result) || [])[1] || '—';
-        return `<fieldset class="diagnostic-task">${who}<p><strong>${label}</strong></p></fieldset>`;
-      }
-      const options = RESULTS.map(
-        ([value, label]) =>
-          `<label class="diagnostic-rating"><input type="radio" name="r_${x.student_id}" value="${value}" required><span>${label}</span></label>`
-      ).join('');
-      return `<fieldset class="diagnostic-task">${who}<div class="diagnostic-ratings">${options}</div></fieldset>`;
-    })
-    .join('');
-  const list = rows || '<p class="muted">Tidak ada siswa di jadwal ini.</p>';
-  if (!open) return `${head}${list}`;
-  return `<form data-form="complete" data-id="${h(id)}">${head}${list}<p class="muted">Setelah ditandai selesai, jadwal dikunci dan hasilnya tidak bisa diubah.</p><button class="primary full">Tandai pertemuan selesai</button></form>`;
-}
-
-// Nomor pertemuan berikutnya untuk guru ini: satu setelah nomor terbesar di jadwalnya.
-export function nextMeeting() {
-  const max = Math.max(0, ...state.classSchedules.map(c => c.meeting_number));
-  return Math.min(max + 1, MEETINGS);
-}
-
-// Nilai formulir dari jadwal tersimpan, untuk diubah.
-export function scheduleValues(id) {
-  const c = state.classSchedules.find(x => x.id === id);
-  if (!c) return {};
-  const kids = state.classScheduleStudents.filter(x => x.schedule_id === id);
-  const v = {
-    meeting: String(c.meeting_number),
-    theme: String(c.theme_number),
-    date: c.scheduled_date,
-    time: c.scheduled_time ? String(c.scheduled_time).slice(0, 5) : '',
-    students: kids.map(k => k.student_id)
-  };
-  for (const k of kids) v[`indicator_${k.student_id}`] = String(k.indicator_number);
-  return v;
-}
-
-// Tema yang berlaku untuk nomor pertemuan, sebagai pilihan awal dropdown tema.
-export const themeForMeeting = n =>
-  state.curriculumThemes.find(t => n >= t.first_meeting && n <= t.last_meeting);
-
-// Siswa yang bisa dijadwalkan: aktif dan sudah punya level dari tes diagnostik.
+// Siswa yang bisa ikut kelas: aktif dan sudah punya level dari tes diagnostik.
 const ready = s => s.status === 'Aktif' && !!testFor(s.id) && !!s.pilot_level;
 
 // Teks ringkas dropdown siswa: nama siswa terpilih, atau ajakan memilih.
 export function kidsSummary(ids) {
   const names = state.students.filter(s => new Set(ids).has(s.id)).map(s => s.nickname || s.name);
-  return names.length ? `${names.length} siswa: ${names.join(', ')}` : 'Pilih siswa…';
+  return names.length ? `${names.length} siswa: ${names.join(', ')}` : 'Pilih siswa yang hadir…';
 }
 
-// Satu dropdown indikator untuk setiap siswa terpilih, berisi indikator dari level siswa itu sendiri.
-export function indicatorRows(picked, v = {}) {
+// Nilai lembar pertemuan dari yang tersimpan (sementara atau final).
+export function meetingValues(id) {
+  const rows = rowsOf(id);
+  const v = { students: rows.map(r => r.student_id) };
+  for (const r of rows) {
+    v[`indicator_${r.student_id}`] = String(r.indicator_number);
+    if (r.result) v[`r_${r.student_id}`] = r.result;
+  }
+  return v;
+}
+
+// Untuk setiap siswa terpilih: dropdown indikator dari levelnya (saran = terkecil yang belum lulus) dan Lulus/Belum.
+export function meetingRows(picked, v = {}) {
   const rows = state.students
     .filter(s => picked.has(s.id) && ready(s))
     .map(s => {
@@ -149,28 +111,40 @@ export function indicatorRows(picked, v = {}) {
       const chosen = items.some(([n]) => n === String(v[name]))
         ? String(v[name])
         : String(suggestedIndicator(s) ?? items[0]?.[0] ?? '');
-      return select(`${h(s.name)} · Level ${s.pilot_level}`, name, items, chosen, 'required');
+      const options = RESULTS.map(
+        ([value, label]) =>
+          `<label class="diagnostic-rating"><input type="radio" name="r_${s.id}" value="${value}" ${v[`r_${s.id}`] === value ? 'checked' : ''}><span>${label}</span></label>`
+      ).join('');
+      return `<fieldset class="diagnostic-task"><legend>${h(s.name)} · Level ${s.pilot_level}</legend>${select('Indikator', name, items, chosen, 'required')}<div class="diagnostic-ratings">${options}</div></fieldset>`;
     })
     .join('');
-  const body = rows || '<p class="muted">Indikator muncul setelah siswa dipilih.</p>';
-  return `<div class="schedule-field" data-indicators><span class="schedule-label">Indikator</span>${body}</div>`;
+  const body = rows || '<p class="muted">Pilih siswa yang hadir untuk menilai indikatornya.</p>';
+  return `<div class="schedule-field" data-meeting-rows>${body}</div>`;
 }
 
-// v: nilai formulir saat ini (dipakai ulang setiap pilihan berubah supaya bagian yang bergantung ikut diperbarui).
-export function scheduleForm(v = {}, id = '') {
-  const meeting = Number(v.meeting) || nextMeeting();
-  const theme =
-    v.changed === 'meeting' || !v.theme ? String(themeForMeeting(meeting)?.number || '') : String(v.theme);
-  const picked = new Set([].concat(v.students || []));
-
-  const meetings = Array.from({ length: MEETINGS }, (_, i) => [String(i + 1), `Pertemuan ${i + 1}`]);
-  const themes = [...state.curriculumThemes]
-    .sort((a, b) => a.number - b.number)
-    .map(t => [
-      String(t.number),
-      `Tema ${t.number} — ${t.name} (pertemuan ${t.first_meeting}–${t.last_meeting})`
-    ]);
-
+// Lembar pertemuan. Belum selesai: pilih siswa, indikator, Lulus/Belum; Simpan sementara atau Tandai selesai.
+// Sudah selesai: hanya ditampilkan.
+export function meetingSheet(id, v = null) {
+  const c = state.classSchedules.find(x => x.id === id);
+  if (!c) return '<p class="muted">Jadwal tidak ditemukan.</p>';
+  const { time, theme } = scheduleHead(c);
+  const head = `<p class="muted">${h(dateText(c.scheduled_date))}${time} · Pertemuan ${c.meeting_number} · ${theme}</p>`;
+  if (c.completed_at || state.role !== 'teacher') {
+    const list = rowsOf(id)
+      .map(x => {
+        const s = state.students.find(y => y.id === x.student_id);
+        const ind = state.curriculumIndicators.find(
+          i => i.level === x.level && i.number === x.indicator_number
+        );
+        const label = (RESULTS.find(r => r[0] === x.result) || [])[1] || '—';
+        return `<fieldset class="diagnostic-task"><legend>${h(s ? s.name : 'Siswa')} · Level ${x.level}</legend><p class="muted">${x.indicator_number}. ${h(ind ? ind.text : 'Indikator')}</p><p><strong>${label}</strong></p></fieldset>`;
+      })
+      .join('');
+    const status = c.completed_at ? '' : '<p class="muted">Pertemuan belum selesai.</p>';
+    return `${head}${status}${list || '<p class="muted">Belum ada siswa.</p>'}`;
+  }
+  const values = v || meetingValues(id);
+  const picked = new Set([].concat(values.students || []));
   const kids = state.students
     .filter(s => s.status === 'Aktif')
     .map(s => {
@@ -178,18 +152,52 @@ export function scheduleForm(v = {}, id = '') {
       return `<label class="schedule-kid"><input type="checkbox" name="students" value="${s.id}" ${picked.has(s.id) ? 'checked' : ''} ${ready(s) ? '' : 'disabled'}><span>${h(s.name)} <small class="muted">${tag}</small></span></label>`;
     })
     .join('');
-  // Dropdown pilih banyak: ringkasan menyebut siswa terpilih, daftar centang terbuka di bawahnya.
   const kidBlock = kids
-    ? `<div class="schedule-field"><span class="schedule-label">Siswa</span><details class="schedule-kids" ${v.kidsOpen ? 'open' : ''}><summary data-kids-summary>${h(kidsSummary(picked))}</summary><div class="schedule-kids-list">${kids}</div></details></div>`
+    ? `<div class="schedule-field"><span class="schedule-label">Siswa yang hadir</span><details class="schedule-kids"><summary data-kids-summary>${h(kidsSummary(picked))}</summary><div class="schedule-kids-list">${kids}</div></details></div>`
     : '<p class="muted">Belum ada siswa aktif.</p>';
+  const buttons = `<div class="button-row"><button class="secondary" name="finish" value="0">Simpan sementara</button><button class="primary" name="finish" value="1">Tandai pertemuan selesai</button></div>`;
+  return `<form data-form="meeting" data-id="${h(id)}">${head}${kidBlock}${meetingRows(picked, values)}<p class="muted">Simpan sementara bisa diubah lagi. Setelah ditandai selesai, pertemuan dikunci.</p>${buttons}</form>`;
+}
 
+// Nomor pertemuan berikutnya untuk guru ini: satu setelah nomor terbesar di jadwalnya.
+export function nextMeeting() {
+  const max = Math.max(0, ...state.classSchedules.map(c => c.meeting_number));
+  return Math.min(max + 1, MEETINGS);
+}
+
+// Nilai formulir jadwal tersimpan, untuk diubah.
+export function scheduleValues(id) {
+  const c = state.classSchedules.find(x => x.id === id);
+  if (!c) return {};
+  return {
+    meeting: String(c.meeting_number),
+    theme: String(c.theme_number),
+    date: c.scheduled_date,
+    time: c.scheduled_time ? String(c.scheduled_time).slice(0, 5) : ''
+  };
+}
+
+// Tema yang berlaku untuk nomor pertemuan, sebagai pilihan awal dropdown tema.
+export const themeForMeeting = n =>
+  state.curriculumThemes.find(t => n >= t.first_meeting && n <= t.last_meeting);
+
+// Formulir jadwal: tema, pertemuan (terkunci), tanggal, jam.
+export function scheduleForm(v = {}, id = '') {
+  const meeting = Number(v.meeting) || nextMeeting();
+  const theme = v.theme ? String(v.theme) : String(themeForMeeting(meeting)?.number || '');
+  const meetings = Array.from({ length: MEETINGS }, (_, i) => [String(i + 1), `Pertemuan ${i + 1}`]);
+  const themes = [...state.curriculumThemes]
+    .sort((a, b) => a.number - b.number)
+    .map(t => [
+      String(t.number),
+      `Tema ${t.number} — ${t.name} (pertemuan ${t.first_meeting}–${t.last_meeting})`
+    ]);
   return `<form data-form="schedule"${id ? ` data-id="${h(id)}"` : ''}>
-${kidBlock}
 ${select('Tema', 'theme', themes, theme, 'required')}
-${indicatorRows(picked, v)}
 ${select('Pertemuan', 'meeting', meetings, String(meeting), 'disabled')}
 <p class="muted schedule-cp">Nomor pertemuan otomatis dan berurutan.</p>
 ${field('Tanggal', 'date', 'date', v.date || localDate(), 'required')}
 ${field('Jam', 'time', 'time', v.time || '', '')}
+<p class="muted">Siswa, indikator, dan hasil dipilih saat kelas lewat tombol Buka.</p>
 <button class="primary full">Simpan jadwal</button></form>`;
 }

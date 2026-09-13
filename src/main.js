@@ -17,7 +17,7 @@ import {
   sessionsView,
   scheduleForm,
   kidsSummary,
-  indicatorRows,
+  meetingRows,
   scheduleValues,
   meetingSheet
 } from './views/sessions.js';
@@ -398,11 +398,11 @@ document.addEventListener('click', async e => {
 document.addEventListener('change', e => {
   const form = e.target.form;
   // Memilih siswa memperbarui ringkasan dan dropdown indikator per siswa di tempat, tanpa menutup daftar.
-  if (form?.dataset.form === 'schedule' && e.target.name === 'students') {
+  if (form?.dataset.form === 'meeting' && e.target.name === 'students') {
     const f = new FormData(form);
     const ids = f.getAll('students');
     form.querySelector('[data-kids-summary]').textContent = kidsSummary(ids);
-    form.querySelector('[data-indicators]').outerHTML = indicatorRows(new Set(ids), Object.fromEntries(f));
+    form.querySelector('[data-meeting-rows]').outerHTML = meetingRows(new Set(ids), Object.fromEntries(f));
     return;
   }
   if (form?.dataset.form === 'diagnostic-start' && e.target.name === 'student')
@@ -515,25 +515,35 @@ document.addEventListener('submit', async e => {
         break;
       }
       case 'schedule': {
-        const ids = f.getAll('students');
-        if (!ids.length) throw new Error('Pilih minimal satu siswa.');
         const payload = {
           theme_number: Number(v.theme),
           scheduled_date: v.date,
-          scheduled_time: v.time || '',
-          students: ids.map(sid => ({ student_id: sid, indicator_number: Number(v['indicator_' + sid]) }))
+          scheduled_time: v.time || ''
         };
         await result(db.rpc('save_schedule', { p_schedule: id || null, p_payload: payload }));
         break;
       }
-      case 'complete': {
-        const rows = state.classScheduleStudents.filter(x => x.schedule_id === id);
-        const results = rows.map(x => ({ student_id: x.student_id, result: v['r_' + x.student_id] }));
-        if (results.some(r => !r.result))
-          throw new Error('Beri setiap siswa Lulus, Belum, atau Tidak hadir.');
-        if (!confirm('Tandai pertemuan selesai? Hasilnya tidak bisa diubah lagi.')) return;
-        await result(db.rpc('complete_schedule', { p_schedule: id, p_results: results }));
-        break;
+      // Isi pertemuan: Simpan sementara (bisa diubah lagi) atau Tandai selesai (final).
+      case 'meeting': {
+        const finish = e.submitter?.value === '1';
+        const students = f.getAll('students').map(sid => ({
+          student_id: sid,
+          indicator_number: Number(v['indicator_' + sid]),
+          result: v['r_' + sid] || ''
+        }));
+        if (finish) {
+          if (!students.length) throw new Error('Pilih minimal satu siswa yang hadir.');
+          if (students.some(s => !s.result))
+            throw new Error('Beri setiap siswa yang hadir Lulus atau Belum.');
+          if (!confirm('Tandai pertemuan selesai? Hasilnya tidak bisa diubah lagi.')) return;
+        }
+        await result(db.rpc('save_meeting', { p_schedule: id, p_students: students, p_finish: finish }));
+        document.querySelector('#modal')?.close();
+        await refresh();
+        notify(
+          finish ? 'Pertemuan ditandai selesai.' : 'Tersimpan sementara. Bisa diubah lagi sebelum selesai.'
+        );
+        return;
       }
       case 'password': {
         if (v.password !== v.confirm) throw new Error('Kedua kata sandi belum sama.');
