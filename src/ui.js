@@ -20,7 +20,9 @@ export function notify(text, error = false) {
   el.className = `toast ${error ? 'error' : ''}`;
   el.role = 'status';
   el.textContent = text;
-  document.body.append(el);
+  // Modal yang terbuka berada di lapisan paling atas, jadi pesan yang ditempel ke body tertutup olehnya.
+  // Pesan galat simpan justru muncul saat modal masih terbuka, maka pesan ditempel ke modal itu.
+  (document.querySelector('dialog[open]') || document.body).append(el);
   clearTimeout(messageTimer);
   messageTimer = setTimeout(() => el.remove(), 6500);
 }

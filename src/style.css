@@ -2290,10 +2290,12 @@ dialog::backdrop {
   font-weight: 600;
 }
 
-/* Keterangan kecil di bawah input: usia dari tanggal lahir, tahun ajaran dari kelas formal. */
+/* Keterangan kecil di bawah input: usia dari tanggal lahir, tahun ajaran dari kelas formal. Label
+   membawa jarak 18px di bawahnya, sehingga keterangan tadinya jauh dari inputnya sendiri dan menempel
+   ke label berikutnya. Jaraknya dibalik: rapat ke atas, longgar ke bawah. */
 .field-hint {
   display: block;
-  margin-top: 4px;
+  margin: -12px 0 18px;
   font-size: 11px;
   color: var(--muted);
 }

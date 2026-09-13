@@ -684,15 +684,11 @@ document.addEventListener('submit', async e => {
           math_target: phaseEnd(v.math_baseline || 1)
         };
         if (id) {
-          const { name, parent_name, phone, interest, diagnostic, learning_notes } = payload;
-          await result(
-            db.rpc('update_student_profile', {
-              p_student: id,
-              // No status here: the profile form has no status field, and activating or deactivating
-              // a child goes through set_student_active so the open-session guard runs.
-              p_payload: { name, parent_name, phone, interest, diagnostic, learning_notes }
-            })
-          );
+          // Seluruh payload dikirim, bukan pilihan beberapa kolom: update_student_profile mewajibkan
+          // tanggal lahir dan kelas formal, dan kolom yang tertinggal di sini dulu membuat simpan profil
+          // selalu ditolak. Payload ini memang tidak membawa status: aktif/nonaktif lewat
+          // set_student_active supaya penjaga sesi terbuka tetap berjalan.
+          await result(db.rpc('update_student_profile', { p_student: id, p_payload: payload }));
           if (
             v.reading_baseline &&
             (Number(v.reading_baseline) !== before?.reading_baseline ||
