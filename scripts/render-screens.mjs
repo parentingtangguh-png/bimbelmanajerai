@@ -1,4 +1,4 @@
-// Renders every screen with a fixed sample classroom and writes the HTML to a file.
+// Renders every screen with a fixed sample state and writes the HTML to a file.
 // Run it before and after a refactor and compare the two files: identical HTML means the screens
 // still produce exactly what they produced before, without needing a browser or a login.
 //
@@ -13,7 +13,6 @@ import { dashboard } from '../src/views/dashboard.js';
 import { studentsView } from '../src/views/students.js';
 import { curriculumView } from '../src/views/curriculum.js';
 import { teamView } from '../src/views/team.js';
-import { state } from '../src/state.js';
 
 const out = process.argv[2] || 'screens.html';
 loadSampleState();
@@ -21,11 +20,9 @@ loadSampleState();
 const screens = [];
 const add = (name, html) => screens.push(`<!-- ${name} -->\n${html}`);
 
-add('sessionsView (di dalam kelas)', sessionsView());
-state.active = null;
-add('sessionsView (daftar sesi)', sessionsView());
 add('dashboard', dashboard());
 add('studentsView', studentsView());
+add('sessionsView', sessionsView());
 add('teamView', teamView());
 add('curriculumView', curriculumView());
 

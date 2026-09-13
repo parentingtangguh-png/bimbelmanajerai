@@ -1,58 +1,28 @@
 import { createClient } from '@supabase/supabase-js';
-import {
-  escapeHtml as h,
-  progress,
-  waLink,
-  localDate,
-  minutesBetween,
-  durationPattern,
-  formatTime
-} from './domain.js';
+import { escapeHtml as h } from './domain.js';
 import {
   ORG_NAME,
   initialState,
   state,
   icons,
   labels,
-  subjects,
-  subjectLabels,
   reminderOfTheDay,
-  characterLabels,
-  studentFor,
-  assessmentsFor,
-  checksFor,
-  priorChecks,
-  hintText,
-  observationFor,
-  activeCompetenciesFor,
-  ready,
-  timeLabel,
-  scheduleMembers,
-  durationText,
-  areaProgress,
-  indicatorsOf,
-  phaseOf,
-  phaseShort,
-  phaseEnd,
-  phasePct,
-  startPresets,
   schoolYearOf,
-  ageText,
-  levelOptions
+  ageText
 } from './state.js';
-import { field, select, area, empty, notify, heading, meter, modal } from './ui.js';
+// select diimpor karena scripts/check-imports.mjs mencocokkan kata, termasuk .select() milik Supabase.
+import { field, select, notify, modal } from './ui.js';
 import { curriculumView } from './views/curriculum.js';
-import { sessionsView, newSession } from './views/sessions.js';
-import { studentsView, studentForm, scheduleForm } from './views/students.js';
+import { sessionsView } from './views/sessions.js';
+import { studentsView, studentForm } from './views/students.js';
 import { diagnosticForm } from './views/diagnostic.js';
-import { diagnosticOutcome, diagnosticSummary, diagnosticPayload, runFromSaved } from './diagnostic.js';
+import { diagnosticOutcome, diagnosticPayload, runFromSaved } from './diagnostic.js';
 import { dashboard } from './views/dashboard.js';
 import { homeMenu, homeTop, homeDoa, homeNav, leafArt } from './views/home.js';
 import { teamView } from './views/team.js';
 import './style.css';
 import './curriculum.css';
 import './owner.css';
-import './schedule.css';
 import './student-form.css';
 
 const root = document.querySelector('#app');
@@ -72,83 +42,53 @@ async function result(query) {
   if (error) throw new Error(error.message);
   return data;
 }
-async function allRows(table, order = 'id') {
+async function allRows(table, order) {
   const rows = [];
   for (let from = 0; ; from += 500) {
-    let query = db.from(table).select('*').order(order);
-    if (table === 'assignments') query = query.order('teacher_id');
-    if (table === 'student_competencies' || table === 'session_assessments') query = query.order('subject');
-    const page = await result(query.range(from, from + 499));
+    const page = await result(
+      db
+        .from(table)
+        .select('*')
+        .order(order)
+        .range(from, from + 499)
+    );
     rows.push(...page);
     if (page.length < 500) return rows;
   }
 }
+// Semua data yang dipakai layar: siswa, kurikulum pilot, dan tes diagnostik. Pemilik juga memuat tim.
 async function refresh() {
   const [
     students,
-    classes,
-    records,
-    themes,
-    curriculum,
     curriculumPhases,
     curriculumLevels,
     curriculumIndicators,
     curriculumThemes,
     diagnosticTests,
-    diagnosticResults,
-    competencies,
-    assessments,
-    observations,
-    indicatorChecks,
-    schedules,
-    scheduleStudents
+    diagnosticResults
   ] = await Promise.all([
-    allRows('students'),
-    allRows('class_sessions'),
-    allRows('session_students'),
-    result(db.from('themes').select('*').order('name')),
-    result(db.from('curriculum').select('*').order('level')),
+    allRows('students', 'name'),
     result(db.from('curriculum_phases').select('*').order('sort_order')),
     result(db.from('curriculum_levels').select('*').order('level')),
     result(db.from('curriculum_level_indicators').select('*').order('level').order('number')),
     result(db.from('curriculum_themes').select('*').order('number')),
-    allRows('diagnostic_tests'),
-    allRows('diagnostic_results', 'test_id'),
-    allRows('student_competencies', 'student_id'),
-    allRows('session_assessments', 'session_student_id'),
-    allRows('session_observations', 'session_student_id'),
-    allRows('session_indicator_checks', 'session_student_id'),
-    allRows('schedules'),
-    allRows('schedule_students', 'schedule_id')
+    allRows('diagnostic_tests', 'id'),
+    allRows('diagnostic_results', 'test_id')
   ]);
-  students.sort((a, b) => a.name.localeCompare(b.name));
-  classes.sort((a, b) => b.date.localeCompare(a.date) || b.created_at.localeCompare(a.created_at));
-  schedules.sort((a, b) => a.start_time.localeCompare(b.start_time) || a.name.localeCompare(b.name));
   Object.assign(state, {
     students,
-    classes,
-    records,
-    themes,
-    curriculum,
     curriculumPhases,
     curriculumLevels,
     curriculumIndicators,
     curriculumThemes,
     diagnosticTests,
-    diagnosticResults,
-    competencies,
-    assessments,
-    observations,
-    indicatorChecks,
-    schedules,
-    scheduleStudents
+    diagnosticResults
   });
   if (state.role === 'owner') {
-    [state.alerts, state.members, state.assignments, state.profiles] = await Promise.all([
-      allRows('student_alerts', 'student_id'),
+    [state.members, state.assignments, state.profiles] = await Promise.all([
       allRows('access_list', 'email'),
       allRows('assignments', 'student_id'),
-      allRows('profiles')
+      allRows('profiles', 'id')
     ]);
   }
   render();
@@ -268,135 +208,58 @@ function login() {
   root.innerHTML = `<main class="login">${loginStory()}${loginForm()}</main>`;
 }
 // Re-rendering replaces the whole page, so keep unsaved classroom inputs and the scroll position.
-const drafts = new Map();
-let lastScreen = '';
-// Shared devices: never keep one account's data or unsaved inputs in memory for the next login.
+
+let lastView = '';
+// Shared devices: never keep one account's data in memory for the next login.
 function resetSession() {
-  drafts.clear();
-  lastScreen = '';
+  lastView = '';
   Object.assign(state, initialState());
-}
-function saveDrafts() {
-  document.querySelectorAll('.session-card form[data-id]').forEach(form => {
-    const values = {};
-    form.querySelectorAll('input,select,textarea').forEach(el => {
-      if (!el.name || el.disabled) return;
-      if (el.type === 'checkbox') {
-        values[el.name] ??= [];
-        if (el.checked) values[el.name].push(el.value);
-      } else values[el.name] = el.value;
-    });
-    drafts.set(form.dataset.form + ':' + form.dataset.id, values);
-  });
-}
-function restoreDrafts() {
-  document.querySelectorAll('.session-card form[data-id]').forEach(form => {
-    const values = drafts.get(form.dataset.form + ':' + form.dataset.id);
-    if (!values) return;
-    form.querySelectorAll('input,select,textarea').forEach(el => {
-      if (!el.name || el.disabled || !(el.name in values)) return;
-      if (el.type === 'checkbox') el.checked = values[el.name].includes(el.value);
-      else el.value = values[el.name];
-    });
-  });
 }
 function render() {
   if (!state.user) {
     login();
     return;
   }
-  saveDrafts();
-  const screen = state.view + ':' + state.active;
-  const y = screen === lastScreen ? scrollY : 0;
-  lastScreen = screen;
-  // Owners see aggregates and manage team/curriculum; classroom work belongs to teachers.
-  if (state.role === 'owner' && state.view === 'sessions') {
-    state.view = 'dashboard';
-    state.active = null;
-  }
+  const y = state.view === lastView ? scrollY : 0;
+  lastView = state.view;
+  // Pemilik memantau dan mengurus tim; ruang kelas milik guru.
+  if (state.role === 'owner' && state.view === 'sessions') state.view = 'dashboard';
   const nav =
     state.role === 'owner'
       ? ['dashboard', 'students', 'team', 'curriculum']
       : ['dashboard', 'students', 'sessions', 'curriculum'];
   // Di layar HP dasbor dibuka oleh menu utama, dan kepala serta doa menemani semua tab. CSS yang
-  // memilih mana yang tampil, jadi tidak ada pengukuran lebar layar di sini dan tidak ada
-  // pendengar resize.
+  // memilih mana yang tampil.
   const home = state.view === 'dashboard' ? homeMenu() : '';
-  root.innerHTML = `<div class="shell${home ? ' at-home' : ''}">${sidebar(nav)}<main class="workspace">${topbar()}${homeTop(ORG_NAME)}${
+  const reminder =
     state.role === 'teacher'
       ? (() => {
           const [lead, rest] = reminderOfTheDay();
           return `<div class="onboarding reminder"><div><strong>${h(lead)}</strong><p>${h(rest)}</p></div></div>`;
         })()
-      : ''
-  }${home}<section class="content">${{ dashboard: dashboard, students: studentsView, sessions: sessionsView, team: teamView, curriculum: curriculumView }[state.view]()}</section>${homeDoa()}${homeNav()}<footer>${ORG_NAME} <span>Belajar bertumbuh, bersama.</span></footer></main></div><dialog id="modal"></dialog>`;
-  restoreDrafts();
+      : '';
+  const screens = {
+    dashboard: dashboard,
+    students: studentsView,
+    sessions: sessionsView,
+    team: teamView,
+    curriculum: curriculumView
+  };
+  root.innerHTML = `<div class="shell${home ? ' at-home' : ''}">${sidebar(nav)}<main class="workspace">${topbar()}${homeTop(ORG_NAME)}${reminder}${home}<section class="content">${screens[state.view]()}</section>${homeDoa()}${homeNav()}<footer>${ORG_NAME} <span>Belajar bertumbuh, bersama.</span></footer></main></div><dialog id="modal"></dialog>`;
   scrollTo(0, y);
 }
-document.addEventListener('change', async e => {
-  const box = e.target.closest('.indicator-check');
-  if (!box) return;
-  const wrap = box.closest('.indicator-checks');
-  const all = [...wrap.querySelectorAll('.indicator-check')];
-  const done = all.filter(x => x.checked).length;
-  const key = Number(wrap.dataset.key || 0);
-  const keyDone = !key || !all[key - 1] || all[key - 1].checked;
-  wrap.querySelector('.indicator-hint').innerHTML = hintText(done, all.length, key, keyDone);
-  const { record, subject } = wrap.dataset;
-  const index = Number(box.dataset.index);
-  const checked = box.checked;
-  try {
-    await result(
-      db.rpc('set_indicator_check', {
-        p_id: record,
-        p_subject: subject,
-        p_index: index,
-        p_checked: checked,
-        p_text: box.dataset.text || ''
-      })
-    );
-    const rest = state.indicatorChecks.filter(
-      c => !(c.session_student_id === record && c.subject === subject && c.indicator_index === index)
-    );
-    state.indicatorChecks = checked
-      ? [
-          ...rest,
-          {
-            session_student_id: record,
-            subject,
-            // The level the database stamps on the tick. Kept truthful locally so the "seen in an
-            // earlier session" line keeps working before the next refresh.
-            level_snapshot: assessmentsFor(record).find(a => a.subject === subject)?.level_snapshot ?? 0,
-            indicator_index: index,
-            indicator_text: box.dataset.text || ''
-          }
-        ]
-      : rest;
-  } catch (error) {
-    // The tick is the teacher's record of what they saw; if it did not save, say so rather than let it look saved.
-    box.checked = !checked;
-    const back = all.filter(x => x.checked).length;
-    wrap.querySelector('.indicator-hint').innerHTML = hintText(
-      back,
-      all.length,
-      key,
-      !key || !all[key - 1] || all[key - 1].checked
-    );
-    notify(error.message || 'Centang gagal disimpan.', true);
-  }
-});
 
 document.addEventListener('click', async e => {
   const b = e.target.closest('[data-action],[data-view]');
   if (!b) return;
   e.preventDefault();
   if (b.dataset.view) {
+    document.querySelector('dialog[open]')?.close();
     state.view = b.dataset.view;
-    state.active = null;
     render();
     return;
   }
-  const { action, id, kind } = b.dataset;
+  const { action, id } = b.dataset;
   try {
     if (action === 'refresh') {
       await refresh();
@@ -421,7 +284,7 @@ document.addEventListener('click', async e => {
     }
     if (action === 'diagnostic-resume') {
       const run = readDrafts()[id];
-      // Simpanan dari versi tes lama (beberapa level) tidak bisa dilanjutkan.
+      // Simpanan dari versi tes lama tidak bisa dilanjutkan.
       if (!run?.level) {
         dropDraft(id);
         return notify('Tes sementara ini dari versi lama dan tidak bisa dilanjutkan. Mulai tes baru.', true);
@@ -453,11 +316,8 @@ document.addEventListener('click', async e => {
       keepDraft();
       return diagnosticForm();
     }
-    // Revisi hanya sebelum kelas pertama; save_diagnostic menjaga aturan yang sama.
     if (action === 'diagnostic-revise') {
       if (state.role !== 'teacher') return notify('Tes diagnostik direvisi oleh guru pendamping.', true);
-      if (state.records.some(r => r.student_id === id))
-        return notify('Hasil tes tidak bisa direvisi setelah anak mengikuti kelas.', true);
       const test = state.diagnosticTests.find(t => t.student_id === id);
       if (!test) return notify('Hasil tes diagnostik tidak ditemukan.', true);
       const saved = readDrafts()[id];
@@ -465,43 +325,23 @@ document.addEventListener('click', async e => {
       keepDraft();
       return diagnosticForm();
     }
-    if (action === 'new-session') return newSession();
-    if (action === 'new-schedule') return scheduleForm();
-    if (action === 'edit-schedule') return scheduleForm(state.schedules.find(x => x.id === id));
-    if (action === 'open-session') {
-      state.active = id;
-      return render();
-    }
-    if (action === 'back-sessions') {
-      state.active = null;
-      return render();
-    }
     if (action === 'password') return modal('Ganti kata sandi', passwordForm());
     if (action === 'new-member')
       return modal(
         'Daftarkan guru',
         `<form data-form="member">${field('Nama guru', 'name', 'text', '', 'required maxlength="120"')}${field('Email guru', 'email', 'email', '', 'required')}<button class="primary full">Daftarkan email guru</button></form>`
       );
-    if (action === 'copy') {
-      await navigator.clipboard.writeText(state.records.find(r => r.id === id).report);
-      return notify('Pesan berhasil disalin.');
-    }
-    if (action === 'print') {
-      document
-        .querySelectorAll('.session-card')
-        .forEach(el => el.classList.toggle('print-target', !!el.querySelector(`[data-id="${id}"]`)));
-      return window.print();
-    }
     b.disabled = true;
     if (action === 'delete-student') {
       const s = state.students.find(x => x.id === id);
       if (
         !confirm(
-          `Hapus ${s?.name || 'siswa ini'} secara permanen? Data yang sudah dihapus tidak bisa dikembalikan.`
+          `Hapus ${s?.name || 'siswa ini'} secara permanen beserta hasil tes diagnostiknya? Data yang dihapus tidak bisa dikembalikan.`
         )
       )
         return;
       await result(db.rpc('delete_student', { p_student: id }));
+      dropDraft(id);
       document.querySelector('#modal').close();
       await refresh();
       return notify('Siswa dihapus.');
@@ -513,7 +353,7 @@ document.addEventListener('click', async e => {
         !confirm(
           activate
             ? `Aktifkan kembali ${s?.name || 'siswa ini'}?`
-            : `Nonaktifkan ${s?.name || 'siswa ini'}? Anak tidak ikut sesi kelas, tetapi riwayat belajarnya tetap tersimpan.`
+            : `Nonaktifkan ${s?.name || 'siswa ini'}? Datanya tetap tersimpan.`
         )
       )
         return;
@@ -521,66 +361,6 @@ document.addEventListener('click', async e => {
       document.querySelector('#modal').close();
       await refresh();
       return notify(activate ? 'Siswa diaktifkan kembali.' : 'Siswa dinonaktifkan.');
-    }
-    if (action === 'all-sessions') {
-      state.allSessions = true;
-      return render();
-    }
-    if (action === 'delete-class') {
-      const c = state.classes.find(x => x.id === id);
-      if (
-        !confirm(
-          `Batalkan sesi "${c?.theme || 'ini'}" pada ${c?.date || ''}? Sesi dan daftar anaknya dihapus permanen. Tidak ada evaluasi yang hilang karena belum ada yang tersimpan.`
-        )
-      )
-        return;
-      await result(db.rpc('delete_class', { p_session: id }));
-      state.active = null;
-      state.view = 'sessions';
-      await refresh();
-      return notify('Sesi dibatalkan.');
-    }
-    if (action === 'reopen-eval') {
-      const r = state.records.find(x => x.id === id);
-      const s = state.students.find(x => x.id === r?.student_id);
-      if (
-        !confirm(
-          `Buka kembali evaluasi ${s?.name || 'anak ini'}? Level dan bukti dikembalikan seperti sebelum evaluasi ini disimpan, lalu Anda menilai ulang.`
-        )
-      )
-        return;
-      await result(db.rpc('reopen_evaluation', { p_id: id }));
-      await refresh();
-      return notify('Evaluasi dibuka kembali. Silakan perbaiki penilaiannya.');
-    }
-    if (action === 'delete-schedule') {
-      if (!confirm('Hapus sesi jadwal ini? Data siswa tidak ikut terhapus.')) return;
-      await result(db.from('schedules').delete().eq('id', id));
-      document.querySelector('#modal').close();
-      await refresh();
-      return notify('Sesi jadwal dihapus.');
-    }
-    if (action === 'generate-class') {
-      const c = state.classes.find(c => c.id === id);
-      if (c?.material) return notify('Panduan kelas tersimpan sudah tampil.');
-      b.textContent = 'Sedang menyusun…';
-      const { data, error } = await db.functions.invoke('generate-learning', {
-        body: { session_id: id, kind: 'class_material' }
-      });
-      if (error) {
-        let detail;
-        try {
-          detail = await error.context?.json();
-        } catch {}
-        throw new Error(detail?.error || error.message);
-      }
-      if (data?.error) throw new Error(data.error);
-      await refresh();
-      return notify('Panduan kelas tersimpan. Periksa sebelum digunakan.');
-    }
-    if (action === 'print-class') {
-      document.querySelector('.class-guide')?.classList.add('print-target');
-      return window.print();
     }
     if (action === 'register') {
       const form = document.querySelector('#login-form');
@@ -600,32 +380,12 @@ document.addEventListener('click', async e => {
       await result(db.from('access_list').update({ active: !m.active }).eq('email', id));
       await refresh();
     }
-    if (action === 'generate') {
-      const r = state.records.find(r => r.id === id);
-      if (r[kind === 'material' ? 'material' : 'report'])
-        return notify('Hasil tersimpan sudah tampil di kartu ini.');
-      b.textContent = 'Sedang menyusun…';
-      const { data, error } = await db.functions.invoke('generate-learning', {
-        body: { record_id: id, kind }
-      });
-      if (error) {
-        let detail;
-        try {
-          detail = await error.context?.json();
-        } catch {}
-        throw new Error(detail?.error || error.message);
-      }
-      if (data?.error) throw new Error(data.error);
-      await refresh();
-      notify('Hasil AI tersimpan. Periksa isinya sebelum digunakan.');
-    }
   } catch (err) {
     notify(err.message, true);
   } finally {
     b.disabled = false;
   }
 });
-// Student form: a grade preset fills the starting levels, and the meaning text follows the choice.
 document.addEventListener('change', e => {
   const form = e.target.form;
   if (form?.dataset.form === 'diagnostic-start' && e.target.name === 'student')
@@ -641,56 +401,24 @@ document.addEventListener('change', e => {
       el.hidden = el.dataset.levelDesc !== e.target.value;
     return;
   }
-  // Form siswa baru tidak punya level, jadi usia diperbarui sebelum pemeriksaan level di bawah.
   if (e.target.name === 'birth_date' && form?.dataset.form === 'student') {
     const age = ageText(e.target.value);
     form.querySelector('[data-age]').textContent = age ? 'Usia ' + age : 'Usia dihitung otomatis';
-    return;
   }
-});
-// "＋ Tema lain…" reveals a free-text theme name; any listed theme hides it again.
-document.addEventListener('change', e => {
-  if (e.target.name !== 'theme' || e.target.form?.dataset.form !== 'session') return;
-  const custom = e.target.form.querySelector('.theme-custom');
-  const input = custom.querySelector('input');
-  custom.hidden = e.target.value !== '__new';
-  input.required = !custom.hidden;
-  if (!custom.hidden) input.focus();
-});
-// Picking a schedule slot when opening a class pre-selects its children and duration pattern.
-document.addEventListener('change', e => {
-  if (e.target.name !== 'schedule' || e.target.form?.dataset.form !== 'session') return;
-  const sc = state.schedules.find(x => x.id === e.target.value);
-  if (!sc) return;
-  const members = scheduleMembers(sc.id);
-  const form = e.target.form;
-  form.querySelectorAll('input[name="student"]').forEach(box => {
-    box.checked = members.has(box.value);
-  });
-  form.elements.duration.value = String(durationPattern(minutesBetween(sc.start_time, sc.end_time)));
 });
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && e.target.matches('tr[data-action]')) e.target.click();
 });
 document.addEventListener('input', e => {
-  if (e.target.form?.dataset.form === 'schedule' && ['start_time', 'end_time'].includes(e.target.name)) {
-    const els = e.target.form.elements;
-    document.querySelector('#schedule-duration').textContent = durationText(
-      els.start_time.value,
-      els.end_time.value
-    );
-    return;
-  }
-  if (e.target.id === 'student-search') {
-    state.filter = e.target.value;
-    const pos = e.target.selectionStart;
-    render();
-    const input = document.querySelector('#student-search');
-    input.focus();
-    try {
-      input.setSelectionRange(pos, pos);
-    } catch {}
-  }
+  if (e.target.id !== 'student-search') return;
+  state.filter = e.target.value;
+  const pos = e.target.selectionStart;
+  render();
+  const input = document.querySelector('#student-search');
+  input.focus();
+  try {
+    input.setSelectionRange(pos, pos);
+  } catch {}
 });
 document.addEventListener('submit', async e => {
   e.preventDefault();
@@ -709,13 +437,10 @@ document.addEventListener('submit', async e => {
     switch (form.dataset.form) {
       case 'student': {
         const before = state.students.find(x => x.id === id);
-        // Minat tidak lagi ditanyakan, tapi kolomnya NOT NULL dan create_student tidak mengubah null
-        // menjadi teks kosong, jadi nilai lama (atau '') selalu dikirim.
         const payload = {
           name: v.name.trim(),
           parent_name: v.parent_name.trim(),
           phone: v.phone,
-          interest: before?.interest || '',
           nickname: (v.nickname || '').trim(),
           birth_date: v.birth_date,
           school_grade: v.school_grade,
@@ -723,36 +448,10 @@ document.addEventListener('submit', async e => {
           school_year:
             before && before.school_grade === v.school_grade && before.school_year
               ? before.school_year
-              : schoolYearOf(),
-          diagnostic: v.diagnostic ?? before?.diagnostic ?? '',
-          learning_notes: before?.learning_notes ?? '',
-          reading_target: phaseEnd(v.reading_baseline || 1),
-          math_target: phaseEnd(v.math_baseline || 1)
+              : schoolYearOf()
         };
-        if (id) {
-          // Seluruh payload dikirim, bukan pilihan beberapa kolom: update_student_profile mewajibkan
-          // tanggal lahir dan kelas formal, dan kolom yang tertinggal di sini dulu membuat simpan profil
-          // selalu ditolak. Payload ini memang tidak membawa status: aktif/nonaktif lewat
-          // set_student_active supaya penjaga sesi terbuka tetap berjalan.
-          await result(db.rpc('update_student_profile', { p_student: id, p_payload: payload }));
-          if (
-            v.reading_baseline &&
-            (Number(v.reading_baseline) !== before?.reading_baseline ||
-              Number(v.math_baseline) !== before?.math_baseline)
-          )
-            await result(
-              db.rpc('correct_student_baseline', {
-                p_student: id,
-                p_reading: Number(v.reading_baseline),
-                p_math: Number(v.math_baseline)
-              })
-            );
-        } else {
-          // Level awal wajib ada saat siswa dibuat. Level 1 hanya sementara sampai guru menjalankan Tes
-          // Diagnostik, yang menggantinya lewat correct_student_baseline.
-          Object.assign(payload, { reading_baseline: 1, math_baseline: 1 });
-          await result(db.rpc('create_student', { p_payload: payload }));
-        }
+        if (id) await result(db.rpc('update_student_profile', { p_student: id, p_payload: payload }));
+        else await result(db.rpc('create_student', { p_payload: payload }));
         break;
       }
       // Tes Diagnostik berjalan bertahap di dalam modal; dua langkah pertama belum menyimpan apa pun.
@@ -784,112 +483,18 @@ document.addEventListener('submit', async e => {
           throw new Error('Tes diagnostik tidak ditemukan. Mulai ulang tesnya.');
         if (!diagnosticOutcome(run.level, run.answers).complete)
           throw new Error('Indikator 1–6 belum semuanya dinilai.');
-        // save_diagnostic menyimpan hasil per indikator, level awal, status, dan ringkasan dalam satu
-        // transaksi, dan menghitung ulang hasilnya sendiri dari nilai yang dikirim.
-        const summary = diagnosticSummary({
-          date: new Date().toLocaleDateString('id-ID'),
-          grade: s.school_grade,
-          level: run.level,
-          answers: run.answers,
-          note: v.note
-        });
+        // save_diagnostic menyimpan hasil per indikator dan level anak dalam satu transaksi, dan menghitung
+        // ulang hasilnya sendiri dari nilai yang dikirim.
         await result(
           db.rpc('save_diagnostic', {
             p_student: s.id,
-            p_start: run.level,
+            p_level: run.level,
             p_results: diagnosticPayload(run.level, run.answers),
-            p_summary: summary,
-            p_note: v.note || '',
-            p_learning_notes: s.learning_notes || ''
+            p_note: v.note || ''
           })
         );
         dropDraft(s.id);
         state.diagnostic = null;
-        break;
-      }
-      case 'session': {
-        const ids = f.getAll('student');
-        if (!ids.length) throw new Error('Pilih minimal satu siswa.');
-        const theme = (v.theme && v.theme !== '__new' ? v.theme : v.theme_custom || '').trim();
-        if (!theme) throw new Error('Isi tema bersama.');
-        if (!state.themes.some(t => t.name === theme))
-          await result(
-            db.from('themes').upsert({ name: theme }, { onConflict: 'name', ignoreDuplicates: true })
-          );
-        const sc = state.schedules.find(x => x.id === v.schedule);
-        const duration = sc
-          ? durationPattern(minutesBetween(sc.start_time, sc.end_time))
-          : Number(v.duration);
-        state.active = await result(
-          db.rpc('create_class', {
-            p_id: id,
-            p_date: v.date,
-            p_theme: theme,
-            p_students: ids,
-            p_duration: duration
-          })
-        );
-        if (sc) await result(db.rpc('set_class_schedule', { p_session: state.active, p_schedule: sc.id }));
-        state.view = 'sessions';
-        break;
-      }
-      case 'schedule': {
-        const mins = minutesBetween(v.start_time, v.end_time);
-        if (!(mins >= 30 && mins <= 180)) throw new Error('Durasi sesi harus 30–180 menit.');
-        const payload = { name: v.name.trim(), start_time: v.start_time, end_time: v.end_time };
-        let sid = id;
-        if (sid) await result(db.from('schedules').update(payload).eq('id', sid));
-        else sid = (await result(db.from('schedules').insert(payload).select('id').single())).id;
-        const chosen = f.getAll('student');
-        // Only unticking a box removes a child. A member the form never offered stays a member,
-        // so a roster that hides someone can never quietly drop them.
-        const offered = new Set([...form.querySelectorAll('input[name="student"]')].map(el => el.value));
-        const old = [...scheduleMembers(sid)];
-        const removed = old.filter(x => offered.has(x) && !chosen.includes(x));
-        if (removed.length)
-          await result(
-            db.from('schedule_students').delete().eq('schedule_id', sid).in('student_id', removed)
-          );
-        const added = chosen.filter(x => !old.includes(x));
-        if (added.length)
-          await result(
-            db.from('schedule_students').insert(added.map(student_id => ({ schedule_id: sid, student_id })))
-          );
-        break;
-      }
-      case 'attendance':
-        await result(db.rpc('save_attendance', { p_id: id, p_attendance: v.attendance }));
-        break;
-      case 'evaluation': {
-        const targets = assessmentsFor(id);
-        if (targets.length) {
-          const payload = targets.map(a => ({
-            subject: a.subject,
-            rating: v[`rating_${a.subject}`],
-            note: v[`note_${a.subject}`] || ''
-          }));
-          const observation = {
-            english_rating: v.english_rating || '',
-            english_note: v.english_note || '',
-            character_dimensions: f.getAll('character'),
-            character_note: v.character_note || ''
-          };
-          await result(
-            db.rpc('finalize_competency_evaluation', {
-              p_id: id,
-              p_assessments: payload,
-              p_anecdote: v.anecdote || '',
-              p_observation: observation
-            })
-          );
-        } else
-          await result(
-            db.rpc('finalize_evaluation', {
-              p_id: id,
-              p_grade: v.grade || null,
-              p_anecdote: v.anecdote || ''
-            })
-          );
         break;
       }
       case 'password': {
@@ -900,11 +505,6 @@ document.addEventListener('submit', async e => {
         notify('Kata sandi berhasil diganti.');
         return;
       }
-      case 'summative':
-        await result(
-          db.rpc('complete_summative', { p_student: id, p_score: Number(v.score), p_pass: v.pass === 'true' })
-        );
-        break;
       case 'member':
         await result(
           db

@@ -43,9 +43,9 @@ const icons = {
   [homeKeys.tim]: '<circle cx="12" cy="7" r="3.4"/><path d="M5 20c0-3.6 3.1-5.6 7-5.6s7 2 7 5.6"/>'
 };
 const blurbs = {
-  [homeKeys.kelas]: 'Buka sesi, catat kehadiran, isi evaluasi',
-  [homeKeys.ringkasan]: 'Melihat kemajuan dan siapa yang perlu perhatian',
-  [homeKeys.siswa]: 'Menambah anak, mengubah profil dan statusnya',
+  [homeKeys.kelas]: 'Sedang disiapkan untuk kurikulum pilot',
+  [homeKeys.ringkasan]: 'Siswa, tes diagnostik, dan sebaran level',
+  [homeKeys.siswa]: 'Menambah anak dan menjalankan Tes Diagnostik',
   [homeKeys.kurikulum]: 'Membaca tujuan dan indikator tiap level',
   [homeKeys.tim]: 'Mendaftarkan guru dan melihat timnya'
 };

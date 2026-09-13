@@ -57,10 +57,9 @@ export function diagnosticPayload(level, answers = {}) {
   return Object.entries(answers).map(([number, rating]) => ({ level, number: Number(number), rating }));
 }
 
-// Tes tersimpan dibuka lagi untuk direvisi. Tes lama yang menguji beberapa level dibuka pada level
-// pertama yang dites.
+// Tes tersimpan dibuka lagi untuk direvisi, dengan nilai dan catatannya.
 export function runFromSaved(test, rows) {
-  const level = test.tested_level || test.start_level;
+  const level = test.tested_level;
   const answers = {};
   for (const r of rows.filter(x => x.test_id === test.id && x.level === level))
     answers[r.indicator_number] = r.rating;
@@ -69,18 +68,3 @@ export function runFromSaved(test, rows) {
 
 // Berapa indikator yang sudah dinilai, untuk tombol "Lanjutkan".
 export const draftProgress = run => Object.keys(run.answers || {}).length;
-
-// Ringkasan yang disimpan ke kolom diagnostic. Tidak pernah kosong, karena kolom itulah penanda
-// "sudah dites". save_diagnostic memeriksa baris "Level awal: N".
-export function diagnosticSummary({ date, grade, level, answers = {}, note }) {
-  const o = diagnosticOutcome(level, answers);
-  const marks = DECIDING.map(n => ratingMark(answers[n])).join('');
-  const lines = [
-    `Tes diagnostik ${date}${grade ? ` · ${grade}` : ''} · Level ${level}`,
-    `Level ${level}: ${marks} (English ${ratingMark(answers[7])}) → ${o.passed ? 'lulus' : 'belum lulus'}`,
-    `Level awal: ${o.final}${o.beyond ? ' (melampaui Fondasi)' : ''}`
-  ];
-  if (answers[8]) lines.push(`Karakter: ${ratingMark(answers[8])}`);
-  if (String(note || '').trim()) lines.push(`Catatan: ${String(note).trim()}`);
-  return lines.join('\n');
-}

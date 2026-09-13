@@ -10,15 +10,13 @@ import {
   DECIDING,
   RATINGS,
   RATING_RULE,
+  ratingMark,
   taskOrder,
   suggestedStart,
   diagnosticOutcome,
-  diagnosticSummary,
   focusIndicators,
   draftProgress
 } from '../diagnostic.js';
-
-const hasClass = id => state.records.some(r => r.student_id === id);
 
 export function diagnosticForm(studentId = '') {
   const run = state.diagnostic;
@@ -133,10 +131,9 @@ export function diagnosticTaskCard(level, n, value = '') {
 }
 
 // Langkah 3: hasil dan simpan.
-export function diagnosticResultStep(s, run, date = new Date().toLocaleDateString('id-ID')) {
+export function diagnosticResultStep(s, run) {
   const o = diagnosticOutcome(run.level, run.answers);
   const next = state.curriculumLevels.find(x => x.level === o.final);
-  const locked = hasClass(s.id);
   const verdict = o.passed
     ? `<span class="badge green">LULUS LEVEL ${run.level}</span><h3>Mulai belajar Level ${o.final}${next ? ` — ${h(next.title)}` : ''}</h3>${o.beyond ? '<p>Level 4 sudah lulus: <strong>melampaui Fondasi</strong>. Anak tetap belajar di Level 4.</p>' : ''}`
     : `<span class="badge">BELUM LULUS LEVEL ${run.level}</span><h3>Mulai belajar Level ${o.final}${next ? ` — ${h(next.title)}` : ''}</h3>`;
@@ -149,21 +146,14 @@ export function diagnosticResultStep(s, run, date = new Date().toLocaleDateStrin
   const focusBlock = focus
     ? `<h4>Perlu dilatih lebih dulu</h4><ul class="diagnostic-focus">${focus}</ul>`
     : '';
-  const notices = [
-    locked ? `${h(s.name)} sudah pernah ikut kelas, jadi level tidak diubah.` : '',
-    run.revision ? 'Revisi mengganti hasil tes sebelumnya.' : '',
-    'Setelah disimpan, anak bisa langsung dimasukkan ke sesi kelas.'
-  ]
-    .filter(Boolean)
-    .map(t => `<p class="muted">${t}</p>`)
-    .join('');
-  const preview = diagnosticSummary({
-    date,
-    grade: s.school_grade,
-    level: run.level,
-    answers: run.answers,
-    note: ''
-  });
-  const notes = `${area('Catatan tes (opsional)', 'note', run.note || '', 'maxlength="1500" placeholder="Misalnya: membaca kalimat masih mengeja."')}`;
-  return `<form data-form="diagnostic" data-id="${s.id}"><div class="diagnostic-result">${verdict}${notices}</div>${focusBlock}<h4>Ringkasan yang disimpan</h4><pre class="diagnostic-summary">${h(preview)}</pre>${notes}<div class="button-row"><button type="button" class="secondary" data-action="diagnostic-back">← Ubah nilai</button><button class="primary">${run.revision ? 'Simpan revisi' : 'Simpan hasil tes'}</button></div></form>`;
+  const revision = run.revision ? '<p class="muted">Revisi mengganti hasil tes sebelumnya.</p>' : '';
+  const marks = DECIDING.map(n => `${n} ${ratingMark(run.answers[n])}`).join(' · ');
+  const summary = `<p class="muted diagnostic-marks">Nilai 1–6: ${marks} · English ${ratingMark(run.answers[7])} · Karakter ${ratingMark(run.answers[8])}</p>`;
+  const note = area(
+    'Catatan tes (opsional)',
+    'note',
+    run.note || '',
+    'maxlength="1500" placeholder="Misalnya: membaca kalimat masih mengeja."'
+  );
+  return `<form data-form="diagnostic" data-id="${s.id}"><div class="diagnostic-result">${verdict}${revision}</div>${summary}${focusBlock}${note}<div class="button-row"><button type="button" class="secondary" data-action="diagnostic-back">← Ubah nilai</button><button class="primary">${run.revision ? 'Simpan revisi' : 'Simpan hasil tes'}</button></div></form>`;
 }

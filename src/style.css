@@ -534,17 +534,17 @@ button {
   color: #91998e;
   font-size: 10px;
 }
-.mini-progress {
+.mini-level {
   width: 115px;
   margin-left: auto;
 }
-.mini-progress small {
+.mini-level small {
   display: flex;
   justify-content: space-between;
   color: #8c998b;
   font-size: 9px;
 }
-.mini-progress b {
+.mini-level b {
   color: #5a735d;
   font-weight: 500;
 }
@@ -572,7 +572,7 @@ progress::-moz-progress-bar {
   background: #93a677;
   border-radius: 5px;
 }
-.mini-progress progress {
+.mini-level progress {
   margin-top: 10px;
 }
 .attention-item {
@@ -1118,7 +1118,7 @@ hr {
   .dashboard-grid {
     grid-template-columns: 1.4fr 1fr;
   }
-  .mini-progress {
+  .mini-level {
     width: 90px;
   }
   .student-row {
@@ -1364,13 +1364,13 @@ hr {
   .row-arrow {
     order: 5;
   }
-  .mini-progress {
+  .mini-level {
     order: 9;
     flex: 1 1 100%;
     width: auto;
     margin-left: 0;
   }
-  .mini-progress small {
+  .mini-level small {
     display: block;
     margin-bottom: 4px;
   }
@@ -1717,10 +1717,10 @@ strong {
   background: #20241f;
 }
 .student-info small,
-.mini-progress small {
+.mini-level small {
   color: #aab1a8;
 }
-.mini-progress b {
+.mini-level b {
   color: #e1c16b;
 }
 .row-arrow {
