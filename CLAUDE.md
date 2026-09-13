@@ -88,7 +88,18 @@ Ikuti Alur kerja langkah 3–4. Jangan pernah push tanpa persetujuan lebih dulu.
 - CSS memberi `display` ke `label`, jadi atribut `hidden` dipaksa lewat `[hidden]{display:none!important}` (`src/student-form.css`).
 - Berkas CSS pernah menyimpan tanda `—` sebagai satu byte CP1252 sehingga bukan UTF-8 valid. Sudah diperbaiki; jangan menulis ulang berkas CSS dengan pengodean lain.
 
-## Keadaan kurikulum — sudah selesai
+## ⚠ Kurikulum sedang direvisi (13 Sep 2026)
+- Atas permintaan pemilik, isi tabel `curriculum` **dikosongkan** (`20260913020000_clear_curriculum.sql`); tabel dan kolom masih bentuk lama. Penjaga isi di `tests/database.test.mjs` (peta cakupan, jangkar Matematika, pencocokan indikator–tujuan) ikut dihapus. Teks lama tetap ada di migrasi sebelumnya.
+- **Fase Fondasi jadi pilot.** Kurikulum barunya disetujui pemilik kata demi kata dan dipasang di `20260913030000_fondasi_pilot_curriculum.sql`:
+  - Tabel `curriculum_phases` (CP), `curriculum_levels` (judul + deskripsi), `curriculum_level_indicators` (8 per level; kolom area bernama `domain`, karena kata `area` memicu `check-imports`), dan `curriculum_themes` (8 tema × 24 pertemuan).
+  - Level milik anak secara utuh. Anggota membaca, pemilik hanya bisa UPDATE teks; baris ditambah lewat migrasi.
+  - Tab Kurikulum menampilkan CP → kartu level → tabel tema. Editor kurikulum lama dihapus dari `main.js`.
+  - Tabel `curriculum` lama (kosong) masih dibaca kartu evaluasi, `levelMeaning`, dan rapor AI.
+- Rancangan alur pilot dari pemilik (belum dibangun): tema menurut nomor pertemuan; lembar aktivitas per pertemuan (pembuka + English phrase, aktivitas utama dengan tugas otomatis per level anak, penutup + checklist karakter); guru memilih yang hadir lalu menandai pertemuan selesai. Belum diputuskan: cara naik level, sumber isi 192 lembar, cara menghitung nomor pertemuan, 5 butir checklist karakter, dan rapor.
+- Tes Diagnostik (instrumen tugas penentu bertahap) **ditunda** sampai kurikulum baru jadi, karena diturunkan darinya.
+- Bagian di bawah menggambarkan kurikulum **lama** yang sudah dihapus; perbarui setelah kurikulum baru dipasang.
+
+## Keadaan kurikulum lama (sudah dihapus)
 Indikator **lengkap**: 16 level × 6 bidang wajib (Menyimak, Berbicara, Membaca, Menulis, Matematika, IPAS), masing-masing 3 indikator + simpul spiral, plus English Exposure 16 level tanpa simpul. Tidak ada lubang; `tests/database.test.mjs` memakai peta cakupan yang menolak satu kotak kosong pun.
 - Kolom di `curriculum`: `<bidang>`, `<bidang>_criteria`, `<bidang>_indicators` (jsonb, maks 6), `<bidang>_key`, `<bidang>_spiral`. Pemilik mengedit; guru membaca.
 - Tab Kurikulum: **Per untaian** (default; satu bidang menurun 16 level dengan kotak simpul di antaranya) dan **Per level**.

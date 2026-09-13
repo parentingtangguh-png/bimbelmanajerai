@@ -47,6 +47,31 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   await assert.rejects(as(owner,'update curriculum set reading_key=5 where level=1'),/curriculum_reading_key_range/);
   assert.equal((await as(teacher,'update curriculum set reading_key=0 where level=1 returning level')).rows.length,0);
  });
+ await t.test('kurikulum pilot Fondasi lengkap: CP, 4 level x 8 indikator, 8 tema tanpa lubang',async()=>{
+  const cp=(await admin("select cp from curriculum_phases where code='fondasi'")).rows[0].cp;
+  assert.match(cp,/^Pada akhir Fase Fondasi, anak mampu mengenali/);
+  const levels=(await admin("select level,title from curriculum_levels where phase_code='fondasi' order by level")).rows;
+  assert.deepEqual(levels.map(r=>r.title),['Aku Siap Belajar','Aku Mulai Mengenal','Aku Mulai Bisa','Aku Siap ke SD']);
+  // Tiap level wajib 8 indikator bernomor 1-8 tanpa lompatan, dan nomor 7 English, nomor 8 karakter.
+  for(const {level} of levels){
+   const ind=(await admin('select number,domain,text from curriculum_level_indicators where level=$1 order by number',[level])).rows;
+   assert.deepEqual(ind.map(r=>r.number),[1,2,3,4,5,6,7,8],`level ${level} harus punya indikator 1-8`);
+   assert.equal(ind[6].domain,'English',`level ${level} indikator 7`);
+   assert.equal(ind[7].domain,'Karakter',`level ${level} indikator 8`);
+   assert.match(ind[7].text,/\(observasi guru\)$/);
+  }
+  // Rentang pertemuan tema bersambung dari 1 sampai 192, 24 pertemuan per tema.
+  const themes=(await admin("select number,name,first_meeting,last_meeting from curriculum_themes where phase_code='fondasi' order by number")).rows;
+  assert.equal(themes.length,8);
+  themes.forEach((th,i)=>{assert.equal(th.number,i+1);assert.equal(th.first_meeting,i*24+1);assert.equal(th.last_meeting,(i+1)*24);});
+  assert.equal(themes[0].name,'Aku Bisa Bercerita');assert.equal(themes[7].name,'Aku Siap ke SD');
+  // Guru membaca tapi tidak menyunting; pemilik menyunting teks tapi tidak menambah baris.
+  assert.equal((await as(teacher,'select * from curriculum_level_indicators')).rows.length,32);
+  assert.equal((await as(teacher,"update curriculum_levels set title='X' where level=1 returning level")).rows.length,0);
+  assert.equal((await as(owner,"update curriculum_levels set title=title where level=1 returning level")).rows.length,1);
+  await assert.rejects(as(owner,"insert into curriculum_themes values(9,'fondasi','X',193,216)"),/permission denied/);
+  assert.equal((await as(stranger,'select * from curriculum_levels')).rows.length,4,'guru terdaftar lain juga membaca');
+ });
  await t.test('fungsi trigger tidak tersedia sebagai RPC pengguna',async()=>{
   assert.equal((await db.query("select has_function_privilege('authenticated','public.handle_new_user()','execute') as allowed")).rows[0].allowed,false);
   assert.equal((await db.query("select has_function_privilege('authenticated','public.guard_student_update()','execute') as allowed")).rows[0].allowed,false);

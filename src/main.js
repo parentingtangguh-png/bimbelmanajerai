@@ -88,6 +88,10 @@ async function refresh() {
     records,
     themes,
     curriculum,
+    curriculumPhases,
+    curriculumLevels,
+    curriculumIndicators,
+    curriculumThemes,
     competencies,
     assessments,
     observations,
@@ -100,6 +104,10 @@ async function refresh() {
     allRows('session_students'),
     result(db.from('themes').select('*').order('name')),
     result(db.from('curriculum').select('*').order('level')),
+    result(db.from('curriculum_phases').select('*').order('sort_order')),
+    result(db.from('curriculum_levels').select('*').order('level')),
+    result(db.from('curriculum_level_indicators').select('*').order('level').order('number')),
+    result(db.from('curriculum_themes').select('*').order('number')),
     allRows('student_competencies', 'student_id'),
     allRows('session_assessments', 'session_student_id'),
     allRows('session_observations', 'session_student_id'),
@@ -116,6 +124,10 @@ async function refresh() {
     records,
     themes,
     curriculum,
+    curriculumPhases,
+    curriculumLevels,
+    curriculumIndicators,
+    curriculumThemes,
     competencies,
     assessments,
     observations,
@@ -159,38 +171,6 @@ function passwordForm() {
     'required minlength="8" autocomplete="new-password"'
   );
   return `<form data-form="password">${intro}${baru}${ulangi}<button class="primary full">Simpan kata sandi baru</button></form>`;
-}
-
-// One subject inside the owner's curriculum editor: the goal, its indicators, which of them is the
-// spiral node, why the next level needs it, and what counts as evidence.
-function curriculumFieldset(k, c) {
-  const goal = area('Tujuan kompetensi', k, c[k], 'required maxlength="2000"');
-  const indicators = area(
-    'Indikator (satu per baris, maksimal 6)',
-    `${k}_indicators`,
-    indicatorsOf(c, k).join('\n'),
-    'maxlength="3000"'
-  );
-  const key = field(
-    'Nomor indikator simpul spiral (0 bila tidak ada)',
-    `${k}_key`,
-    'number',
-    String(Number(c[`${k}_key`] || 0)),
-    'min="0" max="6"'
-  );
-  const spiral = area(
-    'Simpul spiral menuju level berikutnya',
-    `${k}_spiral`,
-    c[`${k}_spiral`] || '',
-    'maxlength="2000"'
-  );
-  const criteria = area(
-    'Bukti keberhasilan',
-    `${k}_criteria`,
-    c[`${k}_criteria`],
-    'required maxlength="2000"'
-  );
-  return `<fieldset class="curriculum-edit"><h3>${h(subjectLabels[k])}</h3>${goal}${indicators}${key}${spiral}${criteria}</fieldset>`;
 }
 
 // The chrome around every screen: the sidebar that switches screens and the bar that names the
@@ -382,18 +362,6 @@ document.addEventListener('click', async e => {
   }
   const { action, id, kind } = b.dataset;
   try {
-    if (action === 'curriculum-tab') {
-      state.curriculumTab = id;
-      return render();
-    }
-    if (action === 'curriculum-subject') {
-      state.curriculumSubject = id;
-      return render();
-    }
-    if (action === 'curriculum-phase') {
-      state.curriculumPhase = id;
-      return render();
-    }
     if (action === 'refresh') {
       await refresh();
       return notify('Data terbaru sudah dimuat.');
@@ -430,13 +398,6 @@ document.addEventListener('click', async e => {
         'Daftarkan guru',
         `<form data-form="member">${field('Nama guru', 'name', 'text', '', 'required maxlength="120"')}${field('Email guru', 'email', 'email', '', 'required')}<button class="primary full">Daftarkan email guru</button></form>`
       );
-    if (action === 'edit-curriculum') {
-      const c = state.curriculum.find(c => c.level === Number(id));
-      return modal(
-        `Kurikulum level ${id}`,
-        `<form data-form="curriculum" data-id="${id}">${subjects.map(k => curriculumFieldset(k, c)).join('')}<button class="primary">Simpan kurikulum</button></form>`
-      );
-    }
     if (action === 'copy') {
       await navigator.clipboard.writeText(state.records.find(r => r.id === id).report);
       return notify('Pesan berhasil disalin.');
@@ -848,23 +809,6 @@ document.addEventListener('submit', async e => {
             )
         );
         break;
-      case 'curriculum': {
-        const payload = {};
-        for (const subject of subjects) {
-          payload[subject] = v[subject];
-          payload[`${subject}_criteria`] = v[`${subject}_criteria`];
-          const lines = String(v[`${subject}_indicators`] || '')
-            .split('\n')
-            .map(x => x.trim())
-            .filter(Boolean)
-            .slice(0, 6);
-          payload[`${subject}_indicators`] = lines;
-          payload[`${subject}_key`] = Math.min(Math.max(0, Number(v[`${subject}_key`]) || 0), lines.length);
-          payload[`${subject}_spiral`] = String(v[`${subject}_spiral`] || '');
-        }
-        await result(db.from('curriculum').update(payload).eq('level', Number(id)));
-        break;
-      }
     }
     document.querySelector('#modal')?.close();
     await refresh();

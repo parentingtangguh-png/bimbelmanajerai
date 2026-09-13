@@ -27,9 +27,7 @@ add('sessionsView (daftar sesi)', sessionsView());
 add('dashboard', dashboard());
 add('studentsView', studentsView());
 add('teamView', teamView());
-add('curriculumView (per untaian)', curriculumView());
-state.curriculumTab = 'level';
-add('curriculumView (per level)', curriculumView());
+add('curriculumView', curriculumView());
 
 const html = screens.join('\n\n');
 fs.writeFileSync(out, html);

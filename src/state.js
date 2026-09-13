@@ -21,13 +21,14 @@ export const initialState = () => ({
   profiles: [],
   themes: [],
   curriculum: [],
+  curriculumPhases: [],
+  curriculumLevels: [],
+  curriculumIndicators: [],
+  curriculumThemes: [],
   active: null,
   filter: '',
   schedules: [],
   scheduleStudents: [],
-  curriculumTab: 'strand',
-  curriculumSubject: 'reading',
-  curriculumPhase: 'all',
   // The class list keeps every session ever taught. Only the latest are shown until asked.
   allSessions: false
 });

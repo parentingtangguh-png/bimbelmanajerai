@@ -406,3 +406,37 @@ dialog .history small {
   line-height: 1.55;
   opacity: 0.75;
 }
+
+/* Kurikulum pilot: CP fase, kartu level dengan area tiap indikator, dan tabel tema. */
+.curriculum-cp {
+  margin-bottom: 16px;
+}
+.curriculum-cp p {
+  margin: 10px 0 0;
+  line-height: 1.6;
+}
+.curriculum-card .indicator-list .badge {
+  margin-left: 4px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.curriculum-themes {
+  margin-top: 16px;
+}
+.curriculum-themes .table-scroll {
+  overflow-x: auto;
+}
+.curriculum-themes table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.curriculum-themes th,
+.curriculum-themes td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid rgba(127, 127, 127, 0.25);
+}
+.curriculum-themes td:first-child,
+.curriculum-themes td:last-child {
+  white-space: nowrap;
+}

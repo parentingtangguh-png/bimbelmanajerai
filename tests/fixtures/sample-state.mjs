@@ -269,6 +269,27 @@ export function loadSampleState() {
         english_spiral: ''
       }
     ],
+    curriculumPhases: [
+      { code: 'fondasi', name: 'Fase Fondasi', cp: 'Pada akhir Fase Fondasi, anak mampu.', sort_order: 1 }
+    ],
+    curriculumLevels: [
+      { level: 1, phase_code: 'fondasi', title: 'Aku Siap Belajar', description: 'Anak mulai nyaman.' },
+      {
+        level: 2,
+        phase_code: 'fondasi',
+        title: 'Aku Mulai Mengenal',
+        description: 'Huruf dan angka bermakna.'
+      }
+    ],
+    curriculumIndicators: [
+      { level: 1, number: 2, text: 'Merespons ketika namanya dipanggil', domain: 'Bahasa lisan' },
+      { level: 1, number: 1, text: 'Mengikuti sesi dari awal hingga selesai', domain: 'Kesiapan belajar' },
+      { level: 2, number: 1, text: 'Menyebutkan nama huruf vokal <A>', domain: 'Literasi' }
+    ],
+    curriculumThemes: [
+      { number: 2, phase_code: 'fondasi', name: 'Aku Bisa Menghitung', first_meeting: 25, last_meeting: 48 },
+      { number: 1, phase_code: 'fondasi', name: 'Aku Bisa Bercerita', first_meeting: 1, last_meeting: 24 }
+    ],
     schedules: [{ id: 'jadwal-1', name: 'Sesi Pagi', start_time: '08:00:00', end_time: '09:30:00' }],
     scheduleStudents: [{ schedule_id: 'jadwal-1', student_id: 'anak-1' }],
     themes: [{ name: 'Pasar Sehat' }]

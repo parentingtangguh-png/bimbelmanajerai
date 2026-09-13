@@ -126,9 +126,23 @@ test('ringkasan menghitung siswa aktif dan menampilkan barisnya', () => {
 test('daftar siswa dan kurikulum tersusun dari data yang sama', () => {
   loadSampleState();
   assert.match(studentsView(), /Alya Contoh/);
+});
+
+test('kurikulum pilot menampilkan CP, level berurutan dengan indikatornya, dan tema', () => {
+  loadSampleState();
   const kur = curriculumView();
-  assert.equal(count(kur, 'strand-rung'), 2, 'dua level pada contoh');
-  assert.match(kur, /Simpul spiral/);
+  assert.match(kur, /CP FASE FONDASI/);
+  assert.equal(count(kur, 'class="panel curriculum-card"'), 2, 'dua level pada contoh');
+  assert.ok(kur.indexOf('Mengikuti sesi') < kur.indexOf('Merespons ketika'), 'indikator urut menurut nomor');
+  assert.ok(kur.indexOf('Aku Siap Belajar') < kur.indexOf('Mengikuti sesi'), 'indikator di dalam levelnya');
+  assert.ok(kur.indexOf('Mengikuti sesi') < kur.indexOf('Aku Mulai Mengenal'));
+  assert.match(kur, /Kesiapan belajar/);
+  assert.ok(kur.includes('&lt;A&gt;') && !kur.includes('<A>'), 'teks indikator di-escape');
+  assert.ok(kur.indexOf('Aku Bisa Bercerita') < kur.indexOf('Aku Bisa Menghitung'), 'tema urut');
+  assert.match(kur, /1–24/);
+  assert.ok(!kur.includes('data-action="edit-curriculum"'), 'editor kurikulum lama sudah tidak ada');
+  state.curriculumPhases = [];
+  assert.match(curriculumView(), /sedang disiapkan/);
 });
 
 test('daftar sesi memisahkan yang belum selesai dan membatasi riwayat', () => {

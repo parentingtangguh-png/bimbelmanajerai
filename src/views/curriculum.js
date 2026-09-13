@@ -1,96 +1,54 @@
-// Tab Kurikulum: satu bidang dibaca menurun dengan simpul spiral di antara level.
-import { state, subjects, subjectLabels, indicatorsOf, phaseOf, phaseShort } from '../state.js';
+// Tab Kurikulum: CP fase, level beserta 8 indikatornya, lalu tema yang berjalan menurut nomor pertemuan.
+import { state } from '../state.js';
 
 import { escapeHtml as h } from '../domain.js';
 import { empty, heading } from '../ui.js';
+
 export function curriculumView() {
-  const tab = state.curriculumTab === 'level' ? 'level' : 'strand';
-  const tabs = `<div class="curriculum-tabs">${[
-    ['strand', 'Per untaian'],
-    ['level', 'Per level']
-  ]
-    .map(
-      ([v, t]) =>
-        `<button class="${tab === v ? 'active' : ''}" data-action="curriculum-tab" data-id="${v}">${t}</button>`
-    )
-    .join('')}</div>`;
-  return `${heading('TANGGA KOMPETENSI', '16 level yang saling berulang dan bertumbuh.', 'Tujuan tetap; aktivitas berubah mengikuti tema, kelompok, dan kebutuhan anak.')}${tabs}<div class="notice">Bahasa Indonesia terdiri dari menyimak, berbicara, membaca, dan menulis. English Exposure wajib hadir dalam tema, tetapi tidak menjadi syarat kelulusan. Karakter diamati pada semua kegiatan.</div>${tab === 'level' ? curriculumByLevel() : curriculumByStrand()}`;
-}
-// Levels are a spiral, so the strand view reads down one subject and names the knot between each pair of levels.
-export function curriculumByStrand() {
-  const subject = subjects.includes(state.curriculumSubject) ? state.curriculumSubject : 'reading';
-  const band = state.curriculumPhase || 'all';
-  const pick = (label, action, items, current) =>
-    `<div class="strand-picker"><span>${label}</span>${items.map(([v, t]) => `<button class="${v === current ? 'active' : ''}" data-action="${action}" data-id="${v}">${h(t)}</button>`).join('')}</div>`;
-  const pickers =
-    pick(
-      'Bidang',
-      'curriculum-subject',
-      subjects.map(k => [k, subjectLabels[k]]),
-      subject
-    ) +
-    pick(
-      'Fase',
-      'curriculum-phase',
-      [
-        ['all', 'Semua'],
-        ['1', 'Fondasi 1–4'],
-        ['2', 'Fase A 5–8'],
-        ['3', 'Fase B 9–12'],
-        ['4', 'Fase C 13–16']
-      ],
-      band
-    );
-  const rows = state.curriculum
-    .filter(c => band === 'all' || Math.ceil(c.level / 4) === Number(band))
-    .sort((x, y) => x.level - y.level);
-  if (!rows.length)
+  const intro = heading(
+    'KURIKULUM PILOT',
+    'Fase Fondasi, empat level.',
+    'Setiap anak punya level sendiri; tema berjalan menurut pertemuan dan sama untuk semua anak.'
+  );
+  if (!state.curriculumPhases.length)
     return (
-      pickers +
-      empty(
-        'Bank kurikulum',
-        'Kurikulum sedang direvisi. Isi baru akan tampil di sini setelah disetujui dan dipasang.'
-      )
+      intro + empty('Kurikulum', 'Kurikulum sedang disiapkan. Isinya akan tampil di sini setelah dipasang.')
     );
-  const body = rows
-    .map((c, i) => {
-      const header =
-        i === 0 || phaseShort(c.level) !== phaseShort(rows[i - 1].level)
-          ? `<h2 class="strand-band">${phaseShort(c.level)}</h2>`
-          : '';
-      return header + strandRung(c, subject) + spiralNode(c, subject);
-    })
+  return intro + state.curriculumPhases.map(phaseSection).join('');
+}
+
+function phaseSection(p) {
+  const levels = state.curriculumLevels
+    .filter(l => l.phase_code === p.code)
+    .sort((a, b) => a.level - b.level);
+  const themes = state.curriculumThemes
+    .filter(t => t.phase_code === p.code)
+    .sort((a, b) => a.number - b.number);
+  return `${cpPanel(p)}<div class="curriculum-grid">${levels.map(levelCard).join('')}</div>${themeTable(themes)}`;
+}
+
+export function cpPanel(p) {
+  return `<article class="panel curriculum-cp"><span class="badge green">CP ${h(p.name).toUpperCase()}</span><p>${h(p.cp)}</p></article>`;
+}
+
+export function levelCard(l) {
+  const items = state.curriculumIndicators
+    .filter(i => i.level === l.level)
+    .sort((a, b) => a.number - b.number)
+    .map(i => `<li>${h(i.text)} <span class="badge">${h(i.domain)}</span></li>`)
     .join('');
-  return `${pickers}<div class="strand">${body}</div>`;
-}
-export function strandRung(c, k) {
-  const list = indicatorsOf(c, k);
-  const key = Number(c[`${k}_key`] || 0);
-  const items = list.length
-    ? `<ol class="indicator-list">${list.map((t, i) => `<li class="${i + 1 === key ? 'key' : ''}">${i + 1 === key ? '<span class="star" title="Simpul spiral">★</span>' : ''}${h(t)}</li>`).join('')}</ol>`
+  const list = items
+    ? `<ol class="indicator-list">${items}</ol>`
     : '<p class="muted">Indikator belum disusun untuk level ini.</p>';
-  return `<article class="panel strand-rung"><div class="rung-head"><span class="badge green">LEVEL ${c.level}</span><span class="badge">${phaseShort(c.level)}</span></div><h4>Tujuan</h4><p>${h(c[k] || '—')}</p><h4>Indikator</h4>${items}<h4>Bukti berhasil</h4><small>${h(c[`${k}_criteria`] || 'Kriteria belum tersedia.')}</small>${state.role === 'owner' ? `<button class="secondary" data-action="edit-curriculum" data-id="${c.level}">Edit level ${c.level}</button>` : ''}</article>`;
+  return `<article class="panel curriculum-card"><span class="badge green">LEVEL ${l.level}</span><h2>${h(l.title)}</h2><p>${h(l.description)}</p><h4>Indikator</h4>${list}</article>`;
 }
-export function spiralNode(c, k) {
-  const key = Number(c[`${k}_key`] || 0);
-  const note = c[`${k}_spiral`] || '';
-  // A knot that crosses a phase boundary matters most: that step goes through the summative exam.
-  // Level 16 has nothing above it, so its note closes the ladder instead of pointing onwards.
-  const top = c.level === 16;
-  const crossing = c.level % 4 === 0;
-  if (!note)
-    return `<div class="spiral-node muted-node"><span aria-hidden="true">↓</span><p>${top ? 'Penutup tangga belum ditulis.' : 'Simpul spiral menuju level berikutnya belum ditulis.'}</p></div>`;
-  const label = top
-    ? `Menutup tangga${key ? ` → indikator ${key}` : ''} · kelulusan setelah ujian sumatif akhir`
-    : `Simpul spiral${key ? ` → indikator ${key}` : ''}${crossing ? ` · menuju ${phaseShort(c.level + 1)} lewat ujian sumatif` : ''}`;
-  return `<div class="spiral-node${crossing ? ' crossing' : ''}${top ? ' top' : ''}"><span class="star" aria-hidden="true">${crossing ? '⇅' : '★'}</span><div><strong>${label}</strong><p>${h(note)}</p></div></div>`;
+
+export function themeTable(themes) {
+  if (!themes.length) return '';
+  const rows = themes
+    .map(
+      t => `<tr><td>${t.number}</td><td>${h(t.name)}</td><td>${t.first_meeting}–${t.last_meeting}</td></tr>`
+    )
+    .join('');
+  return `<article class="panel curriculum-themes"><h3>Tema</h3><p class="muted">Berjalan menurut nomor pertemuan, sama untuk semua siswa.</p><div class="table-scroll"><table><thead><tr><th>Tema</th><th>Nama</th><th>Pertemuan</th></tr></thead><tbody>${rows}</tbody></table></div></article>`;
 }
-export function curriculumByLevel() {
-  const detail = (c, k) => {
-    const list = indicatorsOf(c, k);
-    const key = Number(c[`${k}_key`] || 0);
-    return `<details><summary>${h(subjectLabels[k])} <em>(${list.length || '–'})</em></summary><p>${h(c[k])}</p>${list.length ? `<ol class="indicator-list">${list.map((t, i) => `<li class="${i + 1 === key ? 'key' : ''}">${h(t)}</li>`).join('')}</ol>` : '<p class="muted">Indikator belum disusun.</p>'}<small><strong>Bukti berhasil</strong><br>${h(c[`${k}_criteria`] || 'Kriteria belum tersedia.')}</small></details>`;
-  };
-  return `<div class="curriculum-grid">${state.curriculum.map(c => `<article class="panel curriculum-card"><span class="badge green">LEVEL ${c.level}</span><h2>${phaseOf(c.level)}</h2><h3>Bahasa Indonesia</h3>${['listening', 'speaking', 'reading', 'writing'].map(k => detail(c, k)).join('')}<h3>Matematika</h3>${detail(c, 'math')}<h3>IPAS tematik</h3>${detail(c, 'ipas')}<h3>English Exposure</h3>${detail(c, 'english')}${state.role === 'owner' ? `<button class="secondary" data-action="edit-curriculum" data-id="${c.level}">Edit tujuan & kriteria</button>` : ''}</article>`).join('') || empty('Bank kurikulum', 'Kurikulum sedang direvisi. Isi baru akan tampil di sini setelah disetujui dan dipasang.')}</div>`;
-}
-// Indicators arrive as jsonb; tolerate a string payload so older rows keep rendering.
