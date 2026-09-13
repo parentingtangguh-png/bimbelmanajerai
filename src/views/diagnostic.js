@@ -62,7 +62,17 @@ export function diagnosticStart(studentId = '') {
 }
 
 function diagnosticRules() {
-  return '<details class="diagnostic-rules"><summary>Cara tes</summary><p>Tes perorangan ±20–25 menit, disampaikan sebagai permainan. Tiap indikator diberi ✓ Tercapai, ◐ Dengan bantuan, atau ✗ Belum. Level <strong>tuntas</strong> bila indikator 1–6 minimal 5 ✓ dan tidak ada ✗; English dan Karakter dicatat tanpa menentukan level. Tuntas → naik satu level; belum tuntas → level itu menjadi level awal. Hentikan bila anak lelah atau menolak dua tugas berturut-turut. Jangan mengajari selama tes; memberi contoh sekali boleh, dicatat ◐.</p></details>';
+  const items = [
+    ['⏱', '±20–25 menit, satu anak, sebagai permainan.'],
+    ['✓◐✗', 'Nilai tiap tugas: Tercapai, Dengan bantuan, Belum.'],
+    ['★', '<strong>Tuntas</strong> = nomor 1–6: minimal 5 ✓, tanpa ✗.'],
+    ['↕', 'Tuntas → naik level. Belum → itulah level awal.'],
+    ['✋', 'Jangan mengajari. Contoh sekali boleh, dicatat ◐.'],
+    ['⏸', 'Anak lelah atau menolak 2 kali? Berhenti dulu.']
+  ]
+    .map(([icon, text]) => `<li><span aria-hidden="true">${icon}</span><span>${text}</span></li>`)
+    .join('');
+  return `<details class="diagnostic-rules"><summary>Cara tes</summary><ul>${items}</ul></details>`;
 }
 
 // Langkah 2: satu level, delapan kartu tugas.

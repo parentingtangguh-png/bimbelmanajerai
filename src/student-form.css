@@ -33,8 +33,24 @@
   cursor: pointer;
   font-weight: 600;
 }
-.diagnostic-rules p {
-  line-height: 1.6;
+.diagnostic-rules ul {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.diagnostic-rules li {
+  display: grid;
+  grid-template-columns: 2.4em 1fr;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 13px;
+  line-height: 1.45;
+  border-top: 1px solid rgba(127, 127, 127, 0.18);
+}
+.diagnostic-rules li > span:first-child {
+  color: var(--green);
+  text-align: center;
+  white-space: nowrap;
 }
 .diagnostic-task {
   margin: 12px 0;
