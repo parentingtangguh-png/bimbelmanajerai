@@ -65,6 +65,18 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   assert.equal(themes.length,8);
   themes.forEach((th,i)=>{assert.equal(th.number,i+1);assert.equal(th.first_meeting,i*24+1);assert.equal(th.last_meeting,(i+1)*24);});
   assert.equal(themes[0].name,'Aku Bisa Bercerita');assert.equal(themes[7].name,'Aku Siap ke SD');
+  // Setiap tema berdeskriptor lengkap, dan indikator fokusnya menunjuk indikator kurikulum yang ada.
+  const desc=(await admin("select number,description,focus_areas,focus_indicators,character_focus,english_words from curriculum_themes where phase_code='fondasi' order by number")).rows;
+  for(const d of desc){
+   for(const k of ['description','focus_areas','character_focus','english_words'])assert.ok(d[k].trim().length>5,`tema ${d.number} belum punya ${k}`);
+   assert.ok(d.focus_indicators.length>=5,`tema ${d.number} kekurangan indikator fokus`);
+   for(const ref of d.focus_indicators){
+    const [,lv,no]=ref.match(/^L(\d+)-(\d+)$/);
+    assert.equal((await admin('select count(*)::int as n from curriculum_level_indicators where level=$1 and number=$2',[Number(lv),Number(no)])).rows[0].n,1,`tema ${d.number}: ${ref} tidak ada di kurikulum`);
+   }
+  }
+  assert.match(desc[5].english_words,/I don't know/);
+  await assert.rejects(admin("update curriculum_themes set focus_indicators=array['Level 1'] where number=1"),/check/);
   // Guru membaca tapi tidak menyunting; pemilik menyunting teks tapi tidak menambah baris.
   assert.equal((await as(teacher,'select * from curriculum_level_indicators')).rows.length,32);
   assert.equal((await as(teacher,"update curriculum_levels set title='X' where level=1 returning level")).rows.length,0);

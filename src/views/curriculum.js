@@ -45,10 +45,24 @@ export function levelCard(l) {
 
 export function themeTable(themes) {
   if (!themes.length) return '';
-  const rows = themes
-    .map(
-      t => `<tr><td>${t.number}</td><td>${h(t.name)}</td><td>${t.first_meeting}–${t.last_meeting}</td></tr>`
-    )
+  return `<article class="panel curriculum-themes"><h3>Tema</h3><p class="muted">Berjalan menurut nomor pertemuan, sama untuk semua siswa. Buka tema untuk melihat deskriptornya.</p>${themes.map(themeDetail).join('')}</article>`;
+}
+
+// One theme: the summary line stays short; the descriptor opens below it.
+export function themeDetail(t) {
+  const row = (label, value) => (value ? `<div><dt>${label}</dt><dd>${value}</dd></div>` : '');
+  return `<details class="theme-detail"><summary><span class="theme-no">${t.number}</span><strong>${h(t.name)}</strong><small>Pertemuan ${t.first_meeting}–${t.last_meeting}</small></summary>${t.description ? `<p>${h(t.description)}</p>` : ''}<dl>${row('Indikator yang paling dilatih', focusList(t))}${row('Karakter yang ditonjolkan', h(t.character_focus || ''))}${row('English theme words', h(t.english_words || ''))}</dl></details>`;
+}
+
+// Focus indicators are stored as "L<level>-<number>"; the text is looked up so teachers need not.
+function focusList(t) {
+  const refs = (t.focus_indicators || [])
+    .map(ref => {
+      const [, lv, no] = String(ref).match(/^L(\d+)-(\d+)$/) || [];
+      const ind = state.curriculumIndicators.find(i => i.level === Number(lv) && i.number === Number(no));
+      return `<li><span class="badge">${h(ref)}</span> ${h(ind ? ind.text : 'indikator tidak ditemukan')}</li>`;
+    })
     .join('');
-  return `<article class="panel curriculum-themes"><h3>Tema</h3><p class="muted">Berjalan menurut nomor pertemuan, sama untuk semua siswa.</p><div class="table-scroll"><table><thead><tr><th>Tema</th><th>Nama</th><th>Pertemuan</th></tr></thead><tbody>${rows}</tbody></table></div></article>`;
+  if (!t.focus_areas && !refs) return '';
+  return `${h(t.focus_areas || '')}${refs ? `<ul class="theme-focus">${refs}</ul>` : ''}`;
 }

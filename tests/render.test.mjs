@@ -139,7 +139,16 @@ test('kurikulum pilot menampilkan CP, level berurutan dengan indikatornya, dan t
   assert.match(kur, /Kesiapan belajar/);
   assert.ok(kur.includes('&lt;A&gt;') && !kur.includes('<A>'), 'teks indikator di-escape');
   assert.ok(kur.indexOf('Aku Bisa Bercerita') < kur.indexOf('Aku Bisa Menghitung'), 'tema urut');
-  assert.match(kur, /1–24/);
+  assert.match(kur, /Pertemuan 1–24/);
+  // Deskriptor tema: gambaran di-escape, indikator fokus diterjemahkan ke teks kurikulum.
+  assert.equal(count(kur, 'class="theme-detail"'), 2);
+  assert.ok(kur.includes('diri &amp; keluarga'), 'gambaran tema di-escape');
+  assert.match(kur, /L1-2<\/span> Merespons ketika namanya dipanggil/);
+  assert.match(kur, /L9-9<\/span> indikator tidak ditemukan/);
+  assert.match(kur, /Karakter yang ditonjolkan<\/dt><dd>berani menjawab/);
+  assert.ok(kur.includes('I don&#39;t know') || kur.includes("I don't know"));
+  // Tema tanpa deskriptor tetap tampil, tanpa baris kosong.
+  assert.ok(!/<dt>English theme words<\/dt><dd><\/dd>/.test(kur));
   assert.ok(!kur.includes('data-action="edit-curriculum"'), 'editor kurikulum lama sudah tidak ada');
   state.curriculumPhases = [];
   assert.match(curriculumView(), /sedang disiapkan/);

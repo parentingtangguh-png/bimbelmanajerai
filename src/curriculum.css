@@ -423,20 +423,54 @@ dialog .history small {
 .curriculum-themes {
   margin-top: 16px;
 }
-.curriculum-themes .table-scroll {
-  overflow-x: auto;
+.theme-detail {
+  border-top: 1px solid rgba(127, 127, 127, 0.25);
+  padding: 10px 0;
 }
-.curriculum-themes table {
-  width: 100%;
-  border-collapse: collapse;
+.theme-detail summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+  cursor: pointer;
 }
-.curriculum-themes th,
-.curriculum-themes td {
-  padding: 8px 10px;
-  text-align: left;
-  border-bottom: 1px solid rgba(127, 127, 127, 0.25);
+.theme-detail summary small {
+  opacity: 0.7;
 }
-.curriculum-themes td:first-child,
-.curriculum-themes td:last-child {
-  white-space: nowrap;
+.theme-no {
+  min-width: 1.6em;
+  font-weight: 700;
+  opacity: 0.8;
+}
+.theme-detail > p {
+  margin: 10px 0;
+  line-height: 1.6;
+}
+.theme-detail dl {
+  margin: 0;
+}
+.theme-detail dl > div {
+  margin-top: 10px;
+}
+.theme-detail dt {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.theme-detail dd {
+  margin: 4px 0 0;
+  line-height: 1.55;
+}
+.theme-focus {
+  margin: 6px 0 0;
+  padding-left: 0;
+  list-style: none;
+}
+.theme-focus li {
+  margin: 4px 0;
+}
+.theme-focus .badge {
+  margin-right: 4px;
+  font-size: 10px;
 }

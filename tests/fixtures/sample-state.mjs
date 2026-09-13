@@ -288,7 +288,18 @@ export function loadSampleState() {
     ],
     curriculumThemes: [
       { number: 2, phase_code: 'fondasi', name: 'Aku Bisa Menghitung', first_meeting: 25, last_meeting: 48 },
-      { number: 1, phase_code: 'fondasi', name: 'Aku Bisa Bercerita', first_meeting: 1, last_meeting: 24 }
+      {
+        number: 1,
+        phase_code: 'fondasi',
+        name: 'Aku Bisa Bercerita',
+        first_meeting: 1,
+        last_meeting: 24,
+        description: 'Anak bercerita tentang diri & keluarga.',
+        focus_areas: 'Bahasa lisan dan Literasi',
+        focus_indicators: ['L1-2', 'L9-9'],
+        character_focus: 'berani menjawab',
+        english_words: "My name is… · I don't know"
+      }
     ],
     schedules: [{ id: 'jadwal-1', name: 'Sesi Pagi', start_time: '08:00:00', end_time: '09:30:00' }],
     scheduleStudents: [{ schedule_id: 'jadwal-1', student_id: 'anak-1' }],
