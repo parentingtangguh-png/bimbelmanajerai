@@ -10,11 +10,11 @@ test('aplikasi memuat dan layar login dapat dipakai', async ({ page }) => {
   page.on('pageerror', e => errors.push(e.message));
 
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Selamat datang kembali' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Assalamu’alaikum' })).toBeVisible();
   await expect(page.getByLabel('Email terdaftar')).toBeVisible();
   await expect(page.getByLabel('Kata sandi')).toBeVisible();
-  await expect(page.getByRole('button', { name: /Masuk ke ruang belajar/ })).toBeVisible();
-  await expect(page.getByRole('button', { name: /Aktivasi akun/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Masuk/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Aktifkan akun/ })).toBeVisible();
 
   // The preview was removed; nothing should offer a way in without an account.
   await expect(page.getByRole('button', { name: /pratinjau/i })).toHaveCount(0);
@@ -25,7 +25,7 @@ test('aplikasi memuat dan layar login dapat dipakai', async ({ page }) => {
 test('layar login tidak meluber di layar HP 390px', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Selamat datang kembali' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Assalamu’alaikum' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.getByLabel('Email terdaftar').fill('contoh@bimbel.test');
   await expect(page.getByLabel('Email terdaftar')).toHaveValue('contoh@bimbel.test');

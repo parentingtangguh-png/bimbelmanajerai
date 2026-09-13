@@ -1887,7 +1887,9 @@ dialog::backdrop {
 .home,
 .home-top,
 .home-doa,
-.home-nav {
+.home-nav,
+.login-phone-brand,
+.login-leaf {
   display: none;
 }
 @media (max-width: 620px) {
@@ -2168,5 +2170,103 @@ dialog::backdrop {
     background: none;
     font-size: 12.5px;
     color: #9a7f45;
+  }
+
+  /* Layar login di HP mengikuti menu utama: satu permukaan gelap tanpa panel hijau, logo daun,
+     daun samar di latar, dan baris kedua judul dalam gold serif seperti motto. */
+  /* Hanya sisi samping yang dipotong, dan di tingkat seluruh layar: kalau .login-story yang
+     memotong, daun yang diturunkan terpenggal di batas bawah judul. */
+  .login {
+    overflow-x: hidden;
+  }
+  .login-story {
+    position: relative;
+    background: transparent;
+    min-height: 0;
+    padding: 18px 16px 6px;
+    gap: 20px;
+  }
+  .login-story > *:not(.login-leaf) {
+    position: relative;
+    z-index: 1;
+  }
+  .login-story .brand {
+    display: none;
+  }
+  .login-phone-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .login-phone-brand strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .login-phone-brand small {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  /* Daun diperbesar supaya tidak mengambang sendirian di bidang gelap yang kosong, dan diturunkan
+     sampai berada di belakang judul dan kalimat di bawahnya. */
+  .login-leaf {
+    display: block;
+    position: absolute;
+    top: 40px;
+    right: -92px;
+    width: 300px;
+    height: 280px;
+    opacity: 0.2;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .login-leaf .growth-art,
+  .login-phone-brand .growth-art {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: auto;
+    bottom: auto;
+    width: 250px;
+    height: 220px;
+    min-width: 0;
+    margin: 0;
+    transform-origin: 0 0;
+    transform: scale(1.2) translate(-22px, 5px);
+  }
+  .login-phone-brand .growth-art {
+    transform: scale(0.2) translate(-22px, 5px);
+  }
+  .login-story .eyebrow {
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    color: #9a7f45;
+  }
+  .login-story h1 {
+    margin: 10px 0 12px;
+    font-size: 30px;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    color: #fffdf7;
+  }
+  .login-story h1 em {
+    font-family: 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    color: #d7b35d;
+  }
+  /* Kotak form tadinya dibatasi 370px dan diletakkan di tengah, sehingga di layar selebar tablet
+     kecil ia menjorok ke dalam, tidak sejajar dengan judul di atasnya. */
+  .login-form {
+    position: relative;
+    z-index: 1;
+    background: transparent;
+    padding: 6px 16px 40px;
+    place-items: stretch;
+  }
+  .login-box {
+    max-width: none;
   }
 }

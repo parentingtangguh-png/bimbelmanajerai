@@ -5,7 +5,7 @@ import { escapeHtml as h } from '../domain.js';
 
 // Motif daun yang sama dengan dasbor (growth-art), dipakai dua kali: kecil sebagai logo di kiri
 // atas, besar dan samar sebagai latar. Markupnya identik supaya CSS-nya bisa dipakai bersama.
-const leafArt = () =>
+export const leafArt = () =>
   '<div class="growth-art" aria-hidden="true"><div class="orbit"></div><span class="petal p1"></span><span class="petal p2"></span><span class="petal p3"></span><span class="stem"></span></div>';
 
 // Ilustrasi guru: gambar tetap, bukan foto, supaya tidak ada data pribadi di repo publik.

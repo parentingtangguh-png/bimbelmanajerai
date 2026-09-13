@@ -43,7 +43,7 @@ import { curriculumView } from './views/curriculum.js';
 import { sessionsView, newSession } from './views/sessions.js';
 import { studentsView, levelMeaning, studentForm, scheduleForm } from './views/students.js';
 import { dashboard } from './views/dashboard.js';
-import { homeMenu, homeTop, homeDoa, homeNav } from './views/home.js';
+import { homeMenu, homeTop, homeDoa, homeNav, leafArt } from './views/home.js';
 import { teamView } from './views/team.js';
 import './style.css';
 import './curriculum.css';
@@ -228,9 +228,13 @@ function topbar() {
 // whether Supabase is reachable at all.
 function loginStory() {
   const brand = `<div class="brand">b<span>·</span> ${ORG_NAME}</div>`;
-  const pitch = `<div class="eyebrow">RUANG TUMBUH BERSAMA</div><h1>Langkah kecil.<br><em>Kemajuan berarti.</em></h1><p>Lebih dekat dengan setiap anak.<br>Lebih tenang menjalani hari mengajar.</p>`;
+  const pitch = `<h1>Langkah kecil.<br><em>Kemajuan berarti.</em></h1><p>Lebih dekat dengan setiap anak, lebih tenang menjalani hari mengajar.</p>`;
   const card = `<div class="story-card"><span class="sprout">✳</span><div><strong>Setiap anak punya jalannya.</strong><p>Materi personal · Evaluasi adaptif · Kabar baik untuk keluarga</p></div></div>`;
-  return `<section class="login-story">${brand}<div>${pitch}${card}</div><small>Dibangun untuk guru yang peduli.</small></section>`;
+  // Di HP layar login memakai kepala yang sama dengan menu utama: logo daun menggantikan "b·", dan
+  // daun besar samar jadi latar. Keduanya tersembunyi di layar lebar.
+  const phoneBrand = `<div class="login-phone-brand"><span class="home-mark" aria-hidden="true">${leafArt()}</span><span><strong>${ORG_NAME}</strong><small>Ruang tumbuh bersama</small></span></div>`;
+  const leaf = `<div class="login-leaf" aria-hidden="true">${leafArt()}</div>`;
+  return `<section class="login-story">${leaf}${phoneBrand}${brand}<div>${pitch}${card}</div><small>Dibangun untuk guru yang peduli.</small></section>`;
 }
 
 function loginForm() {
@@ -238,8 +242,8 @@ function loginForm() {
     ? '<div class="notice">Koneksi Supabase belum diatur, jadi belum ada yang bisa masuk. Periksa berkas config.json atau variabel VITE_SUPABASE_URL dan VITE_SUPABASE_PUBLISHABLE_KEY.</div>'
     : '';
   const inputs = `${field('Email terdaftar', 'email', 'email', '', 'required autocomplete="email"')}${field('Kata sandi', 'password', 'password', '', 'required minlength="8" autocomplete="current-password"')}`;
-  const buttons = `<button class="primary full" ${configured ? '' : 'disabled'}>Masuk ke ruang belajar →</button><button type="button" class="text-btn full" data-action="register" ${configured ? '' : 'disabled'}>Aktivasi akun yang sudah didaftarkan pemilik</button>`;
-  return `<section class="login-form"><div class="login-box"><span class="pill">RUMAH BELAJAR / 02</span><h2>Selamat datang kembali</h2><p class="muted">Masuk untuk melanjutkan perjalanan belajar anak.</p>${warning}<form id="login-form">${inputs}${buttons}</form><p class="fine">Akses hanya untuk pemilik dan guru terdaftar.</p></div></section>`;
+  const buttons = `<button class="primary full" ${configured ? '' : 'disabled'}>Masuk →</button><button type="button" class="text-btn full" data-action="register" ${configured ? '' : 'disabled'}>Guru baru? Aktifkan akun yang sudah didaftarkan pemilik</button>`;
+  return `<section class="login-form"><div class="login-box"><h2>Assalamu’alaikum</h2><p class="muted">Masuk dengan akun guru atau pemilik.</p>${warning}<form id="login-form">${inputs}${buttons}</form><p class="fine">Akses hanya untuk pemilik dan guru terdaftar.</p></div></section>`;
 }
 
 function login() {
