@@ -134,6 +134,34 @@ export const homeKeys = {
 };
 // Tes diagnostik anak, bila sudah ada. "Sudah dites" = ada barisnya; tidak ada kolom penanda lain.
 export const testFor = id => state.diagnosticTests.find(t => t.student_id === id);
+
+// Indikator yang pernah Lulus di pertemuan yang sudah selesai, untuk satu siswa dan satu level.
+export function passedIndicators(studentId, level) {
+  const done = new Set(state.classSchedules.filter(c => c.completed_at).map(c => c.id));
+  return [
+    ...new Set(
+      state.classScheduleStudents
+        .filter(
+          x =>
+            x.student_id === studentId &&
+            x.level === Number(level) &&
+            x.result === 'lulus' &&
+            done.has(x.schedule_id)
+        )
+        .map(x => x.indicator_number)
+    )
+  ].sort((a, b) => a - b);
+}
+
+// Saran indikator jadwal berikutnya: nomor terkecil di level siswa yang belum lulus.
+export function suggestedIndicator(s) {
+  const passed = new Set(passedIndicators(s.id, s.pilot_level));
+  const numbers = state.curriculumIndicators
+    .filter(i => i.level === Number(s.pilot_level))
+    .map(i => i.number)
+    .sort((a, b) => a - b);
+  return numbers.find(n => !passed.has(n)) ?? numbers[0];
+}
 // "Lulus Level 2" / "Belum lulus Level 2", diturunkan dari tes, bukan disimpan terpisah.
 export const testStatus = test =>
   test ? `${test.passed ? 'Lulus' : 'Belum lulus'} Level ${test.tested_level}` : '';

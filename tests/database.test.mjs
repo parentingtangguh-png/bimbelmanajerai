@@ -26,7 +26,7 @@ test('PostgreSQL: akun, siswa, kurikulum pilot, dan tes diagnostik',async t=>{
   const tabel=(await admin("select table_name from information_schema.tables where table_schema='public' order by 1")).rows.map(r=>r.table_name);
   assert.deepEqual(tabel,['access_list','assignments','class_schedule_students','class_schedules','curriculum_level_indicators','curriculum_levels','curriculum_phases','curriculum_themes','diagnostic_results','diagnostic_tests','profiles','students']);
   const fungsi=(await admin("select proname from pg_proc where pronamespace='public'::regnamespace order by 1")).rows.map(r=>r.proname);
-  assert.deepEqual(fungsi,['can_teach','check_student_identity','create_student','delete_schedule','delete_student','handle_new_user','is_member','is_owner','reject_owner_student_insert','save_diagnostic','save_schedule','set_student_active','update_student_profile']);
+  assert.deepEqual(fungsi,['can_teach','check_student_identity','complete_schedule','create_student','delete_schedule','delete_student','handle_new_user','is_member','is_owner','reject_owner_student_insert','save_diagnostic','save_schedule','set_student_active','update_student_profile']);
   const kolom=(await admin("select column_name from information_schema.columns where table_schema='public' and table_name='students' order by ordinal_position")).rows.map(r=>r.column_name);
   assert.deepEqual(kolom,['id','name','parent_name','phone','status','created_at','nickname','birth_date','school_grade','school_year','pilot_level']);
   const tes=(await admin("select column_name from information_schema.columns where table_schema='public' and table_name='diagnostic_tests' order by ordinal_position")).rows.map(r=>r.column_name);
@@ -220,6 +220,24 @@ test('PostgreSQL: akun, siswa, kurikulum pilot, dan tes diagnostik',async t=>{
   await assert.rejects(as(stranger,'select delete_schedule($1)',[id]),/tidak tersedia/);
   await as(teacher,'select delete_schedule($1)',[id]);
   assert.equal((await admin('select count(*)::int n from class_schedule_students where schedule_id=$1',[id])).rows[0].n,0);
+  // Tahap 2: tandai selesai dengan Lulus / Belum / Tidak hadir untuk setiap siswa.
+  const id3=(await simpan(teacher,muat(baik))).rows[0].id;
+  const selesai=(who,res,sid=id3)=>as(who,'select complete_schedule($1,$2::jsonb)',[sid,JSON.stringify(res)]);
+  const penuh=[{student_id:a1,result:'lulus'},{student_id:a4,result:'absen'}];
+  await assert.rejects(selesai(owner,penuh),/guru pengajar/);
+  await assert.rejects(selesai(stranger,penuh),/tidak tersedia/);
+  await assert.rejects(selesai(teacher,[penuh[0]]),/harus diberi satu hasil/,'semua siswa wajib');
+  await assert.rejects(selesai(teacher,[penuh[0],penuh[0]]),/harus diberi satu hasil/);
+  await assert.rejects(selesai(teacher,[penuh[0],{student_id:a4,result:'ragu'}]),/Lulus, Belum, atau Tidak hadir/);
+  await assert.rejects(selesai(teacher,[penuh[0],{student_id:milikLain,result:'lulus'}]),/siswa di jadwal ini/);
+  assert.equal((await admin('select completed_at from class_schedules where id=$1',[id3])).rows[0].completed_at,null,'gagal tidak menandai selesai');
+  await selesai(teacher,penuh);
+  const hasil=(await admin('select student_id,result from class_schedule_students where schedule_id=$1 order by level',[id3])).rows.map(r=>[r.student_id,r.result]);
+  assert.deepEqual(hasil,[[a1,'lulus'],[a4,'absen']]);
+  assert.notEqual((await admin('select completed_at from class_schedules where id=$1',[id3])).rows[0].completed_at,null);
+  await assert.rejects(selesai(teacher,penuh),/sudah ditandai selesai/);
+  await assert.rejects(simpan(teacher,muat(baik),id3),/sudah selesai/);
+  assert.equal((await as(owner,'select result from class_schedule_students where schedule_id=$1',[id3])).rows.length,2,'pemilik membaca hasil');
   // Menghapus siswa ikut mengeluarkannya dari jadwal.
   const id2=(await simpan(teacher,muat(baik))).rows[0].id;
   await as(teacher,'select delete_student($1)',[a1]);

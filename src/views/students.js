@@ -1,5 +1,14 @@
 // Data siswa: daftar anak, profil, hasil tes diagnostik, level saat ini, status, dan hapus.
-import { state, testFor, testStatus, levelName, schoolGrades, schoolYearOf, ageText } from '../state.js';
+import {
+  state,
+  testFor,
+  testStatus,
+  levelName,
+  schoolGrades,
+  schoolYearOf,
+  ageText,
+  passedIndicators
+} from '../state.js';
 import { field, select, empty, heading, modal } from '../ui.js';
 import { escapeHtml as h } from '../domain.js';
 
@@ -116,7 +125,23 @@ function profileForm(s, edit, owner) {
 
 // Everything below the profile, shown only for a child who already exists.
 function studentDetails(s, owner) {
-  return `${diagnosticResultSection(s)}${currentLevelSection(s)}${owner ? '' : studentActionsSection(s)}`;
+  return `${diagnosticResultSection(s)}${currentLevelSection(s)}${passedSection(s)}${owner ? '' : studentActionsSection(s)}`;
+}
+
+// Indikator level saat ini yang sudah Lulus di pertemuan kelas.
+export function passedSection(s) {
+  if (!s.pilot_level) return '';
+  const passed = passedIndicators(s.id, s.pilot_level);
+  const items = passed
+    .map(n => {
+      const ind = state.curriculumIndicators.find(i => i.level === Number(s.pilot_level) && i.number === n);
+      return `<li><span class="diagnostic-mark">✓</span> ${n}. ${h(ind ? ind.text : 'Indikator ' + n)}</li>`;
+    })
+    .join('');
+  const body = items
+    ? `<ul class="diagnostic-result-list">${items}</ul>`
+    : '<p class="muted">Belum ada indikator yang lulus di kelas.</p>';
+  return `<hr><h3>Indikator yang sudah lulus</h3>${body}`;
 }
 
 // Hasil Tes Diagnostik. Guru pendamping melihat nilai per indikator; pemilik hanya ringkasannya,

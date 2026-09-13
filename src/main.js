@@ -19,7 +19,8 @@ import {
   kidsSummary,
   indicatorRows,
   themeForMeeting,
-  scheduleValues
+  scheduleValues,
+  meetingSheet
 } from './views/sessions.js';
 import { studentsView, studentForm } from './views/students.js';
 import { diagnosticForm } from './views/diagnostic.js';
@@ -326,6 +327,7 @@ document.addEventListener('click', async e => {
       return diagnosticForm();
     }
     if (action === 'new-schedule') return modal('Buat jadwal', scheduleForm());
+    if (action === 'open-schedule') return modal('Pertemuan', meetingSheet(id));
     if (action === 'edit-schedule') return modal('Ubah jadwal', scheduleForm(scheduleValues(id), id));
     if (action === 'password') return modal('Ganti kata sandi', passwordForm());
     if (action === 'new-member')
@@ -530,6 +532,15 @@ document.addEventListener('submit', async e => {
           students: ids.map(sid => ({ student_id: sid, indicator_number: Number(v['indicator_' + sid]) }))
         };
         await result(db.rpc('save_schedule', { p_schedule: id || null, p_payload: payload }));
+        break;
+      }
+      case 'complete': {
+        const rows = state.classScheduleStudents.filter(x => x.schedule_id === id);
+        const results = rows.map(x => ({ student_id: x.student_id, result: v['r_' + x.student_id] }));
+        if (results.some(r => !r.result))
+          throw new Error('Beri setiap siswa Lulus, Belum, atau Tidak hadir.');
+        if (!confirm('Tandai pertemuan selesai? Hasilnya tidak bisa diubah lagi.')) return;
+        await result(db.rpc('complete_schedule', { p_schedule: id, p_results: results }));
         break;
       }
       case 'password': {

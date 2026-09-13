@@ -12,7 +12,9 @@ import {
   testStatus,
   levelName
 } from '../src/state.js';
-import { sessionsView, scheduleForm, kidsSummary, scheduleValues } from '../src/views/sessions.js';
+import { sessionsView, scheduleForm, kidsSummary, scheduleValues, meetingSheet } from '../src/views/sessions.js';
+import { passedIndicators, suggestedIndicator } from '../src/state.js';
+import { passedSection } from '../src/views/students.js';
 import { dashboard } from '../src/views/dashboard.js';
 import { studentsView, studentForm, diagnosticResultSection } from '../src/views/students.js';
 import { diagnosticForm } from '../src/views/diagnostic.js';
@@ -104,13 +106,33 @@ test('ruang kelas: formulir jadwal — siswa, tema, indikator per siswa dari lev
   assert.match(daftar, /15\.00|15:00/);
   assert.match(daftar, /Tema 1 — Aku Bisa Bercerita · 1 siswa/);
   assert.match(daftar, /data-action="edit-schedule" data-id="j1"/);
-  assert.ok(!daftar.includes('data-id="j0"'), 'jadwal selesai dikunci');
+  assert.ok(!/data-action="(edit|delete)-schedule" data-id="j0"/.test(daftar), 'jadwal selesai dikunci');
   assert.match(scheduleForm(), /<option value="4" selected>Pertemuan 4</, 'pertemuan berikutnya otomatis');
   const ubah = scheduleForm(scheduleValues('j1'), 'j1');
   assert.match(ubah, /data-form="schedule" data-id="j1"/);
   assert.match(ubah, /value="anak-1" checked/);
   assert.match(ubah, /<option value="3" selected>Pertemuan 3</);
   assert.match(ubah, /name="time" type="time" value="15:00"/);
+
+  // Tahap 2: lembar pertemuan, hasil, indikator lulus, dan saran indikator berikutnya.
+  const lembar = meetingSheet('j1');
+  assert.match(lembar, /data-form="complete" data-id="j1"/);
+  assert.match(lembar, /Alya Contoh · Level 2/);
+  for (const v of ['lulus', 'belum', 'absen']) assert.match(lembar, new RegExp(`name="r_anak-1" value="${v}" required`));
+  assert.match(lembar, />Tandai pertemuan selesai</);
+  assert.match(daftar, /data-action="open-schedule" data-id="j1">Buka/);
+  assert.match(daftar, /data-action="open-schedule" data-id="j0">Lihat/);
+  state.classScheduleStudents.push({ schedule_id: 'j0', student_id: 'anak-1', level: 2, indicator_number: 1, result: 'lulus' });
+  const lihat = meetingSheet('j0');
+  assert.ok(!lihat.includes('<form'), 'pertemuan selesai hanya dilihat');
+  assert.match(lihat, /<strong>Lulus<\/strong>/);
+  assert.deepEqual(passedIndicators('anak-1', 2), [1]);
+  assert.deepEqual(passedIndicators('anak-1', 1), [], 'level lain tidak ikut');
+  const alya = state.students[0];
+  assert.equal(suggestedIndicator(alya), 1, 'contoh Level 2 hanya punya indikator 1 → tetap 1 bila semua lulus');
+  assert.match(passedSection(alya), /Indikator yang sudah lulus[\s\S]*✓<\/span> 1\. Menyebutkan nama huruf vokal/);
+  state.classScheduleStudents.find(x => x.schedule_id === 'j1').result = 'lulus';
+  assert.deepEqual(passedIndicators('anak-1', 2), [1], 'jadwal belum selesai tidak dihitung');
   state.role = 'owner';
   assert.ok(!sessionsView().includes('new-schedule'), 'pemilik tidak membuat jadwal');
 });
