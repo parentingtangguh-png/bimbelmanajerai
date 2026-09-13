@@ -47,7 +47,10 @@ export function curriculumByStrand() {
   if (!rows.length)
     return (
       pickers +
-      empty('Bank kurikulum', 'Enam belas level kurikulum akan tersedia setelah database terhubung.')
+      empty(
+        'Bank kurikulum',
+        'Kurikulum sedang direvisi. Isi baru akan tampil di sini setelah disetujui dan dipasang.'
+      )
     );
   const body = rows
     .map((c, i) => {
@@ -88,6 +91,6 @@ export function curriculumByLevel() {
     const key = Number(c[`${k}_key`] || 0);
     return `<details><summary>${h(subjectLabels[k])} <em>(${list.length || '–'})</em></summary><p>${h(c[k])}</p>${list.length ? `<ol class="indicator-list">${list.map((t, i) => `<li class="${i + 1 === key ? 'key' : ''}">${h(t)}</li>`).join('')}</ol>` : '<p class="muted">Indikator belum disusun.</p>'}<small><strong>Bukti berhasil</strong><br>${h(c[`${k}_criteria`] || 'Kriteria belum tersedia.')}</small></details>`;
   };
-  return `<div class="curriculum-grid">${state.curriculum.map(c => `<article class="panel curriculum-card"><span class="badge green">LEVEL ${c.level}</span><h2>${phaseOf(c.level)}</h2><h3>Bahasa Indonesia</h3>${['listening', 'speaking', 'reading', 'writing'].map(k => detail(c, k)).join('')}<h3>Matematika</h3>${detail(c, 'math')}<h3>IPAS tematik</h3>${detail(c, 'ipas')}<h3>English Exposure</h3>${detail(c, 'english')}${state.role === 'owner' ? `<button class="secondary" data-action="edit-curriculum" data-id="${c.level}">Edit tujuan & kriteria</button>` : ''}</article>`).join('') || empty('Bank kurikulum', 'Enam belas level kurikulum akan tersedia setelah database terhubung.')}</div>`;
+  return `<div class="curriculum-grid">${state.curriculum.map(c => `<article class="panel curriculum-card"><span class="badge green">LEVEL ${c.level}</span><h2>${phaseOf(c.level)}</h2><h3>Bahasa Indonesia</h3>${['listening', 'speaking', 'reading', 'writing'].map(k => detail(c, k)).join('')}<h3>Matematika</h3>${detail(c, 'math')}<h3>IPAS tematik</h3>${detail(c, 'ipas')}<h3>English Exposure</h3>${detail(c, 'english')}${state.role === 'owner' ? `<button class="secondary" data-action="edit-curriculum" data-id="${c.level}">Edit tujuan & kriteria</button>` : ''}</article>`).join('') || empty('Bank kurikulum', 'Kurikulum sedang direvisi. Isi baru akan tampil di sini setelah disetujui dan dipasang.')}</div>`;
 }
 // Indicators arrive as jsonb; tolerate a string payload so older rows keep rendering.

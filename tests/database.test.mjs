@@ -37,33 +37,11 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   await assert.rejects(as(teacher,`insert into students(name,parent_name,reading_baseline,reading_level,reading_target,math_baseline,math_level,math_target) values('X','Y',1,1,3,1,1,3)`),/row-level security/i);
   assert.equal((await as(teacher,"update students set reading_target=10 where id=$1 returning id",[student])).rows.length,0);
  });
- await t.test('indikator kurikulum: level 1 terisi, hanya pemilik yang mengubah',async()=>{
-  const row=(await admin('select reading_indicators,reading_key,reading_spiral from curriculum where level=1')).rows[0];
-  assert.equal(row.reading_indicators.length,3);
-  assert.equal(row.reading_key,3);
-  assert.match(row.reading_spiral,/suku kata terbuka/);
-  // Fondasi is written strand by strand: every level 1-4 carries indicators and a knot to the next.
-  // The ladder is complete: all sixteen levels on every strand that gates a level.
-  const covered={reading:16,writing:16,math:16,ipas:16,listening:16,speaking:16};
-  for(const [strand,last] of Object.entries(covered)){
-   const rows=(await admin(`select level, jsonb_array_length(${strand}_indicators) as n, ${strand}_key as key, ${strand}_spiral as spiral from curriculum where level between 1 and ${last} order by level`)).rows;
-   assert.equal(rows.length,last);
-   for(const r of rows){
-    assert.ok(r.n>=3,`${strand} level ${r.level} kekurangan indikator`);
-    assert.ok(r.key>0,`${strand} level ${r.level} belum menunjuk simpul spiral`);
-    assert.ok(r.spiral.length>40,`${strand} level ${r.level} belum menjelaskan simpul spiral`);
-   }
-  }
-  // English is enrichment: it carries indicators on every level but never a knot, so it gates nothing.
-  const eng=(await admin('select level, jsonb_array_length(english_indicators) as n, english_key as key from curriculum order by level')).rows;
-  assert.equal(eng.length,16);
-  for(const r of eng){
-   assert.ok(r.n>=3,`english level ${r.level} kekurangan indikator`);
-   assert.equal(r.key,0,`english level ${r.level} tidak boleh menjadi simpul`);
-  }
-  // The knot must point at an indicator that exists, otherwise the evaluation card would star nothing.
-  const orphan=(await admin('select count(*)::int as n from curriculum where reading_key>jsonb_array_length(reading_indicators)')).rows[0].n;
-  assert.equal(orphan,0);
+ await t.test('kurikulum dikosongkan untuk revisi; hanya pemilik yang mengubah',async()=>{
+  // 13 Sep 2026 pemilik merevisi kurikulum dari awal, jadi isi lama dihapus. Peta cakupan dan jangkar
+  // indikator lama ikut dihapus; tulis penjaga baru bersama kurikulum baru.
+  assert.equal((await admin('select count(*)::int as n from curriculum')).rows[0].n,0);
+  await admin("insert into curriculum(level,reading,writing,math,english,character) values(1,'uji','uji','uji','uji','uji')");
   await as(owner,`update curriculum set reading_indicators='["Satu indikator uji"]'::jsonb, reading_key=1 where level=1`);
   assert.equal((await admin('select reading_key from curriculum where level=1')).rows[0].reading_key,1);
   await assert.rejects(as(owner,'update curriculum set reading_key=5 where level=1'),/curriculum_reading_key_range/);
@@ -483,38 +461,6 @@ test('PostgreSQL: hak akses, kelas, evaluasi, remedial, sumatif, dan AI',async t
   const subjects=(await as(teacher,'select subject from session_assessments where session_student_id=$1',[y.rid])).rows.map(r=>r.subject);
   await as(teacher,'select finalize_competency_evaluation($1,$2::jsonb,$3,$4::jsonb)',[y.rid,JSON.stringify(subjects.map(subject=>({subject,rating:'MB',note:'Bukti'}))),'Sudah dievaluasi',kosong]);
   await assert.rejects(as(teacher,'select delete_class($1)',[y.cid]),/sudah punya evaluasi tersimpan/);
- });
- await t.test('tidak ada bidang yang indikatornya menggambarkan tujuan level lain',async()=>{
-  // Penjaga umum, dibuat setelah indikator Matematika 6-14 ketahuan milik level berikutnya.
-  // Peta cakupan hanya menghitung jumlah indikator, jadi pergeseran isi lolos begitu saja.
-  // Indikator ke-3 adalah simpul yang memang menunjuk ke depan, jadi hanya indikator 1-2 diperiksa:
-  // keduanya harus berbagi kata dengan tujuan levelnya sendiri. Ambangnya sengaja tegas — nol
-  // kesamaan dengan tujuan sendiri padahal ada kesamaan dengan tujuan berikutnya — supaya tidak
-  // menyalakan alarm palsu untuk level bertetangga yang wajar memakai kata serupa.
-  const stop=new Set('dan atau yang dengan pada dari untuk serta dalam anak guru misalnya bukan hanya lalu bila sebagai satu dua tiga empat lima minimal soal kali sampai tanpa lebih tidak sudah belum akan menjadi setiap semua bagian kata benda gambar'.split(' '));
-  const kata=s=>new Set(String(s||'').toLowerCase().replace(/[^a-z0-9.\s]/g,' ').split(/\s+/).filter(w=>w.length>3&&!stop.has(w)));
-  const skor=(a,b)=>[...a].filter(w=>b.has(w)).length;
-  const bidang=['reading','writing','listening','speaking','ipas','math'];
-  const rows=(await admin(`select level,${bidang.map(b=>`${b},${b}_indicators`).join(',')} from curriculum order by level`)).rows;
-  for(const b of bidang)for(let i=0;i<rows.length-1;i++){
-   const inti=kata(rows[i][`${b}_indicators`].slice(0,2).join(' '));
-   const sendiri=skor(inti,kata(rows[i][b])),berikutnya=skor(inti,kata(rows[i+1][b]));
-   assert.ok(!(sendiri===0&&berikutnya>0),`${b} level ${rows[i].level}: indikator 1-2 tidak berbagi kata dengan tujuan levelnya sendiri, tetapi berbagi dengan tujuan level ${rows[i+1].level} — kemungkinan indikatornya terpasang di level yang salah`);
-  }
- });
- await t.test('indikator Matematika menempel pada tujuan levelnya sendiri',async()=>{
-  // Peta cakupan lama hanya menghitung jumlah indikator, jadi lolos meski isinya milik level lain:
-  // Level 6 menampilkan tujuan "sampai 100" dengan indikator "sampai 1.000". Jangkar di bawah ini
-  // mengunci kata kunci yang wajib ada pada indikator pertama tiap level.
-  const jangkar={6:'sampai 100',7:'ratusan',8:'perkalian sebagai kelompok',9:'fakta perkalian',10:'berpembilang satu',11:'10.000',12:'senilai',13:'pecahan atau desimal',14:'rasio dan skala',15:'aljabar',16:'belum pernah'};
-  const rows=(await admin('select level, math_indicators->>0 as pertama, math_spiral as spiral from curriculum where level between 6 and 16 order by level')).rows;
-  for(const r of rows){
-    assert.ok(r.pertama.toLowerCase().includes(jangkar[r.level].toLowerCase()),`Matematika level ${r.level}: indikator pertama tidak menyebut "${jangkar[r.level]}" — cek apakah indikator bergeser ke level lain`);
-    if(r.level<16)assert.ok(r.spiral.includes(`Level ${r.level+1}`),`simpul spiral level ${r.level} harus menjelaskan tuntutan Level ${r.level+1}`);
-  }
-  // Level 6 pernah memuat indikator Level 7; pastikan tidak kembali.
-  const enam=(await admin("select math_indicators::text as t from curriculum where level=6")).rows[0].t;
-  assert.ok(!enam.includes('1.000'),'indikator Level 6 tidak boleh bicara sampai 1.000');
  });
  await t.test('tabel potret kompetensi tertutup untuk pengguna',async()=>{
   // Dua lapis: tidak ada izin tabel, dan RLS menyala tanpa satu pun kebijakan.
