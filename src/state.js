@@ -153,15 +153,18 @@ export function passedIndicators(studentId, level) {
   ].sort((a, b) => a - b);
 }
 
-// Saran indikator jadwal berikutnya: nomor terkecil di level siswa yang belum lulus.
+// Indikator akademik yang menjadi antrean kenaikan level. English (7) dan Karakter (8) tidak termasuk.
+export const QUEUE = [1, 2, 3, 4, 5, 6];
+
+// Indikator siswa saat ini: terkecil di antrean yang belum lulus; bila semua lulus tetap 6 sampai naik level.
+// save_meeting (current_indicator) menghitung hal yang sama; ini hanya untuk ditampilkan.
 export function suggestedIndicator(s) {
   const passed = new Set(passedIndicators(s.id, s.pilot_level));
-  const numbers = state.curriculumIndicators
-    .filter(i => i.level === Number(s.pilot_level))
-    .map(i => i.number)
-    .sort((a, b) => a - b);
-  return numbers.find(n => !passed.has(n)) ?? numbers[0];
+  return QUEUE.find(n => !passed.has(n)) ?? QUEUE[QUEUE.length - 1];
 }
+
+export const readyToLevelUp = s =>
+  !!s.pilot_level && QUEUE.every(n => passedIndicators(s.id, s.pilot_level).includes(n));
 // "Lulus Level 2" / "Belum lulus Level 2", diturunkan dari tes, bukan disimpan terpisah.
 export const testStatus = test =>
   test ? `${test.passed ? 'Lulus' : 'Belum lulus'} Level ${test.tested_level}` : '';

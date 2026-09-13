@@ -515,22 +515,16 @@ document.addEventListener('submit', async e => {
         break;
       }
       case 'schedule': {
-        const payload = {
-          theme_number: Number(v.theme),
-          scheduled_date: v.date,
-          scheduled_time: v.time || ''
-        };
+        // Pertemuan dan tema ditentukan database; guru hanya mengisi tanggal dan jam.
+        const payload = { scheduled_date: v.date, scheduled_time: v.time || '' };
         await result(db.rpc('save_schedule', { p_schedule: id || null, p_payload: payload }));
         break;
       }
       // Isi pertemuan: Simpan sementara (bisa diubah lagi) atau Tandai selesai (final).
       case 'meeting': {
         const finish = e.submitter?.value === '1';
-        const students = f.getAll('students').map(sid => ({
-          student_id: sid,
-          indicator_number: Number(v['indicator_' + sid]),
-          result: v['r_' + sid] || ''
-        }));
+        // Level dan indikator dihitung database; guru hanya memilih siswa hadir dan Lulus/Belum.
+        const students = f.getAll('students').map(sid => ({ student_id: sid, result: v['r_' + sid] || '' }));
         if (finish) {
           if (!students.length) throw new Error('Pilih minimal satu siswa yang hadir.');
           if (students.some(s => !s.result))
