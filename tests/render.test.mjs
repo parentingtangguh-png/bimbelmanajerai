@@ -117,7 +117,9 @@ test('ruang kelas: pertemuan per hari dengan sesi; guru hanya mengisi tanggal/ja
   let lembar = meetingSheet('s2');
   assert.match(lembar, /data-form="meeting" data-id="s2"/);
   assert.match(lembar, /Pertemuan 26 · Sesi 2 · 10:00 · Tema 2/);
-  assert.match(lembar, /value="anak-1"[^>]*disabled><span>Alya Contoh <small class="muted">Level 2 · sudah di Sesi 1 hari ini/);
+  assert.ok(!lembar.includes('value="anak-1"'), 'siswa yang sudah di Sesi 1 hari ini disembunyikan');
+  assert.match(lembar, /1 siswa sudah masuk sesi lain hari ini dan tidak ditampilkan/);
+  assert.match(meetingSheet('s1').replace(/<form[\s\S]*/, ''), /Pertemuan 26/);
   assert.match(lembar, /value="anak-2"[^>]*disabled/, 'belum dites tidak bisa dipilih');
   assert.ok(!lembar.includes('value="anak-3"'), 'anak nonaktif tidak tampil');
   assert.match(lembar, /name="finish" value="0">Simpan sementara</);

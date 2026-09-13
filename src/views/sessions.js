@@ -180,21 +180,20 @@ export function meetingSheet(id, v = null) {
   }
   const values = v || meetingValues(id);
   const picked = new Set([].concat(values.students || []));
-  const kids = state.students
-    .filter(s => s.status === 'Aktif')
+  // Siswa yang sudah masuk sesi lain di tanggal yang sama disembunyikan (satu anak satu sesi per hari).
+  const available = state.students.filter(s => s.status === 'Aktif' && !otherSessionOf(s.id, c));
+  const hidden = state.students.filter(s => s.status === 'Aktif').length - available.length;
+  const kids = available
     .map(s => {
-      const other = otherSessionOf(s.id, c);
-      const blocked = !ready(s) || other;
-      const tag = !ready(s)
-        ? 'Belum tes diagnostik'
-        : other
-          ? `Level ${s.pilot_level} · sudah di Sesi ${other} hari ini`
-          : `Level ${s.pilot_level}`;
-      return `<label class="schedule-kid"><input type="checkbox" name="students" value="${s.id}" ${picked.has(s.id) && !blocked ? 'checked' : ''} ${blocked ? 'disabled' : ''}><span>${h(s.name)} <small class="muted">${tag}</small></span></label>`;
+      const tag = ready(s) ? `Level ${s.pilot_level}` : 'Belum tes diagnostik';
+      return `<label class="schedule-kid"><input type="checkbox" name="students" value="${s.id}" ${picked.has(s.id) && ready(s) ? 'checked' : ''} ${ready(s) ? '' : 'disabled'}><span>${h(s.name)} <small class="muted">${tag}</small></span></label>`;
     })
     .join('');
+  const hiddenNote = hidden
+    ? `<p class="muted">${hidden} siswa sudah masuk sesi lain hari ini dan tidak ditampilkan.</p>`
+    : '';
   const kidBlock = kids
-    ? `<div class="schedule-field"><span class="schedule-label">Siswa yang hadir</span><details class="schedule-kids"><summary data-kids-summary>${h(kidsSummary(picked))}</summary><div class="schedule-kids-list">${kids}</div></details></div>`
+    ? `<div class="schedule-field"><span class="schedule-label">Siswa yang hadir</span><details class="schedule-kids"><summary data-kids-summary>${h(kidsSummary(picked))}</summary><div class="schedule-kids-list">${kids}${hiddenNote}</div></details></div>`
     : '<p class="muted">Belum ada siswa aktif.</p>';
   const ids = state.students.filter(s => picked.has(s.id) && ready(s)).map(s => s.id);
   const { done, hint } = finishState(ids, values);
