@@ -19,7 +19,8 @@ import {
   kidsSummary,
   meetingRows,
   scheduleValues,
-  meetingSheet
+  meetingSheet,
+  finishState
 } from './views/sessions.js';
 import { studentsView, studentForm } from './views/students.js';
 import { diagnosticForm } from './views/diagnostic.js';
@@ -406,8 +407,9 @@ document.addEventListener('change', e => {
     const ids = f.getAll('students');
     form.querySelector('[data-kids-summary]').textContent = kidsSummary(ids);
     form.querySelector('[data-meeting-rows]').outerHTML = meetingRows(new Set(ids), Object.fromEntries(f));
-    return;
+    return updateFinish(form);
   }
+  if (form?.dataset.form === 'meeting' && e.target.name.startsWith('r_')) return updateFinish(form);
   if (form?.dataset.form === 'diagnostic-start' && e.target.name === 'student')
     return diagnosticForm(e.target.value);
   // Setiap nilai yang dipilih langsung disimpan sementara, jadi tes yang terhenti tidak kehilangan jawaban.
@@ -566,8 +568,20 @@ document.addEventListener('submit', async e => {
     notify(err.message, true);
   } finally {
     buttons.forEach(b => (b.disabled = false));
+    if (form.dataset.form === 'meeting' && form.isConnected) updateFinish(form);
   }
 });
+
+// Tombol "Tandai sesi selesai" mengikuti isi lembar: aktif bila setiap siswa yang dicentang sudah Lulus/Belum.
+function updateFinish(form) {
+  const f = new FormData(form);
+  const ids = [...form.querySelectorAll('[data-meeting-rows] input[type="radio"]')]
+    .map(r => r.name.slice(2))
+    .filter((x, i, a) => a.indexOf(x) === i);
+  const { done, hint } = finishState(ids, Object.fromEntries(f));
+  form.querySelector('[data-finish]').disabled = !done;
+  form.querySelector('[data-finish-hint]').textContent = hint;
+}
 login();
 if (db) {
   db.auth.getSession().then(async ({ data }) => {

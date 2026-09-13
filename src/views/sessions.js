@@ -196,8 +196,18 @@ export function meetingSheet(id, v = null) {
   const kidBlock = kids
     ? `<div class="schedule-field"><span class="schedule-label">Siswa yang hadir</span><details class="schedule-kids"><summary data-kids-summary>${h(kidsSummary(picked))}</summary><div class="schedule-kids-list">${kids}</div></details></div>`
     : '<p class="muted">Belum ada siswa aktif.</p>';
-  const buttons = `<div class="button-row"><button class="secondary" name="finish" value="0">Simpan sementara</button><button class="primary" name="finish" value="1">Tandai sesi selesai</button></div>`;
+  const ids = state.students.filter(s => picked.has(s.id) && ready(s)).map(s => s.id);
+  const { done, hint } = finishState(ids, values);
+  const buttons = `<div class="button-row"><button class="secondary" name="finish" value="0">Simpan sementara</button><button class="primary" name="finish" value="1" data-finish ${done ? '' : 'disabled'}>Tandai sesi selesai</button></div><p class="muted" data-finish-hint>${hint}</p>`;
   return `<form data-form="meeting" data-id="${h(id)}">${head}${kidBlock}${meetingRows(picked, values)}<p class="muted">Simpan sementara bisa diubah lagi. Setelah ditandai selesai, sesi dikunci dan indikator siswa yang lulus berganti otomatis.</p>${buttons}</form>`;
+}
+
+// "Tandai sesi selesai" aktif hanya bila ada siswa hadir dan setiap siswa yang dicentang sudah Lulus/Belum.
+export function finishState(ids, values = {}) {
+  const missing = ids.filter(id => !values[`r_${id}`]).length;
+  if (!ids.length) return { done: false, hint: 'Centang siswa yang hadir lebih dulu.' };
+  if (missing) return { done: false, hint: `Beri Lulus/Belum untuk ${missing} siswa lagi.` };
+  return { done: true, hint: 'Semua siswa sudah dinilai.' };
 }
 
 // Nomor pertemuan berikutnya (hari baru).

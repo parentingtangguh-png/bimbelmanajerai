@@ -12,7 +12,7 @@ import {
   testStatus,
   levelName
 } from '../src/state.js';
-import { sessionsView, scheduleForm, kidsSummary, scheduleValues, meetingSheet, meetingRows } from '../src/views/sessions.js';
+import { sessionsView, scheduleForm, kidsSummary, scheduleValues, meetingSheet, meetingRows, finishState } from '../src/views/sessions.js';
 import { passedIndicators, suggestedIndicator, readyToLevelUp } from '../src/state.js';
 import { passedSection } from '../src/views/students.js';
 import { dashboard } from '../src/views/dashboard.js';
@@ -121,7 +121,11 @@ test('ruang kelas: pertemuan per hari dengan sesi; guru hanya mengisi tanggal/ja
   assert.match(lembar, /value="anak-2"[^>]*disabled/, 'belum dites tidak bisa dipilih');
   assert.ok(!lembar.includes('value="anak-3"'), 'anak nonaktif tidak tampil');
   assert.match(lembar, /name="finish" value="0">Simpan sementara</);
-  assert.match(lembar, /name="finish" value="1">Tandai sesi selesai</);
+  assert.match(lembar, /name="finish" value="1" data-finish disabled>Tandai sesi selesai</, 'tanpa siswa: nonaktif');
+  assert.match(lembar, /Centang siswa yang hadir lebih dulu/);
+  assert.deepEqual(finishState(['a', 'b'], { r_a: 'lulus' }), { done: false, hint: 'Beri Lulus/Belum untuk 1 siswa lagi.' });
+  assert.equal(finishState(['a', 'b'], { r_a: 'lulus', r_b: 'belum' }).done, true);
+  assert.equal(finishState([], {}).done, false);
   assert.ok(!/absen|Tidak hadir|<select/.test(lembar), 'tanpa Tidak hadir dan tanpa dropdown');
   const lihat = meetingSheet('s1');
   assert.ok(!lihat.includes('<form'), 'sesi selesai hanya dilihat');
