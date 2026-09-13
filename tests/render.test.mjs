@@ -353,6 +353,7 @@ test('tambah siswa hanya identitas; tes diagnostik memuat catatan dan level awal
       !akhir.includes('data-form="summative"') && !akhir.includes('Ujian sumatif'),
       'tanpa formulir sumatif'
     );
+    assert.ok(!akhir.includes('Riwayat evaluasi'), 'riwayat evaluasi lama disembunyikan');
     state.records = records;
   }
   // Profil pilot: hasil diagnostik, pilihan level awal, dan tampilan per bidang lama tidak ditampilkan.

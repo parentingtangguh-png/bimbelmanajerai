@@ -187,7 +187,9 @@ function studentDetails(s, owner) {
   // Ujian sumatif disembunyikan selama pilot Fondasi (keputusan pemilik 13 Sep 2026): aturan lama
   // menganggap anak yang MULAI di Level 4 sudah menyelesaikan fase. summativeForm dan RPC
   // complete_summative sengaja dibiarkan untuk dipakai lagi di tempat lain.
-  return `${diagnosticResultSection(s)}${meters}${actions}<hr><h3>Riwayat evaluasi</h3>${evaluationHistory(s)}`;
+  // Riwayat evaluasi per bidang (sistem lama) juga disembunyikan selama pilot; evaluationHistory
+  // dibiarkan untuk dipakai lagi setelah evaluasi kelas pilot dirancang.
+  return `${diagnosticResultSection(s)}${meters}${actions}`;
 }
 
 // Hasil Tes Diagnostik per indikator. Pemilik tidak menerima baris ini dari database, jadi bagian ini
