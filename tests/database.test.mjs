@@ -191,7 +191,6 @@ test('PostgreSQL: akun, siswa, kurikulum pilot, dan tes diagnostik',async t=>{
   await assert.rejects(simpan(teacher,muat([])),/minimal satu siswa/);
   await assert.rejects(simpan(teacher,muat([{student_id:belum,indicator_number:1}])),/sudah dites diagnostik/);
   await assert.rejects(simpan(teacher,muat([{student_id:milikLain,indicator_number:1}])),/tidak tersedia/,'siswa guru lain');
-  await assert.rejects(simpan(teacher,muat(baik,{meeting_number:193})),/1–192/);
   await assert.rejects(simpan(teacher,muat(baik,{theme_number:99})),/Tema tidak dikenal/);
   await assert.rejects(simpan(teacher,muat([baik[0],baik[0]])),/lebih dari sekali/);
   assert.equal((await admin('select count(*)::int n from class_schedules')).rows[0].n,0,'gagal tidak meninggalkan data');
@@ -207,11 +206,11 @@ test('PostgreSQL: akun, siswa, kurikulum pilot, dan tes diagnostik',async t=>{
   assert.equal((await as(stranger,'select * from class_schedule_students')).rows.length,0);
   await assert.rejects(as(teacher,'insert into class_schedules(teacher_id,meeting_number,theme_number,scheduled_date) values($1,1,1,current_date)',[teacher]),/permission denied|row-level security/i);
   await assert.rejects(simpan(stranger,muat([{student_id:milikLain,indicator_number:1}]),id),/Jadwal tidak tersedia/,'guru lain tidak mengubah');
-  // Ubah: siswa, indikator, pertemuan, tema, jam.
+  // Ubah: siswa, indikator, tema, jam. Nomor pertemuan tidak bisa diganti.
   await simpan(teacher,muat([{student_id:a4,indicator_number:3}],{meeting_number:30,theme_number:2,scheduled_time:''}),id);
   assert.deepEqual(await isi(),[[a4,4,3]]);
   j=(await admin('select meeting_number,theme_number,scheduled_time from class_schedules where id=$1',[id])).rows[0];
-  assert.deepEqual([j.meeting_number,j.theme_number,j.scheduled_time],[30,2,null]);
+  assert.deepEqual([j.meeting_number,j.theme_number,j.scheduled_time],[1,2,null],'nomor tetap 1');
   // Selesai → dikunci.
   await admin('update class_schedules set completed_at=now() where id=$1',[id]);
   await assert.rejects(simpan(teacher,muat(baik),id),/sudah selesai/);
@@ -221,9 +220,15 @@ test('PostgreSQL: akun, siswa, kurikulum pilot, dan tes diagnostik',async t=>{
   await as(teacher,'select delete_schedule($1)',[id]);
   assert.equal((await admin('select count(*)::int n from class_schedule_students where schedule_id=$1',[id])).rows[0].n,0);
   // Tahap 2: tandai selesai dengan Lulus / Belum / Tidak hadir untuk setiap siswa.
-  const id3=(await simpan(teacher,muat(baik))).rows[0].id;
+  const id3=(await simpan(teacher,muat(baik,{meeting_number:9}))).rows[0].id;
+  const idB=(await simpan(teacher,muat(baik))).rows[0].id;
+  const nomor=async x=>(await admin('select meeting_number from class_schedules where id=$1',[x])).rows[0].meeting_number;
+  assert.deepEqual([await nomor(id3),await nomor(idB)],[1,2],'nomor otomatis berurutan, isian diabaikan');
+  await assert.rejects(admin('update class_schedules set meeting_number=1 where id=$1',[idB]),/unique|duplicate/i,'tanpa nomor ganda');
+  await assert.rejects(as(teacher,'select delete_schedule($1)',[id3]),/Hanya jadwal terakhir/);
   const selesai=(who,res,sid=id3)=>as(who,'select complete_schedule($1,$2::jsonb)',[sid,JSON.stringify(res)]);
   const penuh=[{student_id:a1,result:'lulus'},{student_id:a4,result:'absen'}];
+  await assert.rejects(selesai(teacher,penuh,idB),/Selesaikan Pertemuan 1 lebih dulu/,'selesai berurutan');
   await assert.rejects(selesai(owner,penuh),/guru pengajar/);
   await assert.rejects(selesai(stranger,penuh),/tidak tersedia/);
   await assert.rejects(selesai(teacher,[penuh[0]]),/harus diberi satu hasil/,'semua siswa wajib');
@@ -238,6 +243,11 @@ test('PostgreSQL: akun, siswa, kurikulum pilot, dan tes diagnostik',async t=>{
   await assert.rejects(selesai(teacher,penuh),/sudah ditandai selesai/);
   await assert.rejects(simpan(teacher,muat(baik),id3),/sudah selesai/);
   assert.equal((await as(owner,'select result from class_schedule_students where schedule_id=$1',[id3])).rows.length,2,'pemilik membaca hasil');
+  await selesai(teacher,penuh,idB);
+  // Batas 192 pertemuan.
+  await admin('update class_schedules set meeting_number=192 where id=$1',[idB]);
+  await assert.rejects(simpan(teacher,muat(baik)),/Semua 192 pertemuan/);
+  await admin('update class_schedules set meeting_number=2 where id=$1',[idB]);
   // Menghapus siswa ikut mengeluarkannya dari jadwal.
   const id2=(await simpan(teacher,muat(baik))).rows[0].id;
   await as(teacher,'select delete_student($1)',[a1]);

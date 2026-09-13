@@ -18,7 +18,6 @@ import {
   scheduleForm,
   kidsSummary,
   indicatorRows,
-  themeForMeeting,
   scheduleValues,
   meetingSheet
 } from './views/sessions.js';
@@ -398,12 +397,6 @@ document.addEventListener('click', async e => {
 });
 document.addEventListener('change', e => {
   const form = e.target.form;
-  // Nomor pertemuan memilihkan tema yang berlaku; guru tetap bisa menggantinya.
-  if (form?.dataset.form === 'schedule' && e.target.name === 'meeting') {
-    const t = themeForMeeting(Number(e.target.value));
-    if (t) form.elements.theme.value = String(t.number);
-    return;
-  }
   // Memilih siswa memperbarui ringkasan dan dropdown indikator per siswa di tempat, tanpa menutup daftar.
   if (form?.dataset.form === 'schedule' && e.target.name === 'students') {
     const f = new FormData(form);
@@ -525,7 +518,6 @@ document.addEventListener('submit', async e => {
         const ids = f.getAll('students');
         if (!ids.length) throw new Error('Pilih minimal satu siswa.');
         const payload = {
-          meeting_number: Number(v.meeting),
           theme_number: Number(v.theme),
           scheduled_date: v.date,
           scheduled_time: v.time || '',

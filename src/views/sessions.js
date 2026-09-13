@@ -49,10 +49,15 @@ export function scheduleCard(c) {
     .map(s => h(s.nickname || s.name))
     .join(', ');
   const teacher = state.role === 'teacher';
+  // Hanya jadwal terakhir yang bisa dihapus, supaya nomor pertemuan tidak berlubang.
+  const last = c.meeting_number === Math.max(...state.classSchedules.map(x => x.meeting_number));
+  const remove = last
+    ? `<button type="button" class="secondary" data-action="delete-schedule" data-id="${c.id}">Hapus</button>`
+    : '';
   const actions = c.completed_at
     ? `<div class="button-row"><button type="button" class="secondary" data-action="open-schedule" data-id="${c.id}">Lihat</button></div>`
     : teacher
-      ? `<div class="button-row"><button type="button" class="primary" data-action="open-schedule" data-id="${c.id}">Buka</button><button type="button" class="secondary" data-action="edit-schedule" data-id="${c.id}">Ubah</button><button type="button" class="secondary" data-action="delete-schedule" data-id="${c.id}">Hapus</button></div>`
+      ? `<div class="button-row"><button type="button" class="primary" data-action="open-schedule" data-id="${c.id}">Buka</button><button type="button" class="secondary" data-action="edit-schedule" data-id="${c.id}">Ubah</button>${remove}</div>`
       : '';
   return `<article class="panel schedule-card"><strong>${h(dateText(c.scheduled_date))}${time} · Pertemuan ${c.meeting_number}</strong><p>Tema ${c.theme_number}${theme ? ` — ${h(theme.name)}` : ''} · ${kids.length} siswa</p>${names ? `<p class="muted">${names}</p>` : ''}${actions}</article>`;
 }
@@ -182,7 +187,8 @@ export function scheduleForm(v = {}, id = '') {
 ${kidBlock}
 ${select('Tema', 'theme', themes, theme, 'required')}
 ${indicatorRows(picked, v)}
-${select('Pertemuan', 'meeting', meetings, String(meeting), 'required')}
+${select('Pertemuan', 'meeting', meetings, String(meeting), 'disabled')}
+<p class="muted schedule-cp">Nomor pertemuan otomatis dan berurutan.</p>
 ${field('Tanggal', 'date', 'date', v.date || localDate(), 'required')}
 ${field('Jam', 'time', 'time', v.time || '', '')}
 <button class="primary full">Simpan jadwal</button></form>`;

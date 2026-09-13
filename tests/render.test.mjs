@@ -108,6 +108,13 @@ test('ruang kelas: formulir jadwal — siswa, tema, indikator per siswa dari lev
   assert.match(daftar, /data-action="edit-schedule" data-id="j1"/);
   assert.ok(!/data-action="(edit|delete)-schedule" data-id="j0"/.test(daftar), 'jadwal selesai dikunci');
   assert.match(scheduleForm(), /<option value="4" selected>Pertemuan 4</, 'pertemuan berikutnya otomatis');
+  assert.match(scheduleForm(), /<select name="meeting" disabled>/, 'nomor pertemuan tidak bisa diganti');
+  assert.match(daftar, /data-action="delete-schedule" data-id="j1"/, 'jadwal terakhir bisa dihapus');
+  state.classSchedules.push({ id: 'j2', meeting_number: 4, theme_number: 1, scheduled_date: '2026-09-22', scheduled_time: null, completed_at: null });
+  const tiga = sessionsView();
+  assert.ok(!tiga.includes('data-action="delete-schedule" data-id="j1"'), 'bukan jadwal terakhir: tanpa Hapus');
+  assert.match(tiga, /data-action="delete-schedule" data-id="j2"/);
+  state.classSchedules.pop();
   const ubah = scheduleForm(scheduleValues('j1'), 'j1');
   assert.match(ubah, /data-form="schedule" data-id="j1"/);
   assert.match(ubah, /value="anak-1" checked/);
