@@ -7,14 +7,14 @@ Belum dipasang di aplikasi. Kurikulum yang berjalan di aplikasi masih 4 level ×
 
 ## Urutan kerja
 1. Arsitektur (dokumen ini) — **terkunci**.
-2. **Matriks Cakupan Bahan L1–L8** — **dikunci 14 Sep 2026**: [`docs/curriculum/matriks-cakupan-bahan.md`](docs/curriculum/matriks-cakupan-bahan.md).
-3. 12 jalur × 8 milestone (tiap sel beberapa kata, tanpa cara uji/bahan/tanda lulus) — diaudit. ← *tahap berikutnya*
-4. 96 indikator operasional.
+2. **Matriks Cakupan Bahan L1–L8** — **dikunci 14 Sep 2026, dengan amendemen 14 Sep 2026**: [`docs/curriculum/matriks-cakupan-bahan.md`](docs/curriculum/matriks-cakupan-bahan.md).
+3. **12 jalur × 8 milestone** — **dikunci 14 Sep 2026**: [`docs/curriculum/milestone-12x8.md`](docs/curriculum/milestone-12x8.md).
+4. 96 indikator operasional (Kompetensi · Cara uji · Bahan · Tanda lulus) — disusun Codex, diaudit Claude. ← *tahap berikutnya*
 5. Baru kemudian perubahan aplikasi (database, antrean kelas, diagnostik) — direncanakan bersama pemilik.
 
-Peran: ChatGPT menyusun isi pedagogis; Claude mengaudit konsistensi terhadap arsitektur, batas antarslot, dan kebutuhan aplikasi. Setiap perubahan isi: draf teks dulu, disetujui pemilik kata demi kata.
+Peran: Codex (penerus ChatGPT sebagai authority pedagogis) menyusun isi pedagogis; Claude mengaudit konsistensi terhadap arsitektur, batas antarslot, dan kebutuhan aplikasi. Setiap perubahan isi: draf teks dulu, disetujui pemilik kata demi kata.
 
-Yang **boleh berubah** di tahap berikutnya: isi Matriks Cakupan Bahan dan milestone, berdasarkan audit.
+Arsitektur, matriks, dan milestone yang sudah dikunci **hanya boleh diubah melalui keputusan eksplisit pemilik** (amendemen tercatat di dokumen yang bersangkutan). Diterimanya milestone belum berarti prosedur tes tervalidasi; kelayakan durasi ±1 menit dan ambang kelulusan dinilai pada redaksi indikator.
 
 ## 1. Level dan batas cakupan
 8 level. Kesetaraan **internal bimbel**, bukan pembagian resmi CP.

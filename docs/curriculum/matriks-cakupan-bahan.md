@@ -2,7 +2,7 @@
 
 **Status: DIKUNCI — 14 Sep 2026, dengan amendemen 14 Sep 2026** (C1 L7/L8, C2 L3, B2 L1) · **Authority:** [`CURRICULUM_ARCHITECTURE.md`](../../CURRICULUM_ARCHITECTURE.md)
 
-Matriks ini menetapkan cakupan bahan dan kenaikan kompleksitas per slot. Belum berupa milestone atau indikator: cara uji, jumlah percobaan, bahan operasional, dan tanda lulus ditetapkan di tahap berikutnya (12 jalur × 8 milestone, lalu 96 indikator). Perubahan isi memerlukan keputusan eksplisit pemilik.
+Matriks ini menetapkan cakupan bahan dan kenaikan kompleksitas per slot. Belum berupa milestone atau indikator: cara uji, jumlah percobaan, bahan operasional, dan tanda lulus ditetapkan pada 96 indikator operasional (tahap berikutnya), setelah milestone dikunci di [`milestone-12x8.md`](milestone-12x8.md). Perubahan isi memerlukan keputusan eksplisit pemilik.
 
 ## A. Menyimak & berbicara
 

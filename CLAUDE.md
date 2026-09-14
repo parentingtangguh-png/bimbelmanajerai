@@ -19,8 +19,8 @@ Berkas ini menggambarkan **keadaan sekarang**, bukan riwayat. Kalau sesuatu di s
 
 **Pekerjaan yang sedang berjalan: kurikulum indikator baru (belum ada kode/migrasi).**
 - **Authority: [`CURRICULUM_ARCHITECTURE.md`](CURRICULUM_ARCHITECTURE.md) — arsitektur TERKUNCI (14 Sep 2026)**: 8 level × 12 slot + English + Karakter, fungsi slot, batas B–C/D1–D2/E1–E2–F2, titik transisi, F1 per level, aturan progresi, format 4 komponen. **Jangan mengubah keputusan terkunci tanpa persetujuan eksplisit pemilik.**
-- Peran: ChatGPT (authority pedagogis) menyusun isi; Claude mengaudit terhadap arsitektur, batas antarslot, dan kebutuhan aplikasi. Claude tidak menulis 96 indikator sendiri.
-- **Matriks Cakupan Bahan sudah dikunci** di `docs/curriculum/matriks-cakupan-bahan.md`. **Tahap berikutnya: 12 jalur × 8 milestone** (draf ChatGPT → audit Claude) → 96 indikator. Belum ada perubahan kode, database, atau logika diagnostik.
+- Peran: Codex (authority pedagogis, penerus ChatGPT) menyusun isi; Claude mengaudit terhadap arsitektur, batas antarslot, dan kebutuhan aplikasi. Claude tidak menulis 96 indikator sendiri.
+- **Dikunci 14 Sep 2026:** arsitektur, Matriks Cakupan Bahan beserta amendemen (`docs/curriculum/matriks-cakupan-bahan.md`), dan 96 milestone (`docs/curriculum/milestone-12x8.md`). Perubahan hanya lewat keputusan eksplisit pemilik. **Tahap berikutnya: 96 indikator operasional** (Kompetensi · Cara uji · Bahan · Tanda lulus; draf Codex → audit Claude). Belum ada perubahan kode, database, atau logika diagnostik.
 - Draf 96 indikator ChatGPT yang lama sudah ditinggalkan dan tidak disimpan di repo.
 
 **Dampak saat kurikulum baru dipasang (rencanakan bersama pemilik):** batas level 1–4 di database (`pilot_level`, `diagnostic_tests`, check `final_level`, "Level 4 melampaui Fondasi"), antrean kelas `current_indicator` 1–6 → 1–12, `QUEUE` di `state.js`, tugas tes diagnostik per indikator (12 tugas), saran level dari kelas formal, deskripsi & judul 8 level, CP (Fondasi + awal Fase A), kolom `curriculum_themes.focus_indicators` (tidak cocok lagi), prompt kegiatan, tes database/render.
