@@ -9,7 +9,7 @@ Belum dipasang di aplikasi. Kurikulum yang berjalan di aplikasi masih 4 level ×
 1. Arsitektur (dokumen ini) — **terkunci**.
 2. **Matriks Cakupan Bahan L1–L8** — **dikunci 14 Sep 2026, dengan amendemen 14 Sep 2026**: [`docs/curriculum/matriks-cakupan-bahan.md`](docs/curriculum/matriks-cakupan-bahan.md).
 3. **12 jalur × 8 milestone** — **dikunci 14 Sep 2026**: [`docs/curriculum/milestone-12x8.md`](docs/curriculum/milestone-12x8.md).
-4. 96 indikator operasional (Kompetensi · Cara uji · Bahan · Tanda lulus) — disusun Codex, diaudit Claude, per alur. ← *tahap berjalan*: **Alur A, B, dan C dikunci 14 Sep 2026** ([`alur-a.md`](docs/curriculum/indikator/alur-a.md), [`alur-b.md`](docs/curriculum/indikator/alur-b.md), [`alur-c.md`](docs/curriculum/indikator/alur-c.md)); Alur D–F belum.
+4. 96 indikator operasional (Kompetensi · Cara uji · Bahan · Tanda lulus) — disusun Codex, diaudit Claude, per alur. ← *tahap berjalan*: **Alur A–D dikunci 14 Sep 2026** ([`alur-a.md`](docs/curriculum/indikator/alur-a.md), [`alur-b.md`](docs/curriculum/indikator/alur-b.md), [`alur-c.md`](docs/curriculum/indikator/alur-c.md), [`alur-d.md`](docs/curriculum/indikator/alur-d.md)); Alur E–F belum.
 5. Baru kemudian perubahan aplikasi (database, antrean kelas, diagnostik) — direncanakan bersama pemilik.
 
 Peran: Codex (penerus ChatGPT sebagai authority pedagogis) menyusun isi pedagogis; Claude mengaudit konsistensi terhadap arsitektur, batas antarslot, dan kebutuhan aplikasi. Setiap perubahan isi: draf teks dulu, disetujui pemilik kata demi kata.
