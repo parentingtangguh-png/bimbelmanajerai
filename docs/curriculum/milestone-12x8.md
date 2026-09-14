@@ -1,6 +1,6 @@
 # 12 Jalur × 8 Milestone
 
-**Status: DIKUNCI — 14 Sep 2026, dengan amendemen A2 L7, B1 L8, dan urutan B2 L3–L7 (disetujui pemilik)**
+**Status: DIKUNCI — 14 Sep 2026, dengan amendemen A2 L7, B1 L8, urutan B2 L3–L7, dan C2 L2 (disetujui pemilik)**
 **Authority:** [`CURRICULUM_ARCHITECTURE.md`](../../CURRICULUM_ARCHITECTURE.md) · [`docs/curriculum/matriks-cakupan-bahan.md`](matriks-cakupan-bahan.md)
 
 Milestone menjawab "apa yang sudah mampu dilakukan anak". Belum memuat cara uji, bahan operasional, jumlah soal, atau tanda lulus; itu ditetapkan saat 96 milestone diturunkan menjadi 96 indikator (Kompetensi · Cara uji · Bahan · Tanda lulus). Perubahan isi memerlukan keputusan eksplisit pemilik.
@@ -38,7 +38,7 @@ A1 L3 menilai isi dan urutan, bukan kepatuhan. A1 L8 adalah integrasi disengaja;
 | Level | C1 — Pramembaca → dekoding → membaca | C2 — Makna tulisan → pemahaman |
 |---|---|---|
 | L1 | Mengikuti arah membaca pada satu baris tulisan dari titik awal yang benar. | Menunjukkan tulisan yang mewakili identitas dirinya atau orang yang dikenal. |
-| L2 | Membedakan tulisan atau huruf dari angka dan gambar. | Menghubungkan tulisan yang sangat familiar dengan referennya. |
+| L2 | Membedakan tulisan atau huruf dari angka dan gambar. | Menghubungkan tulisan penanda benda dengan referennya setelah makna tulisan diperkenalkan pada kesempatan uji yang sama. |
 | L3 | Membaca suku kata terbuka berpola KV. | Mengenali makna kata benda KV-KV dari kosakata inti tetap kurikulum. |
 | L4 | Membaca kata sederhana berpola KV-KV atau V-KV. | Mencocokkan kata baru yang dibaca sendiri dengan referen konkret yang sesuai. |
 | L5 | Membaca kata yang memuat suku kata tertutup sederhana. | Mengelompokkan kata tertulis berdasarkan kategori makna sederhana. |

@@ -1,6 +1,6 @@
 # Matriks Cakupan Bahan L1–L8
 
-**Status: DIKUNCI — 14 Sep 2026, dengan amendemen 14 Sep 2026** (C1 L7/L8, C2 L3, B2 L1, A2 L7, B1 L8, urutan B2 L3–L7) · **Authority:** [`CURRICULUM_ARCHITECTURE.md`](../../CURRICULUM_ARCHITECTURE.md)
+**Status: DIKUNCI — 14 Sep 2026, dengan amendemen 14 Sep 2026** (C1 L7/L8, C2 L3, B2 L1, A2 L7, B1 L8, urutan B2 L3–L7, C2 L2) · **Authority:** [`CURRICULUM_ARCHITECTURE.md`](../../CURRICULUM_ARCHITECTURE.md)
 
 Matriks ini menetapkan cakupan bahan dan kenaikan kompleksitas per slot. Belum berupa milestone atau indikator: cara uji, jumlah percobaan, bahan operasional, dan tanda lulus ditetapkan pada 96 indikator operasional (tahap berikutnya), setelah milestone dikunci di [`milestone-12x8.md`](milestone-12x8.md). Perubahan isi memerlukan keputusan eksplisit pemilik.
 
@@ -37,7 +37,7 @@ Dekoding mulai L3. C1 memakai bahan B yang diperkenalkan paling lambat pada leve
 | Level | C1 — Pramembaca → dekoding → membaca | C2 — Makna tulisan → pemahaman (**mulai L4: bahan ≤ C1**) |
 |---|---|---|
 | L1 | Arah baca dan titik awal satu baris tulisan | Tulisan sebagai penanda identitas diri/orang dikenal |
-| L2 | Membedakan tulisan/huruf dari angka atau gambar | Tulisan sangat familiar sebagai penanda referen dikenal |
+| L2 | Membedakan tulisan/huruf dari angka atau gambar | Tiga label tertulis untuk benda konkret yang maknanya diperkenalkan pada kesempatan uji yang sama, lalu dikenali kembali; dekoding tidak disyaratkan. |
 | L3 | Suku kata terbuka KV | Kata benda KV-KV sangat akrab dari kosakata inti tetap kurikulum (bukan tes dekoding) |
 | L4 | Kata KV-KV / V-KV | Kata KV-KV/V-KV **baru**, didekode sendiri lalu dihubungkan dengan referen konkret |
 | L5 | Kata dengan suku kata tertutup sederhana | Mengelompokkan kata tertulis menurut kategori makna (mis. hewan vs makanan) |
