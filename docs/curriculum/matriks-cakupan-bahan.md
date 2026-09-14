@@ -1,6 +1,6 @@
 # Matriks Cakupan Bahan L1–L8
 
-**Status: DIKUNCI — 14 Sep 2026, dengan amendemen 14 Sep 2026** (C1 L7/L8, C2 L3, B2 L1) · **Authority:** [`CURRICULUM_ARCHITECTURE.md`](../../CURRICULUM_ARCHITECTURE.md)
+**Status: DIKUNCI — 14 Sep 2026, dengan amendemen 14 Sep 2026** (C1 L7/L8, C2 L3, B2 L1, A2 L7) · **Authority:** [`CURRICULUM_ARCHITECTURE.md`](../../CURRICULUM_ARCHITECTURE.md)
 
 Matriks ini menetapkan cakupan bahan dan kenaikan kompleksitas per slot. Belum berupa milestone atau indikator: cara uji, jumlah percobaan, bahan operasional, dan tanda lulus ditetapkan pada 96 indikator operasional (tahap berikutnya), setelah milestone dikunci di [`milestone-12x8.md`](milestone-12x8.md). Perubahan isi memerlukan keputusan eksplisit pemilik.
 
@@ -14,7 +14,7 @@ Matriks ini menetapkan cakupan bahan dan kenaikan kompleksitas per slot. Belum b
 | L4 | Dua kalimat sederhana tentang satu kejadian, informasi tersurat | Dua kalimat berhubungan tentang satu kejadian konkret |
 | L5 | Tuturan pendek: satu informasi utama + satu detail | Tiga kalimat pengalaman dengan urutan yang dapat ditelusuri |
 | L6 | Tuturan pendek dengan urutan waktu eksplisit | Tuturan berurutan dengan penanda waktu (*lalu/kemudian*) |
-| L7 | Tuturan pendek dengan sebab–akibat eksplisit | Tuturan yang menyertakan sebab (*karena*) |
+| L7 | Tuturan pendek dengan sebab–akibat eksplisit | Tuturan yang menyertakan sebab dengan penghubung sebab seperti karena. |
 | L8 | Mini-narasi sangat pendek: urutan **dan** sebab–akibat (integrasi disengaja; kelak keduanya diperiksa terpisah dan mekanis) | Cerita pendek awal → kejadian → akhir (struktur lebih penting daripada panjang) |
 
 ## B. Huruf & bunyi (subleksikal)

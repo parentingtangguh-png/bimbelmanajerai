@@ -1,6 +1,6 @@
 # 12 Jalur × 8 Milestone
 
-**Status: DIKUNCI — 14 Sep 2026**
+**Status: DIKUNCI — 14 Sep 2026, dengan amendemen A2 L7 (disetujui pemilik)**
 **Authority:** [`CURRICULUM_ARCHITECTURE.md`](../../CURRICULUM_ARCHITECTURE.md) · [`docs/curriculum/matriks-cakupan-bahan.md`](matriks-cakupan-bahan.md)
 
 Milestone menjawab "apa yang sudah mampu dilakukan anak". Belum memuat cara uji, bahan operasional, jumlah soal, atau tanda lulus; itu ditetapkan saat 96 milestone diturunkan menjadi 96 indikator (Kompetensi · Cara uji · Bahan · Tanda lulus). Perubahan isi memerlukan keputusan eksplisit pemilik.
@@ -15,7 +15,7 @@ Milestone menjawab "apa yang sudah mampu dilakukan anak". Belum memuat cara uji,
 | L4 | Menemukan informasi tersurat dari tuturan dua kalimat tentang satu kejadian. | Menyampaikan satu kejadian dalam dua kalimat yang saling berhubungan. |
 | L5 | Menentukan informasi utama dari tuturan pendek yang juga memuat detail pendukung. | Menceritakan pengalaman dengan urutan kejadian yang dapat ditelusuri. |
 | L6 | Menentukan urutan waktu dari tuturan yang memakai penanda urutan eksplisit. | Menceritakan kejadian berurutan memakai penanda waktu seperti *lalu/kemudian*. |
-| L7 | Menentukan hubungan sebab–akibat yang dinyatakan eksplisit dalam tuturan. | Menceritakan kejadian berurutan yang menyertakan sebab sederhana dengan *karena*. |
+| L7 | Menentukan hubungan sebab–akibat yang dinyatakan eksplisit dalam tuturan. | Menceritakan kejadian berurutan yang menyertakan sebab sederhana dengan penghubung sebab seperti karena. |
 | L8 | Menyebutkan urutan kejadian serta sebab yang dinyatakan dalam mini-narasi. | Menceritakan cerita pendek berurutan yang mempunyai akhir/penyelesaian yang jelas. |
 
 A1 L3 menilai isi dan urutan, bukan kepatuhan. A1 L8 adalah integrasi disengaja; kelak urutan dan sebab diperiksa terpisah dan mekanis. A2 L5–L8 kumulatif: tiap level mewarisi narasi berurutan.
