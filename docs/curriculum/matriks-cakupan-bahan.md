@@ -1,6 +1,6 @@
 # Matriks Cakupan Bahan L1–L8
 
-**Status: DIKUNCI — 14 Sep 2026** · **Authority:** [`CURRICULUM_ARCHITECTURE.md`](../../CURRICULUM_ARCHITECTURE.md)
+**Status: DIKUNCI — 14 Sep 2026, dengan amendemen 14 Sep 2026** (C1 L7/L8, C2 L3, B2 L1) · **Authority:** [`CURRICULUM_ARCHITECTURE.md`](../../CURRICULUM_ARCHITECTURE.md)
 
 Matriks ini menetapkan cakupan bahan dan kenaikan kompleksitas per slot. Belum berupa milestone atau indikator: cara uji, jumlah percobaan, bahan operasional, dan tanda lulus ditetapkan di tahap berikutnya (12 jalur × 8 milestone, lalu 96 indikator). Perubahan isi memerlukan keputusan eksplisit pemilik.
 
@@ -21,7 +21,7 @@ Matriks ini menetapkan cakupan bahan dan kenaikan kompleksitas per slot. Belum b
 
 | Level | B1 — Mengenali/membedakan | B2 — Mengolah bunyi (**lisan murni**) |
 |---|---|---|
-| L1 | Vokal a, i, u, e, o | Menghasilkan bunyi vokal |
+| L1 | Vokal a, i, u, e, o | Menirukan urutan dua bunyi vokal yang didengar (mis. /a/–/i/) |
 | L2 | Grafem m, n, b, p | Bunyi awal kata akrab |
 | L3 | + s, t, l, k, d (kapital/kecil hanya variasi bahan) | Menggabungkan dua fonem → KV |
 | L4 | + g, r, h, j, c | Memisahkan KV → fonem |
@@ -38,12 +38,14 @@ Dekoding mulai L3. C1 memakai bahan B yang diperkenalkan paling lambat pada leve
 |---|---|---|
 | L1 | Arah baca dan titik awal satu baris tulisan | Tulisan sebagai penanda identitas diri/orang dikenal |
 | L2 | Membedakan tulisan/huruf dari angka atau gambar | Tulisan sangat familiar sebagai penanda referen dikenal |
-| L3 | Suku kata terbuka KV | Kata benda KV-KV sangat akrab dari daftar kecil yang sudah dikenal, dikenali utuh (bukan tes dekoding) |
+| L3 | Suku kata terbuka KV | Kata benda KV-KV sangat akrab dari kosakata inti tetap kurikulum (bukan tes dekoding) |
 | L4 | Kata KV-KV / V-KV | Kata KV-KV/V-KV **baru**, didekode sendiri lalu dihubungkan dengan referen konkret |
 | L5 | Kata dengan suku kata tertutup sederhana | Mengelompokkan kata tertulis menurut kategori makna (mis. hewan vs makanan) |
 | L6 | Satu kalimat pendek dengan struktur kata L3–L5 | Satu informasi literal dari kalimat setingkat C1 L6 |
-| L7 | Dua kalimat pendek, dapat memuat ng/ny | Urutan kejadian dari dua kalimat setingkat C1 L7 |
-| L8 | Dua kalimat pendek, dapat memuat ai/au/oi | Sebab–akibat sederhana dari dua kalimat setingkat C1 L8 |
+| L7 | Dua kalimat pendek yang memuat kata dengan ng/ny | Urutan kejadian dari dua kalimat setingkat C1 L7 |
+| L8 | Dua kalimat pendek yang memuat kata dengan diftong ai/au/oi | Sebab–akibat sederhana dari dua kalimat setingkat C1 L8 |
+
+**Kosakata inti tetap C2 L3:** buku, bola, susu, mata, kaki, sapi (KV-KV, konkret, tanpa ng/ny/diftong, grafem sampai B1 L3). Tujuannya standardisasi bahan; kata tidak diajarkan lebih dulu sebelum tes diagnostik. Yang dinilai: tulisan terhubung dengan makna yang benar, baik dikenali utuh maupun dibaca.
 
 ## D. Menulis
 
