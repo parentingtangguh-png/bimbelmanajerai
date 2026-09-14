@@ -93,6 +93,8 @@ Setiap level memiliki 12 indikator akademik dengan urutan dan fungsi tetap:
 **Perpindahan subkemampuan yang disengaja**
 - **F2** berkembang dengan urutan terencana: tambah sederhana → kurang sederhana → gabung → ambil beberapa → penjumlahan dalam 10 → pengurangan dalam 10 → penjumlahan melewati 10 → pengurangan melewati 10.
 - **E1 L7→L8**: dari garis bilangan ke hitung loncat adalah perpindahan subkemampuan yang disengaja di dalam fungsi E1 dan harus tetap disebut eksplisit di matriks dan milestone.
+- **B1 L7→L8** (amendemen 14 Sep 2026, disetujui pemilik): B1 L7→L8 merupakan perpindahan subkemampuan yang disengaja. L8 berfungsi sebagai penguatan pemetaan bunyi ke grafem mirip, bukan kelanjutan tingkat kompleksitas diftong L7; transisi ini dikecualikan dari tuntutan kenaikan kesulitan yang ketat.
+- **Urutan B2 L3–L7** (amendemen 14 Sep 2026, disetujui pemilik): gabung suku kata → pisah suku kata → hapus suku kata → gabung fonem KV → pisah fonem KV. Ini keputusan rancangan pedagogis, bukan norma kesulitan yang sudah terbukti; kelulusan B2 bukan prasyarat membaca C1.
 
 ## 6. Titik transisi tahap
 | Slot | L1–L2 | L3 | L4 | L5–L8 |

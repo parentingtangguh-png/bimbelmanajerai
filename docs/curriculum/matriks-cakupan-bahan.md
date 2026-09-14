@@ -1,6 +1,6 @@
 # Matriks Cakupan Bahan L1–L8
 
-**Status: DIKUNCI — 14 Sep 2026, dengan amendemen 14 Sep 2026** (C1 L7/L8, C2 L3, B2 L1, A2 L7) · **Authority:** [`CURRICULUM_ARCHITECTURE.md`](../../CURRICULUM_ARCHITECTURE.md)
+**Status: DIKUNCI — 14 Sep 2026, dengan amendemen 14 Sep 2026** (C1 L7/L8, C2 L3, B2 L1, A2 L7, B1 L8, urutan B2 L3–L7) · **Authority:** [`CURRICULUM_ARCHITECTURE.md`](../../CURRICULUM_ARCHITECTURE.md)
 
 Matriks ini menetapkan cakupan bahan dan kenaikan kompleksitas per slot. Belum berupa milestone atau indikator: cara uji, jumlah percobaan, bahan operasional, dan tanda lulus ditetapkan pada 96 indikator operasional (tahap berikutnya), setelah milestone dikunci di [`milestone-12x8.md`](milestone-12x8.md). Perubahan isi memerlukan keputusan eksplisit pemilik.
 
@@ -23,12 +23,12 @@ Matriks ini menetapkan cakupan bahan dan kenaikan kompleksitas per slot. Belum b
 |---|---|---|
 | L1 | Vokal a, i, u, e, o | Menirukan urutan dua bunyi vokal yang didengar (mis. /a/–/i/) |
 | L2 | Grafem m, n, b, p | Bunyi awal kata akrab |
-| L3 | + s, t, l, k, d (kapital/kecil hanya variasi bahan) | Menggabungkan dua fonem → KV |
-| L4 | + g, r, h, j, c | Memisahkan KV → fonem |
-| L5 | + w, y, f, z, v; q dan x dikenali sebagai huruf, bukan bahan utama dekoding | Menggabungkan dua suku kata → kata |
-| L6 | ng, ny | Memisahkan kata → suku kata |
-| L7 | Diftong ai, au, oi | Menghilangkan satu suku kata |
-| L8 | Diskriminasi visual grafem mirip (b–d, p–q) | Mengganti satu fonem (terutama bunyi awal) |
+| L3 | + s, t, l, k, d (kapital/kecil hanya variasi bahan) | Menggabungkan dua suku kata lisan menjadi kata. |
+| L4 | + g, r, h, j, c | Memisahkan kata lisan menjadi suku kata penyusunnya. |
+| L5 | + w, y, f, z, v; q dan x dikenali sebagai huruf, bukan bahan utama dekoding | Menghilangkan satu suku kata dari kata lisan. |
+| L6 | ng, ny | Menggabungkan dua fonem lisan menjadi suku kata KV. |
+| L7 | Diftong ai, au, oi | Memisahkan suku kata KV lisan menjadi dua fonem penyusunnya. |
+| L8 | Pemetaan bunyi /b/, /d/, /p/ ke grafem kecil b, d, p dalam kelompok pilihan b, d, p, q; q hanya sebagai pengecoh, bukan sasaran bunyi. | Mengganti satu fonem (terutama bunyi awal) |
 
 ## C. Membaca
 

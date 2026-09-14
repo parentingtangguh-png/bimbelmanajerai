@@ -1,6 +1,6 @@
 # 12 Jalur × 8 Milestone
 
-**Status: DIKUNCI — 14 Sep 2026, dengan amendemen A2 L7 (disetujui pemilik)**
+**Status: DIKUNCI — 14 Sep 2026, dengan amendemen A2 L7, B1 L8, dan urutan B2 L3–L7 (disetujui pemilik)**
 **Authority:** [`CURRICULUM_ARCHITECTURE.md`](../../CURRICULUM_ARCHITECTURE.md) · [`docs/curriculum/matriks-cakupan-bahan.md`](matriks-cakupan-bahan.md)
 
 Milestone menjawab "apa yang sudah mampu dilakukan anak". Belum memuat cara uji, bahan operasional, jumlah soal, atau tanda lulus; itu ditetapkan saat 96 milestone diturunkan menjadi 96 indikator (Kompetensi · Cara uji · Bahan · Tanda lulus). Perubahan isi memerlukan keputusan eksplisit pemilik.
@@ -26,12 +26,12 @@ A1 L3 menilai isi dan urutan, bukan kepatuhan. A1 L8 adalah integrasi disengaja;
 |---|---|---|
 | L1 | Mengenali lima grafem vokal. | Menirukan urutan dua bunyi vokal yang didengar. |
 | L2 | Mengenali grafem m, n, b, p. | Menyebut bunyi awal dari kata yang didengar. |
-| L3 | Mengenali grafem s, t, l, k, d. | Menggabungkan dua fonem menjadi satu suku kata KV. |
-| L4 | Mengenali grafem g, r, h, j, c. | Memisahkan satu suku kata KV menjadi fonem penyusunnya. |
-| L5 | Mengenali grafem w, y, f, z, v, q, x. | Menggabungkan dua suku kata lisan menjadi satu kata. |
-| L6 | Mengenali ng dan ny sebagai grafem yang mewakili bunyi tertentu. | Memisahkan satu kata lisan menjadi suku kata penyusunnya. |
-| L7 | Mengenali diftong ai, au, oi dalam kata. | Menghilangkan satu suku kata dari kata yang didengar. |
-| L8 | Membedakan secara visual grafem yang bentuknya mirip (b–d, p–q). | Mengganti satu fonem pada kata lisan untuk membentuk kata lain. |
+| L3 | Mengenali grafem s, t, l, k, d. | Menggabungkan dua suku kata lisan menjadi satu kata. |
+| L4 | Mengenali grafem g, r, h, j, c. | Memisahkan satu kata lisan menjadi suku kata penyusunnya. |
+| L5 | Mengenali grafem w, y, f, z, v, q, x. | Menghilangkan satu suku kata dari kata yang didengar. |
+| L6 | Mengenali ng dan ny sebagai grafem yang mewakili bunyi tertentu. | Menggabungkan dua fonem menjadi satu suku kata KV. |
+| L7 | Mengenali diftong ai, au, oi dalam kata. | Memisahkan satu suku kata KV menjadi fonem penyusunnya. |
+| L8 | Menunjuk grafem b, d, atau p sesuai bunyi yang diucapkan guru di antara pilihan grafem yang bentuknya mirip. | Mengganti satu fonem pada kata lisan untuk membentuk kata lain. |
 
 ## C. Membaca
 
