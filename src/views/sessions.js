@@ -38,7 +38,19 @@ function themeLabel(number) {
   return `Tema ${number}${t ? ` — ${h(t.name)}` : ''}`;
 }
 
+// Ruang kelas dikunci antara Fase 2 dan Fase 3 rencana aplikasi; database juga menolak simpan jadwal/sesi.
 export function sessionsView() {
+  return (
+    heading('RUANG KELAS', 'Sedang diperbarui.', '') +
+    empty(
+      'Ruang kelas sedang diperbarui',
+      'Ruang kelas dipasang ulang untuk kurikulum 8 level. Sementara itu, jalankan Tes Diagnostik dari Data siswa.'
+    )
+  );
+}
+
+// Tampilan Ruang kelas pilot, disimpan sampai Ruang kelas baru dibangun di Fase 3.
+export function pilotSessionsView() {
   const teacher = state.role === 'teacher';
   const open = state.classSchedules.some(c => !c.completed_at);
   const button =

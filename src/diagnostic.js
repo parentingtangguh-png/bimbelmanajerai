@@ -1,61 +1,58 @@
-// Tes Diagnostik pilot Fase Fondasi (disetujui pemilik 13 Sep 2026). Tanpa DOM dan tanpa jaringan:
-// isinya hanya aturan yang memutuskan hasil tes, supaya bisa dites langsung.
-// Tugas, bahan, dan ukuran tiap tugas tidak ada di sini: semuanya menempel pada indikatornya di tabel
-// curriculum_level_indicators (kolom diagnostic_*), supaya indikator dan cara mengujinya berubah bersama.
+// Tes Diagnostik kurikulum 8 level (aturan terkunci 15 Sep 2026, docs/curriculum/diagnostik.md). Tanpa DOM
+// dan tanpa jaringan: hanya aturan untuk ditampilkan. Database (start_diagnostic, rate_diagnostic,
+// finalize_diagnostic) menjaga aturan yang sama dan menghitung hasil finalnya sendiri.
 //
-// Satu tes menguji satu level. Lulus = indikator 1-6 semuanya Tercapai. Lulus Level X → level awal X+1
-// (Level 4 tetap 4, melampaui Fondasi); belum lulus → level awal X. save_diagnostic menjaga aturan yang sama.
+// Nomor tugas = nomor indikator k8: 1–12 akademik (urutan slot), 13 English, 14 Karakter.
 
-export const DIAGNOSTIC_LEVELS = [1, 2, 3, 4];
-// Indikator 1-6 menentukan lulus; 7 (English) dan 8 (Karakter) dicatat tanpa memindahkan level.
-export const DECIDING = [1, 2, 3, 4, 5, 6];
-export const RATINGS = [
-  ['T', '✓', 'Tercapai'],
-  ['B', '◐', 'Dengan bantuan'],
-  ['N', '✗', 'Belum']
+export const DIAGNOSTIC_LEVELS = [1, 2, 3, 4, 5, 6, 7, 8];
+// Urutan dikerjakan: enam akademik pertama, English, enam akademik berikutnya, Karakter.
+export const TASK_ORDER = [1, 2, 3, 4, 5, 6, 13, 7, 8, 9, 10, 11, 12, 14];
+export const ACADEMIC = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+export const ENGLISH = 13;
+export const CHARACTER = 14;
+// A1, B1, E1, D1: bila keempatnya Belum, tes berhenti (kecuali Level 1).
+export const STOP_TASKS = [1, 2, 3, 4];
+export const STATUSES = [
+  ['lulus', 'Lulus'],
+  ['belum', 'Belum'],
+  ['', 'Belum dinilai']
 ];
-// Aturan pemberian tanda, sama untuk semua tugas yang memakai hitungan ("4 dari 5").
-export const RATING_RULE =
-  '✓ memenuhi ukuran tanpa bantuan · ◐ memenuhi setelah dibantu, atau kurang satu dari ukuran · ✗ lebih rendah dari itu';
-export const ratingMark = code => (RATINGS.find(r => r[0] === code) || [])[1] || '·';
 
-// Tugas aktif dikerjakan lebih dulu; yang diamati sepanjang tes dinilai di bagian paling bawah.
-export function taskOrder(indicators, level) {
-  const own = indicators.filter(i => i.level === level).sort((a, b) => a.number - b.number);
-  return {
-    active: own.filter(i => !i.diagnostic_observe).map(i => i.number),
-    observed: own.filter(i => i.diagnostic_observe).map(i => i.number)
-  };
-}
-
-// Saran level yang dites, dari kelas formal. Guru bebas memilih level lain.
+// Saran level dari kelas formal. Guru bebas memilih level lain.
 export function suggestedStart(grade) {
-  if (grade === 'TK A') return 2;
   if (grade === 'TK B') return 3;
-  if (/^SD /.test(grade || '')) return 4;
+  if (grade === 'SD 1') return 5;
+  if (/^SD [2-6]$/.test(grade || '')) return 7;
   return 1;
 }
 
-// Hasil satu level. complete=false selama indikator 1-6 belum semuanya dinilai.
+// Awal pita sebelumnya untuk tes yang berhenti: L7/8→5, L5/6→3, L3/4→1, L2→1.
+export const restartLevel = level => Math.max(1, Math.floor((level - 1) / 2) * 2 - 1);
+
+// Jawaban satu tes dari baris diagnostic_results: { nomor: { status, package } }.
+export function answersOf(results, testId) {
+  return Object.fromEntries(
+    results.filter(r => r.test_id === testId).map(r => [r.number, { status: r.status, package: r.package }])
+  );
+}
+const statusOf = (answers, n) => answers[n]?.status || '';
+
+export const isStopped = (level, answers = {}) =>
+  level > 1 && STOP_TASKS.every(n => statusOf(answers, n) === 'belum');
+
+// Tugas yang sudah dinilai dari 13 yang bisa dinilai (English tidak dinilai pada anak baru).
+export const ratedCount = (answers = {}) => TASK_ORDER.filter(n => statusOf(answers, n)).length;
+
+// Dampak bila tes disimpan final sekarang. Belum dinilai dihitung belum lulus.
 export function diagnosticOutcome(level, answers = {}) {
-  const complete = DECIDING.every(n => answers[n]);
-  const passed = complete && DECIDING.every(n => answers[n] === 'T');
+  const passed = ACADEMIC.filter(n => statusOf(answers, n) === 'lulus');
+  const first = ACADEMIC.find(n => statusOf(answers, n) !== 'lulus');
+  const complete = !first && level === 8;
   return {
-    complete,
     passed,
-    final: passed ? Math.min(level + 1, 4) : level,
-    beyond: passed && level === 4,
-    status: complete ? `${passed ? 'Lulus' : 'Belum lulus'} Level ${level}` : ''
+    startLevel: first ? level : Math.min(level + 1, 8),
+    startIndicator: first || (complete ? null : 1),
+    complete,
+    character: statusOf(answers, CHARACTER)
   };
 }
-
-// Indikator penentu yang belum Tercapai: yang perlu dilatih lebih dulu di kelas.
-export const focusIndicators = (answers = {}) => DECIDING.filter(n => answers[n] !== 'T');
-
-// Nilai yang dikirim ke save_diagnostic: satu baris per indikator yang dinilai.
-export function diagnosticPayload(level, answers = {}) {
-  return Object.entries(answers).map(([number, rating]) => ({ level, number: Number(number), rating }));
-}
-
-// Berapa indikator yang sudah dinilai, untuk tombol "Lanjutkan".
-export const draftProgress = run => Object.keys(run.answers || {}).length;

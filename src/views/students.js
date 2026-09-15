@@ -2,22 +2,25 @@
 import {
   state,
   testFor,
+  finalTestFor,
   testStatus,
   levelName,
   schoolGrades,
   schoolYearOf,
-  ageText,
-  passedIndicators
+  ageText
 } from '../state.js';
+import { TASK_ORDER, ENGLISH, answersOf, ratedCount } from '../diagnostic.js';
 import { field, select, empty, heading, modal } from '../ui.js';
 import { escapeHtml as h } from '../domain.js';
+import { inlineMarkdown } from '../markdown.js';
 
-// Anak aktif yang belum punya tes diagnostik. "Sudah dites" = ada baris diagnostic_tests.
-export const needsDiagnostic = s => s.status === 'Aktif' && !testFor(s.id);
+// Anak aktif yang tes diagnostiknya belum final (belum dimulai atau masih draf).
+export const needsDiagnostic = s => s.status === 'Aktif' && !finalTestFor(s.id);
 
-// Tanda di bawah nama: belum dites (oranye) atau status tesnya.
+// Tanda di bawah nama: belum dites / tes belum final (oranye) atau status tesnya.
 function statusNote(s) {
-  if (needsDiagnostic(s)) return '<small class="belum-tes">Belum tes diagnostik</small>';
+  if (needsDiagnostic(s))
+    return `<small class="belum-tes">${h(testStatus(testFor(s.id)) || 'Belum tes diagnostik')}</small>`;
   const status = testStatus(testFor(s.id));
   return status ? `<small class="status-tes">${h(status)}</small>` : '';
 }
@@ -125,49 +128,43 @@ function profileForm(s, edit, owner) {
 
 // Everything below the profile, shown only for a child who already exists.
 function studentDetails(s, owner) {
-  return `${diagnosticResultSection(s)}${currentLevelSection(s)}${passedSection(s)}${owner ? '' : studentActionsSection(s)}`;
+  return `${diagnosticResultSection(s)}${currentLevelSection(s)}${owner ? '' : studentActionsSection(s)}`;
 }
 
-// Indikator level saat ini yang sudah Lulus di pertemuan kelas.
-export function passedSection(s) {
-  if (!s.pilot_level) return '';
-  const passed = passedIndicators(s.id, s.pilot_level);
-  const items = passed
-    .map(n => {
-      const ind = state.curriculumIndicators.find(i => i.level === Number(s.pilot_level) && i.number === n);
-      return `<li><span class="diagnostic-mark">✓</span> ${n}. ${h(ind ? ind.text : 'Indikator ' + n)}</li>`;
-    })
-    .join('');
-  const body = items
-    ? `<ul class="diagnostic-result-list">${items}</ul>`
-    : '<p class="muted">Belum ada indikator yang lulus di kelas.</p>';
-  return `<hr><h3>Indikator yang sudah lulus</h3>${body}`;
-}
-
-// Hasil Tes Diagnostik. Guru pendamping melihat nilai per indikator; pemilik hanya ringkasannya,
-// karena database tidak mengirim baris diagnostic_results kepada pemilik.
+// Hasil Tes Diagnostik. Guru pendamping melihat status 14 tugas; pemilik hanya ringkasannya, karena
+// database tidak mengirim baris diagnostic_results kepada pemilik.
 export function diagnosticResultSection(s) {
   const test = testFor(s.id);
   if (!test) return '';
-  const marks = { T: '✓', B: '◐', N: '✗' };
-  const items = state.diagnosticResults
-    .filter(r => r.test_id === test.id)
-    .sort((a, b) => a.indicator_number - b.indicator_number)
-    .map(
-      r =>
-        `<li><span class="diagnostic-mark">${marks[r.rating] || '·'}</span> ${r.indicator_number}. ${h(r.indicator_text)}</li>`
-    )
-    .join('');
-  const list = items ? `<ul class="diagnostic-result-list">${items}</ul>` : '';
-  const beyond = test.passed && test.tested_level === 4 ? ' (melampaui Fondasi)' : '';
-  const head = `<p class="muted">${h(test.tested_on)} · <strong>${h(testStatus(test))}</strong> → mulai belajar <strong>Level ${test.final_level}</strong>${beyond}</p>`;
-  const note = test.note ? `<p><strong>Catatan:</strong> ${h(test.note)}</p>` : '';
-  return `<hr><h3>Hasil tes diagnostik</h3>${head}${list}${note}`;
+  const owner = state.role === 'owner';
+  const answers = answersOf(state.diagnosticResults, test.id);
+  if (!test.finalized_at) {
+    const resume =
+      owner || s.status !== 'Aktif'
+        ? ''
+        : `<button type="button" class="primary" data-action="diagnostic-open" data-id="${s.id}">Lanjutkan tes</button>`;
+    const tally = owner ? '' : ` · ${ratedCount(answers)} dari 13 tugas dinilai`;
+    return `<hr><h3>Tes diagnostik</h3><p class="muted">Dimulai ${h(test.started_on)} · <strong>Level ${test.tested_level}, belum final</strong>${tally}. Anak belum bisa mengikuti kelas sebelum tes disimpan final.</p>${resume}`;
+  }
+  const head = `<p class="muted">${h(String(test.finalized_at).slice(0, 10))} · <strong>${h(testStatus(test))}</strong></p>`;
+  if (owner) return `<hr><h3>Hasil tes diagnostik</h3>${head}`;
+  const marks = { lulus: ['✓', 'Lulus'], belum: ['✗', 'Belum'] };
+  const items = TASK_ORDER.map(n => {
+    const ind = state.k8Indicators.find(i => i.level === test.tested_level && i.number === n);
+    const a = answers[n];
+    const [mark, label] = marks[a?.status] || [
+      '·',
+      n === ENGLISH ? 'Belum dinilai (anak baru)' : 'Belum dinilai'
+    ];
+    const extra = a?.package === 'cadangan' ? ' · paket cadangan' : '';
+    return `<li><span class="diagnostic-mark">${mark}</span> <span class="badge">${h(ind?.slot || String(n))}</span> ${inlineMarkdown(ind ? ind.competency : 'Indikator ' + n)} <small class="muted">${label}${extra}</small></li>`;
+  }).join('');
+  return `<hr><h3>Hasil tes diagnostik</h3>${head}<ul class="diagnostic-result-list">${items}</ul>`;
 }
 
-// Level anak saat ini beserta deskriptornya dari kurikulum pilot.
+// Level anak saat ini beserta deskriptornya dari kurikulum 8 level.
 export function currentLevelSection(s) {
-  const lv = state.curriculumLevels.find(x => x.level === Number(s.pilot_level));
+  const lv = state.k8Levels.find(x => x.level === Number(s.pilot_level));
   const desc = lv ? `<p class="muted">${h(lv.description)}</p>` : '';
   const pending = s.pilot_level ? '' : '<p class="muted">Level ditentukan oleh Tes Diagnostik.</p>';
   return `<hr><h3>Level saat ini</h3><p><strong>${h(levelName(s.pilot_level))}</strong></p>${desc}${pending}`;
@@ -178,6 +175,6 @@ export function studentActionsSection(s) {
     s.status === 'Aktif'
       ? `<p class="muted">Untuk anak yang berhenti atau cuti. Anak nonaktif tidak bisa dites diagnostik; datanya tetap tersimpan dan bisa diaktifkan kembali kapan saja.</p><button type="button" class="secondary danger" data-action="toggle-student" data-active="false" data-id="${s.id}">Nonaktifkan siswa ini</button>`
       : `<p class="muted">Siswa ini non-aktif. Datanya tetap tersimpan.</p><button type="button" class="secondary" data-action="toggle-student" data-active="true" data-id="${s.id}">Aktifkan kembali</button>`;
-  const remove = `<p class="muted">Hanya untuk data yang salah input atau ganda. Siswa dihapus permanen beserta hasil tes diagnostiknya.</p><button type="button" class="secondary danger" data-action="delete-student" data-id="${s.id}">Hapus siswa ini</button>`;
+  const remove = `<p class="muted">Hanya untuk data yang salah input atau ganda. Siswa dihapus permanen beserta hasil tes diagnostiknya, dan hanya bila belum pernah mengikuti kelas.</p><button type="button" class="secondary danger" data-action="delete-student" data-id="${s.id}">Hapus siswa ini</button>`;
   return `<hr><h3>Status siswa</h3>${status}<hr><h3>Hapus siswa</h3>${remove}`;
 }

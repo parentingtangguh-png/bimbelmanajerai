@@ -89,6 +89,14 @@
   flex-wrap: wrap;
   gap: 8px;
 }
+/* Paket bahan dipisah dari status supaya tidak terbaca sebagai pilihan nilai keempat. */
+.diagnostic-packages {
+  align-items: center;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(127, 127, 127, 0.35);
+  font-size: 0.9em;
+}
 .diagnostic-rating {
   display: flex;
   align-items: center;

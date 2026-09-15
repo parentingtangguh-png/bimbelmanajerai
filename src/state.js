@@ -30,10 +30,8 @@ export const initialState = () => ({
   // Jadwal kelas pilot dan siswa di tiap jadwal (level saat dijadwalkan + satu indikator).
   classSchedules: [],
   classScheduleStudents: [],
-  // Tes Diagnostik yang sedang berjalan: { student, level, answers, reviewed, note }.
-  diagnostic: null,
-  // Tes yang belum disimpan di perangkat ini, per anak (dibaca main.js dari localStorage).
-  diagnosticDrafts: {}
+  // Anak yang lembar tes diagnostiknya sedang terbuka (id siswa); drafnya tersimpan di server.
+  diagnostic: null
 });
 export const state = initialState();
 export const icons = { dashboard: '◫', students: '◉', sessions: '▤', team: '♧', curriculum: '▥' };
@@ -140,8 +138,12 @@ export const homeKeys = {
   kurikulum: 'curriculum',
   tim: 'team'
 };
-// Tes diagnostik anak, bila sudah ada. "Sudah dites" = ada barisnya; tidak ada kolom penanda lain.
+// Tes diagnostik anak (draf atau final), bila sudah dimulai. "Sudah dites" = tesnya sudah final.
 export const testFor = id => state.diagnosticTests.find(t => t.student_id === id);
+export const finalTestFor = id => {
+  const t = testFor(id);
+  return t?.finalized_at ? t : null;
+};
 
 // Indikator yang pernah Lulus di pertemuan yang sudah selesai, untuk satu siswa dan satu level.
 export function passedIndicators(studentId, level) {
@@ -173,13 +175,17 @@ export function suggestedIndicator(s) {
 
 export const readyToLevelUp = s =>
   !!s.pilot_level && QUEUE.every(n => passedIndicators(s.id, s.pilot_level).includes(n));
-// "Lulus Level 2" / "Belum lulus Level 2", diturunkan dari tes, bukan disimpan terpisah.
-export const testStatus = test =>
-  test ? `${test.passed ? 'Lulus' : 'Belum lulus'} Level ${test.tested_level}` : '';
-// Nama level pilot dari kurikulum, misalnya "Level 2 — Aku Mulai Mengenal".
+// Ringkasan tes untuk daftar dan profil, diturunkan dari baris tes.
+export function testStatus(test) {
+  if (!test) return '';
+  if (!test.finalized_at) return `Tes Level ${test.tested_level} belum final`;
+  if (test.curriculum_complete) return `Dites Level ${test.tested_level} · kurikulum selesai`;
+  return `Dites Level ${test.tested_level} · mulai Level ${test.start_level} indikator ${test.start_indicator}`;
+}
+// Nama level dari kurikulum 8 level, misalnya "Level 3 — Merangkai Awal".
 export function levelName(level) {
   if (!level) return 'Level belum ditentukan';
-  const lv = state.curriculumLevels.find(x => x.level === Number(level));
+  const lv = state.k8Levels.find(x => x.level === Number(level));
   return `Level ${level}${lv ? ` — ${lv.title}` : ''}`;
 }
 // Kelas formal anak di sekolahnya. Urutan dan ejaannya sama dengan check di database.

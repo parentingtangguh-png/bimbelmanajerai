@@ -37,15 +37,15 @@ test('PostgreSQL: akun, siswa, kurikulum pilot, dan tes diagnostik',async t=>{
   const tabel=(await admin("select table_name from information_schema.tables where table_schema='public' order by 1")).rows.map(r=>r.table_name);
   assert.deepEqual(tabel,['access_list','assignments','class_schedule_students','class_schedules','curriculum_level_indicators','curriculum_levels','curriculum_phases','curriculum_themes','diagnostic_results','diagnostic_tests','k8_cp','k8_indicators','k8_levels','k8_notes','k8_subthemes','k8_theme_english','k8_themes','profiles','students']);
   const fungsi=(await admin("select proname from pg_proc where pronamespace='public'::regnamespace order by 1")).rows.map(r=>r.proname);
-  assert.deepEqual(fungsi,['can_teach','check_student_identity','create_student','current_indicator','delete_schedule','delete_student','handle_new_user','is_member','is_owner','reject_owner_student_insert','save_diagnostic','save_meeting','save_schedule','set_student_active','update_student_profile']);
+  assert.deepEqual(fungsi,['can_teach','check_student_identity','create_student','current_indicator','delete_schedule','delete_student','diagnostic_restart_level','diagnostic_stopped','finalize_diagnostic','handle_new_user','is_member','is_owner','rate_diagnostic','reject_owner_student_insert','save_meeting','save_schedule','set_student_active','start_diagnostic','update_student_profile']);
   const kolom=(await admin("select column_name from information_schema.columns where table_schema='public' and table_name='students' order by ordinal_position")).rows.map(r=>r.column_name);
   assert.deepEqual(kolom,['id','name','parent_name','phone','status','created_at','nickname','birth_date','school_grade','school_year','pilot_level']);
   const tes=(await admin("select column_name from information_schema.columns where table_schema='public' and table_name='diagnostic_tests' order by ordinal_position")).rows.map(r=>r.column_name);
-  assert.deepEqual(tes,['id','student_id','teacher_id','tested_on','final_level','note','created_at','tested_level','passed']);
+  assert.deepEqual(tes,['id','student_id','teacher_id','tested_level','started_on','finalized_at','start_level','start_indicator','curriculum_complete','created_at']);
  });
  await t.test('email tidak dikenal tidak bisa mendaftar',async()=>{await db.exec('reset role');await assert.rejects(db.query('insert into auth.users values($1,$2)',[randomUUID(),'unknown@test.invalid']),/belum didaftarkan/);});
  await t.test('fungsi pemicu tidak tersedia sebagai RPC pengguna',async()=>{
-  for(const f of ['public.handle_new_user()','public.reject_owner_student_insert()','public.check_student_identity(jsonb)'])
+  for(const f of ['public.diagnostic_stopped(uuid)','public.diagnostic_restart_level(integer)','public.handle_new_user()','public.reject_owner_student_insert()','public.check_student_identity(jsonb)'])
    assert.equal((await db.query('select has_function_privilege($1,$2,$3) as allowed',['authenticated',f,'execute'])).rows[0].allowed,false,f);
   assert.equal((await db.query("select has_function_privilege('anon','public.create_student(jsonb)','execute') as allowed")).rows[0].allowed,false);
  });
@@ -145,127 +145,81 @@ test('PostgreSQL: akun, siswa, kurikulum pilot, dan tes diagnostik',async t=>{
   assert.match(at(3,3).diagnostic_material,/ku · bu → buku/,'suku kata disajikan tertukar');
   assert.match(at(1,6).diagnostic_success,/tetap ✓/);
  });
- await t.test('tes diagnostik satu level: hasil dihitung database, satu tes final per anak tanpa revisi',async()=>{
-  const kid=await buat(),lain=await buat(stranger),k4=await buat();
-  const lvl=(level,ratings)=>ratings.map((rating,i)=>({level,number:i+1,rating}));
-  const simpan=(who,sid,level,res,note='catatan')=>as(who,'select save_diagnostic($1,$2,$3::jsonb,$4) as final',[sid,level,JSON.stringify(res),note]);
-  const hampir=lvl(2,['T','T','B','T','T','T','N','N']);
-  await assert.rejects(simpan(owner,kid,2,hampir),/guru pendamping/,'pemilik ditolak');
-  await assert.rejects(simpan(stranger,kid,2,hampir),/guru pendamping/,'guru lain ditolak');
-  await assert.rejects(simpan(teacher,kid,2,lvl(2,['T','T','T','T','T'])),/belum selesai dinilai/);
-  await assert.rejects(simpan(teacher,kid,2,[...hampir,{level:3,number:1,rating:'T'}]),/hanya boleh berisi indikator Level 2/);
-  await assert.rejects(simpan(teacher,kid,2,[...hampir,{level:2,number:1,rating:'T'}]),/lebih dari sekali/);
-  await assert.rejects(simpan(teacher,kid,2,lvl(2,['T','T','T','T','T','X'])),/nilai yang dikenal/);
-  await assert.rejects(simpan(teacher,kid,5,lvl(5,['T','T','T','T','T','T'])),/Level 1–4/);
-  assert.equal((await admin('select count(*)::int n from diagnostic_tests where student_id=$1',[kid])).rows[0].n,0,'gagal tidak meninggalkan data');
-  // Satu ◐ di indikator 1-6 = belum lulus → level awal = level yang dites. English/Karakter tidak menentukan.
-  assert.equal((await simpan(teacher,kid,2,hampir)).rows[0].final,2);
-  let tes=(await admin('select tested_level,passed,final_level,note,teacher_id from diagnostic_tests where student_id=$1',[kid])).rows[0];
-  assert.deepEqual([tes.tested_level,tes.passed,tes.final_level,tes.note,tes.teacher_id],[2,false,2,'catatan',teacher]);
-  assert.equal((await admin('select pilot_level from students where id=$1',[kid])).rows[0].pilot_level,2);
-  assert.equal((await admin('select count(*)::int n from diagnostic_results r join diagnostic_tests t on t.id=r.test_id where t.student_id=$1',[kid])).rows[0].n,8);
-  // Salinan kalimat indikator tetap walau kurikulum diubah.
-  const asli=(await admin('select indicator_text from diagnostic_results r join diagnostic_tests t on t.id=r.test_id where t.student_id=$1 and indicator_number=1',[kid])).rows[0].indicator_text;
-  await as(owner,"update curriculum_level_indicators set text='Teks baru' where level=2 and number=1");
-  assert.equal((await admin('select indicator_text from diagnostic_results r join diagnostic_tests t on t.id=r.test_id where t.student_id=$1 and indicator_number=1',[kid])).rows[0].indicator_text,asli);
-  await as(owner,'update curriculum_level_indicators set text=$1 where level=2 and number=1',[asli]);
-  // Akses: guru pendamping membaca semuanya; pemilik membaca ringkasan tes saja; guru lain tidak.
-  assert.equal((await as(teacher,'select * from diagnostic_results r join diagnostic_tests t on t.id=r.test_id where t.student_id=$1',[kid])).rows.length,8);
+ await t.test('tes diagnostik 8 level: draf di server, berhenti dini, English tidak dinilai, final tanpa revisi',async()=>{
+  const kid=await buat(),lain=await buat(stranger);
+  const mulai=(who,sid,level)=>as(who,'select start_diagnostic($1,$2) as id',[sid,level]);
+  const nilai=(sid,n,status,pkg='utama',who=teacher)=>as(who,'select rate_diagnostic($1,$2,$3,$4)',[sid,n,status,pkg]);
+  const final=(sid,who=teacher)=>as(who,'select finalize_diagnostic($1) as level',[sid]).then(r=>r.rows[0].level);
+  const tes=async sid=>(await admin('select * from diagnostic_tests where student_id=$1',[sid])).rows[0];
+  await assert.rejects(mulai(owner,kid,3),/guru pendamping/,'pemilik ditolak');
+  await assert.rejects(mulai(stranger,kid,3),/guru pendamping/,'guru lain ditolak');
+  await assert.rejects(mulai(teacher,kid,9),/Level 1–8/);
+  await assert.rejects(nilai(kid,1,'lulus'),/belum dimulai/);
+  await mulai(teacher,kid,5);
+  await assert.rejects(mulai(teacher,kid,3),/sudah dimulai/,'level tidak bisa diganti selama tes berjalan');
+  // Draf: nilai bisa diubah dan dikosongkan sebelum final; English (13) ditolak; nilai tak dikenal ditolak.
+  await nilai(kid,1,'belum');await nilai(kid,1,'lulus','cadangan');
+  assert.deepEqual((await admin('select status,package from diagnostic_results')).rows.map(r=>[r.status,r.package]),[['lulus','cadangan']]);
+  await nilai(kid,1,null);
+  assert.equal((await admin('select count(*)::int n from diagnostic_results')).rows[0].n,0,'belum dinilai = tanpa baris');
+  await assert.rejects(nilai(kid,13,'lulus'),/English tidak dinilai/);
+  await assert.rejects(nilai(kid,2,'T'),/Lulus, Belum/);
+  await assert.rejects(nilai(kid,2,'lulus','lain'),/utama atau cadangan/);
+  await assert.rejects(nilai(kid,15,'lulus'),/tidak dikenal/);
+  await assert.rejects(nilai(kid,2,'lulus','utama',stranger),/guru pendamping/);
+  // Berhenti dini: A1, B1, E1, D1 semuanya Belum → tidak bisa diisi atau final; hanya tes baru di Level 3.
+  for(const n of [1,2,3])await nilai(kid,n,'belum');
+  await nilai(kid,5,'lulus');
+  await nilai(kid,4,'belum');
+  await assert.rejects(nilai(kid,6,'lulus'),/Tes berhenti. Mulai tes baru di Level 3/);
+  await assert.rejects(final(kid),/tidak dihitung/);
+  await assert.rejects(mulai(teacher,kid,1),/Level 3/,'level saran awal pita sebelumnya');
+  await mulai(teacher,kid,3);
+  assert.equal((await tes(kid)).tested_level,3);
+  assert.equal((await admin('select count(*)::int n from diagnostic_results')).rows[0].n,0,'tes yang berhenti tidak dihitung');
+  assert.deepEqual((await admin('select array_agg(diagnostic_restart_level(l) order by l) a from generate_series(1,8) l')).rows[0].a,[1,1,1,1,3,3,5,5]);
+  // Final: mulai dari indikator akademik pertama yang belum Lulus; belum dinilai dihitung belum lulus.
+  for(const n of [1,2,4,5,14])await nilai(kid,n,'lulus');
+  await nilai(kid,3,'belum');
+  assert.equal(await final(kid),3);
+  let t1=await tes(kid);
+  assert.deepEqual([t1.start_level,t1.start_indicator,t1.curriculum_complete,!!t1.finalized_at],[3,3,false,true]);
+  assert.equal((await admin('select pilot_level from students where id=$1',[kid])).rows[0].pilot_level,3);
+  // Tanpa revisi.
+  await assert.rejects(nilai(kid,3,'lulus'),/sudah disimpan final/);
+  await assert.rejects(final(kid),/sudah disimpan final/);
+  await assert.rejects(mulai(teacher,kid,3),/sudah dites diagnostik/);
+  // L1 tidak berhenti; 12 Lulus → level berikutnya indikator 1; 12 Lulus di L8 → kurikulum selesai.
+  const l1=await buat(),l7=await buat(),l8=await buat();
+  await mulai(teacher,l1,1);for(const n of [1,2,3,4])await nilai(l1,n,'belum');await nilai(l1,5,'lulus');
+  assert.equal(await final(l1),1);
+  assert.equal((await tes(l1)).start_indicator,1);
+  for(const [sid,level] of [[l7,7],[l8,8]]){await mulai(teacher,sid,level);for(let n=1;n<=12;n++)await nilai(sid,n,'lulus');}
+  assert.equal(await final(l7),8);
+  assert.deepEqual([(await tes(l7)).start_indicator,(await tes(l7)).curriculum_complete],[1,false]);
+  assert.equal(await final(l8),8);
+  assert.deepEqual([(await tes(l8)).start_indicator,(await tes(l8)).curriculum_complete],[null,true]);
+  // Akses: guru pendamping membaca hasil; pemilik hanya ringkasan; guru lain tidak; tulis langsung ditolak.
+  assert.ok((await as(teacher,'select * from diagnostic_results')).rows.length>0);
   assert.equal((await as(stranger,'select * from diagnostic_tests where student_id=$1',[kid])).rows.length,0);
-  assert.equal((await as(owner,'select passed from diagnostic_tests where student_id=$1',[kid])).rows.length,1,'pemilik membaca ringkasan');
-  assert.equal((await as(owner,'select * from diagnostic_results')).rows.length,0,'pemilik tidak membaca hasil per indikator');
-  await assert.rejects(as(teacher,"insert into diagnostic_tests(student_id,teacher_id,tested_level,passed,final_level) values($1,$2,1,true,2)",[lain,teacher]),/permission denied|row-level security/i);
-  await assert.rejects(admin("update diagnostic_tests set final_level=4 where student_id=$1",[kid]),/final_level_rule/,'level awal harus sesuai hasil');
-  // Tanpa revisi: tes kedua ditolak; tes, level, dan nilai tetap.
-  await assert.rejects(simpan(teacher,kid,2,lvl(2,['T','T','T','T','T','T','B']),'revisi'),/sudah dites diagnostik/);
-  tes=(await admin('select count(*) over() n,passed,final_level,note from diagnostic_tests where student_id=$1',[kid])).rows[0];
-  assert.deepEqual([Number(tes.n),tes.passed,tes.final_level,tes.note],[1,false,2,'catatan']);
-  assert.equal((await admin('select pilot_level from students where id=$1',[kid])).rows[0].pilot_level,2);
-  assert.equal((await admin('select count(*)::int n from diagnostic_results r join diagnostic_tests t on t.id=r.test_id where t.student_id=$1',[kid])).rows[0].n,8);
-  // Lulus Level 4 → tetap Level 4.
-  assert.equal((await simpan(teacher,k4,4,lvl(4,['T','T','T','T','T','T']))).rows[0].final,4);
-  // Anak nonaktif tidak dites.
-  await as(teacher,'select set_student_active($1,false)',[k4]);
-  await assert.rejects(simpan(teacher,k4,4,lvl(4,['T','T','T','T','T','T'])),/anak aktif/);
-  // Menghapus siswa ikut menghapus tesnya.
-  await as(teacher,'select delete_student($1)',[kid]);
-  assert.equal((await admin('select count(*)::int n from diagnostic_tests where student_id=$1',[kid])).rows[0].n,0);
+  assert.equal((await as(owner,'select start_level from diagnostic_tests where student_id=$1',[kid])).rows.length,1,'pemilik membaca ringkasan');
+  assert.equal((await as(owner,'select * from diagnostic_results')).rows.length,0,'pemilik tidak membaca hasil per tugas');
+  await assert.rejects(as(teacher,"insert into diagnostic_tests(student_id,teacher_id,tested_level) values($1,$2,1)",[lain,teacher]),/permission denied|row-level security/i);
+  await assert.rejects(admin("update diagnostic_tests set start_level=null where student_id=$1",[kid]),/check/,'final selalu punya level mulai');
+  // Anak nonaktif tidak dites; hapus siswa ikut menghapus tesnya, tetapi tidak bila sudah ikut kelas.
+  const nonaktif=await buat();await as(teacher,'select set_student_active($1,false)',[nonaktif]);
+  await assert.rejects(mulai(teacher,nonaktif,1),/anak aktif/);
+  await as(teacher,'select delete_student($1)',[l1]);
+  assert.equal((await admin('select count(*)::int n from diagnostic_tests where student_id=$1',[l1])).rows[0].n,0);
+  const c=(await admin("insert into class_schedules(teacher_id,meeting_number,theme_number,scheduled_date) values($1,1,1,'2026-09-16') returning id",[teacher])).rows[0].id;
+  await admin('insert into class_schedule_students(schedule_id,student_id,level,indicator_number) values($1,$2,1,1)',[c,l7]);
+  await assert.rejects(as(teacher,'select delete_student($1)',[l7]),/sudah mengikuti kelas/);
+  await admin('delete from class_schedules where id=$1',[c]);
  });
- await t.test('kelas pilot: pertemuan per hari dengan beberapa sesi; tema dan indikator otomatis; satu anak satu sesi per hari',async()=>{
-  const lvl=(level,r)=>JSON.stringify(r.map((rating,i)=>({level,number:i+1,rating})));
-  const dites=async(level,who=teacher)=>{const id=await buat(who);await as(who,'select save_diagnostic($1,$2,$3::jsonb,$4)',[id,level,lvl(level,['N','T','T','T','T','T']),'']);return id;};
-  const a1=await dites(1),a4=await dites(4),a2=await dites(2),belum=await buat(),milikLain=await dites(2,stranger);
-  const sesi=(date,time='08:00',who=teacher,id=null)=>as(who,'select save_schedule($1,$2::jsonb) as id',[id,JSON.stringify({meeting_number:9,theme_number:5,scheduled_date:date,scheduled_time:time})]).then(r=>r.rows[0].id);
-  const isi=(sid,rows,finish=false,who=teacher)=>as(who,'select save_meeting($1,$2::jsonb,$3)',[sid,JSON.stringify(rows),finish]);
-  const baris=async sid=>(await admin('select student_id,level,indicator_number,result from class_schedule_students where schedule_id=$1 order by level',[sid])).rows.map(r=>[r.student_id,r.level,r.indicator_number,r.result]);
-  const info=async x=>(await admin('select meeting_number m,theme_number t,scheduled_date::text d,scheduled_time::text j,completed_at from class_schedules where id=$1',[x])).rows[0];
-  // Jadwal: guru hanya mengisi tanggal dan jam.
-  await assert.rejects(sesi('2026-09-15','08:00',owner),/guru pengajar/,'pemilik tidak membuat jadwal');
-  await assert.rejects(sesi(''),/Tanggal wajib/);
-  assert.equal((await admin('select count(*)::int n from class_schedules')).rows[0].n,0,'gagal tidak meninggalkan data');
-  // Hari 1 (15 Sep): dua sesi, nomor dan tema sama.
-  const h1s1=await sesi('2026-09-15','08:00'),h1s2=await sesi('2026-09-15','10:00');
-  let j=await info(h1s1);assert.deepEqual([j.m,j.t,j.d,j.j],[1,1,'2026-09-15','08:00:00'],'isian nomor/tema diabaikan');
-  assert.deepEqual([(await info(h1s2)).m,(await info(h1s2)).t],[1,1],'sesi di tanggal yang sama berbagi pertemuan');
-  await assert.rejects(sesi('2026-09-16'),/Selesaikan semua sesi Pertemuan 1 lebih dulu/,'hari berikutnya menunggu semua sesi selesai');
-  await assert.rejects(sesi('2026-09-16','08:00',teacher,h1s1),/punya sesi lain/,'tanggal sesi tidak bisa dipindah bila harinya punya sesi lain');
-  await sesi('2026-09-15','08:30',teacher,h1s1);
-  assert.equal((await info(h1s1)).j,'08:30:00','ubah jam');
-  assert.equal((await as(owner,'select * from class_schedules where id=$1',[h1s1])).rows.length,1);
-  assert.equal((await as(stranger,'select * from class_schedules')).rows.length,0);
-  await assert.rejects(as(teacher,'insert into class_schedules(teacher_id,meeting_number,theme_number,scheduled_date) values($1,50,1,current_date)',[teacher]),/permission denied|row-level security/i);
-  await assert.rejects(sesi('2026-09-15','08:00',stranger,h1s1),/Jadwal tidak tersedia/);
-  assert.equal((await db.query("select has_function_privilege('authenticated','public.current_indicator(uuid)','execute') as ok")).rows[0].ok,false,'fungsi bantu bukan RPC');
-  // Isi sesi: siswa hadir dan Lulus/Belum; level dan indikator dihitung database.
-  await assert.rejects(isi(h1s1,[],false,owner),/guru pengajar/);
-  await assert.rejects(isi(h1s1,[],false,stranger),/tidak tersedia/);
-  await assert.rejects(isi(h1s1,[{student_id:belum}]),/sudah dites diagnostik/);
-  await assert.rejects(isi(h1s1,[{student_id:milikLain}]),/tidak tersedia/,'siswa guru lain');
-  await assert.rejects(isi(h1s1,[{student_id:a1},{student_id:a1}]),/lebih dari sekali/);
-  await assert.rejects(isi(h1s1,[{student_id:a1,result:'absen'}]),/Lulus atau Belum/);
-  await isi(h1s1,[{student_id:a1,indicator_number:5,result:'lulus'},{student_id:a4}]);
-  assert.deepEqual(await baris(h1s1),[[a1,1,1,'lulus'],[a4,4,1,null]],'simpan sementara, indikator 1 otomatis');
-  await assert.rejects(isi(h1s2,[{student_id:a1}]),/sudah ikut sesi lain di tanggal yang sama/,'satu anak satu sesi per hari');
-  await isi(h1s2,[{student_id:a2,result:'lulus'}],true);
-  assert.notEqual((await info(h1s2)).completed_at,null,'sesi 2 boleh selesai lebih dulu dari sesi 1 di hari yang sama');
-  await assert.rejects(sesi('2026-09-16'),/Selesaikan semua sesi Pertemuan 1/);
-  await assert.rejects(isi(h1s1,[],true),/minimal satu siswa/);
-  await assert.rejects(isi(h1s1,[{student_id:a1,result:'lulus'},{student_id:a4}],true),/Lulus atau Belum/,'semua wajib dinilai');
-  await isi(h1s1,[{student_id:a1,result:'lulus'},{student_id:a4,result:'belum'}],true);
-  await assert.rejects(isi(h1s1,[{student_id:a1,result:'belum'}]),/sudah ditandai selesai/,'tanpa koreksi');
-  await assert.rejects(sesi('2026-09-15','09:00',teacher,h1s1),/sudah selesai/);
-  assert.equal((await as(owner,'select result from class_schedule_students where schedule_id=$1',[h1s1])).rows.length,2,'pemilik membaca hasil');
-  // Hari 2: nomor 2; tanggal harus setelah hari terakhir; sesi di hari lama tidak bisa ditambah lagi.
-  await assert.rejects(sesi('2026-09-14'),/harus setelah pertemuan terakhir/);
-  const h2=await sesi('2026-09-16');
-  assert.deepEqual([(await info(h2)).m,(await info(h2)).t],[2,1]);
-  await assert.rejects(sesi('2026-09-15'),/harus setelah pertemuan terakhir/,'tidak menambah sesi ke hari lama');
-  await assert.rejects(as(teacher,'select delete_schedule($1)',[h1s1]),/sudah selesai/);
-  await isi(h2,[{student_id:a1,result:'belum'},{student_id:a4,result:'lulus'}],true);
-  assert.deepEqual(await baris(h2),[[a1,1,2,'belum'],[a4,4,1,'lulus']],'lulus maju, belum tetap');
-  // Pindah tanggal sesi tunggal di hari terakhir yang belum selesai.
-  const h3=await sesi('2026-09-17');
-  await sesi('2026-09-18','08:00',teacher,h3);
-  assert.equal((await info(h3)).d,'2026-09-18');
-  await assert.rejects(sesi('2026-09-16','08:00',teacher,h3),/setelah pertemuan sebelumnya/);
-  await as(teacher,'select delete_schedule($1)',[h3]);
-  // Aisyah lulus 2..6 → setelah 6 lulus tetap di indikator 6.
-  for(let n=2;n<=6;n++){const x=await sesi(`2026-10-${String(n).padStart(2,'0')}`);await isi(x,[{student_id:a1,result:'lulus'}],true);}
-  const akhir=await sesi('2026-10-10');
-  await isi(akhir,[{student_id:a1,result:'belum'}],true);
-  assert.deepEqual(await baris(akhir),[[a1,1,6,'belum']],'setelah 1–6 lulus tetap indikator 6');
-  assert.equal((await info(akhir)).m,8);
-  // Tema mengikuti nomor: pertemuan 25 → Tema 2.
-  await admin('update class_schedules set meeting_number=meeting_number+16 where teacher_id=$1',[teacher]);
-  const h25=await sesi('2026-10-11');
-  assert.deepEqual([(await info(h25)).m,(await info(h25)).t],[25,2]);
-  await assert.rejects(as(stranger,'select delete_schedule($1)',[h25]),/tidak tersedia/);
-  await as(teacher,'select delete_schedule($1)',[h25]);
-  await admin('update class_schedules set meeting_number=192 where id=$1',[akhir]);
-  await assert.rejects(sesi('2026-10-12'),/Semua 192 pertemuan/);
-  // Menghapus siswa ikut mengeluarkannya dari pertemuan.
-  await as(teacher,'select delete_student($1)',[a4]);
-  assert.deepEqual((await baris(h1s1)).map(r=>r[0]),[a1]);
+ await t.test('ruang kelas dikunci sampai kelas 8 level dibangun',async()=>{
+  await assert.rejects(as(teacher,'select save_schedule(null,$1::jsonb)',[JSON.stringify({scheduled_date:'2026-09-16',scheduled_time:'08:00'})]),/sedang diperbarui/);
+  await assert.rejects(as(teacher,'select delete_schedule($1)',[randomUUID()]),/sedang diperbarui/);
+  await assert.rejects(as(teacher,"select save_meeting($1,'[]'::jsonb,false)",[randomUUID()]),/sedang diperbarui/);
  });
  await t.test('guru nonaktif kehilangan akses',async()=>{
   await as(owner,"update access_list set active=false where email='guru@test.invalid'");

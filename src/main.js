@@ -23,8 +23,8 @@ import {
   finishState
 } from './views/sessions.js';
 import { studentsView, studentForm } from './views/students.js';
-import { diagnosticForm } from './views/diagnostic.js';
-import { diagnosticOutcome, diagnosticPayload } from './diagnostic.js';
+import { diagnosticForm, diagnosticSummary } from './views/diagnostic.js';
+import { answersOf, isStopped } from './diagnostic.js';
 import { dashboard } from './views/dashboard.js';
 import { homeMenu, homeTop, homeDoa, homeNav, leafArt } from './views/home.js';
 import { teamView } from './views/team.js';
@@ -137,34 +137,6 @@ async function loadUser(user) {
   state.role = member.role;
   await refresh();
 }
-// Tes diagnostik yang belum disimpan tinggal di perangkat guru, per akun dan per anak, supaya tes bisa
-// dijeda, berpindah anak, lalu dilanjutkan. Browser yang menolak localStorage hanya kehilangan fitur jeda.
-const draftKey = () => 'bimbel.diagnostic.' + (state.user?.id || 'tamu');
-function readDrafts() {
-  try {
-    return JSON.parse(localStorage.getItem(draftKey()) || '{}') || {};
-  } catch {
-    return {};
-  }
-}
-function writeDrafts(drafts) {
-  state.diagnosticDrafts = drafts;
-  try {
-    localStorage.setItem(draftKey(), JSON.stringify(drafts));
-  } catch {
-    /* Simpanan sementara tidak tersedia; tes tetap berjalan selama modal terbuka. */
-  }
-}
-function keepDraft(run = state.diagnostic) {
-  if (run) writeDrafts({ ...readDrafts(), [run.student]: run });
-}
-function dropDraft(studentId) {
-  const drafts = readDrafts();
-  delete drafts[studentId];
-  writeDrafts(drafts);
-}
-const hasAnswers = run => Boolean(run) && Object.keys(run.answers || {}).length > 0;
-
 function passwordForm() {
   const intro = `<p class="muted">Kata sandi baru minimal 8 karakter. Setelah diganti, sesi di perangkat lain tetap berjalan sampai Anda keluar dari sana.</p>`;
   const baru = field(
@@ -314,37 +286,17 @@ document.addEventListener('click', async e => {
     if (action === 'diagnostic-test') {
       if (state.role !== 'teacher') return notify('Tes diagnostik dilakukan oleh guru.', true);
       state.diagnostic = null;
-      state.diagnosticDrafts = readDrafts();
       return diagnosticForm();
     }
-    if (action === 'diagnostic-resume') {
-      const run = readDrafts()[id];
-      // Simpanan dari versi tes lama tidak bisa dilanjutkan.
-      if (!run?.level) {
-        dropDraft(id);
-        return notify('Tes sementara ini dari versi lama dan tidak bisa dilanjutkan. Mulai tes baru.', true);
-      }
-      state.diagnostic = run;
+    if (action === 'diagnostic-open') {
+      state.diagnostic = id;
       return diagnosticForm();
     }
-    if (action === 'diagnostic-discard') {
-      if (!confirm('Buang tes yang belum selesai ini? Jawabannya akan dihapus.')) return;
-      dropDraft(id);
-      return diagnosticForm();
-    }
-    // Ulang dari awal menghapus jawaban, jadi guru diminta memastikan dulu.
+    // Tes yang berhenti diganti tes baru di level saran; database menolak level lain.
     if (action === 'diagnostic-restart') {
-      const run = state.diagnostic;
-      if (hasAnswers(run) && !confirm('Ulang dari awal? Jawaban tes anak ini akan dihapus.')) return;
-      if (run) dropDraft(run.student);
-      state.diagnostic = null;
-      return diagnosticForm();
-    }
-    // Dari halaman hasil kembali ke kartu tugas, dengan semua nilai tetap terisi.
-    if (action === 'diagnostic-back') {
-      if (!state.diagnostic) return diagnosticForm();
-      state.diagnostic.reviewed = false;
-      keepDraft();
+      await result(db.rpc('start_diagnostic', { p_student: id, p_level: Number(b.dataset.level) }));
+      await refresh();
+      state.diagnostic = id;
       return diagnosticForm();
     }
     if (action === 'new-schedule') return modal('Buat jadwal', scheduleForm());
@@ -375,7 +327,6 @@ document.addEventListener('click', async e => {
       )
         return;
       await result(db.rpc('delete_student', { p_student: id }));
-      dropDraft(id);
       document.querySelector('#modal').close();
       await refresh();
       return notify('Siswa dihapus.');
@@ -433,12 +384,7 @@ document.addEventListener('change', e => {
   if (form?.dataset.form === 'meeting' && e.target.name.startsWith('r_')) return updateFinish(form);
   if (form?.dataset.form === 'diagnostic-start' && e.target.name === 'student')
     return diagnosticForm(e.target.value);
-  // Setiap nilai yang dipilih langsung disimpan sementara, jadi tes yang terhenti tidak kehilangan jawaban.
-  if (form?.dataset.form === 'diagnostic-level' && /^i\d$/.test(e.target.name) && state.diagnostic) {
-    const run = state.diagnostic;
-    run.answers = { ...run.answers, [e.target.name.slice(1)]: e.target.value };
-    return keepDraft(run);
-  }
+  if (form?.dataset.form === 'diagnostic' && /^[sp]\d+$/.test(e.target.name)) return rateTask(form, e.target);
   if (form?.dataset.form === 'diagnostic-start' && e.target.name === 'start') {
     for (const el of form.querySelectorAll('[data-level-desc]'))
       el.hidden = el.dataset.levelDesc !== e.target.value;
@@ -497,46 +443,18 @@ document.addEventListener('submit', async e => {
         else await result(db.rpc('create_student', { p_payload: payload }));
         break;
       }
-      // Tes Diagnostik berjalan bertahap di dalam modal; dua langkah pertama belum menyimpan apa pun.
+      // Mulai tes: draf dibuat di server, lalu lembar 14 tugas dibuka.
       case 'diagnostic-start': {
         if (!state.students.some(x => x.id === v.student)) throw new Error('Pilih anak yang dites.');
-        state.diagnostic = {
-          student: v.student,
-          level: Number(v.start),
-          answers: {},
-          reviewed: false,
-          note: ''
-        };
-        keepDraft();
+        await result(db.rpc('start_diagnostic', { p_student: v.student, p_level: Number(v.start) }));
+        await refresh();
+        state.diagnostic = v.student;
         return diagnosticForm();
       }
-      case 'diagnostic-level': {
-        const run = state.diagnostic;
-        run.answers = Object.fromEntries(
-          [1, 2, 3, 4, 5, 6, 7, 8].filter(n => v['i' + n]).map(n => [n, v['i' + n]])
-        );
-        run.reviewed = true;
-        keepDraft(run);
-        return diagnosticForm();
-      }
+      // Simpan final: database menghitung level dan indikator mulai kelas dari nilai yang tersimpan.
       case 'diagnostic': {
-        const run = state.diagnostic;
-        const s = state.students.find(x => x.id === id);
-        if (!run || !s || run.student !== s.id)
-          throw new Error('Tes diagnostik tidak ditemukan. Mulai ulang tesnya.');
-        if (!diagnosticOutcome(run.level, run.answers).complete)
-          throw new Error('Indikator 1–6 belum semuanya dinilai.');
-        // save_diagnostic menyimpan hasil per indikator dan level anak dalam satu transaksi, dan menghitung
-        // ulang hasilnya sendiri dari nilai yang dikirim.
-        await result(
-          db.rpc('save_diagnostic', {
-            p_student: s.id,
-            p_level: run.level,
-            p_results: diagnosticPayload(run.level, run.answers),
-            p_note: v.note || ''
-          })
-        );
-        dropDraft(s.id);
+        if (!confirm('Simpan final tes ini? Hasilnya tidak bisa diubah lagi.')) return;
+        await result(db.rpc('finalize_diagnostic', { p_student: id }));
         state.diagnostic = null;
         break;
       }
@@ -592,6 +510,30 @@ document.addEventListener('submit', async e => {
     if (form.dataset.form === 'meeting' && form.isConnected) updateFinish(form);
   }
 });
+
+// Setiap ketukan di lembar tes langsung disimpan. Status dan paket satu tugas dikirim bersama; state lokal
+// diperbarui tanpa memuat ulang semua data, dan lembar dibuka ulang hanya bila tes berhenti.
+async function rateTask(form, input) {
+  const sid = form.dataset.id;
+  const test = state.diagnosticTests.find(t => t.student_id === sid);
+  const n = Number(input.name.slice(1));
+  const f = new FormData(form);
+  const status = f.get('s' + n) || null;
+  const pkg = f.get('p' + n) || 'utama';
+  try {
+    await result(
+      db.rpc('rate_diagnostic', { p_student: sid, p_number: n, p_status: status, p_package: pkg })
+    );
+    state.diagnosticResults = state.diagnosticResults.filter(r => !(r.test_id === test.id && r.number === n));
+    if (status) state.diagnosticResults.push({ test_id: test.id, number: n, status, package: pkg });
+    const answers = answersOf(state.diagnosticResults, test.id);
+    if (isStopped(test.tested_level, answers)) return diagnosticForm();
+    form.querySelector('[data-diagnostic-summary]').outerHTML = diagnosticSummary(test.tested_level, answers);
+  } catch (err) {
+    notify(err.message, true);
+    diagnosticForm();
+  }
+}
 
 // Tombol "Tandai sesi selesai" mengikuti isi lembar: aktif bila setiap siswa yang dicentang sudah Lulus/Belum.
 function updateFinish(form) {

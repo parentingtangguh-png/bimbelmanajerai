@@ -8,9 +8,9 @@ function statTile(label, icon, count, caption, tone = '') {
   return `<div class="stat${tone}"><span>${label} <i>${icon}</i></span><strong>${String(count).padStart(2, '0')}</strong><small>${caption}</small></div>`;
 }
 
-// Berapa anak aktif di tiap level pilot.
+// Berapa anak aktif di tiap level kurikulum 8 level.
 function levelPanel(active) {
-  const rows = [1, 2, 3, 4]
+  const rows = [1, 2, 3, 4, 5, 6, 7, 8]
     .map(l => {
       const n = active.filter(s => s.pilot_level === l).length;
       return `<article class="attention-item"><span class="badge ${n ? 'green' : ''}">${n} anak</span><h3>${h(levelName(l))}</h3></article>`;
@@ -39,6 +39,6 @@ export function dashboard() {
     button
   );
   const teachers = state.members.filter(m => m.role === 'teacher' && m.active).length;
-  const stats = `<div class="stats">${statTile('Siswa aktif', '◉', active.length, 'Perjalanan yang didampingi')}${statTile('Sudah dites', '✓', active.length - untested, 'Level awalnya sudah jelas')}${statTile('Belum dites', '◌', untested, 'Jalankan Tes Diagnostik', untested ? ' warm' : '')}${owner ? statTile('Guru aktif', '♧', teachers, 'Tim yang mendampingi') : ''}</div>`;
+  const stats = `<div class="stats">${statTile('Siswa aktif', '◉', active.length, 'Perjalanan yang didampingi')}${statTile('Sudah dites', '✓', active.length - untested, 'Level awalnya sudah jelas')}${statTile('Belum dites', '◌', untested, 'Belum ada tes final', untested ? ' warm' : '')}${owner ? statTile('Guru aktif', '♧', teachers, 'Tim yang mendampingi') : ''}</div>`;
   return `${head}${stats}<div class="dashboard-grid">${studentsPanel(active)}${levelPanel(active)}</div>`;
 }
