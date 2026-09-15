@@ -108,7 +108,7 @@ export function k8CurriculumView() {
   const intro = heading(
     'KURIKULUM 8 LEVEL',
     'Dari TK A sampai akhir kelas I.',
-    'Isi terkunci dari dokumen kurikulum. Tes diagnostik sudah memakai kurikulum ini; Ruang kelas menyusul.'
+    'Isi terkunci dari dokumen kurikulum. Tes diagnostik dan Ruang kelas memakai kurikulum ini.'
   );
   const levels = [...state.k8Levels].sort((a, b) => a.level - b.level);
   const themes = [...state.k8Themes].sort((a, b) => a.number - b.number);

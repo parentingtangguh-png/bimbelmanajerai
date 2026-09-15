@@ -12,7 +12,8 @@ import {
   testStatus,
   levelName
 } from '../src/state.js';
-import { sessionsView } from '../src/views/sessions.js';
+import { sessionsView, meetingSheet, finishState, scheduleForm } from '../src/views/sessions.js';
+import { passedIndicators, suggestedIndicator, englishReady } from '../src/state.js';
 import { dashboard } from '../src/views/dashboard.js';
 import { studentsView, studentForm, diagnosticResultSection } from '../src/views/students.js';
 import { diagnosticForm } from '../src/views/diagnostic.js';
@@ -66,11 +67,99 @@ test('ringkasan: siswa aktif, sudah dan belum dites, sebaran level', () => {
   assert.match(dashboard(), /Guru aktif/);
 });
 
-test('ruang kelas dikunci sementara sampai kelas 8 level dibangun', () => {
+test('ruang kelas 8 level: antrean dengan hasil diagnostik, tiga pilihan, English/Karakter, dan siap naik', () => {
   loadSampleState();
-  const html = sessionsView();
-  assert.match(html, /Ruang kelas sedang diperbarui/);
-  assert.ok(!html.includes('data-action="new-schedule"'));
+  Object.assign(state, {
+    k8Themes: [
+      {
+        number: 1,
+        name: 'Aku dan Keluargaku',
+        first_meeting: 1,
+        last_meeting: 24,
+        objects: 'Foto keluarga',
+        vocabulary: 'ayah, ibu',
+        character: 'salam'
+      }
+    ],
+    k8Subthemes: [{ theme: 1, position: 1, name: 'Diriku', first_meeting: 1, last_meeting: 6 }],
+    k8English: [{ theme: 1, kind: 'noun', position: 1, text: 'bag', requestable: true }],
+    classSchedules: [
+      {
+        id: 'j1',
+        meeting_number: 1,
+        theme_number: 1,
+        scheduled_date: '2026-09-21',
+        scheduled_time: '08:00:00',
+        completed_at: 'x'
+      },
+      {
+        id: 'j2',
+        meeting_number: 2,
+        theme_number: 1,
+        scheduled_date: '2026-09-22',
+        scheduled_time: '08:00:00',
+        completed_at: null
+      }
+    ],
+    classScheduleStudents: [
+      {
+        schedule_id: 'j1',
+        student_id: 'anak-1',
+        level: 3,
+        indicator_number: 2,
+        result: 'lulus',
+        english_result: null,
+        character_result: null
+      }
+    ]
+  });
+  const alya = state.students[0];
+  // Diagnostik: 1 dan 14 Lulus; kelas: 2 Lulus → aktif 3.
+  assert.deepEqual(passedIndicators('anak-1', 3), [1, 2, 14]);
+  assert.equal(suggestedIndicator(alya), 3);
+  const daftar = sessionsView();
+  assert.match(daftar, /Pertemuan 2<\/strong><p>Tema 1 — Aku dan Keluargaku · Diriku/);
+  const lembar = meetingSheet('j2', { students: ['anak-1', 'anak-2'] });
+  assert.match(lembar, /Tema hari ini: Diriku/);
+  assert.match(lembar, /Foto keluarga[\s\S]*bag/);
+  assert.match(
+    lembar,
+    /Alya Contoh · Level 3<\/legend><p><span class="badge green">E1<\/span> Indikator 3\./
+  );
+  assert.match(lembar, /name="r_anak-1" value="belum_dinilai"/);
+  assert.match(lembar, /Karakter Level 3 sudah Lulus/);
+  assert.match(lembar, /English[\s\S]*Belum bisa dinilai: anak belum hadir 3 pertemuan/);
+  assert.ok(!lembar.includes('name="r_anak-2"'), 'anak tanpa tes final tidak dinilai');
+  assert.match(lembar, /Tes diagnostik belum final/);
+  assert.equal(
+    englishReady({ id: 'anak-1', pilot_level: 7 }, state.classSchedules[1]),
+    true,
+    'L7 ungkapan tetap'
+  );
+  assert.equal(englishReady(alya, state.classSchedules[1]), false);
+  assert.deepEqual(finishState(['anak-1'], {}).done, false);
+  assert.deepEqual(finishState(['anak-1'], { 'r_anak-1': 'belum_dinilai' }).done, true);
+  // Semua 12 Lulus → siap naik, tanpa pilihan akademik; profil menawarkan naik level.
+  state.diagnosticResults.push(
+    ...[3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(number => ({
+      test_id: 'tes-1',
+      number,
+      status: 'lulus',
+      package: 'utama'
+    }))
+  );
+  assert.equal(suggestedIndicator(alya), null);
+  const siap = meetingSheet('j2', { students: ['anak-1'] });
+  assert.match(siap, /12 indikator Level 3 Lulus — siap naik/);
+  assert.ok(!siap.includes('name="r_anak-1"'));
+  assert.equal(finishState(['anak-1'], {}).done, true);
+  assert.match(openModal(studentForm, alya), /data-action="level-up" data-id="anak-1">Naik ke Level 4/);
+  // Sesi selesai hanya ditampilkan.
+  assert.match(
+    meetingSheet('j1'),
+    /Indikator 2\.[\s\S]*<strong>Lulus<\/strong>[\s\S]*English: Tidak dinilai/
+  );
+  assert.match(scheduleForm(), /Pertemuan 3<\/strong> · Tema 1 — Aku dan Keluargaku · Diriku/);
 });
 
 test('daftar siswa guru dan pemilik memakai status tes dan level 8 level', () => {

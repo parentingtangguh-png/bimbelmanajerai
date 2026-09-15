@@ -318,6 +318,20 @@ document.addEventListener('click', async e => {
       await refresh();
       return notify('Jadwal dihapus.');
     }
+    // Naik level setelah 12 indikator akademik Lulus; database memeriksa ulang syaratnya.
+    if (action === 'level-up') {
+      const s = state.students.find(x => x.id === id);
+      if (
+        !confirm(
+          `Naikkan ${s?.name || 'anak ini'} ke Level ${Number(s?.pilot_level) + 1}? Tidak bisa dibatalkan.`
+        )
+      )
+        return;
+      await result(db.rpc('confirm_level_up', { p_student: id }));
+      document.querySelector('#modal').close();
+      await refresh();
+      return notify('Level anak sudah dinaikkan.');
+    }
     if (action === 'delete-student') {
       const s = state.students.find(x => x.id === id);
       if (
@@ -378,10 +392,11 @@ document.addEventListener('change', e => {
     const f = new FormData(form);
     const ids = f.getAll('students');
     form.querySelector('[data-kids-summary]').textContent = kidsSummary(ids);
-    form.querySelector('[data-meeting-rows]').outerHTML = meetingRows(new Set(ids), Object.fromEntries(f));
+    const c = state.classSchedules.find(x => x.id === form.dataset.id);
+    form.querySelector('[data-meeting-rows]').outerHTML = meetingRows(new Set(ids), Object.fromEntries(f), c);
     return updateFinish(form);
   }
-  if (form?.dataset.form === 'meeting' && e.target.name.startsWith('r_')) return updateFinish(form);
+  if (form?.dataset.form === 'meeting' && /^(r|en|kr)_/.test(e.target.name)) return updateFinish(form);
   if (form?.dataset.form === 'diagnostic-start' && e.target.name === 'student')
     return diagnosticForm(e.target.value);
   if (form?.dataset.form === 'diagnostic' && /^[sp]\d+$/.test(e.target.name)) return rateTask(form, e.target);
@@ -467,12 +482,17 @@ document.addEventListener('submit', async e => {
       // Isi pertemuan: Simpan sementara (bisa diubah lagi) atau Tandai selesai (final).
       case 'meeting': {
         const finish = e.submitter?.value === '1';
-        // Level dan indikator dihitung database; guru hanya memilih siswa hadir dan Lulus/Belum.
-        const students = f.getAll('students').map(sid => ({ student_id: sid, result: v['r_' + sid] || '' }));
+        // Level dan indikator dihitung database; guru hanya memilih siswa hadir dan nilainya.
+        const students = f.getAll('students').map(sid => ({
+          student_id: sid,
+          result: v['r_' + sid] || '',
+          english: v['en_' + sid] || '',
+          character: v['kr_' + sid] || ''
+        }));
         if (finish) {
           if (!students.length) throw new Error('Pilih minimal satu siswa yang hadir.');
-          if (students.some(s => !s.result))
-            throw new Error('Beri setiap siswa yang hadir Lulus atau Belum.');
+          if (!finishState(f.getAll('students'), v).done)
+            throw new Error('Beri setiap siswa yang hadir Lulus, Belum, atau Belum dinilai.');
           if (!confirm('Tandai sesi selesai? Hasilnya tidak bisa diubah lagi.')) return;
         }
         await result(db.rpc('save_meeting', { p_schedule: id, p_students: students, p_finish: finish }));
@@ -535,12 +555,10 @@ async function rateTask(form, input) {
   }
 }
 
-// Tombol "Tandai sesi selesai" mengikuti isi lembar: aktif bila setiap siswa yang dicentang sudah Lulus/Belum.
+// Tombol "Tandai sesi selesai" mengikuti isi lembar: aktif bila setiap siswa yang dicentang sudah dinilai.
 function updateFinish(form) {
   const f = new FormData(form);
-  const ids = [...form.querySelectorAll('[data-meeting-rows] input[type="radio"]')]
-    .map(r => r.name.slice(2))
-    .filter((x, i, a) => a.indexOf(x) === i);
+  const ids = f.getAll('students');
   const { done, hint } = finishState(ids, Object.fromEntries(f));
   form.querySelector('[data-finish]').disabled = !done;
   form.querySelector('[data-finish-hint]').textContent = hint;

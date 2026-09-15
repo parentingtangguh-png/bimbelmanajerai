@@ -145,36 +145,57 @@ export const finalTestFor = id => {
   return t?.finalized_at ? t : null;
 };
 
-// Indikator yang pernah Lulus di pertemuan yang sudah selesai, untuk satu siswa dan satu level.
+// Nomor indikator (1–14) yang sudah Lulus pada satu level: dari sesi selesai dan tes diagnostik final level
+// itu. passed_numbers di database menghitung hal yang sama; ini hanya untuk ditampilkan.
 export function passedIndicators(studentId, level) {
   const done = new Set(state.classSchedules.filter(c => c.completed_at).map(c => c.id));
-  return [
-    ...new Set(
-      state.classScheduleStudents
-        .filter(
-          x =>
-            x.student_id === studentId &&
-            x.level === Number(level) &&
-            x.result === 'lulus' &&
-            done.has(x.schedule_id)
-        )
-        .map(x => x.indicator_number)
-    )
-  ].sort((a, b) => a - b);
+  const lv = Number(level);
+  const passed = new Set();
+  for (const x of state.classScheduleStudents) {
+    if (x.student_id !== studentId || x.level !== lv || !done.has(x.schedule_id)) continue;
+    if (x.result === 'lulus') passed.add(x.indicator_number);
+    if (x.english_result === 'lulus') passed.add(13);
+    if (x.character_result === 'lulus') passed.add(14);
+  }
+  const test = finalTestFor(studentId);
+  if (test && test.tested_level === lv)
+    for (const r of state.diagnosticResults)
+      if (r.test_id === test.id && r.status === 'lulus') passed.add(r.number);
+  return [...passed].sort((a, b) => a - b);
 }
 
-// Indikator akademik yang menjadi antrean kenaikan level. English (7) dan Karakter (8) tidak termasuk.
-export const QUEUE = [1, 2, 3, 4, 5, 6];
+// Antrean akademik; English (13) dan Karakter (14) tidak termasuk.
+export const QUEUE = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
-// Indikator siswa saat ini: terkecil di antrean yang belum lulus; bila semua lulus tetap 6 sampai naik level.
-// save_meeting (current_indicator) menghitung hal yang sama; ini hanya untuk ditampilkan.
+// Indikator akademik aktif: terkecil yang belum Lulus; null bila 12 sudah Lulus (siap naik / selesai).
 export function suggestedIndicator(s) {
+  if (!s.pilot_level) return null;
   const passed = new Set(passedIndicators(s.id, s.pilot_level));
-  return QUEUE.find(n => !passed.has(n)) ?? QUEUE[QUEUE.length - 1];
+  return QUEUE.find(n => !passed.has(n)) ?? null;
 }
+export const readyToLevelUp = s => !!s.pilot_level && suggestedIndicator(s) === null;
 
-export const readyToLevelUp = s =>
-  !!s.pilot_level && QUEUE.every(n => passedIndicators(s.id, s.pilot_level).includes(n));
+// Tema dan subtema kurikulum 8 level untuk nomor pertemuan.
+export const k8ThemeFor = n => state.k8Themes.find(t => n >= t.first_meeting && n <= t.last_meeting);
+export const k8SubthemeFor = n => state.k8Subthemes.find(t => n >= t.first_meeting && n <= t.last_meeting);
+
+// English L1, L4, L7 memakai ungkapan/warna tetap; level lain butuh hadir 3 pertemuan (hari) dalam satu
+// tema, termasuk pertemuan sesi ini. Sama dengan pemeriksaan di save_meeting.
+export const FIXED_ENGLISH_LEVELS = [1, 4, 7];
+export function englishReady(s, c) {
+  if (FIXED_ENGLISH_LEVELS.includes(Number(s.pilot_level))) return true;
+  const done = new Set(state.classSchedules.filter(x => x.completed_at).map(x => x.id));
+  const days = {};
+  for (const x of state.classScheduleStudents) {
+    const sc = state.classSchedules.find(y => y.id === x.schedule_id);
+    if (x.student_id !== s.id || !done.has(x.schedule_id) || sc.scheduled_date >= c.scheduled_date) continue;
+    (days[sc.theme_number] ||= new Set()).add(sc.scheduled_date);
+  }
+  return state.k8Themes.some(
+    t =>
+      t.number <= c.theme_number && (days[t.number]?.size || 0) + (t.number === c.theme_number ? 1 : 0) >= 3
+  );
+}
 // Ringkasan tes untuk daftar dan profil, diturunkan dari baris tes.
 export function testStatus(test) {
   if (!test) return '';

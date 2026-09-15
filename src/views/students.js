@@ -7,7 +7,9 @@ import {
   levelName,
   schoolGrades,
   schoolYearOf,
-  ageText
+  ageText,
+  passedIndicators,
+  suggestedIndicator
 } from '../state.js';
 import { TASK_ORDER, ENGLISH, answersOf, ratedCount } from '../diagnostic.js';
 import { field, select, empty, heading, modal } from '../ui.js';
@@ -128,7 +130,7 @@ function profileForm(s, edit, owner) {
 
 // Everything below the profile, shown only for a child who already exists.
 function studentDetails(s, owner) {
-  return `${diagnosticResultSection(s)}${currentLevelSection(s)}${owner ? '' : studentActionsSection(s)}`;
+  return `${diagnosticResultSection(s)}${currentLevelSection(s)}${progressSection(s, owner)}${owner ? '' : studentActionsSection(s)}`;
 }
 
 // Hasil Tes Diagnostik. Guru pendamping melihat status 14 tugas; pemilik hanya ringkasannya, karena
@@ -160,6 +162,31 @@ export function diagnosticResultSection(s) {
     return `<li><span class="diagnostic-mark">${mark}</span> <span class="badge">${h(ind?.slot || String(n))}</span> ${inlineMarkdown(ind ? ind.competency : 'Indikator ' + n)} <small class="muted">${label}${extra}</small></li>`;
   }).join('');
   return `<hr><h3>Hasil tes diagnostik</h3>${head}<ul class="diagnostic-result-list">${items}</ul>`;
+}
+
+// Kemajuan di level saat ini: indikator aktif, yang sudah Lulus (kelas + diagnostik), dan naik level.
+export function progressSection(s, owner) {
+  // Pemilik tidak menerima hasil per tugas diagnostik, jadi antreannya tidak bisa dihitung utuh di layar.
+  if (owner || !s.pilot_level || !finalTestFor(s.id)) return '';
+  const level = Number(s.pilot_level);
+  const passed = passedIndicators(s.id, level);
+  const current = suggestedIndicator(s);
+  const ind = n => state.k8Indicators.find(i => i.level === level && i.number === n);
+  const now = current
+    ? `<p>Indikator aktif: <strong>${current}. ${inlineMarkdown(ind(current)?.competency || '')}</strong></p>`
+    : level === 8
+      ? '<p><span class="badge green">Kurikulum 8 level selesai</span></p>'
+      : `<p><span class="badge green">12 indikator Level ${level} Lulus — siap naik</span></p>${s.status !== 'Aktif' ? '' : `<button type="button" class="primary" data-action="level-up" data-id="${s.id}">Naik ke Level ${level + 1}</button>`}`;
+  const items = passed
+    .map(
+      n =>
+        `<li><span class="diagnostic-mark">✓</span> <span class="badge">${h(ind(n)?.slot || String(n))}</span> ${inlineMarkdown(ind(n)?.competency || 'Indikator ' + n)}</li>`
+    )
+    .join('');
+  const list = items
+    ? `<ul class="diagnostic-result-list">${items}</ul>`
+    : '<p class="muted">Belum ada indikator yang Lulus di level ini.</p>';
+  return `<hr><h3>Kemajuan Level ${level}</h3>${now}<h4>Sudah Lulus (${passed.filter(n => n <= 12).length} dari 12 akademik)</h4>${list}`;
 }
 
 // Level anak saat ini beserta deskriptornya dari kurikulum 8 level.
