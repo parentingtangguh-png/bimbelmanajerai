@@ -42,15 +42,6 @@
 .owner-students td small {
   color: var(--muted);
 }
-.owner-students .num {
-  text-align: right;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-.owner-students td.num b {
-  font-size: 14px;
-  color: var(--ink);
-}
 .owner-students td.teachers {
   color: var(--muted);
   min-width: 120px;

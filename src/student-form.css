@@ -3,23 +3,12 @@
   display: none !important;
 }
 /* Student form: explain what each level means right where the teacher picks it. */
-.level-guide {
-  margin: 6px 0 16px;
-  line-height: 1.55;
-}
 .danger {
   color: #f2b1a8;
   border-color: #6d3a33;
 }
 .danger:hover {
   background: #3a221f;
-}
-.level-meaning {
-  display: block;
-  margin: 6px 0 16px;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.45;
 }
 
 /* Tes Diagnostik pilot: kartu tugas per indikator, pilihan nilai, dan ringkasan hasil. */
@@ -192,21 +181,8 @@
   opacity: 0.55;
   cursor: not-allowed;
 }
-.schedule-cp {
-  margin-top: -4px;
-  font-size: 13px;
-}
 .diagnostic-result h3 {
   margin: 8px 0 4px;
-}
-.diagnostic-summary {
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  font-size: 12px;
-  line-height: 1.55;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: rgba(127, 127, 127, 0.12);
 }
 .diagnostic-level-desc {
   margin: -4px 0 12px;
@@ -216,19 +192,6 @@
   background: rgba(127, 127, 127, 0.1);
   font-size: 13px;
   line-height: 1.55;
-}
-.diagnostic-legend {
-  margin: 0 0 10px;
-  font-size: 12px;
-  line-height: 1.5;
-}
-.diagnostic-observe {
-  margin: 22px 0 4px;
-  padding-top: 14px;
-  border-top: 2px dashed rgba(127, 127, 127, 0.35);
-  font-size: 13px;
-  letter-spacing: 0.03em;
-  color: var(--green);
 }
 .diagnostic-result-list {
   margin: 4px 0 10px;
@@ -244,58 +207,4 @@
   min-width: 1.4em;
   font-weight: 700;
   color: var(--green);
-}
-.diagnostic-transition {
-  margin: 0 0 12px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid var(--green);
-  background: #2c2616;
-  font-size: 13px;
-  line-height: 1.5;
-}
-.diagnostic-drafts {
-  margin: 0 0 16px;
-  padding: 12px 14px;
-  border: 1px dashed var(--green);
-  border-radius: 12px;
-}
-.diagnostic-drafts h4 {
-  margin: 0;
-}
-.diagnostic-drafts p {
-  margin: 2px 0 8px;
-  font-size: 12px;
-}
-.diagnostic-drafts ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.diagnostic-drafts li {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 8px 0;
-  border-top: 1px solid rgba(127, 127, 127, 0.2);
-}
-.diagnostic-drafts li small {
-  display: block;
-  opacity: 0.75;
-}
-.diagnostic-drafts .button-row,
-.diagnostic-edits {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.diagnostic-edits {
-  margin: 8px 0 12px;
-}
-.diagnostic-focus {
-  margin: 4px 0 12px;
-  padding-left: 18px;
-  line-height: 1.5;
 }

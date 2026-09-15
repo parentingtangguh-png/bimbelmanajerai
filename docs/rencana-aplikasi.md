@@ -1,6 +1,6 @@
 # Rencana Perubahan Aplikasi — Kurikulum 8 Level
 
-**Status: DISETUJUI PEMILIK — 15 Sep 2026.** Sumber isi: dokumen terkunci di [`docs/curriculum/`](curriculum/) dan [`CURRICULUM_ARCHITECTURE.md`](../CURRICULUM_ARCHITECTURE.md). Setiap fase dites, dilaporkan, dan baru di-deploy setelah pemilik menyetujui.
+**Status: DISETUJUI PEMILIK — 15 Sep 2026.** Fase 1–2 di produksi 15 Sep 2026; Fase 3–4 di produksi 16 Sep 2026; Fase 5 (Prompt kegiatan) belum dimulai. Sumber isi: dokumen terkunci di [`docs/curriculum/`](curriculum/) dan [`CURRICULUM_ARCHITECTURE.md`](../CURRICULUM_ARCHITECTURE.md). Setiap fase dites, dilaporkan, dan baru di-deploy setelah pemilik menyetujui.
 
 ## Keputusan pemilik
 

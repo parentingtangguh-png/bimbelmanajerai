@@ -13,11 +13,7 @@ export const initialState = () => ({
   members: [],
   assignments: [],
   profiles: [],
-  curriculumPhases: [],
-  curriculumLevels: [],
-  curriculumIndicators: [],
-  curriculumThemes: [],
-  // Kurikulum 8 level (tabel k8_*), dibangkitkan dari docs/curriculum/. Fase 1: hanya halaman Kurikulum.
+  // Kurikulum 8 level (tabel k8_*), dibangkitkan dari docs/curriculum/.
   k8Cp: '',
   k8Levels: [],
   k8Indicators: [],

@@ -18,7 +18,7 @@ npx --no-install supabase db push --dry-run
 npx --no-install supabase db push --yes
 ```
 
-Pastikan dry-run hanya menampilkan migrasi baru. Jangan menjalankan `db reset` di produksi, dan jangan menyunting migrasi yang sudah diterapkan: perubahan selalu lewat migrasi baru. Migrasi `20260913080000_pilot_only_architecture.sql` menghapus arsitektur lama; yang tersisa hanya akun, siswa, kurikulum pilot, dan tes diagnostik.
+Pastikan dry-run hanya menampilkan migrasi baru. Jangan menjalankan `db reset` di produksi, dan jangan menyunting migrasi yang sudah diterapkan: perubahan selalu lewat migrasi baru. Isi kurikulum 8 level dibangkitkan dari dokumen dengan `node scripts/build-curriculum.mjs` (migrasi `20260915000000_curriculum_8_levels.sql`); jangan menyunting migrasi itu dengan tangan.
 
 ## 3. Pemilik pertama
 
@@ -63,13 +63,13 @@ Kalau workflow tertahan lama di status *Queued*, buka tab **Actions**, pilih wor
 
 Hanya build aplikasi yang dipublikasikan; data siswa berada di Supabase. Jangan commit CSV siswa, token, `.env`, atau `venv/`.
 
-## 8. Alur operasional (pilot)
+## 8. Alur operasional
 
 1. Pemilik mendaftarkan guru di **Tim pengajar**.
 2. Guru menambah siswa di **Data siswa → ＋ Tambah siswa**: nama, panggilan, sapaan orang tua, WhatsApp, tanggal lahir, kelas formal. Level anak belum ditentukan.
-3. Guru menjalankan **Tes Diagnostik**: pilih anak dan satu level (saran dari kelas formal), nilai delapan tugas, lihat hasil, simpan. Tes bisa dijeda dan dilanjutkan di perangkat yang sama, dan hasilnya final (tidak bisa direvisi; salah input diperbaiki dengan menghapus siswa lalu menambah ulang).
-4. Hasil: "Lulus Level X" (mulai belajar Level X+1) atau "Belum lulus Level X" (mulai belajar Level X), dengan daftar indikator yang perlu dilatih.
-5. **Ruang kelas** sedang disiapkan untuk kurikulum pilot.
+3. Guru menjalankan **Tes Diagnostik**: pilih anak dan satu level (saran dari kelas formal), lalu nilai 14 tugas (Lulus / Belum / Belum dinilai). Setiap nilai langsung tersimpan; tes bisa dilanjutkan di pertemuan berikutnya dari profil siswa. Tes berhenti bila A1, B1, E1, D1 semuanya Belum, lalu dimulai ulang di level yang disarankan. **Simpan final** tidak bisa direvisi (salah input: hapus siswa lalu tambah ulang, selama anak belum ikut kelas).
+4. Hasil: anak mulai kelas dari indikator akademik pertama yang belum Lulus pada level itu.
+5. **Ruang kelas**: buat jadwal (tanggal + jam; pertemuan dan tema otomatis), buka sesi, centang siswa yang hadir, beri satu indikator akademik Lulus / Belum / Belum dinilai, English dan Karakter bila dinilai, lalu **Tandai sesi selesai**. Setelah 12 indikator Lulus, guru menekan **Naik ke Level X** di profil siswa.
 
 ## Pemecahan masalah
 

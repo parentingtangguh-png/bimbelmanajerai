@@ -4,8 +4,8 @@ import { PGlite } from '@electric-sql/pglite';
 import { readFile, readdir } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 
-// Semua migrasi dijalankan berurutan, jadi yang diuji adalah keadaan akhir: arsitektur pilot saja.
-test('PostgreSQL: akun, siswa, kurikulum pilot, dan tes diagnostik',async t=>{
+// Semua migrasi dijalankan berurutan, jadi yang diuji adalah keadaan akhir.
+test('PostgreSQL: akun, siswa, kurikulum 8 level, tes diagnostik, dan ruang kelas',async t=>{
  const db=new PGlite();
  await db.exec(`create role anon; create role authenticated; create role service_role bypassrls; create schema auth;
  create table auth.users(id uuid primary key,email text);
@@ -35,7 +35,7 @@ test('PostgreSQL: akun, siswa, kurikulum pilot, dan tes diagnostik',async t=>{
  });
  await t.test('struktur lama sudah tidak ada',async()=>{
   const tabel=(await admin("select table_name from information_schema.tables where table_schema='public' order by 1")).rows.map(r=>r.table_name);
-  assert.deepEqual(tabel,['access_list','assignments','class_schedule_students','class_schedules','curriculum_level_indicators','curriculum_levels','curriculum_phases','curriculum_themes','diagnostic_results','diagnostic_tests','k8_cp','k8_indicators','k8_levels','k8_notes','k8_subthemes','k8_theme_english','k8_themes','profiles','student_level_changes','students']);
+  assert.deepEqual(tabel,['access_list','assignments','class_schedule_students','class_schedules','diagnostic_results','diagnostic_tests','k8_cp','k8_indicators','k8_levels','k8_notes','k8_subthemes','k8_theme_english','k8_themes','profiles','student_level_changes','students']);
   const fungsi=(await admin("select proname from pg_proc where pronamespace='public'::regnamespace order by 1")).rows.map(r=>r.proname);
   assert.deepEqual(fungsi,['can_teach','check_student_identity','confirm_level_up','create_student','current_indicator','delete_schedule','delete_student','diagnostic_restart_level','diagnostic_stopped','finalize_diagnostic','handle_new_user','is_member','is_owner','passed_numbers','rate_diagnostic','reject_owner_student_insert','save_meeting','save_schedule','set_student_active','start_diagnostic','theme_attendance','update_student_profile']);
   const kolom=(await admin("select column_name from information_schema.columns where table_schema='public' and table_name='students' order by ordinal_position")).rows.map(r=>r.column_name);
@@ -92,58 +92,6 @@ test('PostgreSQL: akun, siswa, kurikulum pilot, dan tes diagnostik',async t=>{
   assert.deepEqual(await ids(stranger,'select email from access_list'),['lain@test.invalid']);
   await assert.rejects(as(stranger,'insert into assignments values($1,$2)',[milikA,stranger]),/row-level security/i);
   assert.ok((await ids(owner,'select id from students')).includes(milikA),'pemilik membaca semua siswa');
- });
- await t.test('kurikulum pilot Fondasi lengkap: CP, 4 level x 8 indikator, 8 tema tanpa lubang',async()=>{
-  const cp=(await admin("select cp from curriculum_phases where code='fondasi'")).rows[0].cp;
-  assert.match(cp,/^Pada akhir Fase Fondasi, anak mampu mengenali/);
-  const levels=(await admin("select level,title from curriculum_levels where phase_code='fondasi' order by level")).rows;
-  assert.deepEqual(levels.map(r=>r.title),['Aku Siap Belajar','Aku Mulai Mengenal','Aku Mulai Bisa','Aku Siap ke SD']);
-  // Tiap level wajib 8 indikator bernomor 1-8 tanpa lompatan, dan nomor 7 English, nomor 8 karakter.
-  for(const {level} of levels){
-   const ind=(await admin('select number,domain,text from curriculum_level_indicators where level=$1 order by number',[level])).rows;
-   assert.deepEqual(ind.map(r=>r.number),[1,2,3,4,5,6,7,8],`level ${level} harus punya indikator 1-8`);
-   assert.equal(ind[6].domain,'English',`level ${level} indikator 7`);
-   assert.equal(ind[7].domain,'Karakter',`level ${level} indikator 8`);
-   assert.match(ind[7].text,/\(observasi guru\)$/);
-  }
-  // Rentang pertemuan tema bersambung dari 1 sampai 192, 24 pertemuan per tema.
-  const themes=(await admin("select number,name,first_meeting,last_meeting from curriculum_themes where phase_code='fondasi' order by number")).rows;
-  assert.equal(themes.length,8);
-  themes.forEach((th,i)=>{assert.equal(th.number,i+1);assert.equal(th.first_meeting,i*24+1);assert.equal(th.last_meeting,(i+1)*24);});
-  assert.equal(themes[0].name,'Aku Bisa Bercerita');assert.equal(themes[7].name,'Aku Siap ke SD');
-  // Setiap tema berdeskriptor lengkap, dan indikator fokusnya menunjuk indikator kurikulum yang ada.
-  const desc=(await admin("select number,description,focus_areas,focus_indicators,character_focus,english_words from curriculum_themes where phase_code='fondasi' order by number")).rows;
-  for(const d of desc){
-   for(const k of ['description','focus_areas','character_focus','english_words'])assert.ok(d[k].trim().length>5,`tema ${d.number} belum punya ${k}`);
-   assert.ok(d.focus_indicators.length>=5,`tema ${d.number} kekurangan indikator fokus`);
-   for(const ref of d.focus_indicators){
-    const [,lv,no]=ref.match(/^L(\d+)-(\d+)$/);
-    assert.equal((await admin('select count(*)::int as n from curriculum_level_indicators where level=$1 and number=$2',[Number(lv),Number(no)])).rows[0].n,1,`tema ${d.number}: ${ref} tidak ada di kurikulum`);
-   }
-  }
-  assert.match(desc[5].english_words,/I don't know/);
-  await assert.rejects(admin("update curriculum_themes set focus_indicators=array['Level 1'] where number=1"),/check/);
-  // Guru membaca tapi tidak menyunting; pemilik menyunting teks tapi tidak menambah baris.
-  assert.equal((await as(teacher,'select * from curriculum_level_indicators')).rows.length,32);
-  assert.equal((await as(teacher,"update curriculum_levels set title='X' where level=1 returning level")).rows.length,0);
-  assert.equal((await as(owner,"update curriculum_levels set title=title where level=1 returning level")).rows.length,1);
-  await assert.rejects(as(owner,"insert into curriculum_themes values(9,'fondasi','X',193,216)"),/permission denied/);
-  assert.equal((await as(stranger,'select * from curriculum_levels')).rows.length,4,'guru terdaftar lain juga membaca');
- });
- await t.test('tugas diagnostik menempel pada indikator Level 1-4',async()=>{
-  const rows=(await admin('select level,number,diagnostic_task,diagnostic_material,diagnostic_success,diagnostic_observe from curriculum_level_indicators where level between 1 and 4 order by level,number')).rows;
-  assert.equal(rows.length,32);
-  for(const r of rows){
-   for(const k of ['diagnostic_task','diagnostic_material','diagnostic_success'])assert.ok(r[k].trim().length>0,`L${r.level}-${r.number} belum punya ${k}`);
-   assert.ok(!/kartu|pasir/i.test(r.diagnostic_task+' '+r.diagnostic_material),`L${r.level}-${r.number} masih butuh kartu cetak atau pasir`);
-   // Karakter (8) dan L1-1 diamati sepanjang tes; tugas lain tidak.
-   assert.equal(r.diagnostic_observe,r.number===8||(r.level===1&&r.number===1),`L${r.level}-${r.number} penanda diamati`);
-   if(r.diagnostic_observe)assert.match(r.diagnostic_task,/sepanjang tes/);
-  }
-  const at=(l,n)=>rows.find(r=>r.level===l&&r.number===n);
-  assert.match(at(3,2).diagnostic_material,/jangan ditulis atau diperlihatkan/,'jawaban dikte tidak diperlihatkan');
-  assert.match(at(3,3).diagnostic_material,/ku · bu → buku/,'suku kata disajikan tertukar');
-  assert.match(at(1,6).diagnostic_success,/tetap ✓/);
  });
  await t.test('tes diagnostik 8 level: draf di server, berhenti dini, English tidak dinilai, final tanpa revisi',async()=>{
   const kid=await buat(),lain=await buat(stranger);

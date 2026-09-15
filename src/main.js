@@ -64,14 +64,10 @@ async function allRows(table, order) {
     if (page.length < 500) return rows;
   }
 }
-// Semua data yang dipakai layar: siswa, kurikulum pilot, dan tes diagnostik. Pemilik juga memuat tim.
+// Semua data yang dipakai layar: siswa, tes diagnostik, kelas, dan kurikulum 8 level. Pemilik juga memuat tim.
 async function refresh() {
   const [
     students,
-    curriculumPhases,
-    curriculumLevels,
-    curriculumIndicators,
-    curriculumThemes,
     diagnosticTests,
     diagnosticResults,
     classSchedules,
@@ -85,10 +81,6 @@ async function refresh() {
     k8English
   ] = await Promise.all([
     allRows('students', 'name'),
-    result(db.from('curriculum_phases').select('*').order('sort_order')),
-    result(db.from('curriculum_levels').select('*').order('level')),
-    result(db.from('curriculum_level_indicators').select('*').order('level').order('number')),
-    result(db.from('curriculum_themes').select('*').order('number')),
     allRows('diagnostic_tests', 'id'),
     allRows('diagnostic_results', 'test_id'),
     allRows('class_schedules', 'id'),
@@ -112,10 +104,6 @@ async function refresh() {
     classSchedules,
     classScheduleStudents,
     students,
-    curriculumPhases,
-    curriculumLevels,
-    curriculumIndicators,
-    curriculumThemes,
     diagnosticTests,
     diagnosticResults
   });

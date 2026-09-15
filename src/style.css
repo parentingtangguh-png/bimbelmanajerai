@@ -137,15 +137,6 @@ button {
   color: #758371;
   margin-bottom: 12px;
 }
-.pill {
-  display: inline-block;
-  border: 1px solid #d6ded0;
-  border-radius: 5px;
-  padding: 7px 10px;
-  font-size: 9px;
-  letter-spacing: 1.2px;
-  font-weight: 600;
-}
 .brand {
   display: flex;
   align-items: center;
@@ -277,11 +268,6 @@ button {
   font-weight: 600;
   font-family: 'Manrope', sans-serif;
 }
-.avatar.large {
-  width: 49px;
-  height: 49px;
-  font-size: 20px;
-}
 .workspace {
   margin-left: 236px;
   width: calc(100% - 236px);
@@ -332,42 +318,6 @@ button {
   font-size: 32px;
   vertical-align: middle;
   margin-left: 7px;
-}
-.welcome {
-  border-radius: 14px;
-  background: var(--green);
-  color: #f5f5e9;
-  padding: 31px 35px;
-  min-height: 254px;
-  display: flex;
-  justify-content: space-between;
-  position: relative;
-  overflow: hidden;
-}
-.welcome .light {
-  border-color: #5f8070;
-  color: #cbd8bc;
-  font-size: 8px;
-}
-.welcome h2 {
-  font-size: 26px;
-  line-height: 1.4;
-  font-weight: 500;
-  letter-spacing: -0.8px;
-  margin: 20px 0 13px;
-}
-.welcome p {
-  color: #a9c3b3;
-  font-size: 11px;
-  margin-bottom: 20px;
-}
-.welcome button {
-  padding: 0;
-  color: #e3eacb;
-  font-size: 11px;
-}
-.welcome button span {
-  margin-left: 18px;
 }
 .growth-art {
   position: relative;
@@ -427,14 +377,6 @@ button {
   width: 2px;
   background: #dddfb5;
   transform: rotate(4deg);
-}
-.art-label {
-  position: absolute;
-  bottom: 3px;
-  left: 58px;
-  font-size: 7px;
-  letter-spacing: 1.7px;
-  color: #9db49d;
 }
 .stats {
   display: grid;
@@ -587,10 +529,6 @@ progress::-moz-progress-bar {
   font-weight: 500;
   line-height: 1.4;
 }
-.badge.amber {
-  background: #f6efd9;
-  color: #a38a44;
-}
 .badge.green {
   background: #edf3e8;
   color: #678355;
@@ -604,21 +542,6 @@ progress::-moz-progress-bar {
   color: #8b9589;
   line-height: 1.8;
 }
-.quote {
-  background: #f7f8f1;
-  padding: 19px;
-  border-radius: 8px;
-  font-size: 12px;
-  color: #78866a;
-  font-style: italic;
-}
-.quote small {
-  display: block;
-  font-size: 9px;
-  color: #a7ae99;
-  margin-top: 8px;
-  font-style: normal;
-}
 footer {
   display: flex;
   justify-content: space-between;
@@ -627,17 +550,6 @@ footer {
   color: #a6ada1;
   max-width: 1500px;
   margin: auto;
-}
-.demo-banner {
-  padding: 10px 43px;
-  background: #f0e7cd;
-  font-size: 11px;
-  display: flex;
-  justify-content: space-between;
-  color: #766438;
-}
-.demo-banner button {
-  font-weight: 700;
 }
 .toolbar {
   display: flex;
@@ -651,54 +563,6 @@ footer {
 }
 .toolbar > span {
   color: var(--muted);
-  font-size: 12px;
-}
-.student-grid,
-.curriculum-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
-}
-.student-card .card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-.student-card h2 {
-  margin-bottom: 8px;
-}
-.student-card > p {
-  font-size: 12px;
-  color: var(--muted);
-  min-height: 22px;
-}
-.meter {
-  margin: 20px 0;
-}
-.meter > div {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  margin-bottom: 10px;
-}
-.meter strong {
-  font-size: 12px;
-  font-weight: 500;
-}
-.meter small {
-  font-size: 10px;
-  color: #8b9784;
-}
-.meter > small {
-  display: block;
-  margin-top: 7px;
-}
-.meter progress {
-  height: 6px;
-}
-.student-card .secondary {
-  margin-top: 9px;
   font-size: 12px;
 }
 .empty {
@@ -743,23 +607,6 @@ footer {
   margin-left: auto;
   font-size: 11px;
 }
-.calendar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: #eef2e7;
-  border-radius: 8px;
-  padding: 10px;
-  font-size: 23px;
-  font-weight: 600;
-  min-width: 65px;
-}
-.calendar small {
-  font-size: 8px;
-  margin-top: 3px;
-  color: #8b977d;
-}
 .notice {
   padding: 15px 18px;
   background: #eef2e6;
@@ -770,61 +617,9 @@ footer {
   line-height: 1.7;
   margin: 20px 0;
 }
-.session-list {
-  display: grid;
-  gap: 24px;
-}
-.session-card {
-  padding: 28px;
-}
-.inline-form {
-  display: flex;
-  gap: 15px;
-  align-items: end;
-}
-.inline-form label {
-  min-width: 160px;
-  margin-bottom: 0;
-}
-.lesson,
-.evaluation,
-.report {
-  border-top: 1px solid var(--line);
-  padding-top: 23px;
-  margin-top: 25px;
-}
 /* Cancelling sits at the very bottom of the class, after every child, so it is never the first
    thing a hand reaches for. */
-.cancel-class {
-  margin-top: 25px;
-}
-.cancel-class p {
-  margin-bottom: 14px;
-}
 /* Correcting a saved evaluation is a rare, deliberate step, so it sits quietly under the form. */
-.reopen {
-  margin-top: 16px;
-}
-.reopen p {
-  margin-bottom: 2px;
-}
-.section-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
-  margin-bottom: 15px;
-}
-.section-title h3 {
-  margin: 0;
-}
-.section-title button {
-  font-size: 11px;
-}
-.lesson > p,
-.report > p {
-  font-size: 12px;
-}
 pre {
   font-family: inherit;
   white-space: pre-wrap;
@@ -835,19 +630,6 @@ pre {
   padding: 20px;
   border-radius: 8px;
   margin: 10px 0 15px;
-}
-.evaluation {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 5px 20px;
-}
-.evaluation h3,
-.evaluation .fine {
-  grid-column: 1/-1;
-}
-.evaluation .primary {
-  align-self: start;
-  justify-self: start;
 }
 .button-row {
   display: flex;
@@ -860,16 +642,6 @@ pre {
   flex-direction: column;
   align-items: stretch;
   gap: 8px;
-}
-.curriculum-grid .panel p {
-  font-size: 12px;
-  color: #75856e;
-}
-.curriculum-grid h2 {
-  margin-top: 15px;
-}
-.curriculum-grid strong {
-  color: #365a44;
 }
 label {
   display: block;
@@ -969,11 +741,6 @@ hr {
   border: 0;
   border-top: 1px solid var(--line);
   margin: 25px 0;
-}
-.history {
-  border-bottom: 1px solid var(--line);
-  padding: 12px 0;
-  font-size: 12px;
 }
 .toast {
   position: fixed;
@@ -1078,9 +845,6 @@ hr {
   margin-top: 6px;
 }
 @media (min-width: 1500px) {
-  .welcome {
-    min-height: 275px;
-  }
   .growth-art {
     margin-right: 45px;
   }
@@ -1112,9 +876,6 @@ hr {
   .stat small {
     font-size: 8px;
   }
-  .student-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
   .dashboard-grid {
     grid-template-columns: 1.4fr 1fr;
   }
@@ -1131,12 +892,6 @@ hr {
     transform: scale(0.9);
     transform-origin: right center;
     min-width: 180px;
-  }
-  .welcome h2 {
-    font-size: 23px;
-  }
-  .curriculum-grid {
-    grid-template-columns: repeat(2, 1fr);
   }
 }
 @media (max-width: 850px) {
@@ -1203,9 +958,6 @@ hr {
   .page-heading {
     gap: 16px;
   }
-  .welcome {
-    padding: 27px;
-  }
   .stats {
     grid-template-columns: repeat(4, 1fr);
   }
@@ -1223,9 +975,6 @@ hr {
   }
   footer {
     padding: 15px 24px;
-  }
-  .demo-banner {
-    padding: 10px 24px;
   }
 }
 @media (max-width: 620px) {
@@ -1276,25 +1025,6 @@ hr {
     font-size: 8px;
     letter-spacing: 1.7px;
   }
-  .welcome {
-    padding: 24px;
-    min-height: 265px;
-  }
-  .welcome h2 {
-    font-size: 22px;
-    max-width: 290px;
-    position: relative;
-    z-index: 1;
-  }
-  .welcome p {
-    max-width: 215px;
-    position: relative;
-    z-index: 1;
-  }
-  .welcome > div:first-child {
-    position: relative;
-    z-index: 1;
-  }
   /* On a phone the motif sits behind the paragraph and the button instead of beside them, so it
      is faint enough to stay decoration. Its 7px label is unreadable at this size; it is hidden. */
   .growth-art {
@@ -1309,14 +1039,6 @@ hr {
     transform-origin: bottom right;
     z-index: 0;
     pointer-events: none;
-  }
-  .art-label {
-    display: none;
-  }
-  .welcome button {
-    position: relative;
-    z-index: 1;
-    min-height: 44px;
   }
   .stats {
     grid-template-columns: 1fr 1fr;
@@ -1342,10 +1064,6 @@ hr {
   }
   .panel-heading {
     margin-bottom: 12px;
-  }
-  .student-grid,
-  .curriculum-grid {
-    grid-template-columns: 1fr;
   }
   /* Two narrow columns do not fit a phone: the name wrapped to two lines and "Bahasa Indonesia
      Level 7 · Fase A" to three, inside a 95px box. Name and arrow keep the first line; the
@@ -1398,43 +1116,6 @@ hr {
   .class-row h3 {
     font-size: 13px;
   }
-  .session-card .panel-heading {
-    align-items: flex-start;
-  }
-  .session-card .panel-heading h2 {
-    font-size: 17px;
-  }
-  .session-card .panel-heading p {
-    font-size: 11px;
-  }
-  .session-card .badge {
-    white-space: nowrap;
-    font-size: 8px;
-  }
-  .inline-form {
-    gap: 10px;
-  }
-  .inline-form label {
-    min-width: 0;
-    flex: 1;
-  }
-  .inline-form button {
-    font-size: 11px;
-  }
-  .section-title {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-  .evaluation {
-    grid-template-columns: 1fr;
-  }
-  .evaluation h3,
-  .evaluation .fine {
-    grid-column: 1;
-  }
-  .evaluation .primary {
-    width: 100%;
-  }
   .form-grid {
     grid-template-columns: 1fr 1fr;
     gap: 0 12px;
@@ -1484,11 +1165,6 @@ hr {
   .login-box h2 {
     font-size: 23px;
   }
-  .demo-banner {
-    padding: 10px 17px;
-    font-size: 9px;
-    gap: 10px;
-  }
   footer {
     padding: 12px 17px 23px;
     font-size: 8px;
@@ -1508,12 +1184,7 @@ hr {
   .sidebar,
   .topbar,
   .page-heading,
-  .demo-banner,
   footer,
-  .session-card:not(.print-target),
-  .inline-form,
-  .evaluation,
-  .report,
   button,
   .notice {
     display: none !important;
@@ -1524,21 +1195,6 @@ hr {
   }
   .content {
     padding: 0;
-  }
-  .session-card {
-    border: 0;
-  }
-  .lesson {
-    border: 0;
-  }
-  .session-card pre {
-    background: white;
-  }
-  .session-card .panel-heading {
-    display: block;
-  }
-  .session-card .badge {
-    display: none;
   }
 }
 .top-actions {
@@ -1633,7 +1289,6 @@ strong {
 .student-info small,
 .class-row p,
 .attention-item p,
-.student-card > p,
 .fine,
 .toolbar > span {
   color: var(--muted);
@@ -1680,21 +1335,6 @@ strong {
 }
 .text-btn {
   color: #e0b956;
-}
-.pill {
-  border-color: #796536;
-  color: #e3c776;
-}
-.welcome {
-  background: #302719;
-  color: #fff8e8;
-}
-.welcome p {
-  color: #d0b980;
-}
-.welcome .light {
-  border-color: #8d733e;
-  color: #e5c773;
 }
 .stat {
   box-shadow: 0 4px 20px #0000001c;
@@ -1745,32 +1385,10 @@ progress::-moz-progress-bar {
   background: #263328;
   color: #b8d5a5;
 }
-.badge.amber {
-  background: #40331b;
-  color: #edcc75;
-}
-.quote {
-  background: #22271f;
-  color: #c8d59f;
-}
-.quote small {
-  color: #aeb89a;
-}
-.calendar {
-  background: #292e27;
-  color: #eed18a;
-}
 .notice {
   background: #252b23;
   border-color: #3f4a3a;
   color: #c4d5b5;
-}
-.demo-banner {
-  background: #3b301d;
-  color: #f0d78f;
-}
-.demo-banner button {
-  color: #f4d37a;
 }
 input,
 select,

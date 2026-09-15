@@ -257,33 +257,6 @@ test('profil siswa: identitas, hasil tes 14 tugas, level saat ini, status, dan h
   assert.ok(!diagnosticResultSection(state.students[1]).includes('diagnostic-open'));
 });
 
-test('kurikulum pilot menampilkan CP, level berurutan dengan indikatornya, dan tema', () => {
-  loadSampleState();
-  state.k8Levels = [];
-  const kur = curriculumView();
-  assert.match(kur, /CP FASE FONDASI/);
-  assert.equal(count(kur, 'class="panel curriculum-card"'), 2, 'dua level pada contoh');
-  assert.ok(kur.indexOf('Mengikuti sesi') < kur.indexOf('Merespons ketika'), 'indikator urut menurut nomor');
-  assert.ok(kur.indexOf('Aku Siap Belajar') < kur.indexOf('Mengikuti sesi'), 'indikator di dalam levelnya');
-  assert.ok(kur.indexOf('Mengikuti sesi') < kur.indexOf('Aku Mulai Mengenal'));
-  assert.match(kur, /Kesiapan belajar/);
-  assert.ok(kur.includes('&lt;A&gt;') && !kur.includes('<A>'), 'teks indikator di-escape');
-  assert.ok(kur.indexOf('Aku Bisa Bercerita') < kur.indexOf('Aku Bisa Menghitung'), 'tema urut');
-  assert.match(kur, /Pertemuan 1–24/);
-  // Deskriptor tema: gambaran di-escape, indikator fokus diterjemahkan ke teks kurikulum.
-  assert.equal(count(kur, 'class="theme-detail"'), 2);
-  assert.ok(kur.includes('diri &amp; keluarga'), 'gambaran tema di-escape');
-  assert.match(kur, /L1-2<\/span> Merespons ketika namanya dipanggil/);
-  assert.match(kur, /L9-9<\/span> indikator tidak ditemukan/);
-  assert.match(kur, /Karakter yang ditonjolkan<\/dt><dd>berani menjawab/);
-  assert.ok(kur.includes('I don&#39;t know') || kur.includes("I don't know"));
-  // Tema tanpa deskriptor tetap tampil, tanpa baris kosong.
-  assert.ok(!/<dt>English theme words<\/dt><dd><\/dd>/.test(kur));
-  assert.ok(!kur.includes('data-action="edit-curriculum"'), 'editor kurikulum lama sudah tidak ada');
-  state.curriculumPhases = [];
-  assert.match(curriculumView(), /sedang disiapkan/);
-});
-
 test('tim pengajar: pemilik tanpa tombol, guru bisa dinonaktifkan dan diaktifkan', () => {
   loadSampleState();
   const html = teamView();
