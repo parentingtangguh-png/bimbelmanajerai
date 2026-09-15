@@ -69,7 +69,18 @@ Hanya build aplikasi yang dipublikasikan; data siswa berada di Supabase. Jangan 
 2. Guru menambah siswa di **Data siswa → ＋ Tambah siswa**: nama, panggilan, sapaan orang tua, WhatsApp, tanggal lahir, kelas formal. Level anak belum ditentukan.
 3. Guru menjalankan **Tes Diagnostik**: pilih anak dan satu level (saran dari kelas formal), lalu nilai 14 tugas (Lulus / Belum / Belum dinilai). Setiap nilai langsung tersimpan; tes bisa dilanjutkan di pertemuan berikutnya dari profil siswa. Tes berhenti bila A1, B1, E1, D1 semuanya Belum, lalu dimulai ulang di level yang disarankan. **Simpan final** tidak bisa direvisi (salah input: hapus siswa lalu tambah ulang, selama anak belum ikut kelas).
 4. Hasil: anak mulai kelas dari indikator akademik pertama yang belum Lulus pada level itu.
-5. **Ruang kelas**: buat jadwal (tanggal + jam; pertemuan dan tema otomatis), buka sesi, centang siswa yang hadir, beri satu indikator akademik Lulus / Belum / Belum dinilai, English dan Karakter bila dinilai, lalu **Tandai sesi selesai**. Setelah 12 indikator Lulus, guru menekan **Naik ke Level X** di profil siswa.
+5. **Ruang kelas**: buat jadwal (tanggal + jam; pertemuan dan tema otomatis), buka sesi, centang siswa yang hadir, ketuk **Prompt kegiatan** (kehadiran tersimpan sementara) dan salin ke obrolan baru ChatGPT/Gemini, beri satu indikator akademik Lulus / Belum / Belum dinilai, English dan Karakter bila dinilai, lalu **Tandai sesi selesai**. Setelah 12 indikator Lulus, guru menekan **Naik ke Level X** di profil siswa.
+6. **Kabar orang tua**: di sesi yang sudah selesai (**Lihat**), guru mengetuk **WhatsApp ke …** per anak, membaca pesan, lalu mengirim sendiri. Tombol mati bila Nomor WhatsApp orang tua belum diisi.
+
+## 9. Cadangan data
+
+Proyek Supabase ini tidak memiliki cadangan harian yang bisa dipulihkan. Cadangan manual (hanya membaca produksi):
+
+```powershell
+node scripts/backup-data.mjs "D:\ribuan_pengguna\CLAUDE\bimbel_cadangan"
+```
+
+Hasilnya satu folder bertanggal berisi JSON per tabel, `ringkasan.json`, dan `restore.sql`. Folder cadangan berisi data pribadi anak: simpan di luar repo dan jangan dibagikan. `restore.sql` dijalankan hanya dengan izin pemilik, ke database yang tabelnya sudah dibuat migrasi dan akun loginnya sudah ada.
 
 ## Pemecahan masalah
 
