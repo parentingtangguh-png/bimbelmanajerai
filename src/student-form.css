@@ -208,3 +208,9 @@
   font-weight: 700;
   color: var(--green);
 }
+
+/* Prompt kegiatan: teks panjang siap salin. */
+.prompt-box textarea {
+  font-size: 12px;
+  line-height: 1.45;
+}

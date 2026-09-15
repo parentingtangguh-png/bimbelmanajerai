@@ -20,8 +20,10 @@ import {
   meetingRows,
   scheduleValues,
   meetingSheet,
-  finishState
+  finishState,
+  promptBox
 } from './views/sessions.js';
+import { activityPrompt } from './prompt.js';
 import { studentsView, studentForm } from './views/students.js';
 import { diagnosticForm, diagnosticSummary } from './views/diagnostic.js';
 import { answersOf, isStopped } from './diagnostic.js';
@@ -306,6 +308,25 @@ document.addEventListener('click', async e => {
       await refresh();
       return notify('Jadwal dihapus.');
     }
+    if (action === 'activity-prompt') {
+      const form = b.closest('form');
+      const ids = new FormData(form).getAll('students');
+      if (!ids.length) return notify('Centang siswa yang hadir lebih dulu.', true);
+      const box = form.querySelector('[data-prompt-box]');
+      box.innerHTML = promptBox(activityPrompt(form.dataset.id, ids));
+      box.hidden = false;
+      return box.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    }
+    if (action === 'copy-prompt') {
+      const box = b.closest('form').querySelector('[data-prompt-text]');
+      try {
+        await navigator.clipboard.writeText(box.value);
+      } catch {
+        box.select();
+        document.execCommand('copy');
+      }
+      return notify('Prompt tersalin. Tempel ke ChatGPT atau Gemini.');
+    }
     // Naik level setelah 12 indikator akademik Lulus; database memeriksa ulang syaratnya.
     if (action === 'level-up') {
       const s = state.students.find(x => x.id === id);
@@ -550,6 +571,11 @@ function updateFinish(form) {
   const { done, hint } = finishState(ids, Object.fromEntries(f));
   form.querySelector('[data-finish]').disabled = !done;
   form.querySelector('[data-finish-hint]').textContent = hint;
+  // Prompt kegiatan mengikuti siswa yang dicentang; kotak yang sudah terbuka ikut diperbarui.
+  form.querySelector('[data-prompt-button]').disabled = !ids.length;
+  const box = form.querySelector('[data-prompt-box]');
+  if (!ids.length) box.hidden = true;
+  else if (!box.hidden) box.innerHTML = promptBox(activityPrompt(form.dataset.id, ids));
 }
 login();
 if (db) {

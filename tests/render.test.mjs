@@ -14,6 +14,7 @@ import {
 } from '../src/state.js';
 import { sessionsView, meetingSheet, finishState, scheduleForm } from '../src/views/sessions.js';
 import { passedIndicators, suggestedIndicator, englishReady } from '../src/state.js';
+import { activityPrompt, previousCondition } from '../src/prompt.js';
 import { dashboard } from '../src/views/dashboard.js';
 import { studentsView, studentForm, diagnosticResultSection } from '../src/views/students.js';
 import { diagnosticForm } from '../src/views/diagnostic.js';
@@ -160,6 +161,90 @@ test('ruang kelas 8 level: antrean dengan hasil diagnostik, tiga pilihan, Englis
     /Indikator 2\.[\s\S]*<strong>Lulus<\/strong>[\s\S]*English: Tidak dinilai/
   );
   assert.match(scheduleForm(), /Pertemuan 3<\/strong> · Tema 1 — Aku dan Keluargaku · Diriku/);
+});
+
+test('prompt kegiatan: data kelas, kondisi sebelumnya, English/Karakter, dan aturan dari kurikulum 8 level', () => {
+  loadSampleState();
+  Object.assign(state, {
+    name: 'Guru Contoh',
+    k8Themes: [
+      {
+        number: 1,
+        name: 'Rumah',
+        first_meeting: 1,
+        last_meeting: 24,
+        description: 'Tema **rumah**.',
+        objects: 'sapu',
+        vocabulary: 'dapur',
+        character: 'salam'
+      }
+    ],
+    k8Subthemes: [{ theme: 1, position: 1, name: 'Ruang di rumah', first_meeting: 1, last_meeting: 6 }],
+    k8English: [
+      { theme: 1, kind: 'noun', position: 1, text: 'bag', requestable: true },
+      { theme: 1, kind: 'phrase', position: 1, text: 'open bag', requestable: false }
+    ],
+    classSchedules: [
+      {
+        id: 'j1',
+        meeting_number: 1,
+        theme_number: 1,
+        scheduled_date: '2026-09-21',
+        scheduled_time: '08:00:00',
+        completed_at: 'x'
+      },
+      {
+        id: 'j2',
+        meeting_number: 2,
+        theme_number: 1,
+        scheduled_date: '2026-09-22',
+        scheduled_time: '08:00:00',
+        completed_at: 'x'
+      },
+      {
+        id: 'j3',
+        meeting_number: 3,
+        theme_number: 1,
+        scheduled_date: '2026-09-23',
+        scheduled_time: '08:00:00',
+        completed_at: null
+      }
+    ],
+    classScheduleStudents: [
+      { schedule_id: 'j1', student_id: 'anak-1', level: 3, indicator_number: 2, result: 'belum' },
+      { schedule_id: 'j2', student_id: 'anak-1', level: 3, indicator_number: 2, result: 'belum' }
+    ]
+  });
+  const p = activityPrompt('j3', ['anak-1', 'anak-2']);
+  assert.match(p, /Pertemuan ke-3 · Sesi 1/);
+  assert.match(p, /Tema: 1 — Rumah · Subtema: Ruang di rumah\n  Tema rumah\./, 'Markdown dibersihkan');
+  assert.match(p, /kata benda bag · frasa open bag/);
+  assert.match(p, /Siswa hadir: 1 anak/, 'anak tanpa level tidak ikut');
+  assert.match(p, /Siswa 1 · Alya · .* · TK B · Level 3 — Merangkai Awal/);
+  assert.match(p, /Sudah lulus \(1 dari 12 akademik\): 1\. Kompetensi A1 L3 <b>/);
+  assert.match(p, /melatih 2\. Kompetensi B1 L3 <b> → BELUM \(sudah 2 kali belum lulus\)/);
+  assert.match(
+    p,
+    /Hari ini dilatih: 2\.[\s\S]*Bahan uji di kurikulum: Bahan B1[\s\S]*Tanda lulus \(dari kurikulum\): 4 dari 5 tepat\./
+  );
+  assert.match(p, /Bahasa Inggris \(boleh dinilai\)/, 'hadir 2 + hari ini = 3 pertemuan');
+  assert.match(p, /Karakter: sudah lulus di level ini/);
+  assert.match(p, /untuk\s+1 siswa sekitar 40 menit per siswa/);
+  assert.match(p, /buku, bola, susu, mata, kaki, sapi, lap, air, roti, pot, apel, pena/);
+  assert.match(p, /   - Alya: tugas · tugas mandiri/);
+  assert.ok(!p.includes('undefined') && !p.includes('**'));
+  state.classScheduleStudents = [];
+  assert.match(
+    previousCondition(state.students[0], state.classSchedules[2]),
+    /belum pernah ikut kelas; hasil tes diagnostik: mulai Level 3 indikator 2/
+  );
+  assert.match(activityPrompt('j3', ['anak-1']), /Bahasa Inggris: belum boleh dinilai/);
+  // Tombol di lembar sesi aktif setelah siswa dicentang.
+  assert.match(
+    meetingSheet('j3', { students: ['anak-1'] }),
+    /data-action="activity-prompt" data-prompt-button >Prompt kegiatan/
+  );
+  assert.match(meetingSheet('j3', { students: [] }), /data-prompt-button disabled>/);
 });
 
 test('daftar siswa guru dan pemilik memakai status tes dan level 8 level', () => {

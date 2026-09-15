@@ -259,8 +259,14 @@ export function meetingSheet(id, v = null) {
     : '<p class="muted">Belum ada siswa aktif.</p>';
   const ids = state.students.filter(s => picked.has(s.id) && ready(s)).map(s => s.id);
   const { done, hint } = finishState(ids, values);
-  const buttons = `<div class="button-row"><button class="secondary" name="finish" value="0">Simpan sementara</button><button class="primary" name="finish" value="1" data-finish ${done ? '' : 'disabled'}>Tandai sesi selesai</button></div><p class="muted" data-finish-hint>${hint}</p>`;
+  const prompt = `<div class="button-row"><button type="button" class="secondary" data-action="activity-prompt" data-prompt-button ${ids.length ? '' : 'disabled'}>Prompt kegiatan</button></div><div data-prompt-box hidden></div>`;
+  const buttons = `${prompt}<div class="button-row"><button class="secondary" name="finish" value="0">Simpan sementara</button><button class="primary" name="finish" value="1" data-finish ${done ? '' : 'disabled'}>Tandai sesi selesai</button></div><p class="muted" data-finish-hint>${hint}</p>`;
   return `<form data-form="meeting" data-id="${h(id)}">${head}${kidBlock}${meetingRows(picked, values, c)}<p class="muted">Simpan sementara bisa diubah lagi. Setelah ditandai selesai, sesi dikunci dan indikator siswa yang Lulus berganti otomatis.</p>${buttons}</form>`;
+}
+
+// Kotak Prompt kegiatan di lembar sesi: teks siap salin untuk ChatGPT/Gemini.
+export function promptBox(text) {
+  return `<label class="prompt-box">Prompt kegiatan<textarea readonly rows="14" data-prompt-text>${h(text)}</textarea></label><div class="button-row"><button type="button" class="primary" data-action="copy-prompt">Salin prompt</button></div><p class="muted">Tempel ke ChatGPT atau Gemini untuk mendapat rencana kegiatan sesi ini. Tidak ada data yang disimpan.</p>`;
 }
 
 // "Tandai sesi selesai" aktif hanya bila ada siswa hadir dan setiap siswa yang punya indikator akademik aktif
