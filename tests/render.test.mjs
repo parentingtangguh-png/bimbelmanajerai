@@ -495,3 +495,35 @@ test('usia dihitung dari tanggal lahir dan tahun ajaran berganti Juli', () => {
   assert.equal(schoolYearOf(new Date('2026-07-01T00:00:00+07:00')), '2026/2027');
   assert.equal(schoolYearOf(new Date('2026-06-30T12:00:00+07:00')), '2025/2026');
 });
+
+test('kurikulum 8 level: CP, level berurutan dengan 14 indikator, catatan alur, dan tema dari data k8', async () => {
+  loadSampleState();
+  const { buildCurriculum } = await import('../scripts/build-curriculum.mjs');
+  const { data } = buildCurriculum();
+  Object.assign(state, {
+    k8Cp: data.cp,
+    k8Levels: data.levels,
+    k8Indicators: data.indicators,
+    k8Notes: data.notes,
+    k8Themes: data.themes,
+    k8Subthemes: data.subthemes,
+    k8English: data.english
+  });
+  const kur = curriculumView();
+  assert.match(kur, /KURIKULUM 8 LEVEL/);
+  assert.ok(!kur.includes('KURIKULUM PILOT'), 'kurikulum lama tidak tampil bila data 8 level ada');
+  assert.equal(count(kur, 'class="panel k8-level"'), 8);
+  assert.equal(count(kur, 'class="k8-indicator"'), 112);
+  assert.ok(kur.indexOf('Mulai Mengenali') < kur.indexOf('Mandiri Awal'), 'level urut');
+  assert.equal(count(kur, 'class="theme-detail"'), 8);
+  assert.match(kur, /English — kata benda/);
+  assert.equal(count(kur, 'k8-word requestable'), 39, '39 dari 40 kata benda wajar diminta');
+  assert.match(kur, /Ketentuan dan bahan cadangan per alur/);
+  assert.match(kur, /<div class="md-table"><table>/, 'tabel Markdown catatan alur ditampilkan sebagai tabel');
+  assert.ok(!/\*\*[^*]+\*\*/.test(kur), 'tidak ada tanda tebal Markdown mentah');
+  // Isi di-escape: teks berbahaya di dokumen tidak menjadi HTML.
+  state.k8Indicators = [{ ...data.indicators[0], competency: '<script>x</script> **tebal**' }];
+  const aman = curriculumView();
+  assert.ok(aman.includes('&lt;script&gt;') && !aman.includes('<script>'));
+  assert.match(aman, /<strong>tebal<\/strong>/);
+});

@@ -75,7 +75,14 @@ async function refresh() {
     diagnosticTests,
     diagnosticResults,
     classSchedules,
-    classScheduleStudents
+    classScheduleStudents,
+    k8Cp,
+    k8Levels,
+    k8Indicators,
+    k8Notes,
+    k8Themes,
+    k8Subthemes,
+    k8English
   ] = await Promise.all([
     allRows('students', 'name'),
     result(db.from('curriculum_phases').select('*').order('sort_order')),
@@ -85,9 +92,23 @@ async function refresh() {
     allRows('diagnostic_tests', 'id'),
     allRows('diagnostic_results', 'test_id'),
     allRows('class_schedules', 'id'),
-    allRows('class_schedule_students', 'schedule_id')
+    allRows('class_schedule_students', 'schedule_id'),
+    result(db.from('k8_cp').select('text')),
+    result(db.from('k8_levels').select('*').order('level')),
+    result(db.from('k8_indicators').select('*').order('level').order('number')),
+    result(db.from('k8_notes').select('*').order('doc').order('position')),
+    result(db.from('k8_themes').select('*').order('number')),
+    result(db.from('k8_subthemes').select('*').order('theme').order('position')),
+    result(db.from('k8_theme_english').select('*').order('theme').order('kind').order('position'))
   ]);
   Object.assign(state, {
+    k8Cp: k8Cp[0]?.text || '',
+    k8Levels,
+    k8Indicators,
+    k8Notes,
+    k8Themes,
+    k8Subthemes,
+    k8English,
     classSchedules,
     classScheduleStudents,
     students,

@@ -17,6 +17,14 @@ export const initialState = () => ({
   curriculumLevels: [],
   curriculumIndicators: [],
   curriculumThemes: [],
+  // Kurikulum 8 level (tabel k8_*), dibangkitkan dari docs/curriculum/. Fase 1: hanya halaman Kurikulum.
+  k8Cp: '',
+  k8Levels: [],
+  k8Indicators: [],
+  k8Notes: [],
+  k8Themes: [],
+  k8Subthemes: [],
+  k8English: [],
   diagnosticTests: [],
   diagnosticResults: [],
   // Jadwal kelas pilot dan siswa di tiap jadwal (level saat dijadwalkan + satu indikator).

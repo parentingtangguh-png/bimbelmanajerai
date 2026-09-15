@@ -22,9 +22,20 @@ test('PostgreSQL: akun, siswa, kurikulum pilot, dan tes diagnostik',async t=>{
  const identitas=(extra={})=>JSON.stringify({name:'Hana Salsabila',parent_name:'Bunda Hana',phone:'',nickname:'Hana',birth_date:'2021-03-14',school_grade:'TK A',school_year:'2026/2027',...extra});
  const buat=async(who=teacher,extra={})=>(await as(who,'select create_student($1::jsonb) as id',[identitas(extra)])).rows[0].id;
 
+ await t.test('kurikulum 8 level: isi lengkap, hanya dibaca, kata benda English unik',async()=>{
+  assert.equal((await as(teacher,'select count(*)::int n from k8_indicators')).rows[0].n,112);
+  assert.equal((await as(stranger,'select count(*)::int n from k8_levels')).rows[0].n,8,'semua anggota membaca');
+  assert.equal((await as(owner,'select count(*)::int n from k8_subthemes')).rows[0].n,32);
+  assert.equal((await as(teacher,"select count(*)::int n from k8_theme_english where kind='noun'")).rows[0].n,40);
+  await assert.rejects(as(owner,"update k8_levels set title='X' where level=1"),/permission denied/,'pemilik pun tidak mengubah isi');
+  await assert.rejects(as(owner,"insert into k8_cp values(1,'X')"),/permission denied|row-level/);
+  await assert.rejects(admin("insert into k8_theme_english values(2,'noun',9,'BOX',false)"),/duplicate|unique/);
+  await assert.rejects(admin("insert into k8_theme_english values(2,'phrase',9,'open jar',true)"),/check/);
+  assert.equal((await as(teacher,"select slot from k8_indicators where level=3 and number=11")).rows[0].slot,'C2');
+ });
  await t.test('struktur lama sudah tidak ada',async()=>{
   const tabel=(await admin("select table_name from information_schema.tables where table_schema='public' order by 1")).rows.map(r=>r.table_name);
-  assert.deepEqual(tabel,['access_list','assignments','class_schedule_students','class_schedules','curriculum_level_indicators','curriculum_levels','curriculum_phases','curriculum_themes','diagnostic_results','diagnostic_tests','profiles','students']);
+  assert.deepEqual(tabel,['access_list','assignments','class_schedule_students','class_schedules','curriculum_level_indicators','curriculum_levels','curriculum_phases','curriculum_themes','diagnostic_results','diagnostic_tests','k8_cp','k8_indicators','k8_levels','k8_notes','k8_subthemes','k8_theme_english','k8_themes','profiles','students']);
   const fungsi=(await admin("select proname from pg_proc where pronamespace='public'::regnamespace order by 1")).rows.map(r=>r.proname);
   assert.deepEqual(fungsi,['can_teach','check_student_identity','create_student','current_indicator','delete_schedule','delete_student','handle_new_user','is_member','is_owner','reject_owner_student_insert','save_diagnostic','save_meeting','save_schedule','set_student_active','update_student_profile']);
   const kolom=(await admin("select column_name from information_schema.columns where table_schema='public' and table_name='students' order by ordinal_position")).rows.map(r=>r.column_name);

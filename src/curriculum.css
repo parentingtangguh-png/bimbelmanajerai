@@ -496,3 +496,107 @@ dialog .history small {
   margin: 0;
   line-height: 1.5;
 }
+
+/* Kurikulum 8 level: level dan indikator dapat dibuka-tutup, isi Markdown dari dokumen kurikulum. */
+.k8-cp p {
+  margin: 0.5rem 0 0;
+}
+.k8-levels {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+.k8-level > summary,
+.k8-doc > summary,
+.k8-note > summary {
+  cursor: pointer;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.k8-level > p {
+  margin: 0.75rem 0;
+}
+.k8-indicators {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+.k8-indicator details {
+  border: 1px solid rgba(127, 127, 127, 0.25);
+  border-radius: 8px;
+  padding: 0.5rem 0.6rem;
+}
+.k8-indicator summary {
+  cursor: pointer;
+  line-height: 1.5;
+}
+.k8-no {
+  display: inline-block;
+  min-width: 1.6em;
+  font-weight: 700;
+}
+.k8-indicator dl {
+  margin: 0.6rem 0 0;
+  display: grid;
+  gap: 0.5rem;
+}
+.k8-indicator dt {
+  font-weight: 700;
+  font-size: 0.85em;
+}
+.k8-indicator dd {
+  margin: 0.15rem 0 0;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.k8-rules .k8-doc {
+  border-top: 1px solid rgba(127, 127, 127, 0.25);
+  padding: 0.6rem 0;
+}
+.k8-note {
+  margin: 0.4rem 0 0.4rem 0.75rem;
+}
+.k8-note h3,
+.k8-note h4,
+.k8-note h5 {
+  margin: 0.8rem 0 0.4rem;
+}
+.k8-note p,
+.k8-note li {
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.md-table {
+  overflow-x: auto;
+  margin: 0.5rem 0;
+}
+.md-table table {
+  border-collapse: collapse;
+  min-width: 32rem;
+  font-size: 0.9em;
+}
+.md-table th,
+.md-table td {
+  border: 1px solid rgba(127, 127, 127, 0.3);
+  padding: 0.35rem 0.5rem;
+  vertical-align: top;
+  text-align: left;
+}
+.k8-subthemes {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+.k8-word {
+  display: inline-block;
+  margin: 0 0.25rem 0.25rem 0;
+  padding: 0 0.4rem;
+  border-radius: 6px;
+  border: 1px solid rgba(127, 127, 127, 0.35);
+}
+.k8-word.requestable {
+  text-decoration: underline;
+}
