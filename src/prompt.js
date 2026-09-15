@@ -90,7 +90,7 @@ function studentBlock(student, c, index) {
   const today = current
     ? (() => {
         const ind = indicatorOf(level, current);
-        return `  - Hari ini dilatih: ${current}. ${plain(ind?.competency)}\n  - Cara uji di kurikulum: ${plain(ind?.method)}\n  - Bahan uji di kurikulum: ${plain(ind?.material)}\n  - Tanda lulus (dari kurikulum): ${plain(ind?.success)}`;
+        return `  - Hari ini dilatih: ${current}. ${plain(ind?.competency)}\n  - Cara uji di kurikulum: ${plain(ind?.method)}\n  - Bahan uji di kurikulum (khusus untuk menilai, jangan dipakai untuk latihan): ${plain(ind?.material)}\n  - Tanda lulus (dari kurikulum): ${plain(ind?.success)}`;
       })()
     : `  - Hari ini dilatih: tidak ada indikator akademik baru (12 indikator Level ${level} sudah lulus, menunggu guru menaikkan level); ikut kegiatan bersama sebagai penguatan`;
   return [
@@ -173,12 +173,13 @@ ATURAN
    saat menilai ikuti cara uji tersebut dan jangan menghitung respons yang dipancing sebelumnya.
    Bahan latihan harus berbeda dari bahan uji, supaya yang dinilai
    kemampuan, bukan hafalan: kata, suku kata, kalimat, dan soal bahan uji tidak boleh dipakai
-   untuk latihan, juga sebagian atau dipotong; huruf atau angka tunggal boleh dilatih dengan
-   urutan berbeda. Bila penilaian tidak bisa berjalan sah, tulis "belum dinilai".
+   untuk latihan, juga sebagian atau dipotong; latih dengan huruf atau angka lain. Huruf atau
+   angka yang sama dengan bahan uji hanya boleh dilatih dengan urutan berbeda bila tidak ada
+   pilihan lain (misalnya lima vokal). Bila penilaian tidak bisa berjalan sah, tulis "belum dinilai".
 8. Pastikan isi kegiatan benar secara materi. Jangan memakai kata ${PROTECTED_WORDS}
    sebagai tulisan latihan, karena kata-kata itu dipakai sebagai bahan uji.
 9. Jawaban paling banyak sekitar ${250 + 120 * kids.length} kata (untuk ${kids.length} siswa), Bahasa Indonesia sederhana,
-   berupa poin, tanpa mengulang penjelasan dan tanpa menyalin ulang data siswa yang tidak dipakai.
+   berupa poin tanpa tabel, tanpa mengulang penjelasan dan tanpa menyalin ulang data siswa yang tidak dipakai.
 
 FORMAT JAWABAN
 1. Judul kegiatan

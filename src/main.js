@@ -327,7 +327,7 @@ document.addEventListener('click', async e => {
         box.select();
         document.execCommand('copy');
       }
-      return notify('Prompt tersalin. Tempel ke ChatGPT atau Gemini.');
+      return notify('Prompt tersalin. Tempel ke obrolan baru di ChatGPT atau Gemini.');
     }
     // Naik level setelah 12 indikator akademik Lulus; database memeriksa ulang syaratnya.
     if (action === 'level-up') {

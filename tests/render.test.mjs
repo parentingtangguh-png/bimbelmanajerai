@@ -227,7 +227,7 @@ test('prompt kegiatan: data kelas, kondisi sebelumnya, English/Karakter, dan atu
   assert.match(p, /melatih 2\. Kompetensi B1 L3 <b> → BELUM \(sudah 2 kali belum lulus\)/);
   assert.match(
     p,
-    /Hari ini dilatih: 2\.[\s\S]*Bahan uji di kurikulum: Bahan B1[\s\S]*Tanda lulus \(dari kurikulum\): 4 dari 5 tepat\./
+    /Hari ini dilatih: 2\.[\s\S]*Bahan uji di kurikulum \(khusus untuk menilai, jangan dipakai untuk latihan\): Bahan B1[\s\S]*Tanda lulus \(dari kurikulum\): 4 dari 5 tepat\./
   );
   assert.match(p, /Bahasa Inggris \(boleh dinilai\)/, 'hadir 2 + hari ini = 3 pertemuan');
   assert.match(p, /Karakter: sudah lulus di level ini/);
@@ -235,7 +235,8 @@ test('prompt kegiatan: data kelas, kondisi sebelumnya, English/Karakter, dan atu
   // per siswa, dan bahan latihan tidak boleh memakai kata/soal bahan uji.
   assert.match(p, /Daftar Bahan wajib memuat semua benda yang disebut di bahan uji/);
   assert.match(p, /pada menit\n   berapa dan bagaimana guru menilainya/);
-  assert.match(p, /juga sebagian atau dipotong; huruf atau angka tunggal boleh dilatih/);
+  assert.match(p, /juga sebagian atau dipotong; latih dengan huruf atau angka lain\. Huruf atau\n   angka yang sama/);
+  assert.match(p, /berupa poin tanpa tabel,/);
   assert.match(p, /Bahasa Inggris\/karakter yang boleh dinilai: menit dan cara menilai/);
   assert.match(p, /untuk\s+1 siswa sekitar 40 menit per siswa/);
   assert.match(p, /buku, bola, susu, mata, kaki, sapi, lap, air, roti, pot, apel, pena/);
