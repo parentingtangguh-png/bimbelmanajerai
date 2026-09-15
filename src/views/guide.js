@@ -120,6 +120,14 @@ const teacher = {
     tip(
       'Sesi yang sudah selesai hanya bisa dilihat (tombol <b>Lihat</b>). Bila ada kesalahan, hubungi pemilik.'
     ) +
+    part(
+      'Kabar harian untuk orang tua',
+      steps([
+        `Setelah sesi ditandai selesai, ketuk ${b('Lihat')} pada sesi itu.`,
+        `Di setiap anak ketuk ${b('WhatsApp ke')} … — WhatsApp terbuka dengan pesan yang sudah tersusun.`,
+        'Baca pesannya, ubah bila perlu, lalu tekan Kirim. Aplikasi tidak mengirim sendiri dan tidak mencatat pesan yang terkirim.'
+      ]) + tip('Tombol mati bila Nomor WhatsApp orang tua belum diisi di profil anak.')
+    ) +
     ratingPart(),
 
   [homeKeys.kurikulum]: () =>

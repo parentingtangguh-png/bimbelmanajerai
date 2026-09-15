@@ -4,3 +4,5 @@ test-results/
 supabase/
 # Data pratinjau dihasilkan oleh skrip dan tidak pernah dibaca manusia.
 src/demo-curriculum.js
+# Dibangkitkan scripts/build-kabar.mjs dari docs/curriculum/kabar-orang-tua.md.
+src/kabar-data.js

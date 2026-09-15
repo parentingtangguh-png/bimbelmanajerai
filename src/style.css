@@ -1988,3 +1988,19 @@ dialog::backdrop {
     margin-top: 14px;
   }
 }
+
+/* Kabar harian WhatsApp ke orang tua (views/sessions.js, sesi selesai). */
+.wa-button {
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #1f8f4e;
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+.wa-button.off {
+  background: #3a3d37;
+  color: #9aa096;
+  font-weight: 600;
+}

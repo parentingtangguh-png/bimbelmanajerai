@@ -15,6 +15,7 @@ import {
 import { heading, empty, field } from '../ui.js';
 import { escapeHtml as h, localDate } from '../domain.js';
 import { inlineMarkdown } from '../markdown.js';
+import { parentWhatsappLink } from '../kabar.js';
 
 export const MEETINGS = 192;
 
@@ -234,7 +235,7 @@ export function meetingSheet(id, v = null) {
           ? `<p class="muted">Indikator ${x.indicator_number}. ${inlineMarkdown(ind ? ind.competency : '')}</p><p><strong>${resultLabel(RESULTS, x.result)}</strong></p>`
           : '<p class="muted">12 indikator akademik sudah Lulus.</p>';
         const extra = `<p class="muted">English: ${resultLabel(COMPANION, x.english_result || '')} · Karakter: ${resultLabel(COMPANION, x.character_result || '')}</p>`;
-        return `<fieldset class="diagnostic-task"><legend>${h(s ? s.name : 'Siswa')} · Level ${x.level}</legend>${academic}${extra}</fieldset>`;
+        return `<fieldset class="diagnostic-task"><legend>${h(s ? s.name : 'Siswa')} · Level ${x.level}</legend>${academic}${extra}${parentButton(c, s)}</fieldset>`;
       })
       .join('');
     const status = c.completed_at ? '' : '<p class="muted">Sesi belum selesai.</p>';
@@ -264,6 +265,16 @@ export function meetingSheet(id, v = null) {
   const rating = `<span class="schedule-label">3. Penilaian</span><p class="muted">Isi setelah anak diuji dengan Cara uji, bahan, tanda lulus di bawah.</p>`;
   const buttons = `<div class="button-row"><button class="secondary" name="finish" value="0">Simpan sementara</button><button class="primary" name="finish" value="1" data-finish ${done ? '' : 'disabled'}>Tandai sesi selesai</button></div><p class="muted" data-finish-hint>${hint}</p>`;
   return `<form data-form="meeting" data-id="${h(id)}">${head}${kidBlock}${prompt}${rating}${meetingRows(picked, values, c)}<p class="muted">Simpan sementara bisa diubah lagi. Setelah ditandai selesai, sesi dikunci dan indikator siswa yang Lulus berganti otomatis.</p>${buttons}</form>`;
+}
+
+// Kabar harian ke orang tua: hanya guru, hanya sesi yang sudah selesai. Tautan membuka WhatsApp dengan pesan
+// terisi; guru membaca lalu mengirim sendiri. Tanpa nomor yang sah tombolnya mati.
+function parentButton(c, s) {
+  if (!c.completed_at || state.role !== 'teacher' || !s) return '';
+  const link = parentWhatsappLink(c.id, s.id);
+  return link
+    ? `<div class="button-row"><a class="wa-button" href="${h(link)}" target="_blank" rel="noopener">WhatsApp ke ${h(s.parent_name || 'orang tua')}</a></div>`
+    : '<div class="button-row"><span class="wa-button off">Nomor WhatsApp orang tua belum diisi</span></div>';
 }
 
 // Kotak Prompt kegiatan di lembar sesi: teks siap salin untuk ChatGPT/Gemini.
