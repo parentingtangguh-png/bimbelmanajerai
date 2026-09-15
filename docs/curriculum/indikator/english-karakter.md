@@ -1,36 +1,46 @@
 # Indikator English dan Karakter
 
-**Status: DIKUNCI — 15 Sep 2026** · **Cakupan:** 16 indikator, English L1–L8 dan Karakter L1–L8.
-**Authority:** [`CURRICULUM_ARCHITECTURE.md`](../../../CURRICULUM_ARCHITECTURE.md) §9–§10 · [`english-karakter.md`](../english-karakter.md) (matriks + milestone).
+**Status: DIKUNCI — 15 Sep 2026, dengan amendemen English per tema 15 Sep 2026 (disetujui pemilik)** · **Cakupan:** 16 indikator, English L1–L8 dan Karakter L1–L8.
+**Authority:** [`CURRICULUM_ARCHITECTURE.md`](../../../CURRICULUM_ARCHITECTURE.md) §9–§10 · [`english-karakter.md`](../english-karakter.md) (matriks + milestone) · [`cp-level-tema.md`](../cp-level-tema.md) (kosakata English tema).
 
-Disusun Codex (authority pedagogis), diaudit Claude, disetujui pemilik. Seluruh kompetensi sama persis dengan milestone, tanpa amendemen. Perubahan isi memerlukan keputusan eksplisit pemilik.
+Disusun Codex (authority pedagogis), diaudit Claude, disetujui pemilik. Seluruh kompetensi sama persis dengan milestone. Perubahan isi memerlukan keputusan eksplisit pemilik.
 
 ## Ketentuan Bersama
 
 - English dan Karakter dicatat dan dinilai **Lulus/Belum**, tetapi **tidak menentukan perpindahan indikator akademik, kenaikan level, atau penentuan level awal diagnostik**.
-- English memakai daftar tetap per level dari `english-karakter.md`. Tes English menguji daftar itu **tanpa pengenalan pada kesempatan uji**.
-- English dikecualikan dari aturan umum bahwa asesmen tidak bergantung pada pengajaran bimbel sebelumnya. Pada diagnostik anak baru, hasil **Belum** wajar dan hanya berarti anak belum menunjukkan penguasaan daftar tetap level itu; bukan bukti kelemahan akademik.
-- Untuk kelas berjalan, daftar English boleh diuji setelah semua kata/ungkapan level itu muncul dalam kegiatan kelas biasa pada sedikitnya **tiga pertemuan berbeda**. Guru tidak melatih urutan butir, kunci posisi, atau format tes secara langsung.
-- English tulisan dibuat guru saat itu sebagai kata/frasa/kalimat utuh. Tidak memakai phonics bahasa Inggris, nama huruf bahasa Inggris, pembunyian huruf bahasa Inggris, kartu, lembar kerja, bahan cetak, lagu/video, atau gambar representasional.
-- Pelafalan English anak dengan logat Indonesia diterima selama kata/frasa sasaran masih dapat dikenali. Kesalahan yang mengubah identitas kata, penghilangan kata inti, atau jawaban Indonesia tidak mendapat poin.
-- Semua pilihan English tetap tersedia sampai butir selesai; jangan menyingkirkan pilihan yang sudah dipakai. Sasaran diulang tanpa pola tetap dan guru tidak mengumumkan bahwa semua pilihan akan ditanyakan.
+- Satu paket penilaian dipakai. Bahan cadangan hanya pengganti prapilih, bukan kesempatan tambahan setelah gagal.
+
+### Ketentuan English (amendemen English per tema)
+
+- English memakai **pola/cara uji tetap per level**. Kosakata L2, L3, L5, L6, dan L8 diambil dari kosakata English tema.
+- Semua kosakata English satu tema dianggap dikenalkan pada setiap pertemuan tema itu. Kosakata tema tersebut layak uji bagi anak yang hadir pada sedikitnya **tiga pertemuan dalam tema itu**, termasuk kosakata tema sebelumnya yang telah memenuhi syarat.
+- Pada diagnostik anak baru, English tidak diuji dan dicatat **belum dinilai**.
+- Untuk kelas berjalan, guru menyusun butir secara mekanis dari **daftar layak uji**. Utamakan kosakata tema berjalan; bila belum cukup, gunakan kosakata tema sebelumnya yang sudah memenuhi paparan.
+- Bila jumlah kosakata layak uji belum cukup untuk level tersebut, indikator English belum dinilai.
+- L5 hanya memakai kata benda English yang diberi tanda wajar diminta pada daftar tema.
+- L6 hanya memakai empat frasa tindakan tema yang sudah layak uji; daftar frasa tema harus memuat kontras kata kerja pada kata benda yang sama.
+- Tidak memakai phonics bahasa Inggris, nama huruf bahasa Inggris, pembunyian huruf bahasa Inggris, kartu, lembar kerja, bahan cetak, lagu/video, atau gambar representasional. Tulisan dibuat guru saat itu sebagai kata/frasa/kalimat utuh.
+- Pelafalan anak dengan logat Indonesia diterima selama kata/frasa sasaran masih dapat dikenali. Jawaban Indonesia belum mendapat poin.
+- Semua pilihan benda tetap tersedia sampai butir selesai. Guru tidak menghilangkan pilihan yang sudah dipakai, tidak melatih urutan butir, dan tidak memberi tahu pola kunci.
+
+### Ketentuan Karakter
+
 - Karakter menilai perilaku teramati dalam konteks bimbel, bukan sifat umum, keimanan, hafalan panjang, praktik keluarga, atau kepatuhan akademik A–F.
 - Situasi Karakter yang tidak muncul secara wajar, anak belum bersedia, atau pelaksanaan terputus bukan bukti **Belum**; catat sebagai asesmen belum terlaksana dan ambil sampel ulang pada kesempatan wajar.
 - Guru tidak mempermalukan anak, tidak menuduh, tidak menjebak, tidak memberi hadiah/hukuman atas isi jawaban, dan tidak membuat tugas yang sengaja tidak mungkin selesai.
-- Satu paket penilaian dipakai. Bahan cadangan hanya pengganti prapilih, bukan kesempatan tambahan setelah gagal.
 
 ## English
 
-| Level | Kompetensi | Cara uji | Bahan | Tanda lulus (dengan kunci/rubrik) |
+| Level | Kompetensi | Cara uji | Bahan | Tanda lulus |
 |---|---|---|---|---|
-| L1 | Merespons ungkapan kelas sangat pendek dalam bahasa Inggris yang diucapkan guru. | Anak mulai dalam posisi duduk di kursi. Guru mengucapkan enam stimulus satu per satu. Untuk **hello/goodbye**, anak menjawab dengan ucapan yang sesuai. Untuk **sit down/stand up**, anak melakukan atau mempertahankan posisi yang sesuai. | Stimulus lisan: **sit down; stand up; stand up; hello; sit down; goodbye**. Kursi tersedia. | **5 dari 6** respons tepat, dan kedua butir **hello/goodbye** harus tepat. Kunci: tetap duduk; berdiri; tetap berdiri; **hello/hi**; duduk; **goodbye/bye**. Lambaian tanpa ucapan tidak mendapat poin untuk hello/goodbye. |
-| L2 | Menghubungkan kata Inggris tertulis utuh dari daftar tetap dengan benda konkret yang sesuai. | Guru menulis satu kata setiap butir pada tempat netral, tanpa membacakan. Anak menunjuk benda yang sesuai. Empat benda selalu terlihat dan posisi benda diacak sebelum mulai. | Kata: **pen; cup; door; bag; pen; cup**. Benda nyata: pulpen polos, gelas/cangkir polos, pintu ruangan, tas polos. | **5 dari 6** tepat. Kunci: **pen; cup; door; bag; pen; cup**. Membaca nyaring tidak diwajibkan. |
-| L3 | Menyebut nama benda konkret dari daftar tetap dalam bahasa Inggris. | Guru menunjukkan lima benda satu per satu dan bertanya, “What is this?” Anak menyebut nama benda dalam bahasa Inggris. | Benda nyata: **book, ball, chair, pencil, table**. Urutan tampil: **ball; book; table; pencil; chair**. | **4 dari 5** tepat. Kunci: **ball; book; table; pencil; chair**. Padanan Indonesia tidak mendapat poin. |
-| L4 | Menghubungkan kata warna Inggris tertulis utuh dari daftar tetap dengan atribut warna benda konkret. | Guru menulis satu kata warna setiap butir tanpa membacakan. Anak menunjuk benda dengan warna sesuai. Semua benda warna tetap tersedia. | Kata: **blue; red; yellow; black; green; red**. Benda polos warna merah, biru, hijau, kuning, hitam; bentuk dan ukuran dibuat serupa bila memungkinkan. | **5 dari 6** tepat. Kunci: **biru; merah; kuning; hitam; hijau; merah**. |
-| L5 | Mengucapkan satu ungkapan kebutuhan sederhana dalam bahasa Inggris dari daftar tetap. | Guru menaruh satu benda sasaran agak jauh dari anak, lalu bertanya, “What do you want?” untuk empat butir. Anak mengucapkan ungkapan dari daftar tetap. | Benda: air dalam gelas, tisu, penghapus, krayon. Urutan sasaran: **water; eraser; tissue; crayon**. | **3 dari 4** tepat. Kunci: **I want water; I want eraser; I want tissue; I want crayon**. Penghilangan **I want** belum memenuhi; artikel tambahan kecil tidak menggugurkan bila frasa inti jelas. |
-| L6 | Menghubungkan frasa tindakan Inggris tertulis utuh dari daftar tetap dengan tindakan konkret yang sesuai. | Guru menulis satu frasa setiap butir, tanpa membacakan. Anak melakukan tindakan yang sesuai. Benda ditata sebelum mulai. | Frasa: **clap hands; open bag; touch table; close book; open bag; clap hands**. Bahan: tas polos, buku, meja. | **5 dari 6** tepat. Kunci: tepuk tangan; membuka tas; menyentuh meja; menutup buku; membuka tas; tepuk tangan. |
-| L7 | Menjawab pertanyaan personal rutin dalam bahasa Inggris dengan jawaban berpola dari daftar tetap. | Guru bertanya empat kali: dua pertanyaan nama dan dua pertanyaan kabar. Untuk pertanyaan nama, anak menjawab dengan nama dirinya sendiri. | Pertanyaan lisan: **What is your name?; How are you?; How are you?; What is your name?** | **3 dari 4** tepat. Kunci: **My name is [nama anak]** atau **My name's [nama anak]**; **I am fine** atau **I'm fine**. Jawaban nama panggilan sebenarnya diterima. “Fine” saja belum memenuhi pola L7. |
-| L8 | Menentukan makna literal dari kalimat Inggris sangat pendek dari daftar tetap. | Guru menulis satu kalimat setiap butir tanpa membacakan. Anak menunjuk benda nyata yang sesuai dengan isi kalimat. Semua benda tetap tersedia dan posisi diacak sebelum mulai. | Kalimat: **This is a blue bag.; I see a yellow cup.; This is a red ball.; I see a green book.** Referen dan pengecoh: tas biru, tas merah, gelas kuning, gelas hijau, bola merah, bola biru, buku hijau, buku merah. | **3 dari 4** tepat. Kunci: **tas biru; gelas kuning; bola merah; buku hijau**. Anak tidak diminta menirukan atau membaca nyaring; yang dinilai pilihan referen sesuai warna dan benda pada kalimat. |
+| L1 | Merespons ungkapan kelas sangat pendek dalam bahasa Inggris yang diucapkan guru. | Anak mulai duduk. Guru mengucapkan enam stimulus: **sit down; stand up; stand up; hello; sit down; goodbye**. Untuk hello/goodbye anak menjawab dengan ucapan sesuai; untuk sit down/stand up anak melakukan atau mempertahankan posisi. | Kursi; stimulus tetap **hello, goodbye, sit down, stand up**. | **5 dari 6** tepat dan kedua butir hello/goodbye tepat. Kunci: tetap duduk; berdiri; tetap berdiri; **hello/hi**; duduk; **goodbye/bye**. Lambaian tanpa ucapan tidak mendapat poin untuk hello/goodbye. |
+| L2 | Menghubungkan kata Inggris tertulis utuh dengan benda konkret yang sesuai. | Dari daftar layak uji, guru memilih **4 kata benda** pertama yang bendanya tersedia. Nomori menurut urutan daftar tema. Tulis enam butir dengan urutan indeks **2-4-1-3-2-1**. Anak menunjuk benda. | Empat benda nyata sesuai kata benda terpilih. Bila benda target berlabel tulisan/merek, tutup tulisan. | **5 dari 6** tepat. Kunci mengikuti kata yang ditulis. Membaca nyaring tidak diwajibkan. |
+| L3 | Menyebut nama benda konkret dalam bahasa Inggris. | Dari daftar layak uji, guru memilih **5 kata benda** pertama yang bendanya tersedia. Tampilkan benda dengan urutan indeks **2-4-1-5-3**. Tiap butir guru bertanya, **“What is this?”** | Lima benda nyata dari tema. | **4 dari 5** tepat. Kunci mengikuti nama English benda yang ditunjukkan. |
+| L4 | Menghubungkan kata warna Inggris tertulis utuh dengan atribut warna benda konkret. | Guru menyiapkan benda tema berwarna merah, biru, hijau, kuning, dan hitam. Guru menulis enam kata warna dengan urutan **blue; red; yellow; black; green; red**. Anak menunjuk benda berwarna sesuai. | Lima benda tema atau benda tema yang diberi penanda warna polos. Warna tetap: **red, blue, green, yellow, black**. | **5 dari 6** tepat. Kunci: biru; merah; kuning; hitam; hijau; merah. |
+| L5 | Mengucapkan satu ungkapan kebutuhan sederhana dalam bahasa Inggris. | Dari daftar layak uji, guru memilih **4 kata benda bertanda wajar diminta** pertama yang bendanya tersedia. Tampilkan benda sasaran satu per satu dengan urutan indeks **2-4-1-3** dan bertanya, **“What do you want?”** | Empat benda nyata bertanda wajar diminta dari tema. | **3 dari 4** tepat. Kunci: **I want [kata benda English]** atau **I want a/an [kata benda English]** sesuai benda. Penghilangan **I want** belum memenuhi. |
+| L6 | Menghubungkan frasa tindakan Inggris tertulis utuh dengan tindakan konkret yang sesuai. | Dari daftar layak uji, guru memilih **4 frasa tindakan** pertama yang dapat diperagakan. Tulis enam butir dengan urutan indeks **3-1-4-2-1-3**. Anak melakukan tindakan. | Benda nyata yang diperlukan untuk frasa tindakan tema. | **5 dari 6** tepat. Kunci mengikuti tindakan yang ditulis. Anak tidak wajib membaca nyaring. |
+| L7 | Menjawab pertanyaan personal rutin dalam bahasa Inggris dengan jawaban berpola. | Guru bertanya empat kali: **What is your name?; How are you?; How are you?; What is your name?** | Pertanyaan lisan tetap. | **3 dari 4** tepat. Kunci: **My name is [nama anak]** atau **My name’s [nama anak]**; **I am fine** atau **I’m fine**. Nama panggilan sebenarnya diterima. “Fine” saja belum memenuhi pola L7. |
+| L8 | Menentukan makna literal dari kalimat Inggris sangat pendek. | Dari daftar layak uji, guru memilih **4 kata benda** pertama yang bendanya tersedia. Guru membuat empat kalimat dengan pola: **This is a red [2].; I see a blue [4].; This is a green [1].; I see a yellow [3].** Anak menunjuk benda sesuai. | Untuk tiap kata benda sasaran, sediakan dua referen: warna target dan satu warna pengecoh lain. Benda boleh diberi penanda warna polos bila warna asli tidak tersedia. | **3 dari 4** tepat. Kunci mengikuti warna + benda dalam kalimat. Anak tidak diminta menirukan atau membaca nyaring; yang dinilai pemahaman makna literal. |
 
 ## Karakter
 
@@ -48,19 +58,11 @@ Disusun Codex (authority pedagogis), diaudit Claude, disetujui pemilik. Seluruh 
 ## Bahan Cadangan dan Aturan Penerapan
 
 - Bahan cadangan dipilih sebelum asesmen sebagai pengganti paket utama. Tidak dipakai sebagai paket kedua otomatis setelah anak gagal.
-- Untuk English, bahan cadangan tetap memakai daftar tetap level yang sama; yang boleh berubah hanya urutan stimulus, benda referen, warna benda, atau pengecoh.
+- Untuk English, tidak ada paket cadangan tetap per level. Bila benda tidak tersedia, rusak, bertulisan, atau tidak aman, guru melewati kata/frasa itu dan mengambil kata/frasa layak uji berikutnya dari daftar tema. Pergantian dilakukan **sebelum** uji dimulai, bukan setelah anak salah.
 - Untuk Karakter, cadangan berupa konteks setara yang wajar. Bila konteks tidak muncul, hasilnya **belum terlaksana**, bukan **Belum**.
 
 | Sasaran | Bahan cadangan dan penerapan |
 |---|---|
-| English L1 | Anak mulai dalam posisi duduk. Urutan stimulus cadangan: **hello; sit down; sit down; goodbye; stand up; stand up**. Kunci: **hello/hi**; tetap duduk; tetap duduk; **goodbye/bye**; berdiri; tetap berdiri. Ambang **5 dari 6**, dan kedua butir hello/goodbye harus tepat. |
-| English L2 | Urutan kata cadangan: **bag; door; cup; pen; bag; door**. Benda sama atau benda setara polos; ambang **5 dari 6**. |
-| English L3 | Urutan benda cadangan: **chair; pencil; book; table; ball**. Kunci sesuai benda; ambang **4 dari 5**. |
-| English L4 | Urutan kata cadangan: **green; black; blue; yellow; red; green**. Kunci warna sesuai; ambang **5 dari 6**. |
-| English L5 | Urutan sasaran cadangan: **crayon; water; tissue; eraser**. Kunci memakai pola **I want ...**; ambang **3 dari 4**. |
-| English L6 | Urutan frasa cadangan: **touch table; close book; clap hands; open bag; close book; touch table**. Kunci tindakan sesuai; ambang **5 dari 6**. |
-| English L7 | Urutan pertanyaan cadangan: **How are you?; What is your name?; What is your name?; How are you?**. Kunci pola sama; **I'm fine** dan **My name's ...** diterima; ambang **3 dari 4**. |
-| English L8 | Kalimat cadangan: **I see a red ball.; This is a green book.; This is a yellow cup.; I see a blue bag.** Referen dan pengecoh: bola merah, bola biru, buku hijau, buku merah, gelas kuning, gelas hijau, tas biru, tas merah. Ambang **3 dari 4**; kunci mengikuti kalimat. |
 | Karakter L1 | Jika salam awal terlewat, amati salam penutupan. Salam umum tetap belum memenuhi. |
 | Karakter L2 | Jika pembukaan sudah lewat, gunakan awal kegiatan berikutnya pada sesi yang sama. Jangan meminta hafalan doa panjang. |
 | Karakter L3 | Kesempatan cadangan dapat berupa guru menyerahkan penghapus dan membantu membuka wadah. Tetap dua kesempatan wajar bila tersedia; jangan memberi petunjuk “ucapkan terima kasih.” |
@@ -73,8 +75,8 @@ Disusun Codex (authority pedagogis), diaudit Claude, disetujui pemilik. Seluruh 
 ## Catatan Risiko
 
 - English L1 kini mewajibkan pembedaan hello/goodbye dengan ucapan; ini menutup celah lambaian, tetapi mungkin lebih berat untuk anak L1 yang pemahamannya muncul lewat isyarat sosial.
-- English L8 memakai delapan benda agar warna dan benda sama-sama diuji; jumlah benda dapat menambah beban visual dan waktu penataan.
-- English tetap sangat bergantung pada paparan daftar kelas. Pada diagnostik anak baru, hasil Belum perlu dibaca sesuai batas tafsir dokumen.
+- English L8 memakai dua referen per kata benda (warna target dan pengecoh); jumlah benda dapat menambah beban visual dan waktu penataan. Penandaan kata wajar diminta (L5) masih bergantung pada konteks main/alat kelas.
+- English kini bergantung pada kehadiran dalam tema; paparan aktual anak pada kata tertentu bisa tidak merata. Pada diagnostik anak baru, English belum dinilai.
 - Karakter L3 memakai ambang **1 dari 2**, sehingga lebih toleran terhadap lupa sesaat; dipilih karena Karakter tidak menentukan level dan bertujuan menangkap kebiasaan.
 - Karakter L7 lebih mekanis dengan dua keadaan, tetapi masih mengukur jawaban pada skenario terstruktur, bukan sifat jujur secara umum.
 - Karakter L6 dan L8 bergantung pada rutinitas kelas; pada diagnostik anak baru, asesmen dapat belum terlaksana atau hasil Belum wajar.

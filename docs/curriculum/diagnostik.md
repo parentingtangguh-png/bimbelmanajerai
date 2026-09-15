@@ -1,6 +1,6 @@
 # Aturan Tes Diagnostik — Kurikulum 8 Level
 
-**Status: DIKUNCI — 15 Sep 2026** · **Authority:** [`CURRICULUM_ARCHITECTURE.md`](../../CURRICULUM_ARCHITECTURE.md) §12 · indikator di [`docs/curriculum/indikator/`](indikator/)
+**Status: DIKUNCI — 15 Sep 2026, dengan amendemen English per tema 15 Sep 2026** · **Authority:** [`CURRICULUM_ARCHITECTURE.md`](../../CURRICULUM_ARCHITECTURE.md) §12 · indikator di [`docs/curriculum/indikator/`](indikator/)
 
 Disusun Codex (authority pedagogis), diaudit Claude, disetujui pemilik. Aturan ini **menggantikan** aturan diagnostik yang sekarang berjalan di aplikasi (satu tes level 1–4, 8 tugas, hasil tidak dihitung ke kelas). Aplikasi belum diubah; perubahan menunggu tahap rencana aplikasi. Perubahan isi memerlukan keputusan eksplisit pemilik.
 
@@ -14,7 +14,7 @@ Disusun Codex (authority pedagogis), diaudit Claude, disetujui pemilik. Aturan i
 
 ## Urutan 14 Tugas
 
-1. A1 · 2. B1 · 3. E1 · 4. D1 · 5. C1 · 6. F1 · 7. English · 8. A2 · 9. B2 · 10. E2 · 11. D2 · 12. C2 · 13. F2 · 14. Karakter dicatat dari pengamatan level terkait.
+1. A1 · 2. B1 · 3. E1 · 4. D1 · 5. C1 · 6. F1 · 7. English (anak baru: belum dinilai) · 8. A2 · 9. B2 · 10. E2 · 11. D2 · 12. C2 · 13. F2 · 14. Karakter dicatat dari pengamatan level terkait.
 
 Karakter boleh terjadi sebelum nomor 14 bila konteksnya memang di awal atau sepanjang tes:
 
@@ -36,7 +36,8 @@ Tugas dibiarkan **belum dinilai** bila anak belum bersedia, tugas terputus, baha
 ## Hasil
 
 - **Akademik:** anak mulai kelas dari indikator akademik pertama yang belum lulus pada level final. Indikator sesudahnya yang sudah Lulus tetap tercatat dan dilewati kelak. Jika 12 akademik Lulus pada L1–L7, anak mulai level berikutnya indikator 1. Jika 12 akademik L8 Lulus, kurikulum 8 level selesai; tidak ada level 9.
-- **English dan Karakter:** dicatat pada diagnostik. Jika Lulus, statusnya juga tercatat lulus di kelas sebagai status pendamping. Keduanya tidak memengaruhi level awal, antrean akademik, atau kenaikan level.
+- **English (amendemen English per tema, 15 Sep 2026):** pada tes diagnostik anak baru, English **tidak diuji** karena kosakata English bersumber dari tema kelas yang harus dikenalkan terlebih dahulu. Slot English dicatat **belum dinilai**. Status ini tidak dihitung Belum, tidak memengaruhi level awal, tidak memengaruhi antrean akademik, dan mulai dapat dinilai di kelas setelah anak hadir pada sedikitnya tiga pertemuan dalam satu tema sehingga kosakata tema tersebut layak uji.
+- **Karakter:** dicatat pada diagnostik. Jika Lulus, statusnya juga tercatat lulus di kelas sebagai status pendamping. Tidak memengaruhi level awal, antrean akademik, atau kenaikan level.
 
 ## Kebutuhan Tampilan dan Penyimpanan (untuk rencana aplikasi)
 
@@ -66,7 +67,7 @@ Tidak perlu menyimpan alasan belum dinilai.
 
 Tes diagnostik adalah sampel pada satu level, bukan gambaran lengkap kemampuan anak. Lulus pada diagnostik berarti indikator itu tidak diuji ulang di kelas. Belum berarti bukti belum memenuhi tanda lulus. Belum dinilai berarti belum ada bukti sah, tetapi tetap belum dihitung lulus.
 
-English anak baru bisa Belum karena daftar English memang dikenalkan di bimbel. Karakter menilai perilaku pada konteks bimbel, bukan sifat anak, keimanan, atau praktik keluarga.
+English anak baru belum dinilai karena kosakata English berasal dari tema kelas. Karakter menilai perilaku pada konteks bimbel, bukan sifat anak, keimanan, atau praktik keluarga.
 
 ## Durasi
 
