@@ -1921,3 +1921,70 @@ dialog::backdrop {
   color: var(--green);
   font-weight: 600;
 }
+
+/* Panduan per tab (views/guide.js): tombol di atas doa (HP) atau kaki halaman (laptop), isi di modal. */
+.guide-open {
+  display: block;
+  width: calc(100% - 56px);
+  margin: 28px 28px 0;
+  padding: 12px 16px;
+  border: 1px solid var(--green);
+  border-radius: 12px;
+  background: rgba(199, 154, 59, 0.12);
+  color: #e9c979;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: left;
+}
+.guide-open::before {
+  content: '📖  ';
+}
+.guide h3 {
+  margin: 18px 0 6px;
+  font-size: 15px;
+  color: #e9c979;
+}
+.guide h3:first-child {
+  margin-top: 4px;
+}
+.guide-steps {
+  margin: 4px 0 8px;
+  padding-left: 20px;
+  line-height: 1.5;
+}
+.guide-steps li {
+  margin: 6px 0;
+}
+.guide-btn {
+  padding: 0 5px;
+  border-radius: 6px;
+  background: var(--green);
+  color: #15120c;
+  white-space: nowrap;
+}
+.guide-final {
+  margin: 16px 0 8px;
+  padding: 10px 12px;
+  border: 1px solid #8a3a3a;
+  border-radius: 10px;
+  background: rgba(138, 58, 58, 0.18);
+}
+.guide-final strong {
+  color: #ffb4a8;
+}
+.guide-final ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+.guide-final li {
+  margin: 6px 0;
+}
+@media (max-width: 620px) {
+  .guide-open {
+    width: calc(100% - 28px);
+    margin: 22px 14px 0;
+  }
+  .guide-open + .home-doa {
+    margin-top: 14px;
+  }
+}

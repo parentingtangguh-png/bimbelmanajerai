@@ -1,4 +1,5 @@
 import test from 'node:test';
+import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import { loadSampleState } from './fixtures/sample-state.mjs';
 import {
@@ -30,6 +31,7 @@ import {
 import { curriculumView } from '../src/views/curriculum.js';
 import { teamView } from '../src/views/team.js';
 import { homeMenu, homeTop, homeDoa, homeNav } from '../src/views/home.js';
+import { guideButton, guideBody } from '../src/views/guide.js';
 
 // The screens are plain functions that return HTML, so they can be checked without a browser or a login.
 const count = (html, needle) => html.split(needle).length - 1;
@@ -652,4 +654,30 @@ test('kurikulum 8 level: CP, level berurutan dengan 14 indikator, catatan alur, 
   const aman = curriculumView();
   assert.ok(aman.includes('&lt;script&gt;') && !aman.includes('<script>'));
   assert.match(aman, /<strong>tebal<\/strong>/);
+});
+
+test('panduan per tab: satu panduan untuk tab yang dibuka, dan tombol yang disebut benar-benar ada', () => {
+  loadSampleState();
+  const tombol = html => [...html.matchAll(/<b class="guide-btn">([^<]+)<\/b>/g)].map(m => m[1].replace(/ …$/, ''));
+  const tabs = { teacher: ['dashboard', 'students', 'sessions', 'curriculum'], owner: ['dashboard', 'students', 'team', 'curriculum'] };
+  const sources = [
+    'src/views/students.js', 'src/views/diagnostic.js', 'src/views/sessions.js',
+    'src/views/dashboard.js', 'src/views/team.js', 'src/main.js'
+  ].map(p => fs.readFileSync(p, 'utf8')).join('\n');
+  for (const [role, views] of Object.entries(tabs)) {
+    state.role = role;
+    const bodies = new Set();
+    for (const view of views) {
+      state.view = view;
+      assert.match(guideButton(), /data-action="guide"/, `${role} ${view} punya tombol panduan`);
+      const body = guideBody();
+      assert.ok(body.length > 200, `${role} ${view} punya isi`);
+      bodies.add(body);
+      for (const t of tombol(body)) assert.ok(sources.includes(t), `${role} ${view}: tombol "${t}" ada di layar`);
+    }
+    assert.equal(bodies.size, views.length, 'isi panduan berbeda per tab');
+  }
+  state.role = 'owner';
+  state.view = 'sessions';
+  assert.equal(guideButton(), '', 'pemilik tidak punya panduan Ruang kelas');
 });

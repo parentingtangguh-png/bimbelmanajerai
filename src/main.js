@@ -29,6 +29,7 @@ import { diagnosticForm, diagnosticSummary } from './views/diagnostic.js';
 import { answersOf, isStopped } from './diagnostic.js';
 import { dashboard } from './views/dashboard.js';
 import { homeMenu, homeTop, homeDoa, homeNav, leafArt } from './views/home.js';
+import { guideButton, guideBody } from './views/guide.js';
 import { teamView } from './views/team.js';
 import './style.css';
 import './curriculum.css';
@@ -242,7 +243,7 @@ function render() {
     team: teamView,
     curriculum: curriculumView
   };
-  root.innerHTML = `<div class="shell${home ? ' at-home' : ''}">${sidebar(nav)}<main class="workspace">${topbar()}${homeTop(ORG_NAME)}${reminder}${home}<section class="content">${screens[state.view]()}</section>${homeDoa()}${homeNav()}<footer>${ORG_NAME} <span>Belajar bertumbuh, bersama.</span></footer></main></div><dialog id="modal"></dialog>`;
+  root.innerHTML = `<div class="shell${home ? ' at-home' : ''}">${sidebar(nav)}<main class="workspace">${topbar()}${homeTop(ORG_NAME)}${reminder}${home}<section class="content">${screens[state.view]()}</section>${guideButton()}${homeDoa()}${homeNav()}<footer>${ORG_NAME} <span>Belajar bertumbuh, bersama.</span></footer></main></div><dialog id="modal"></dialog>`;
   scrollTo(0, y);
 }
 
@@ -296,6 +297,7 @@ document.addEventListener('click', async e => {
     if (action === 'open-schedule') return modal('Sesi', meetingSheet(id));
     if (action === 'edit-schedule') return modal('Ubah jadwal', scheduleForm(scheduleValues(id), id));
     if (action === 'password') return modal('Ganti kata sandi', passwordForm());
+    if (action === 'guide') return modal(`Panduan ${labels[state.view]}`, guideBody());
     if (action === 'new-member')
       return modal(
         'Daftarkan guru',
