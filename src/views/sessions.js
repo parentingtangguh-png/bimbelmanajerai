@@ -266,7 +266,7 @@ export function meetingSheet(id, v = null) {
 
 // Kotak Prompt kegiatan di lembar sesi: teks siap salin untuk ChatGPT/Gemini.
 export function promptBox(text) {
-  return `<label class="prompt-box">Prompt kegiatan<textarea readonly rows="14" data-prompt-text>${h(text)}</textarea></label><div class="button-row"><button type="button" class="primary" data-action="copy-prompt">Salin prompt</button></div><p class="muted">Tempel ke ChatGPT atau Gemini untuk mendapat rencana kegiatan sesi ini. Tidak ada data yang disimpan.</p>`;
+  return `<label class="prompt-box">Prompt kegiatan<textarea readonly rows="14" data-prompt-text>${h(text)}</textarea></label><div class="button-row"><button type="button" class="primary" data-action="copy-prompt">Salin prompt</button></div><p class="muted">Tempel ke obrolan baru di ChatGPT atau Gemini (satu sesi, satu obrolan baru). Jawaban AI hanya ide kegiatan; saat menilai, ikuti Cara uji, bahan, tanda lulus di lembar sesi. Tidak ada data yang disimpan.</p>`;
 }
 
 // "Tandai sesi selesai" aktif hanya bila ada siswa hadir dan setiap siswa yang punya indikator akademik aktif

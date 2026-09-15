@@ -156,9 +156,14 @@ ATURAN
    Level 1—harus punya tugas konkret yang bisa dilakukan sendiri.
 4. Tanpa bahan cetak: jangan menyebut kartu, lembar kerja, atau gambar cetak. Huruf, angka,
    dan kata ditulis guru saat itu di kertas atau papan; gunakan benda nyata di kelas atau rumah.
+   Daftar Bahan wajib memuat semua benda yang disebut di bahan uji dan cara uji
+   (akademik, Bahasa Inggris, karakter), termasuk yang bukan benda tema.
 5. Bahasa Inggris dan karakter mewarnai kegiatan. Nilai hanya yang bertanda "boleh dinilai",
    memakai cara uji dan tanda lulusnya apa adanya. Keduanya tidak memengaruhi indikator
-   "Hari ini dilatih".
+   "Hari ini dilatih". Untuk tiap yang boleh dinilai, tulis di bagian siswa itu pada menit
+   berapa dan bagaimana guru menilainya. Jangan menulis perintah di pembuka, kegiatan, atau
+   penutup yang dilarang oleh cara uji (misalnya menyuruh merapikan atau mengucapkan terima
+   kasih bila yang dinilai justru tanpa disuruh).
 6. Perhatikan "Kondisi sebelumnya": jika sebelumnya LULUS, mulai dari yang sudah bisa lalu
    masuk ke indikator hari ini; jika sebelumnya BELUM, latih indikator yang sama dengan cara
    yang berbeda dari sebelumnya; jika BELUM DINILAI, latih lalu nilai indikator yang sama;
@@ -166,11 +171,14 @@ ATURAN
 7. Penilaian Lulus/Belum memakai "Cara uji", "Bahan uji", dan "Tanda lulus" dari kurikulum
    apa adanya; jangan membuat ukuran sendiri. Latihan boleh dikemas dalam permainan, tetapi
    saat menilai ikuti cara uji tersebut dan jangan menghitung respons yang dipancing sebelumnya.
-   Bahan latihan harus berbeda urutan atau isinya dari bahan uji, supaya yang dinilai
-   kemampuan, bukan hafalan. Bila penilaian tidak bisa berjalan sah, tulis "belum dinilai".
+   Bahan latihan harus berbeda dari bahan uji, supaya yang dinilai
+   kemampuan, bukan hafalan: kata, suku kata, kalimat, dan soal bahan uji tidak boleh dipakai
+   untuk latihan, juga sebagian atau dipotong; huruf atau angka tunggal boleh dilatih dengan
+   urutan berbeda. Bila penilaian tidak bisa berjalan sah, tulis "belum dinilai".
 8. Pastikan isi kegiatan benar secara materi. Jangan memakai kata ${PROTECTED_WORDS}
    sebagai tulisan latihan, karena kata-kata itu dipakai sebagai bahan uji.
-9. Jawaban maksimal ±400 kata, Bahasa Indonesia sederhana, berupa poin, tanpa mengulang penjelasan.
+9. Jawaban paling banyak sekitar ${250 + 120 * kids.length} kata (untuk ${kids.length} siswa), Bahasa Indonesia sederhana,
+   berupa poin, tanpa mengulang penjelasan dan tanpa menyalin ulang data siswa yang tidak dipakai.
 
 FORMAT JAWABAN
 1. Judul kegiatan
@@ -179,6 +187,11 @@ FORMAT JAWABAN
 4. Kegiatan inti (menit 10–50)
    - Tugas bersama
    - Urutan pendampingan guru (menit)
-${names.map(n => `   - ${n}: tugas · tugas mandiri saat guru di siswa lain · cara menilai`).join('\n')}
+${names
+  .map(
+    n => `   - ${n}: tugas · tugas mandiri saat guru di siswa lain · cara menilai
+     · Bahasa Inggris/karakter yang boleh dinilai: menit dan cara menilai`
+  )
+  .join('\n')}
 5. Penutup (menit 50–60)`;
 }

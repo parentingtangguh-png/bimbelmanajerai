@@ -108,7 +108,7 @@ const teacher = {
       steps([
         `Ketuk ${b('Buka')}. Buka <b>Tema hari ini</b>: benda nyata, kosakata, English, situasi Karakter.`,
         'Buka <b>Siswa yang hadir</b> dan centang anaknya. Anak dengan tes belum final tidak bisa dicentang; anak yang sudah masuk sesi lain hari itu tidak ditampilkan.',
-        `Opsional: ${b('Prompt kegiatan')} → ${b('Salin prompt')} → tempel ke ChatGPT atau Gemini.`,
+        `Opsional: ${b('Prompt kegiatan')} → ${b('Salin prompt')} → tempel ke <b>obrolan baru</b> di ChatGPT atau Gemini (satu sesi, satu obrolan baru). Jawaban AI hanya ide kegiatan; saat menilai, ikuti <b>Cara uji, bahan, tanda lulus</b> di lembar sesi.`,
         'Tiap anak punya satu indikator. Buka <b>Cara uji, bahan, tanda lulus</b>, uji, lalu pilih <b>Lulus</b>, <b>Belum</b>, atau <b>Belum dinilai</b>.',
         'English dan Karakter boleh dibiarkan <b>Tidak dinilai</b>. English sebagian level baru bisa dinilai setelah anak hadir 3 pertemuan dalam satu tema.',
         `Selama kelas: ${b('Simpan sementara')}. Setelah semua anak dinilai: ${b('Tandai sesi selesai')}.`

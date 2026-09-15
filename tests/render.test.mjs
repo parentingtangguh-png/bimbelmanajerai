@@ -231,6 +231,12 @@ test('prompt kegiatan: data kelas, kondisi sebelumnya, English/Karakter, dan atu
   );
   assert.match(p, /Bahasa Inggris \(boleh dinilai\)/, 'hadir 2 + hari ini = 3 pertemuan');
   assert.match(p, /Karakter: sudah lulus di level ini/);
+  // Aturan tambahan setelah uji ChatGPT (disetujui pemilik): bahan uji di daftar Bahan, English/karakter
+  // per siswa, dan bahan latihan tidak boleh memakai kata/soal bahan uji.
+  assert.match(p, /Daftar Bahan wajib memuat semua benda yang disebut di bahan uji/);
+  assert.match(p, /pada menit\n   berapa dan bagaimana guru menilainya/);
+  assert.match(p, /juga sebagian atau dipotong; huruf atau angka tunggal boleh dilatih/);
+  assert.match(p, /Bahasa Inggris\/karakter yang boleh dinilai: menit dan cara menilai/);
   assert.match(p, /untuk\s+1 siswa sekitar 40 menit per siswa/);
   assert.match(p, /buku, bola, susu, mata, kaki, sapi, lap, air, roti, pot, apel, pena/);
   assert.match(p, /   - Alya: tugas · tugas mandiri/);
