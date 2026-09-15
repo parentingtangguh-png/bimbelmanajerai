@@ -254,6 +254,17 @@ test('prompt kegiatan: data kelas, kondisi sebelumnya, English/Karakter, dan atu
     /data-action="activity-prompt" data-prompt-button >Prompt kegiatan/
   );
   assert.match(meetingSheet('j3', { students: [] }), /data-prompt-button disabled>/);
+  // Urutan kerja guru (disetujui pemilik): siswa hadir → rencana kegiatan (prompt) → penilaian → simpan.
+  const urut = meetingSheet('j3', { students: ['anak-1'] });
+  const pos = [
+    '1. Siswa yang hadir',
+    '2. Rencana kegiatan',
+    'data-prompt-button',
+    '3. Penilaian',
+    'name="r_anak-1"',
+    'Simpan sementara</button>'
+  ].map(t => urut.indexOf(t));
+  assert.ok(pos.every((p, i) => p >= 0 && p > (pos[i - 1] ?? -1)), 'urutan lembar sesi: ' + pos.join(', '));
 });
 
 test('daftar siswa guru dan pemilik memakai status tes dan level 8 level', () => {
