@@ -310,12 +310,29 @@ document.addEventListener('click', async e => {
       await refresh();
       return notify('Jadwal dihapus.');
     }
+    // Guru meninggalkan aplikasi untuk menempel prompt, dan browser HP bisa memuat ulang tab yang ditinggal.
+    // Karena itu kehadiran (dan nilai yang sudah diketuk) disimpan sementara lebih dulu, tanpa menutup lembar.
+    // Bila gagal, prompt tetap ditampilkan supaya kelas tidak tertahan.
     if (action === 'activity-prompt') {
       const form = b.closest('form');
       const ids = new FormData(form).getAll('students');
       if (!ids.length) return notify('Centang siswa yang hadir lebih dulu.', true);
+      let saved = false;
+      try {
+        await result(
+          db.rpc('save_meeting', {
+            p_schedule: form.dataset.id,
+            p_students: meetingStudents(form),
+            p_finish: false
+          })
+        );
+        state.classScheduleStudents = await allRows('class_schedule_students', 'schedule_id');
+        listStale = saved = true;
+      } catch (err) {
+        notify('Kehadiran belum tersimpan: ' + err.message, true);
+      }
       const box = form.querySelector('[data-prompt-box]');
-      box.innerHTML = promptBox(activityPrompt(form.dataset.id, ids));
+      box.innerHTML = promptBox(activityPrompt(form.dataset.id, ids), saved);
       box.hidden = false;
       return box.scrollIntoView({ block: 'start', behavior: 'smooth' });
     }
@@ -405,6 +422,8 @@ document.addEventListener('change', e => {
     form.querySelector('[data-kids-summary]').textContent = kidsSummary(ids);
     const c = state.classSchedules.find(x => x.id === form.dataset.id);
     form.querySelector('[data-meeting-rows]').outerHTML = meetingRows(new Set(ids), Object.fromEntries(f), c);
+    // Prompt lama tidak sesuai lagi dan kehadiran baru belum tersimpan: guru mengetuk Prompt kegiatan lagi.
+    form.querySelector('[data-prompt-box]').hidden = true;
     return updateFinish(form);
   }
   if (form?.dataset.form === 'meeting' && /^(r|en|kr)_/.test(e.target.name)) return updateFinish(form);
@@ -493,13 +512,7 @@ document.addEventListener('submit', async e => {
       // Isi pertemuan: Simpan sementara (bisa diubah lagi) atau Tandai selesai (final).
       case 'meeting': {
         const finish = e.submitter?.value === '1';
-        // Level dan indikator dihitung database; guru hanya memilih siswa hadir dan nilainya.
-        const students = f.getAll('students').map(sid => ({
-          student_id: sid,
-          result: v['r_' + sid] || '',
-          english: v['en_' + sid] || '',
-          character: v['kr_' + sid] || ''
-        }));
+        const students = meetingStudents(form);
         if (finish) {
           if (!students.length) throw new Error('Pilih minimal satu siswa yang hadir.');
           if (!finishState(f.getAll('students'), v).done)
@@ -566,6 +579,29 @@ async function rateTask(form, input) {
   }
 }
 
+// Isi lembar sesi untuk save_meeting. Level dan indikator dihitung database; guru hanya memilih siswa hadir
+// dan nilainya.
+function meetingStudents(form) {
+  const f = new FormData(form);
+  return f.getAll('students').map(sid => ({
+    student_id: sid,
+    result: f.get('r_' + sid) || '',
+    english: f.get('en_' + sid) || '',
+    character: f.get('kr_' + sid) || ''
+  }));
+}
+// Prompt kegiatan menyimpan sementara tanpa render (render menutup lembar), jadi daftar jadwal di belakang
+// lembar disusun ulang setelah lembar ditutup.
+let listStale = false;
+document.addEventListener(
+  'close',
+  e => {
+    if (e.target.id !== 'modal' || !listStale) return;
+    listStale = false;
+    render();
+  },
+  true
+);
 // Tombol "Tandai sesi selesai" mengikuti isi lembar: aktif bila setiap siswa yang dicentang sudah dinilai.
 function updateFinish(form) {
   const f = new FormData(form);
@@ -573,11 +609,8 @@ function updateFinish(form) {
   const { done, hint } = finishState(ids, Object.fromEntries(f));
   form.querySelector('[data-finish]').disabled = !done;
   form.querySelector('[data-finish-hint]').textContent = hint;
-  // Prompt kegiatan mengikuti siswa yang dicentang; kotak yang sudah terbuka ikut diperbarui.
+  // Prompt kegiatan baru bisa diketuk setelah ada siswa yang dicentang.
   form.querySelector('[data-prompt-button]').disabled = !ids.length;
-  const box = form.querySelector('[data-prompt-box]');
-  if (!ids.length) box.hidden = true;
-  else if (!box.hidden) box.innerHTML = promptBox(activityPrompt(form.dataset.id, ids));
 }
 login();
 if (db) {
