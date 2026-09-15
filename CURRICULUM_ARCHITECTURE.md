@@ -149,9 +149,9 @@ Minimal mencakup, per level L1–L8:
 - **Literasi:** grafem (vokal, konsonan, `ng`/`ny`), bunyi, struktur suku kata (V, KV, KV-KV, KVK, …), struktur kata, panjang kalimat, panjang teks.
 - **Numerasi:** rentang bilangan, representasi konkret/simbolik, komposisi dan nilai tempat, operasi, pola, bentuk, ukuran.
 
-## 12. Belum dikunci
-- **Tes diagnostik**: konsep 12 tugas per level dipertahankan sementara; algoritme penentuan level awal (mis. pencarian floor/ceiling) dibahas setelah 96 indikator stabil. Aturan yang berjalan di aplikasi (satu tes satu level) tidak berubah sampai ada keputusan dan migrasi baru.
-- Redaksi final indikator, jumlah soal (3/4 atau 4/5), contoh kata/benda, judul level, kosakata English.
+## 12. Tes diagnostik (dikunci 15 Sep 2026) dan yang belum dikunci
+- **Tes diagnostik:** dikunci di [`docs/curriculum/diagnostik.md`](docs/curriculum/diagnostik.md). Satu level per tes (saran dari kelas formal), 14 tugas, hasil dihitung ke kelas (anak mulai dari indikator akademik pertama yang belum lulus), berhenti dini bila A1/B1/E1/D1 semuanya Belum, tanpa revisi. Aturan ini **menggantikan** aturan diagnostik yang berjalan di aplikasi (satu tes level 1–4, hasil tidak dihitung); aplikasi belum diubah.
+- **Belum dikunci:** judul dan deskripsi level, CP, tema pertemuan, rencana perubahan aplikasi.
 
 ## Rujukan resmi
 - Keputusan Kepala BKPDM No. 020 Tahun 2026 hanya mengubah CP Pendidikan Agama dan Budi Pekerti.
