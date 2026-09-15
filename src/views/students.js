@@ -19,12 +19,22 @@ import { inlineMarkdown } from '../markdown.js';
 // Anak aktif yang tes diagnostiknya belum final (belum dimulai atau masih draf).
 export const needsDiagnostic = s => s.status === 'Aktif' && !finalTestFor(s.id);
 
-// Tanda di bawah nama: belum dites / tes belum final (oranye) atau status tesnya.
+// Tanda di bawah nama: belum dites / tes belum final (oranye), atau posisi anak sekarang di antrean kelas.
+// Pemilik tidak menerima hasil per tugas diagnostik, jadi pemilik hanya melihat "Sudah dites".
 function statusNote(s) {
   if (needsDiagnostic(s))
     return `<small class="belum-tes">${h(testStatus(testFor(s.id)) || 'Belum tes diagnostik')}</small>`;
-  const status = testStatus(testFor(s.id));
-  return status ? `<small class="status-tes">${h(status)}</small>` : '';
+  if (!finalTestFor(s.id) || !s.pilot_level) return '';
+  if (state.role === 'owner') return '<small class="status-tes">Sudah dites</small>';
+  const n = suggestedIndicator(s);
+  const level = Number(s.pilot_level);
+  const ind = state.k8Indicators.find(i => i.level === level && i.number === n);
+  const text = n
+    ? `Indikator ${n}${ind ? ` · ${ind.slot}` : ''}`
+    : level === 8
+      ? 'Kurikulum 8 level selesai'
+      : `Siap naik ke Level ${level + 1}`;
+  return `<small class="status-tes">${h(text)}</small>`;
 }
 
 export function studentRow(s) {

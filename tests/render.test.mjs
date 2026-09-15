@@ -252,7 +252,8 @@ test('daftar siswa guru dan pemilik memakai status tes dan level 8 level', () =>
   const guru = studentsView();
   assert.match(
     guru,
-    /Alya Contoh<\/strong><small class="status-tes">Dites Level 3 · mulai Level 3 indikator 2</
+    /Alya Contoh<\/strong><small class="status-tes">Indikator 2 · B1</,
+    'guru melihat posisi anak sekarang di antrean'
   );
   assert.match(guru, /Bima Contoh<\/strong><small class="belum-tes">Belum tes diagnostik</);
   assert.ok(guru.includes('<b>Level 3 — Merangkai Awal</b>'));
@@ -278,6 +279,23 @@ test('daftar siswa guru dan pemilik memakai status tes dan level 8 level', () =>
     /Alya Contoh[\s\S]*?Level 3 — Merangkai Awal<\/td><td>Dites Level 3 · mulai Level 3 indikator 2<\/td><td class="teachers">Guru Contoh/
   );
   assert.match(pemilik, /3 siswa · 2 aktif · 1 belum tes diagnostik/);
+  assert.match(
+    dashboard(),
+    /Alya Contoh<\/strong><small class="status-tes">Sudah dites</,
+    'pemilik tanpa nomor indikator'
+  );
+  // Semua 12 Lulus: siap naik; di Level 8: kurikulum selesai.
+  state.role = 'teacher';
+  state.diagnosticResults = state.diagnosticResults.filter(r => r.number !== 2);
+  state.diagnosticResults.push(
+    ...[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(number => ({
+      test_id: 'tes-1',
+      number,
+      status: 'lulus',
+      package: 'utama'
+    }))
+  );
+  assert.match(studentsView(), /Alya Contoh<\/strong><small class="status-tes">Siap naik ke Level 4</);
 });
 
 test('profil siswa: identitas, hasil tes 14 tugas, level saat ini, status, dan hapus', () => {
