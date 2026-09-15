@@ -1921,6 +1921,12 @@ dialog::backdrop {
   color: var(--green);
   font-weight: 600;
 }
+/* Pengingat nomor WhatsApp orang tua untuk kabar harian (views/students.js). */
+.student-info small.wa-kosong {
+  display: block;
+  color: #d98b8b;
+  font-weight: 600;
+}
 
 /* Panduan per tab (views/guide.js): tombol di atas doa (HP) atau kaki halaman (laptop), isi di modal. */
 .guide-open {

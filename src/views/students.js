@@ -15,6 +15,7 @@ import { TASK_ORDER, ENGLISH, answersOf, ratedCount } from '../diagnostic.js';
 import { field, select, empty, heading, modal } from '../ui.js';
 import { escapeHtml as h } from '../domain.js';
 import { inlineMarkdown } from '../markdown.js';
+import { waNumber } from '../kabar.js';
 
 // Anak aktif yang tes diagnostiknya belum final (belum dimulai atau masih draf).
 export const needsDiagnostic = s => s.status === 'Aktif' && !finalTestFor(s.id);
@@ -37,8 +38,14 @@ function statusNote(s) {
   return `<small class="status-tes">${h(text)}</small>`;
 }
 
+// Kabar harian WhatsApp butuh nomor orang tua; guru diingatkan di daftar untuk anak aktif yang belum punya nomor sah.
+const waNote = s =>
+  state.role === 'teacher' && s.status === 'Aktif' && !waNumber(s.phone)
+    ? '<small class="wa-kosong">Nomor WA belum diisi</small>'
+    : '';
+
 export function studentRow(s) {
-  const who = `<span class="avatar pastel">${h(s.name[0])}</span><div class="student-info"><strong>${h(s.name)}</strong>${statusNote(s)}</div>`;
+  const who = `<span class="avatar pastel">${h(s.name[0])}</span><div class="student-info"><strong>${h(s.name)}</strong>${statusNote(s)}${waNote(s)}</div>`;
   const level = `<div class="mini-level"><small><b>${h(levelName(s.pilot_level))}</b></small></div>`;
   return `<button class="student-row" data-action="student" data-id="${s.id}">${who}${level}<span class="row-arrow">→</span></button>`;
 }

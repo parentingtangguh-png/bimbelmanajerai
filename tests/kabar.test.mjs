@@ -104,3 +104,15 @@ test('kabar orang tua: siap naik, melewati tujuan, dan tahap 8 tuntas', () => {
   state.diagnosticResults.push(...[5, 6, 7, 8, 9, 10, 11].map(number => ({ test_id: 'tes-1', number, status: 'lulus', package: 'utama' })));
   assert.match(parentMessage('j1', 'anak-1'), /🏆 Alya sudah menuntaskan kedelapan tahap belajar di Rumah Belajar Rainbow Kids Alfatih!/);
 });
+
+test('kabar orang tua: daftar siswa guru menandai anak aktif tanpa nomor WhatsApp', async () => {
+  const { studentsView } = await import('../src/views/students.js');
+  loadSampleState();
+  const rows = studentsView().split('class="student-row"').slice(1);
+  const row = nama => rows.find(r => r.includes(nama));
+  assert.ok(!row('Alya Contoh').includes('wa-kosong'), 'Alya punya nomor');
+  assert.match(row('Bima Contoh'), /<small class="wa-kosong">Nomor WA belum diisi<\/small>/);
+  assert.ok(!row('Citra Cuti').includes('wa-kosong'), 'anak non-aktif tidak ditandai');
+  state.role = 'owner';
+  assert.ok(!studentsView().includes('wa-kosong'), 'pemilik tidak melihat tanda');
+});
