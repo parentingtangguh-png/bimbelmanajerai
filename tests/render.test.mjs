@@ -293,11 +293,15 @@ test('daftar siswa guru dan pemilik memakai status tes dan level 8 level', () =>
 
   state.role = 'owner';
   const pemilik = studentsView();
-  assert.match(pemilik, /<th>Level<\/th><th>Tes diagnostik<\/th><th>Guru pendamping<\/th>/);
+  assert.match(pemilik, /<th>Level<\/th><th>Tes diagnostik<\/th><th>Status<\/th>/);
   assert.match(
     pemilik,
-    /Alya Contoh[\s\S]*?Level 3 — Merangkai Awal<\/td><td>Dites Level 3 · mulai Level 3 indikator 2<\/td><td class="teachers">Guru Contoh/
+    /<details class="panel owner-group" data-teacher="[^"]+"><summary><strong>Guru Contoh<\/strong>[\s\S]*?Alya Contoh[\s\S]*?Level 3 — Merangkai Awal<\/td><td>Dites Level 3 · mulai Level 3 indikator 2<\/td>/,
+    'siswa dikelompokkan per guru, kelompok tertutup'
   );
+  state.filter = 'Alya';
+  assert.match(studentsView(), /class="panel owner-group" data-teacher="[^"]+" open>/, 'saat mencari, kelompok terbuka');
+  state.filter = '';
   assert.match(pemilik, /3 siswa · 2 aktif · 1 belum tes diagnostik/);
   assert.match(
     dashboard(),

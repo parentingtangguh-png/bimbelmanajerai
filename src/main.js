@@ -445,6 +445,17 @@ document.addEventListener('change', e => {
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && e.target.matches('tr[data-action]')) e.target.click();
 });
+// Kelompok guru di Data siswa pemilik: yang dibuka tetap terbuka setelah render ulang.
+document.addEventListener(
+  'toggle',
+  e => {
+    const key = e.target.dataset?.teacher;
+    if (key === undefined || state.filter) return;
+    if (e.target.open) state.openTeachers.add(key);
+    else state.openTeachers.delete(key);
+  },
+  true
+);
 document.addEventListener('input', e => {
   if (e.target.id !== 'student-search') return;
   state.filter = e.target.value;

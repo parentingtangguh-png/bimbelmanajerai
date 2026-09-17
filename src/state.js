@@ -9,6 +9,7 @@ export const initialState = () => ({
   name: '',
   view: 'dashboard',
   filter: '',
+  openTeachers: new Set(),
   students: [],
   members: [],
   assignments: [],

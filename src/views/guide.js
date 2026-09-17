@@ -165,8 +165,11 @@ const owner = {
         '<b>Siswa</b>: nama anak dan sapaan orang tua.',
         '<b>Level</b>: level anak saat ini.',
         '<b>Tes diagnostik</b>: level yang dites dan titik mulai kelas, atau belum final.',
-        '<b>Guru pendamping</b> dan <b>Status</b> (Aktif / Non-Aktif).'
-      ])
+        '<b>Status</b>: Aktif / Non-Aktif.'
+      ]) +
+        tip(
+          'Siswa dikelompokkan per guru pendamping. Ketuk nama guru untuk membuka atau menutup daftarnya; anak yang didampingi dua guru muncul di keduanya. Saat mencari nama, kelompok yang berisi hasil terbuka sendiri.'
+        )
     ) +
     part(
       'Profil anak',

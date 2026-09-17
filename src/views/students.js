@@ -57,16 +57,38 @@ function searchToolbar(tally) {
 }
 const filtered = () => state.students.filter(s => s.name.toLowerCase().includes(state.filter.toLowerCase()));
 
-// Pemilik: satu baris per anak, hanya ringkasan.
+// Pemilik: siswa dikelompokkan per guru pendamping dalam kotak yang bisa dibuka-tutup. Anak yang
+// didampingi dua guru muncul di kedua kelompok. Kelompok yang terbuka diingat di state.openTeachers
+// (main.js), dan saat mencari semua kelompok yang berisi hasil dibuka.
 function ownerRow(s) {
-  const teachers =
-    state.assignments
-      .filter(a => a.student_id === s.id)
-      .map(a => state.profiles.find(p => p.id === a.teacher_id)?.name)
-      .filter(Boolean)
-      .join(', ') || '—';
   const tes = testStatus(testFor(s.id)) || 'Belum tes diagnostik';
-  return `<tr data-action="student" data-id="${s.id}" tabindex="0"><td><strong>${h(s.name)}</strong><small>${h(s.parent_name || '')}</small></td><td>${h(levelName(s.pilot_level))}</td><td>${h(tes)}</td><td class="teachers">${h(teachers)}</td><td><span class="badge ${s.status === 'Aktif' ? 'green' : ''}">${h(s.status)}</span></td></tr>`;
+  return `<tr data-action="student" data-id="${s.id}" tabindex="0"><td><strong>${h(s.name)}</strong><small>${h(s.parent_name || '')}</small></td><td>${h(levelName(s.pilot_level))}</td><td>${h(tes)}</td><td><span class="badge ${s.status === 'Aktif' ? 'green' : ''}">${h(s.status)}</span></td></tr>`;
+}
+export function ownerGroups(list) {
+  const groups = new Map();
+  const add = (key, name, s) => {
+    if (!groups.has(key)) groups.set(key, { key, name, students: [] });
+    groups.get(key).students.push(s);
+  };
+  for (const s of list) {
+    const ids = state.assignments.filter(a => a.student_id === s.id).map(a => a.teacher_id);
+    if (!ids.length) add('', 'Tanpa guru pendamping', s);
+    for (const id of ids) {
+      const p = state.profiles.find(p => p.id === id);
+      const off = state.members.some(m => m.email === p?.email && !m.active);
+      add(id, (p?.name || 'Guru tidak dikenal') + (off ? ' (nonaktif)' : ''), s);
+    }
+  }
+  return [...groups.values()].sort(
+    (a, b) => (a.key === '') - (b.key === '') || a.name.localeCompare(b.name, 'id')
+  );
+}
+function ownerGroup(g) {
+  const active = g.students.filter(s => s.status === 'Aktif').length;
+  const untested = g.students.filter(needsDiagnostic).length;
+  const open = state.filter || state.openTeachers.has(g.key) ? ' open' : '';
+  const tally = `${g.students.length} siswa · ${active} aktif${untested ? ` · <span class="belum-tes">${untested} belum tes diagnostik</span>` : ''}`;
+  return `<details class="panel owner-group" data-teacher="${h(g.key)}"${open}><summary><strong>${h(g.name)}</strong><small>${tally}</small></summary><div class="table-wrap"><table class="owner-students"><thead><tr><th>Siswa</th><th>Level</th><th>Tes diagnostik</th><th>Status</th></tr></thead><tbody>${g.students.map(ownerRow).join('')}</tbody></table></div></details>`;
 }
 export function ownerStudentsView() {
   const list = filtered();
@@ -75,14 +97,13 @@ export function ownerStudentsView() {
   const head = heading(
     'DATA UMUM SISWA',
     'Ringkasan siswa.',
-    `${state.students.length} siswa · ${active} aktif · ${untested} belum tes diagnostik. Klik baris untuk membuka profil.`
+    `${state.students.length} siswa · ${active} aktif · ${untested} belum tes diagnostik. Ketuk nama guru untuk membuka daftar siswanya.`
   );
-  const table = list.length
-    ? `<div class="panel table-wrap"><table class="owner-students"><thead><tr><th>Siswa</th><th>Level</th><th>Tes diagnostik</th><th>Guru pendamping</th><th>Status</th></tr></thead><tbody>${list.map(ownerRow).join('')}</tbody></table></div>`
+  const groups = list.length
+    ? `<div class="owner-groups">${ownerGroups(list).map(ownerGroup).join('')}</div>`
     : empty('Belum ada siswa', 'Siswa baru ditambahkan oleh guru dan akan tampil di sini.');
-  return `${head}${searchToolbar(`${list.length} ditampilkan`)}${table}`;
+  return `${head}${searchToolbar(`${list.length} ditampilkan`)}${groups}`;
 }
-
 export function teacherStudentsView() {
   const list = filtered();
   const active = list.filter(s => s.status === 'Aktif');
