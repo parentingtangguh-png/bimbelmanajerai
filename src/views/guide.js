@@ -181,14 +181,31 @@ const owner = {
       'Menambah guru baru',
       steps([
         `Ketuk ${b('＋ Daftarkan guru')}, isi <b>Nama guru</b> dan <b>Email guru</b>, lalu ${b('Daftarkan email guru')}.`,
-        'Buat akunnya di <b>Supabase Dashboard → Authentication → Add user</b> dengan email yang sama dan <b>Auto Confirm</b> dicentang. Akun ditolak bila emailnya belum didaftarkan di sini.',
-        'Beri tahu guru email dan kata sandi awalnya. Guru lalu masuk dan mengganti kata sandi lewat <b>Ganti kata sandi</b>.'
+        'Buat akunnya di <b>Supabase Dashboard → Authentication → Users → Add user → Create new user</b>: email yang sama, kata sandi <b>minimal 8 karakter</b>, dan <b>Auto Confirm User</b> dicentang. Akun ditolak bila emailnya belum didaftarkan di sini.',
+        'Serahkan email dan kata sandi langsung ke guru (jangan lewat grup). Guru boleh menggantinya lewat <b>Ganti kata sandi</b>.'
       ])
+    ) +
+    part(
+      'Guru lupa kata sandi atau muncul "Email not confirmed"',
+      steps([
+        'Buka <b>Supabase Dashboard → SQL Editor</b> dan jalankan perintah <b>B</b> dari dokumen <b>Prosedur akun guru</b> (docs/prosedur-akun-guru.md di GitHub).',
+        'Ganti email guru dan kata sandi baru (minimal 8 karakter). Hasil yang benar: satu baris berisi email guru.',
+        'Serahkan kata sandi baru langsung ke guru.'
+      ]) +
+        tip(
+          'Kata sandi selalu ikut diganti, walau masalahnya hanya "Email not confirmed", supaya akun yang mungkin didaftarkan orang lain tidak bisa dipakai.'
+        )
     ) +
     part(
       'Menonaktifkan guru',
       tip(
-        `${b('Nonaktifkan')} mematikan akses guru ke data aplikasi; data siswanya tetap tersimpan. ${b('Aktifkan')} mengembalikan aksesnya.`
+        `${b('Nonaktifkan')} mematikan akses guru ke data aplikasi; data siswanya tetap tersimpan. ${b('Aktifkan')} mengembalikan aksesnya. Jangan menghapus akun guru di Supabase: jadwal dan nilai kelas tercatat atas namanya.`
+      )
+    ) +
+    part(
+      'Guru ganti email',
+      tip(
+        'Jangan mengubah email guru yang sudah punya akun. Nonaktifkan email lama, lalu daftarkan email baru seperti guru baru. Siswa lama tidak ikut pindah.'
       )
     ),
 

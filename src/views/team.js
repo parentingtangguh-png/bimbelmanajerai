@@ -17,7 +17,7 @@ function memberRow(m) {
 function memberList() {
   return (
     state.members.map(m => memberRow(m)).join('') ||
-    empty('Belum ada guru', 'Tambahkan email guru. Guru kemudian mengaktifkan akun melalui halaman login.')
+    empty('Belum ada guru', 'Daftarkan email guru, lalu buat akunnya di Supabase. Buka Panduan Tim pengajar.')
   );
 }
 
@@ -31,6 +31,6 @@ function teamHeading() {
 }
 
 export function teamView() {
-  const note = `<div class="notice">Guru mengaktifkan akun menggunakan email yang didaftarkan di sini, lalu menambahkan siswanya sendiri di menu Data siswa.</div>`;
+  const note = `<div class="notice">Akun guru dibuat dan diaktifkan oleh pemilik di Supabase dengan email yang didaftarkan di sini (lihat Panduan Tim pengajar). Guru lalu menambahkan siswanya sendiri di menu Data siswa.</div>`;
   return `${teamHeading()}<div class="panel">${memberList()}</div>${note}`;
 }

@@ -400,7 +400,9 @@ document.addEventListener('click', async e => {
           options: { emailRedirectTo: location.origin + location.pathname }
         })
       );
-      notify('Aktivasi diterima. Periksa email konfirmasi, lalu masuk.');
+      notify(
+        'Pendaftaran diterima. Minta pemilik bimbel mengaktifkan akun Anda, lalu masuk dengan email dan kata sandi ini.'
+      );
     }
     if (action === 'toggle-member') {
       const m = state.members.find(m => m.email === id);
