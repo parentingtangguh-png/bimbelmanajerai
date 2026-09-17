@@ -178,15 +178,26 @@ ATURAN
    pilihan lain (misalnya lima vokal). Bila penilaian tidak bisa berjalan sah, tulis "belum dinilai".
 8. Pastikan isi kegiatan benar secara materi. Jangan memakai kata ${PROTECTED_WORDS}
    sebagai tulisan latihan, karena kata-kata itu dipakai sebagai bahan uji.
-9. Jawaban paling banyak sekitar ${250 + 120 * kids.length} kata (untuk ${kids.length} siswa), Bahasa Indonesia sederhana,
+9. Jawaban paling banyak sekitar ${350 + 120 * kids.length} kata (untuk ${kids.length} siswa), Bahasa Indonesia sederhana,
    berupa poin tanpa tabel, tanpa mengulang penjelasan dan tanpa menyalin ulang data siswa yang tidak dipakai.
+10. Tulis kalimat praktis guru dalam Bahasa Inggris sederhana untuk menjalankan kelas:
+   membuka kelas, menarik perhatian, memberi instruksi, pergantian kegiatan, menunggu
+   giliran, menyemangati, mengarahkan perilaku, dan menutup kelas. Tulis dengan format
+   Guru: "kalimat Bahasa Inggris" (arti Bahasa Indonesia); dalam arti, guru disebut Ustazah.
+   Kalimat pendek 2–6 kata yang mudah ditiru anak, misalnya "Good morning, everyone!",
+   "Eyes on me, please.", "Your turn.", "Well done!", "Let's tidy up.", "See you next time!".
+   Ungkapan Islami yang lazim boleh menyertai (Assalamu'alaikum, Bismillah, Alhamdulillah,
+   MasyaAllah, Barakallahu fiik). Ajak anak menirukan sebagian kalimat, tetapi kalimat
+   praktis bukan bahan penilaian. Saat menilai Bahasa Inggris atau karakter, jangan
+   mengucapkan kalimat praktis yang menyebut jawaban atau menyuruh perilaku yang dinilai
+   (lihat aturan 5).
 
 FORMAT JAWABAN
 1. Judul kegiatan
 2. Bahan
-3. Pembuka (menit 0–10)
+3. Pembuka (menit 0–10) · kalimat praktis guru
 4. Kegiatan inti (menit 10–50)
-   - Tugas bersama
+   - Tugas bersama · kalimat praktis guru
    - Urutan pendampingan guru (menit)
 ${names
   .map(
@@ -194,5 +205,5 @@ ${names
      · Bahasa Inggris/karakter yang boleh dinilai: menit dan cara menilai`
   )
   .join('\n')}
-5. Penutup (menit 50–60)`;
+5. Penutup (menit 50–60) · kalimat praktis guru`;
 }

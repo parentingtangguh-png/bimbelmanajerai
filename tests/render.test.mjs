@@ -241,6 +241,11 @@ test('prompt kegiatan: data kelas, kondisi sebelumnya, English/Karakter, dan atu
   assert.match(p, /untuk\s+1 siswa sekitar 40 menit per siswa/);
   assert.match(p, /buku, bola, susu, mata, kaki, sapi, lap, air, roti, pot, apel, pena/);
   assert.match(p, /   - Alya: tugas · tugas mandiri/);
+  // Kalimat praktis guru dalam Bahasa Inggris (disetujui pemilik 18 Sep 2026).
+  assert.match(p, /sekitar 470 kata \(untuk 1 siswa\)/);
+  assert.match(p, /10\. Tulis kalimat praktis guru dalam Bahasa Inggris[\s\S]*guru disebut Ustazah\.[\s\S]*bukan bahan penilaian/);
+  assert.match(p, /3\. Pembuka \(menit 0–10\) · kalimat praktis guru/);
+  assert.match(p, /5\. Penutup \(menit 50–60\) · kalimat praktis guru$/);
   assert.ok(!p.includes('undefined') && !p.includes('**'));
   state.classScheduleStudents = [];
   assert.match(
