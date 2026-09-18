@@ -29,7 +29,7 @@ export function buildKabar() {
   const md = fs.readFileSync(path.join(ROOT, DOC), 'utf8').replace(/^﻿/, '').replace(/\r\n/g, '\n');
   const indicators = md
     .split('\n')
-    .filter(l => /^\| \d \| \d+ \|/.test(l))
+    .filter(l => /^\| \d+ \| \d+ \|/.test(l))
     .map(l => {
       const [level, number, slot, berhasil, berlatih, berikutnya, rumah] = cells(l);
       return {

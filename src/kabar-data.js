@@ -1008,6 +1008,1266 @@ export const KABAR = {
    "berlatih": "menjalankan rutinitas belajar pendek dengan mandiri",
    "berikutnya": "membiasakan rutinitas belajar mandiri",
    "rumah": "Beri isyarat umum rutinitas kecil, lalu biarkan {panggilan} menjalankannya."
+  },
+  {
+   "level": 9,
+   "number": 1,
+   "slot": "A1",
+   "berhasil": "membaca kata berawalan me- dan ber-",
+   "berlatih": "membaca kata berawalan me- dan ber-",
+   "berikutnya": "membaca kata berawalan me- dan ber-",
+   "rumah": "Tulis 5 kata berawalan me- atau ber-, lalu minta {panggilan} membacanya."
+  },
+  {
+   "level": 9,
+   "number": 2,
+   "slot": "B1",
+   "berhasil": "memahami arti kata dari kalimat",
+   "berlatih": "memahami arti kata dari kalimat",
+   "berikutnya": "memahami arti kata dari kalimat",
+   "rumah": "Ucapkan satu kalimat dengan kata baru, lalu tanya maknanya."
+  },
+  {
+   "level": 9,
+   "number": 3,
+   "slot": "E1",
+   "berhasil": "mengenali ratusan, puluhan, dan satuan",
+   "berlatih": "mengenali ratusan, puluhan, dan satuan",
+   "berikutnya": "mengenali ratusan, puluhan, dan satuan",
+   "rumah": "Tulis angka 3 digit, minta {panggilan} menyebut ratusan sampai satuan."
+  },
+  {
+   "level": 9,
+   "number": 4,
+   "slot": "D1",
+   "berhasil": "menyalin paragraf pendek dengan rapi",
+   "berlatih": "menyalin paragraf pendek dengan rapi",
+   "berikutnya": "menyalin paragraf pendek dengan rapi",
+   "rumah": "Tulis dua kalimat pendek, lalu minta {panggilan} menyalinnya pelan."
+  },
+  {
+   "level": 9,
+   "number": 5,
+   "slot": "C1",
+   "berhasil": "membaca teks pendek dengan teliti",
+   "berlatih": "membaca teks pendek dengan teliti",
+   "berikutnya": "membaca teks pendek dengan teliti",
+   "rumah": "Tulis tiga kalimat pendek, lalu dengarkan {panggilan} membacanya."
+  },
+  {
+   "level": 9,
+   "number": 6,
+   "slot": "F1",
+   "berhasil": "mengenali sifat bangun datar sederhana",
+   "berlatih": "mengenali sifat bangun datar sederhana",
+   "berikutnya": "mengenali sifat bangun datar sederhana",
+   "rumah": "Gambar empat bangun, lalu minta {panggilan} menyebut sisinya."
+  },
+  {
+   "level": 9,
+   "number": 7,
+   "slot": "A2",
+   "berhasil": "membaca kalimat pendek dengan jeda tepat",
+   "berlatih": "membaca kalimat pendek dengan jeda tepat",
+   "berikutnya": "membaca kalimat pendek dengan jeda tepat",
+   "rumah": "Tulis kalimat memakai koma, lalu minta {panggilan} membaca berjeda."
+  },
+  {
+   "level": 9,
+   "number": 8,
+   "slot": "B2",
+   "berhasil": "memilih kata yang lebih tepat",
+   "berlatih": "memilih kata yang lebih tepat",
+   "berikutnya": "memilih kata yang lebih tepat",
+   "rumah": "Beri dua pilihan kata, minta {panggilan} memilih yang cocok."
+  },
+  {
+   "level": 9,
+   "number": 9,
+   "slot": "E2",
+   "berhasil": "menjumlah dan mengurang angka tiga digit",
+   "berlatih": "menjumlah dan mengurang angka tiga digit",
+   "berikutnya": "menjumlah dan mengurang angka tiga digit",
+   "rumah": "Tulis satu penjumlahan tiga digit, kerjakan bersama pelan."
+  },
+  {
+   "level": 9,
+   "number": 10,
+   "slot": "D2",
+   "berhasil": "menulis dua kalimat yang saling berhubungan",
+   "berlatih": "menulis dua kalimat yang saling berhubungan",
+   "berikutnya": "menulis dua kalimat yang saling berhubungan",
+   "rumah": "Minta {panggilan} menulis dua kalimat tentang kegiatan hari ini."
+  },
+  {
+   "level": 9,
+   "number": 11,
+   "slot": "C2",
+   "berhasil": "menemukan informasi langsung dari teks pendek",
+   "berlatih": "menemukan informasi langsung dari teks pendek",
+   "berikutnya": "menemukan informasi langsung dari teks pendek",
+   "rumah": "Bacakan dua kalimat, lalu tanyakan satu hal yang disebut."
+  },
+  {
+   "level": 9,
+   "number": 12,
+   "slot": "F2",
+   "berhasil": "menghitung keliling bangun bersisi empat",
+   "berlatih": "menghitung keliling bangun bersisi empat",
+   "berikutnya": "menghitung keliling bangun bersisi empat",
+   "rumah": "Gambar persegi panjang, tulis sisi, lalu jumlahkan bersama."
+  },
+  {
+   "level": 9,
+   "number": 13,
+   "slot": "EN",
+   "berhasil": "merespons instruksi kelas dalam English",
+   "berlatih": "merespons instruksi kelas dalam English",
+   "berikutnya": "merespons instruksi kelas dalam English",
+   "rumah": "Ucapkan \"stand up\" dan \"sit down\", lalu lakukan bergantian."
+  },
+  {
+   "level": 9,
+   "number": 14,
+   "slot": "KR",
+   "berhasil": "merawat barang pribadi dan barang bersama",
+   "berlatih": "merawat barang pribadi dan barang bersama",
+   "berikutnya": "merawat barang pribadi dan barang bersama",
+   "rumah": "Ajak {panggilan} mengembalikan satu barang ke tempatnya."
+  },
+  {
+   "level": 10,
+   "number": 1,
+   "slot": "A1",
+   "berhasil": "membaca kata berakhiran -an dan -kan",
+   "berlatih": "membaca kata berakhiran -an dan -kan",
+   "berikutnya": "membaca kata berakhiran -an dan -kan",
+   "rumah": "Tulis 5 kata berakhiran -an atau -kan, lalu baca bersama."
+  },
+  {
+   "level": 10,
+   "number": 2,
+   "slot": "B1",
+   "berhasil": "mengenali kata mirip dan berlawanan",
+   "berlatih": "mengenali kata mirip dan berlawanan",
+   "berikutnya": "mengenali kata mirip dan berlawanan",
+   "rumah": "Sebutkan satu kata, lalu cari lawan katanya bersama."
+  },
+  {
+   "level": 10,
+   "number": 3,
+   "slot": "E1",
+   "berhasil": "memahami perkalian sebagai penjumlahan berulang",
+   "berlatih": "memahami perkalian sebagai penjumlahan berulang",
+   "berikutnya": "memahami perkalian sebagai penjumlahan berulang",
+   "rumah": "Pakai sendok, buat 3 kelompok isi 2, lalu hitung."
+  },
+  {
+   "level": 10,
+   "number": 4,
+   "slot": "D1",
+   "berhasil": "menyalin paragraf dari jarak lebih jauh",
+   "berlatih": "menyalin paragraf dari jarak lebih jauh",
+   "berikutnya": "menyalin paragraf dari jarak lebih jauh",
+   "rumah": "Tulis dua kalimat di papan kecil, minta {panggilan} menyalin."
+  },
+  {
+   "level": 10,
+   "number": 5,
+   "slot": "C1",
+   "berhasil": "membaca teks pendek dengan jeda wajar",
+   "berlatih": "membaca teks pendek dengan jeda wajar",
+   "berikutnya": "membaca teks pendek dengan jeda wajar",
+   "rumah": "Tulis tiga kalimat, lalu dengarkan jeda titiknya."
+  },
+  {
+   "level": 10,
+   "number": 6,
+   "slot": "F1",
+   "berhasil": "membaca jam dan satuan waktu sederhana",
+   "berlatih": "membaca jam dan satuan waktu sederhana",
+   "berikutnya": "membaca jam dan satuan waktu sederhana",
+   "rumah": "Tunjuk jam rumah, tanyakan jam tepat atau setengah."
+  },
+  {
+   "level": 10,
+   "number": 7,
+   "slot": "A2",
+   "berhasil": "membaca dua kalimat berurutan dengan lancar",
+   "berlatih": "membaca dua kalimat berurutan dengan lancar",
+   "berikutnya": "membaca dua kalimat berurutan dengan lancar",
+   "rumah": "Tulis dua kalimat bersambung, lalu baca bergantian."
+  },
+  {
+   "level": 10,
+   "number": 8,
+   "slot": "B2",
+   "berhasil": "menyusun kata acak menjadi kalimat",
+   "berlatih": "menyusun kata acak menjadi kalimat",
+   "berikutnya": "menyusun kata acak menjadi kalimat",
+   "rumah": "Ucapkan tiga kata acak, minta {panggilan} menyusun kalimat."
+  },
+  {
+   "level": 10,
+   "number": 9,
+   "slot": "E2",
+   "berhasil": "membagi bilangan kecil dengan benar",
+   "berlatih": "membagi bilangan kecil dengan benar",
+   "berikutnya": "membagi bilangan kecil dengan benar",
+   "rumah": "Bagi 12 sendok ke 3 kelompok, lalu hitung tiap kelompok."
+  },
+  {
+   "level": 10,
+   "number": 10,
+   "slot": "D2",
+   "berhasil": "menulis tiga kalimat berurutan",
+   "berlatih": "menulis tiga kalimat berurutan",
+   "berikutnya": "menulis tiga kalimat berurutan",
+   "rumah": "Minta {panggilan} menulis awal, tengah, akhir kejadian."
+  },
+  {
+   "level": 10,
+   "number": 11,
+   "slot": "C2",
+   "berhasil": "menemukan dua informasi dari teks pendek",
+   "berlatih": "menemukan dua informasi dari teks pendek",
+   "berikutnya": "menemukan dua informasi dari teks pendek",
+   "rumah": "Bacakan cerita sangat singkat, lalu tanyakan dua hal."
+  },
+  {
+   "level": 10,
+   "number": 12,
+   "slot": "F2",
+   "berhasil": "mengubah sentimeter dan meter sederhana",
+   "berlatih": "mengubah sentimeter dan meter sederhana",
+   "berikutnya": "mengubah sentimeter dan meter sederhana",
+   "rumah": "Ukur meja kira-kira, lalu ubah meter ke sentimeter."
+  },
+  {
+   "level": 10,
+   "number": 13,
+   "slot": "EN",
+   "berhasil": "menjawab pertanyaan English tentang tema",
+   "berlatih": "menjawab pertanyaan English tentang tema",
+   "berikutnya": "menjawab pertanyaan English tentang tema",
+   "rumah": "Tunjuk benda rumah, tanya \"What color is it?\""
+  },
+  {
+   "level": 10,
+   "number": 14,
+   "slot": "KR",
+   "berhasil": "berkata jujur saat situasi sulit",
+   "berlatih": "berkata jujur saat situasi sulit",
+   "berikutnya": "berkata jujur saat situasi sulit",
+   "rumah": "Ceritakan contoh jujur, lalu tanya pilihan {panggilan}."
+  },
+  {
+   "level": 11,
+   "number": 1,
+   "slot": "A1",
+   "berhasil": "membaca kata berimbuhan gabungan",
+   "berlatih": "membaca kata berimbuhan gabungan",
+   "berikutnya": "membaca kata berimbuhan gabungan",
+   "rumah": "Tulis 5 kata panjang, lalu minta dibaca utuh."
+  },
+  {
+   "level": 11,
+   "number": 2,
+   "slot": "B1",
+   "berhasil": "memahami fungsi kata hubung",
+   "berlatih": "memahami fungsi kata hubung",
+   "berikutnya": "memahami fungsi kata hubung",
+   "rumah": "Buat dua kalimat, lalu sambungkan dengan \"karena\"."
+  },
+  {
+   "level": 11,
+   "number": 3,
+   "slot": "E1",
+   "berhasil": "memahami ribuan dan urutan bilangan",
+   "berlatih": "memahami ribuan dan urutan bilangan",
+   "berikutnya": "memahami ribuan dan urutan bilangan",
+   "rumah": "Tulis 4 angka ribuan, minta urutkan dari kecil."
+  },
+  {
+   "level": 11,
+   "number": 4,
+   "slot": "D1",
+   "berhasil": "menulis kalimat dengan tanda baca tepat",
+   "berlatih": "menulis kalimat dengan tanda baca tepat",
+   "berikutnya": "menulis kalimat dengan tanda baca tepat",
+   "rumah": "Tulis kalimat tanpa titik, minta {panggilan} memperbaiki."
+  },
+  {
+   "level": 11,
+   "number": 5,
+   "slot": "C1",
+   "berhasil": "mengenali bagian teks informasi pendek",
+   "berlatih": "mengenali bagian teks informasi pendek",
+   "berikutnya": "mengenali bagian teks informasi pendek",
+   "rumah": "Tulis judul dan dua kalimat, bahas bagian pembukanya."
+  },
+  {
+   "level": 11,
+   "number": 6,
+   "slot": "F1",
+   "berhasil": "mengenali satuan berat dan waktu",
+   "berlatih": "mengenali satuan berat dan waktu",
+   "berikutnya": "mengenali satuan berat dan waktu",
+   "rumah": "Tanya 1 jam berapa menit, lalu contohkan kegiatan."
+  },
+  {
+   "level": 11,
+   "number": 7,
+   "slot": "A2",
+   "berhasil": "membaca tiga kalimat tanpa mengeja",
+   "berlatih": "membaca tiga kalimat tanpa mengeja",
+   "berikutnya": "membaca tiga kalimat tanpa mengeja",
+   "rumah": "Tulis tiga kalimat, lalu minta dibaca tanpa mengeja."
+  },
+  {
+   "level": 11,
+   "number": 8,
+   "slot": "B2",
+   "berhasil": "mengubah kalimat menjadi bentuk dibalik",
+   "berlatih": "mengubah kalimat menjadi bentuk dibalik",
+   "berikutnya": "mengubah kalimat menjadi bentuk dibalik",
+   "rumah": "Ucapkan \"Ibu memasak nasi\", lalu ubah menjadi \"dimasak\"."
+  },
+  {
+   "level": 11,
+   "number": 9,
+   "slot": "E2",
+   "berhasil": "mengalikan dan membagi bilangan dua digit",
+   "berlatih": "mengalikan dan membagi bilangan dua digit",
+   "berikutnya": "mengalikan dan membagi bilangan dua digit",
+   "rumah": "Tulis satu kali-kalian dua digit, kerjakan perlahan."
+  },
+  {
+   "level": 11,
+   "number": 10,
+   "slot": "D2",
+   "berhasil": "menulis paragraf dengan gagasan dan rincian",
+   "berlatih": "menulis paragraf dengan gagasan dan rincian",
+   "berikutnya": "menulis paragraf dengan gagasan dan rincian",
+   "rumah": "Minta {panggilan} menulis satu paragraf tentang kegiatan sore."
+  },
+  {
+   "level": 11,
+   "number": 11,
+   "slot": "C2",
+   "berhasil": "menemukan gagasan pokok teks pendek",
+   "berlatih": "menemukan gagasan pokok teks pendek",
+   "berikutnya": "menemukan gagasan pokok teks pendek",
+   "rumah": "Bacakan paragraf pendek, tanyakan hal utama yang dibahas."
+  },
+  {
+   "level": 11,
+   "number": 12,
+   "slot": "F2",
+   "berhasil": "menghitung keliling dan mengubah gram-kilogram",
+   "berlatih": "menghitung keliling dan mengubah gram-kilogram",
+   "berikutnya": "menghitung keliling dan mengubah gram-kilogram",
+   "rumah": "Tulis sisi segitiga, lalu jumlahkan kelilingnya bersama."
+  },
+  {
+   "level": 11,
+   "number": 13,
+   "slot": "EN",
+   "berhasil": "menjawab What, How many, dan color",
+   "berlatih": "menjawab What, How many, dan color",
+   "berikutnya": "menjawab What, How many, dan color",
+   "rumah": "Tunjuk benda, tanyakan \"What is this?\" singkat."
+  },
+  {
+   "level": 11,
+   "number": 14,
+   "slot": "KR",
+   "berhasil": "bekerja sama menyelesaikan tugas bersama",
+   "berlatih": "bekerja sama menyelesaikan tugas bersama",
+   "berikutnya": "bekerja sama menyelesaikan tugas bersama",
+   "rumah": "Ajak {panggilan} membagi tugas merapikan meja makan."
+  },
+  {
+   "level": 12,
+   "number": 1,
+   "slot": "A1",
+   "berhasil": "membaca kata majemuk dan kata ulang",
+   "berlatih": "membaca kata majemuk dan kata ulang",
+   "berikutnya": "membaca kata majemuk dan kata ulang",
+   "rumah": "Tulis 5 kata ulang, lalu baca bersama bergantian."
+  },
+  {
+   "level": 12,
+   "number": 2,
+   "slot": "B1",
+   "berhasil": "menemukan gagasan pokok paragraf",
+   "berlatih": "menemukan gagasan pokok paragraf",
+   "berikutnya": "menemukan gagasan pokok paragraf",
+   "rumah": "Bacakan paragraf pendek, tanya inti ceritanya."
+  },
+  {
+   "level": 12,
+   "number": 3,
+   "slot": "E1",
+   "berhasil": "mengenali pecahan sederhana",
+   "berlatih": "mengenali pecahan sederhana",
+   "berikutnya": "mengenali pecahan sederhana",
+   "rumah": "Lipat kertas menjadi dua dan empat bagian, lalu sebutkan."
+  },
+  {
+   "level": 12,
+   "number": 4,
+   "slot": "D1",
+   "berhasil": "menulis narasi mengikuti urutan kejadian",
+   "berlatih": "menulis narasi mengikuti urutan kejadian",
+   "berikutnya": "menulis narasi mengikuti urutan kejadian",
+   "rumah": "Sebutkan awal, tengah, akhir kejadian, lalu tulis singkat."
+  },
+  {
+   "level": 12,
+   "number": 5,
+   "slot": "C1",
+   "berhasil": "membaca narasi sambil mengikuti urutan kejadian",
+   "berlatih": "membaca narasi sambil mengikuti urutan kejadian",
+   "berikutnya": "membaca narasi sambil mengikuti urutan kejadian",
+   "rumah": "Bacakan cerita pendek, minta {panggilan} menyebut awalnya."
+  },
+  {
+   "level": 12,
+   "number": 6,
+   "slot": "F1",
+   "berhasil": "memahami luas sebagai jumlah kotak",
+   "berlatih": "memahami luas sebagai jumlah kotak",
+   "berikutnya": "memahami luas sebagai jumlah kotak",
+   "rumah": "Gambar petak 3 kali 2, lalu hitung kotaknya."
+  },
+  {
+   "level": 12,
+   "number": 7,
+   "slot": "A2",
+   "berhasil": "membaca tanya dan seru dengan intonasi",
+   "berlatih": "membaca tanya dan seru dengan intonasi",
+   "berikutnya": "membaca tanya dan seru dengan intonasi",
+   "rumah": "Tulis satu tanya dan satu seru, lalu bacakan."
+  },
+  {
+   "level": 12,
+   "number": 8,
+   "slot": "B2",
+   "berhasil": "menyusun kalimat acak menjadi paragraf",
+   "berlatih": "menyusun kalimat acak menjadi paragraf",
+   "berikutnya": "menyusun kalimat acak menjadi paragraf",
+   "rumah": "Ucapkan tiga kejadian acak, minta disusun berurutan."
+  },
+  {
+   "level": 12,
+   "number": 9,
+   "slot": "E2",
+   "berhasil": "mengurutkan dan menjumlah pecahan sejenis",
+   "berlatih": "mengurutkan dan menjumlah pecahan sejenis",
+   "berikutnya": "mengurutkan dan menjumlah pecahan sejenis",
+   "rumah": "Tulis 1/5 dan 3/5, tanyakan mana lebih besar."
+  },
+  {
+   "level": 12,
+   "number": 10,
+   "slot": "D2",
+   "berhasil": "menulis cerita dengan awal, tengah, akhir",
+   "berlatih": "menulis cerita dengan awal, tengah, akhir",
+   "berikutnya": "menulis cerita dengan awal, tengah, akhir",
+   "rumah": "Minta {panggilan} menulis cerita enam kalimat tentang rumah."
+  },
+  {
+   "level": 12,
+   "number": 11,
+   "slot": "C2",
+   "berhasil": "mengurutkan kejadian dalam cerita",
+   "berlatih": "mengurutkan kejadian dalam cerita",
+   "berikutnya": "mengurutkan kejadian dalam cerita",
+   "rumah": "Ceritakan tiga kejadian, minta {panggilan} mengurutkan kembali."
+  },
+  {
+   "level": 12,
+   "number": 12,
+   "slot": "F2",
+   "berhasil": "menghitung luas persegi dan persegi panjang",
+   "berlatih": "menghitung luas persegi dan persegi panjang",
+   "berikutnya": "menghitung luas persegi dan persegi panjang",
+   "rumah": "Gambar persegi panjang 4 kali 3, lalu hitung luas."
+  },
+  {
+   "level": 12,
+   "number": 13,
+   "slot": "EN",
+   "berhasil": "memperkenalkan diri dan teman dalam English",
+   "berlatih": "memperkenalkan diri dan teman dalam English",
+   "berikutnya": "memperkenalkan diri dan teman dalam English",
+   "rumah": "Latih \"My name is...\" dan \"This is my friend.\""
+  },
+  {
+   "level": 12,
+   "number": 14,
+   "slot": "KR",
+   "berhasil": "mengikuti aturan dan jadwal belajar",
+   "berlatih": "mengikuti aturan dan jadwal belajar",
+   "berikutnya": "mengikuti aturan dan jadwal belajar",
+   "rumah": "Sepakati waktu belajar 5 menit, lalu tepati bersama."
+  },
+  {
+   "level": 13,
+   "number": 1,
+   "slot": "A1",
+   "berhasil": "membaca kata bergugus konsonan",
+   "berlatih": "membaca kata bergugus konsonan",
+   "berikutnya": "membaca kata bergugus konsonan",
+   "rumah": "Tulis \"strategi\" dan \"struktur\", lalu baca perlahan."
+  },
+  {
+   "level": 13,
+   "number": 2,
+   "slot": "B1",
+   "berhasil": "mengenali cara paragraf dikembangkan",
+   "berlatih": "mengenali cara paragraf dikembangkan",
+   "berikutnya": "mengenali cara paragraf dikembangkan",
+   "rumah": "Bacakan paragraf pendek, tanya apakah berisi contoh."
+  },
+  {
+   "level": 13,
+   "number": 3,
+   "slot": "E1",
+   "berhasil": "memahami nilai tempat, FPB, dan KPK",
+   "berlatih": "memahami nilai tempat, FPB, dan KPK",
+   "berikutnya": "memahami nilai tempat, FPB, dan KPK",
+   "rumah": "Tulis dua angka kecil, cari kelipatan bersamanya."
+  },
+  {
+   "level": 13,
+   "number": 4,
+   "slot": "D1",
+   "berhasil": "menggabungkan kalimat memakai kata hubung",
+   "berlatih": "menggabungkan kalimat memakai kata hubung",
+   "berikutnya": "menggabungkan kalimat memakai kata hubung",
+   "rumah": "Beri dua kalimat, minta sambungkan dengan \"tetapi\"."
+  },
+  {
+   "level": 13,
+   "number": 5,
+   "slot": "C1",
+   "berhasil": "membaca teks akademik dan menangkap konteks kata",
+   "berlatih": "membaca teks akademik dan menangkap konteks kata",
+   "berikutnya": "membaca teks akademik dan menangkap konteks kata",
+   "rumah": "Tulis satu kata sulit dalam kalimat, tebak maknanya."
+  },
+  {
+   "level": 13,
+   "number": 6,
+   "slot": "F1",
+   "berhasil": "mengenali sisi, rusuk, dan titik sudut",
+   "berlatih": "mengenali sisi, rusuk, dan titik sudut",
+   "berikutnya": "mengenali sisi, rusuk, dan titik sudut",
+   "rumah": "Gambar kubus sederhana, hitung sisi bersama-sama."
+  },
+  {
+   "level": 13,
+   "number": 7,
+   "slot": "A2",
+   "berhasil": "membaca kalimat tanya dan seru dengan tepat",
+   "berlatih": "membaca kalimat tanya dan seru dengan tepat",
+   "berikutnya": "membaca kalimat tanya dan seru dengan tepat",
+   "rumah": "Tulis satu kalimat tanya, lalu latih nada membacanya."
+  },
+  {
+   "level": 13,
+   "number": 8,
+   "slot": "B2",
+   "berhasil": "menambah kalimat penjelas yang sesuai",
+   "berlatih": "menambah kalimat penjelas yang sesuai",
+   "berikutnya": "menambah kalimat penjelas yang sesuai",
+   "rumah": "Beri satu gagasan, minta {panggilan} menambah penjelasan."
+  },
+  {
+   "level": 13,
+   "number": 9,
+   "slot": "E2",
+   "berhasil": "mengalikan dua digit dan membagi bersisa",
+   "berlatih": "mengalikan dua digit dan membagi bersisa",
+   "berikutnya": "mengalikan dua digit dan membagi bersisa",
+   "rumah": "Tulis satu perkalian dua digit, kerjakan bersama."
+  },
+  {
+   "level": 13,
+   "number": 10,
+   "slot": "D2",
+   "berhasil": "menulis deskripsi dengan ciri yang jelas",
+   "berlatih": "menulis deskripsi dengan ciri yang jelas",
+   "berikutnya": "menulis deskripsi dengan ciri yang jelas",
+   "rumah": "Pilih satu benda rumah, tulis tiga cirinya."
+  },
+  {
+   "level": 13,
+   "number": 11,
+   "slot": "C2",
+   "berhasil": "menebak makna kata dari konteks",
+   "berlatih": "menebak makna kata dari konteks",
+   "berikutnya": "menebak makna kata dari konteks",
+   "rumah": "Ucapkan kalimat dengan kata baru, lalu bahas petunjuknya."
+  },
+  {
+   "level": 13,
+   "number": 12,
+   "slot": "F2",
+   "berhasil": "menghitung volume kubus dan balok",
+   "berlatih": "menghitung volume kubus dan balok",
+   "berikutnya": "menghitung volume kubus dan balok",
+   "rumah": "Gambar balok 2x3x4, lalu kalikan ukurannya."
+  },
+  {
+   "level": 13,
+   "number": 13,
+   "slot": "EN",
+   "berhasil": "mendeskripsikan benda atau orang dalam English",
+   "berlatih": "mendeskripsikan benda atau orang dalam English",
+   "berikutnya": "mendeskripsikan benda atau orang dalam English",
+   "rumah": "Latih \"It is big\" dan \"It is small.\""
+  },
+  {
+   "level": 13,
+   "number": 14,
+   "slot": "KR",
+   "berhasil": "memahami perasaan orang lain",
+   "berlatih": "memahami perasaan orang lain",
+   "berikutnya": "memahami perasaan orang lain",
+   "rumah": "Tanyakan perasaan tokoh film, lalu bahas cara membantu."
+  },
+  {
+   "level": 14,
+   "number": 1,
+   "slot": "A1",
+   "berhasil": "membaca kata serapan panjang",
+   "berlatih": "membaca kata serapan panjang",
+   "berikutnya": "membaca kata serapan panjang",
+   "rumah": "Tulis \"komunikasi\" dan \"teknologi\", lalu baca bersama."
+  },
+  {
+   "level": 14,
+   "number": 2,
+   "slot": "B1",
+   "berhasil": "membedakan fakta dan opini",
+   "berlatih": "membedakan fakta dan opini",
+   "berikutnya": "membedakan fakta dan opini",
+   "rumah": "Ucapkan satu fakta dan opini, minta {panggilan} memilih."
+  },
+  {
+   "level": 14,
+   "number": 3,
+   "slot": "E1",
+   "berhasil": "menghubungkan desimal dan pecahan sederhana",
+   "berlatih": "menghubungkan desimal dan pecahan sederhana",
+   "berikutnya": "menghubungkan desimal dan pecahan sederhana",
+   "rumah": "Tulis 0,5 dan 1/2, bahas nilainya sama."
+  },
+  {
+   "level": 14,
+   "number": 4,
+   "slot": "D1",
+   "berhasil": "menulis paragraf informasi dari poin",
+   "berlatih": "menulis paragraf informasi dari poin",
+   "berikutnya": "menulis paragraf informasi dari poin",
+   "rumah": "Tulis tiga poin tentang tanaman, ubah jadi paragraf."
+  },
+  {
+   "level": 14,
+   "number": 5,
+   "slot": "C1",
+   "berhasil": "membaca teks dengan kalimat lebih kompleks",
+   "berlatih": "membaca teks dengan kalimat lebih kompleks",
+   "berikutnya": "membaca teks dengan kalimat lebih kompleks",
+   "rumah": "Tulis kalimat dengan \"karena\", lalu minta dibaca lancar."
+  },
+  {
+   "level": 14,
+   "number": 6,
+   "slot": "F1",
+   "berhasil": "membaca tabel dan diagram sederhana",
+   "berlatih": "membaca tabel dan diagram sederhana",
+   "berikutnya": "membaca tabel dan diagram sederhana",
+   "rumah": "Buat tabel jumlah sendok dan piring, lalu bandingkan."
+  },
+  {
+   "level": 14,
+   "number": 7,
+   "slot": "A2",
+   "berhasil": "membaca teks berisi kata serapan",
+   "berlatih": "membaca teks berisi kata serapan",
+   "berikutnya": "membaca teks berisi kata serapan",
+   "rumah": "Tulis dua kalimat dengan kata \"informasi\", lalu baca."
+  },
+  {
+   "level": 14,
+   "number": 8,
+   "slot": "B2",
+   "berhasil": "memilih kata formal yang tepat",
+   "berlatih": "memilih kata formal yang tepat",
+   "berikutnya": "memilih kata formal yang tepat",
+   "rumah": "Bandingkan \"bilang\" dan \"mengatakan\", pilih yang formal."
+  },
+  {
+   "level": 14,
+   "number": 9,
+   "slot": "E2",
+   "berhasil": "menghitung desimal dan mengubah pecahan",
+   "berlatih": "menghitung desimal dan mengubah pecahan",
+   "berikutnya": "menghitung desimal dan mengubah pecahan",
+   "rumah": "Tulis 1,5 + 2,0, lalu hitung bersama."
+  },
+  {
+   "level": 14,
+   "number": 10,
+   "slot": "D2",
+   "berhasil": "menulis informasi dengan gagasan utama",
+   "berlatih": "menulis informasi dengan gagasan utama",
+   "berikutnya": "menulis informasi dengan gagasan utama",
+   "rumah": "Minta {panggilan} menulis empat kalimat tentang hewan."
+  },
+  {
+   "level": 14,
+   "number": 11,
+   "slot": "C2",
+   "berhasil": "membedakan informasi utama dan pendukung",
+   "berlatih": "membedakan informasi utama dan pendukung",
+   "berikutnya": "membedakan informasi utama dan pendukung",
+   "rumah": "Bacakan paragraf, tanya mana ide utama dan contoh."
+  },
+  {
+   "level": 14,
+   "number": 12,
+   "slot": "F2",
+   "berhasil": "menghitung rata-rata data kecil",
+   "berlatih": "menghitung rata-rata data kecil",
+   "berikutnya": "menghitung rata-rata data kecil",
+   "rumah": "Tulis tiga angka nilai, jumlahkan, lalu bagi tiga."
+  },
+  {
+   "level": 14,
+   "number": 13,
+   "slot": "EN",
+   "berhasil": "bercerita kegiatan harian dalam English",
+   "berlatih": "bercerita kegiatan harian dalam English",
+   "berikutnya": "bercerita kegiatan harian dalam English",
+   "rumah": "Latih \"I wake up\" dan \"I go home.\""
+  },
+  {
+   "level": 14,
+   "number": 14,
+   "slot": "KR",
+   "berhasil": "mencoba dulu sebelum meminta bantuan",
+   "berlatih": "mencoba dulu sebelum meminta bantuan",
+   "berikutnya": "mencoba dulu sebelum meminta bantuan",
+   "rumah": "Saat sulit, minta {panggilan} mencoba dua cara dulu."
+  },
+  {
+   "level": 15,
+   "number": 1,
+   "slot": "A1",
+   "berhasil": "membaca frasa panjang sebagai satu kelompok",
+   "berlatih": "membaca frasa panjang sebagai satu kelompok",
+   "berikutnya": "membaca frasa panjang sebagai satu kelompok",
+   "rumah": "Tulis frasa \"kegiatan sekolah pagi\", lalu baca utuh."
+  },
+  {
+   "level": 15,
+   "number": 2,
+   "slot": "B1",
+   "berhasil": "mengenali klaim, alasan, dan simpulan",
+   "berlatih": "mengenali klaim, alasan, dan simpulan",
+   "berikutnya": "mengenali klaim, alasan, dan simpulan",
+   "rumah": "Bacakan pendapat singkat, tanya alasan pendukungnya."
+  },
+  {
+   "level": 15,
+   "number": 3,
+   "slot": "E1",
+   "berhasil": "memahami bilangan negatif dan lawannya",
+   "berlatih": "memahami bilangan negatif dan lawannya",
+   "berikutnya": "memahami bilangan negatif dan lawannya",
+   "rumah": "Gambar garis angka sederhana dari -5 sampai 5."
+  },
+  {
+   "level": 15,
+   "number": 4,
+   "slot": "D1",
+   "berhasil": "menulis deskripsi dari bagan sederhana",
+   "berlatih": "menulis deskripsi dari bagan sederhana",
+   "berikutnya": "menulis deskripsi dari bagan sederhana",
+   "rumah": "Buat tiga poin tentang kamar, lalu tulis deskripsi."
+  },
+  {
+   "level": 15,
+   "number": 5,
+   "slot": "C1",
+   "berhasil": "memprediksi isi dari judul bacaan",
+   "berlatih": "memprediksi isi dari judul bacaan",
+   "berikutnya": "memprediksi isi dari judul bacaan",
+   "rumah": "Sebutkan judul cerita, minta {panggilan} menebak isinya."
+  },
+  {
+   "level": 15,
+   "number": 6,
+   "slot": "F1",
+   "berhasil": "mengenali jenis segitiga dan jajargenjang",
+   "berlatih": "mengenali jenis segitiga dan jajargenjang",
+   "berikutnya": "mengenali jenis segitiga dan jajargenjang",
+   "rumah": "Gambar tiga segitiga, lalu bandingkan sisinya."
+  },
+  {
+   "level": 15,
+   "number": 7,
+   "slot": "A2",
+   "berhasil": "membaca teks panjang tanpa menebak-nebak",
+   "berlatih": "membaca teks panjang tanpa menebak-nebak",
+   "berikutnya": "membaca teks panjang tanpa menebak-nebak",
+   "rumah": "Tulis empat kalimat, ingatkan membaca tanpa mengulang kata."
+  },
+  {
+   "level": 15,
+   "number": 8,
+   "slot": "B2",
+   "berhasil": "menyusun pendapat dengan satu alasan",
+   "berlatih": "menyusun pendapat dengan satu alasan",
+   "berikutnya": "menyusun pendapat dengan satu alasan",
+   "rumah": "Tanya pendapat {panggilan}, lalu minta satu alasan."
+  },
+  {
+   "level": 15,
+   "number": 9,
+   "slot": "E2",
+   "berhasil": "menghitung penjumlahan dan pengurangan negatif",
+   "berlatih": "menghitung penjumlahan dan pengurangan negatif",
+   "berikutnya": "menghitung penjumlahan dan pengurangan negatif",
+   "rumah": "Buat soal suhu naik turun sederhana, hitung bersama."
+  },
+  {
+   "level": 15,
+   "number": 10,
+   "slot": "D2",
+   "berhasil": "menulis pendapat dengan alasan jelas",
+   "berlatih": "menulis pendapat dengan alasan jelas",
+   "berikutnya": "menulis pendapat dengan alasan jelas",
+   "rumah": "Minta {panggilan} menulis pendapat dan satu alasan."
+  },
+  {
+   "level": 15,
+   "number": 11,
+   "slot": "C2",
+   "berhasil": "menyimpulkan pesan dan menyebut bukti",
+   "berlatih": "menyimpulkan pesan dan menyebut bukti",
+   "berikutnya": "menyimpulkan pesan dan menyebut bukti",
+   "rumah": "Bacakan cerita pendek, tanya pesan dan buktinya."
+  },
+  {
+   "level": 15,
+   "number": 12,
+   "slot": "F2",
+   "berhasil": "menghitung luas segitiga dan jajargenjang",
+   "berlatih": "menghitung luas segitiga dan jajargenjang",
+   "berikutnya": "menghitung luas segitiga dan jajargenjang",
+   "rumah": "Gambar segitiga, beri alas dan tinggi, lalu hitung."
+  },
+  {
+   "level": 15,
+   "number": 13,
+   "slot": "EN",
+   "berhasil": "menyampaikan perasaan dan pendapat dalam English",
+   "berlatih": "menyampaikan perasaan dan pendapat dalam English",
+   "berikutnya": "menyampaikan perasaan dan pendapat dalam English",
+   "rumah": "Latih \"I feel happy\" dan \"I think it is good.\""
+  },
+  {
+   "level": 15,
+   "number": 14,
+   "slot": "KR",
+   "berhasil": "melakukan yang benar tanpa diawasi",
+   "berlatih": "melakukan yang benar tanpa diawasi",
+   "berikutnya": "melakukan yang benar tanpa diawasi",
+   "rumah": "Beri tugas kecil, lalu apresiasi saat dilakukan mandiri."
+  },
+  {
+   "level": 16,
+   "number": 1,
+   "slot": "A1",
+   "berhasil": "membaca kata berimbuhan panjang",
+   "berlatih": "membaca kata berimbuhan panjang",
+   "berikutnya": "membaca kata berimbuhan panjang",
+   "rumah": "Tulis \"pembelajaran\" dan \"keberhasilan\", lalu baca perlahan."
+  },
+  {
+   "level": 16,
+   "number": 2,
+   "slot": "B1",
+   "berhasil": "memahami istilah pelajaran dari konteks",
+   "berlatih": "memahami istilah pelajaran dari konteks",
+   "berikutnya": "memahami istilah pelajaran dari konteks",
+   "rumah": "Ucapkan kalimat dengan \"menyerap\", lalu tebak maknanya."
+  },
+  {
+   "level": 16,
+   "number": 3,
+   "slot": "E1",
+   "berhasil": "menyederhanakan perbandingan dua besaran",
+   "berlatih": "menyederhanakan perbandingan dua besaran",
+   "berikutnya": "menyederhanakan perbandingan dua besaran",
+   "rumah": "Tulis 6:9, lalu sederhanakan bersama."
+  },
+  {
+   "level": 16,
+   "number": 4,
+   "slot": "D1",
+   "berhasil": "menyusun kalimat berpola S-P-O-K",
+   "berlatih": "menyusun kalimat berpola S-P-O-K",
+   "berikutnya": "menyusun kalimat berpola S-P-O-K",
+   "rumah": "Beri empat kata acak, minta susun satu kalimat."
+  },
+  {
+   "level": 16,
+   "number": 5,
+   "slot": "C1",
+   "berhasil": "mencari informasi kunci dalam teks ilmiah",
+   "berlatih": "mencari informasi kunci dalam teks ilmiah",
+   "berikutnya": "mencari informasi kunci dalam teks ilmiah",
+   "rumah": "Bacakan teks pendek, minta sebut dua informasi penting."
+  },
+  {
+   "level": 16,
+   "number": 6,
+   "slot": "F1",
+   "berhasil": "mengenali bagian dan ukuran lingkaran",
+   "berlatih": "mengenali bagian dan ukuran lingkaran",
+   "berikutnya": "mengenali bagian dan ukuran lingkaran",
+   "rumah": "Gambar lingkaran, tunjuk pusat, jari-jari, diameter."
+  },
+  {
+   "level": 16,
+   "number": 7,
+   "slot": "A2",
+   "berhasil": "membaca frasa sebagai satu unit makna",
+   "berlatih": "membaca frasa sebagai satu unit makna",
+   "berikutnya": "membaca frasa sebagai satu unit makna",
+   "rumah": "Tulis frasa panjang, lalu baca tanpa berhenti berlebihan."
+  },
+  {
+   "level": 16,
+   "number": 8,
+   "slot": "B2",
+   "berhasil": "memakai istilah pelajaran dalam kalimat",
+   "berlatih": "memakai istilah pelajaran dalam kalimat",
+   "berikutnya": "memakai istilah pelajaran dalam kalimat",
+   "rumah": "Minta {panggilan} membuat kalimat dengan kata \"data\"."
+  },
+  {
+   "level": 16,
+   "number": 9,
+   "slot": "E2",
+   "berhasil": "menghitung nilai perbandingan sederhana",
+   "berlatih": "menghitung nilai perbandingan sederhana",
+   "berikutnya": "menghitung nilai perbandingan sederhana",
+   "rumah": "Tulis 2:3 = 4:?, lalu cari bersama."
+  },
+  {
+   "level": 16,
+   "number": 10,
+   "slot": "D2",
+   "berhasil": "menulis prosedur atau deskripsi berurutan",
+   "berlatih": "menulis prosedur atau deskripsi berurutan",
+   "berikutnya": "menulis prosedur atau deskripsi berurutan",
+   "rumah": "Minta {panggilan} menulis tiga langkah merapikan meja."
+  },
+  {
+   "level": 16,
+   "number": 11,
+   "slot": "C2",
+   "berhasil": "membedakan fakta dan opini dalam teks",
+   "berlatih": "membedakan fakta dan opini dalam teks",
+   "berikutnya": "membedakan fakta dan opini dalam teks",
+   "rumah": "Ucapkan dua kalimat, minta tandai fakta atau opini."
+  },
+  {
+   "level": 16,
+   "number": 12,
+   "slot": "F2",
+   "berhasil": "menghitung keliling lingkaran",
+   "berlatih": "menghitung keliling lingkaran",
+   "berikutnya": "menghitung keliling lingkaran",
+   "rumah": "Tulis diameter 14 cm, lalu hitung keliling bersama."
+  },
+  {
+   "level": 16,
+   "number": 13,
+   "slot": "EN",
+   "berhasil": "bercakap singkat dalam English tentang topik",
+   "berlatih": "bercakap singkat dalam English tentang topik",
+   "berikutnya": "bercakap singkat dalam English tentang topik",
+   "rumah": "Tanya \"What is your hobby?\" lalu bantu jawab singkat."
+  },
+  {
+   "level": 16,
+   "number": 14,
+   "slot": "KR",
+   "berhasil": "menghargai pendapat dan latar berbeda",
+   "berlatih": "menghargai pendapat dan latar berbeda",
+   "berikutnya": "menghargai pendapat dan latar berbeda",
+   "rumah": "Saat beda pendapat, latih kalimat \"Aku mendengarkan dulu.\""
+  },
+  {
+   "level": 17,
+   "number": 1,
+   "slot": "A1",
+   "berhasil": "membaca istilah ilmu dengan akurat",
+   "berlatih": "membaca istilah ilmu dengan akurat",
+   "berikutnya": "membaca istilah ilmu dengan akurat",
+   "rumah": "Tulis \"ekosistem\" dan \"gravitasi\", lalu baca bersama."
+  },
+  {
+   "level": 17,
+   "number": 2,
+   "slot": "B1",
+   "berhasil": "mengenali hubungan kata antar kalimat",
+   "berlatih": "mengenali hubungan kata antar kalimat",
+   "berikutnya": "mengenali hubungan kata antar kalimat",
+   "rumah": "Bacakan dua kalimat, cari kata yang merujuk sama."
+  },
+  {
+   "level": 17,
+   "number": 3,
+   "slot": "E1",
+   "berhasil": "menemukan aturan pola bilangan",
+   "berlatih": "menemukan aturan pola bilangan",
+   "berikutnya": "menemukan aturan pola bilangan",
+   "rumah": "Tulis 3,6,9,12, minta lanjutkan dua angka."
+  },
+  {
+   "level": 17,
+   "number": 4,
+   "slot": "D1",
+   "berhasil": "menulis paragraf pendapat dari kerangka",
+   "berlatih": "menulis paragraf pendapat dari kerangka",
+   "berikutnya": "menulis paragraf pendapat dari kerangka",
+   "rumah": "Buat klaim dan dua alasan, lalu tulis paragraf."
+  },
+  {
+   "level": 17,
+   "number": 5,
+   "slot": "C1",
+   "berhasil": "mengenali tujuan penulis dalam teks",
+   "berlatih": "mengenali tujuan penulis dalam teks",
+   "berikutnya": "mengenali tujuan penulis dalam teks",
+   "rumah": "Bacakan teks pendek, tanya penulis ingin apa."
+  },
+  {
+   "level": 17,
+   "number": 6,
+   "slot": "F1",
+   "berhasil": "membaca denah dan skala sederhana",
+   "berlatih": "membaca denah dan skala sederhana",
+   "berikutnya": "membaca denah dan skala sederhana",
+   "rumah": "Gambar denah kecil, ubah 2 cm menjadi jarak nyata."
+  },
+  {
+   "level": 17,
+   "number": 7,
+   "slot": "A2",
+   "berhasil": "membaca teks sains atau sosial dengan alami",
+   "berlatih": "membaca teks sains atau sosial dengan alami",
+   "berikutnya": "membaca teks sains atau sosial dengan alami",
+   "rumah": "Tulis lima kalimat, latih jeda dan nada bacanya."
+  },
+  {
+   "level": 17,
+   "number": 8,
+   "slot": "B2",
+   "berhasil": "memperbaiki kalimat agar lebih jelas",
+   "berlatih": "memperbaiki kalimat agar lebih jelas",
+   "berikutnya": "memperbaiki kalimat agar lebih jelas",
+   "rumah": "Beri kalimat kurang jelas, minta {panggilan} memperbaiki."
+  },
+  {
+   "level": 17,
+   "number": 9,
+   "slot": "E2",
+   "berhasil": "menghitung operasi campuran dengan urutan benar",
+   "berlatih": "menghitung operasi campuran dengan urutan benar",
+   "berikutnya": "menghitung operasi campuran dengan urutan benar",
+   "rumah": "Tulis 6+4x2, tanyakan operasi mana lebih dulu."
+  },
+  {
+   "level": 17,
+   "number": 10,
+   "slot": "D2",
+   "berhasil": "menulis penjelasan dengan dua dukungan",
+   "berlatih": "menulis penjelasan dengan dua dukungan",
+   "berikutnya": "menulis penjelasan dengan dua dukungan",
+   "rumah": "Minta {panggilan} menjelaskan topik dengan dua alasan."
+  },
+  {
+   "level": 17,
+   "number": 11,
+   "slot": "C2",
+   "berhasil": "menganalisis sudut pandang penulis",
+   "berlatih": "menganalisis sudut pandang penulis",
+   "berikutnya": "menganalisis sudut pandang penulis",
+   "rumah": "Bacakan pendapat singkat, cari kata yang menunjukkan sikap."
+  },
+  {
+   "level": 17,
+   "number": 12,
+   "slot": "F2",
+   "berhasil": "menghitung luas trapesium dan belah ketupat",
+   "berlatih": "menghitung luas trapesium dan belah ketupat",
+   "berikutnya": "menghitung luas trapesium dan belah ketupat",
+   "rumah": "Gambar trapesium sederhana, tulis ukuran, hitung bersama."
+  },
+  {
+   "level": 17,
+   "number": 13,
+   "slot": "EN",
+   "berhasil": "membaca paragraf English dan menjawab isi",
+   "berlatih": "membaca paragraf English dan menjawab isi",
+   "berikutnya": "membaca paragraf English dan menjawab isi",
+   "rumah": "Bacakan tiga kalimat English mudah, tanya \"Who?\""
+  },
+  {
+   "level": 17,
+   "number": 14,
+   "slot": "KR",
+   "berhasil": "memberi contoh baik saat memimpin diri",
+   "berlatih": "memberi contoh baik saat memimpin diri",
+   "berikutnya": "memberi contoh baik saat memimpin diri",
+   "rumah": "Minta {panggilan} memilih satu kebiasaan baik hari ini."
+  },
+  {
+   "level": 18,
+   "number": 1,
+   "slot": "A1",
+   "berhasil": "membaca frasa panjang dan kalimat majemuk",
+   "berlatih": "membaca frasa panjang dan kalimat majemuk",
+   "berikutnya": "membaca frasa panjang dan kalimat majemuk",
+   "rumah": "Tulis kalimat panjang dengan \"karena\", lalu baca perlahan."
+  },
+  {
+   "level": 18,
+   "number": 2,
+   "slot": "B1",
+   "berhasil": "menilai paragraf yang kurang padu",
+   "berlatih": "menilai paragraf yang kurang padu",
+   "berikutnya": "menilai paragraf yang kurang padu",
+   "rumah": "Bacakan paragraf pendek, cari kalimat yang tidak nyambung."
+  },
+  {
+   "level": 18,
+   "number": 3,
+   "slot": "E1",
+   "berhasil": "memperkirakan hasil hitung bilangan besar",
+   "berlatih": "memperkirakan hasil hitung bilangan besar",
+   "berikutnya": "memperkirakan hasil hitung bilangan besar",
+   "rumah": "Tulis 498+503, minta tebak hasil mendekati berapa."
+  },
+  {
+   "level": 18,
+   "number": 4,
+   "slot": "D1",
+   "berhasil": "menulis tiga paragraf dari kerangka",
+   "berlatih": "menulis tiga paragraf dari kerangka",
+   "berikutnya": "menulis tiga paragraf dari kerangka",
+   "rumah": "Buat kerangka pembuka, isi, penutup, lalu isi singkat."
+  },
+  {
+   "level": 18,
+   "number": 5,
+   "slot": "C1",
+   "berhasil": "membedakan dua sudut pandang bacaan",
+   "berlatih": "membedakan dua sudut pandang bacaan",
+   "berikutnya": "membedakan dua sudut pandang bacaan",
+   "rumah": "Ceritakan dua pendapat berbeda, minta bandingkan singkat."
+  },
+  {
+   "level": 18,
+   "number": 6,
+   "slot": "F1",
+   "berhasil": "memahami mean, median, dan modus",
+   "berlatih": "memahami mean, median, dan modus",
+   "berikutnya": "memahami mean, median, dan modus",
+   "rumah": "Tulis lima angka kecil, cari nilai yang sering muncul."
+  },
+  {
+   "level": 18,
+   "number": 7,
+   "slot": "A2",
+   "berhasil": "membaca teks majemuk dengan tempo wajar",
+   "berlatih": "membaca teks majemuk dengan tempo wajar",
+   "berikutnya": "membaca teks majemuk dengan tempo wajar",
+   "rumah": "Tulis enam kalimat pendek, latih jeda tanda baca."
+  },
+  {
+   "level": 18,
+   "number": 8,
+   "slot": "B2",
+   "berhasil": "menyusun pendapat dengan simpulan berkaitan",
+   "berlatih": "menyusun pendapat dengan simpulan berkaitan",
+   "berikutnya": "menyusun pendapat dengan simpulan berkaitan",
+   "rumah": "Tanya pendapat, dua alasan, dan simpulan singkat."
+  },
+  {
+   "level": 18,
+   "number": 9,
+   "slot": "E2",
+   "berhasil": "menyelesaikan soal terapan angka dan pecahan",
+   "berlatih": "menyelesaikan soal terapan angka dan pecahan",
+   "berikutnya": "menyelesaikan soal terapan angka dan pecahan",
+   "rumah": "Buat cerita belanja sederhana, hitung sisa uang bersama."
+  },
+  {
+   "level": 18,
+   "number": 10,
+   "slot": "D2",
+   "berhasil": "menulis argumentasi dengan alasan dan simpulan",
+   "berlatih": "menulis argumentasi dengan alasan dan simpulan",
+   "berikutnya": "menulis argumentasi dengan alasan dan simpulan",
+   "rumah": "Minta {panggilan} menulis pendapat, dua alasan, simpulan."
+  },
+  {
+   "level": 18,
+   "number": 11,
+   "slot": "C2",
+   "berhasil": "menggabungkan informasi dari dua teks",
+   "berlatih": "menggabungkan informasi dari dua teks",
+   "berikutnya": "menggabungkan informasi dari dua teks",
+   "rumah": "Bacakan dua teks pendek, cari persamaan dan perbedaannya."
+  },
+  {
+   "level": 18,
+   "number": 12,
+   "slot": "F2",
+   "berhasil": "menghitung dan menafsirkan data kecil",
+   "berlatih": "menghitung dan menafsirkan data kecil",
+   "berikutnya": "menghitung dan menafsirkan data kecil",
+   "rumah": "Tulis lima angka, hitung rata-rata, lalu bahas artinya."
+  },
+  {
+   "level": 18,
+   "number": 13,
+   "slot": "EN",
+   "berhasil": "menulis kalimat English tentang topik bebas",
+   "berlatih": "menulis kalimat English tentang topik bebas",
+   "berikutnya": "menulis kalimat English tentang topik bebas",
+   "rumah": "Latih dua kalimat English tentang keluarga atau hobi."
+  },
+  {
+   "level": 18,
+   "number": 14,
+   "slot": "KR",
+   "berhasil": "memberi kontribusi baik bagi sekitar",
+   "berlatih": "memberi kontribusi baik bagi sekitar",
+   "berikutnya": "memberi kontribusi baik bagi sekitar",
+   "rumah": "Ajak {panggilan} memilih satu bantuan kecil untuk rumah."
   }
  ],
  "themes": [

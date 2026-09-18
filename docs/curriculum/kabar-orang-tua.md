@@ -118,6 +118,146 @@ Dokumen ini menyiapkan frasa pendek untuk pesan WhatsApp harian orang tua. Frasa
 | 8 | 12 | F2 | mengurangkan melewati sepuluh | mengurangkan melewati sepuluh | mengurangkan dari bilangan belasan | Tulis 13 - 4, lalu {panggilan} mencari hasilnya dengan jari. |
 | 8 | 13 | EN | memahami kalimat English sangat pendek | memahami kalimat English sangat pendek | memahami kalimat English pendek | Ucapkan "I see ..." dengan benda di rumah, lalu {panggilan} menunjuknya. |
 | 8 | 14 | KR | menjalankan rutinitas belajar pendek dengan mandiri | menjalankan rutinitas belajar pendek dengan mandiri | membiasakan rutinitas belajar mandiri | Beri isyarat umum rutinitas kecil, lalu biarkan {panggilan} menjalankannya. |
+| 9 | 1 | A1 | membaca kata berawalan me- dan ber- | membaca kata berawalan me- dan ber- | membaca kata berawalan me- dan ber- | Tulis 5 kata berawalan me- atau ber-, lalu minta {panggilan} membacanya. |
+| 9 | 2 | B1 | memahami arti kata dari kalimat | memahami arti kata dari kalimat | memahami arti kata dari kalimat | Ucapkan satu kalimat dengan kata baru, lalu tanya maknanya. |
+| 9 | 3 | E1 | mengenali ratusan, puluhan, dan satuan | mengenali ratusan, puluhan, dan satuan | mengenali ratusan, puluhan, dan satuan | Tulis angka 3 digit, minta {panggilan} menyebut ratusan sampai satuan. |
+| 9 | 4 | D1 | menyalin paragraf pendek dengan rapi | menyalin paragraf pendek dengan rapi | menyalin paragraf pendek dengan rapi | Tulis dua kalimat pendek, lalu minta {panggilan} menyalinnya pelan. |
+| 9 | 5 | C1 | membaca teks pendek dengan teliti | membaca teks pendek dengan teliti | membaca teks pendek dengan teliti | Tulis tiga kalimat pendek, lalu dengarkan {panggilan} membacanya. |
+| 9 | 6 | F1 | mengenali sifat bangun datar sederhana | mengenali sifat bangun datar sederhana | mengenali sifat bangun datar sederhana | Gambar empat bangun, lalu minta {panggilan} menyebut sisinya. |
+| 9 | 7 | A2 | membaca kalimat pendek dengan jeda tepat | membaca kalimat pendek dengan jeda tepat | membaca kalimat pendek dengan jeda tepat | Tulis kalimat memakai koma, lalu minta {panggilan} membaca berjeda. |
+| 9 | 8 | B2 | memilih kata yang lebih tepat | memilih kata yang lebih tepat | memilih kata yang lebih tepat | Beri dua pilihan kata, minta {panggilan} memilih yang cocok. |
+| 9 | 9 | E2 | menjumlah dan mengurang angka tiga digit | menjumlah dan mengurang angka tiga digit | menjumlah dan mengurang angka tiga digit | Tulis satu penjumlahan tiga digit, kerjakan bersama pelan. |
+| 9 | 10 | D2 | menulis dua kalimat yang saling berhubungan | menulis dua kalimat yang saling berhubungan | menulis dua kalimat yang saling berhubungan | Minta {panggilan} menulis dua kalimat tentang kegiatan hari ini. |
+| 9 | 11 | C2 | menemukan informasi langsung dari teks pendek | menemukan informasi langsung dari teks pendek | menemukan informasi langsung dari teks pendek | Bacakan dua kalimat, lalu tanyakan satu hal yang disebut. |
+| 9 | 12 | F2 | menghitung keliling bangun bersisi empat | menghitung keliling bangun bersisi empat | menghitung keliling bangun bersisi empat | Gambar persegi panjang, tulis sisi, lalu jumlahkan bersama. |
+| 9 | 13 | EN | merespons instruksi kelas dalam English | merespons instruksi kelas dalam English | merespons instruksi kelas dalam English | Ucapkan "stand up" dan "sit down", lalu lakukan bergantian. |
+| 9 | 14 | KR | merawat barang pribadi dan barang bersama | merawat barang pribadi dan barang bersama | merawat barang pribadi dan barang bersama | Ajak {panggilan} mengembalikan satu barang ke tempatnya. |
+| 10 | 1 | A1 | membaca kata berakhiran -an dan -kan | membaca kata berakhiran -an dan -kan | membaca kata berakhiran -an dan -kan | Tulis 5 kata berakhiran -an atau -kan, lalu baca bersama. |
+| 10 | 2 | B1 | mengenali kata mirip dan berlawanan | mengenali kata mirip dan berlawanan | mengenali kata mirip dan berlawanan | Sebutkan satu kata, lalu cari lawan katanya bersama. |
+| 10 | 3 | E1 | memahami perkalian sebagai penjumlahan berulang | memahami perkalian sebagai penjumlahan berulang | memahami perkalian sebagai penjumlahan berulang | Pakai sendok, buat 3 kelompok isi 2, lalu hitung. |
+| 10 | 4 | D1 | menyalin paragraf dari jarak lebih jauh | menyalin paragraf dari jarak lebih jauh | menyalin paragraf dari jarak lebih jauh | Tulis dua kalimat di papan kecil, minta {panggilan} menyalin. |
+| 10 | 5 | C1 | membaca teks pendek dengan jeda wajar | membaca teks pendek dengan jeda wajar | membaca teks pendek dengan jeda wajar | Tulis tiga kalimat, lalu dengarkan jeda titiknya. |
+| 10 | 6 | F1 | membaca jam dan satuan waktu sederhana | membaca jam dan satuan waktu sederhana | membaca jam dan satuan waktu sederhana | Tunjuk jam rumah, tanyakan jam tepat atau setengah. |
+| 10 | 7 | A2 | membaca dua kalimat berurutan dengan lancar | membaca dua kalimat berurutan dengan lancar | membaca dua kalimat berurutan dengan lancar | Tulis dua kalimat bersambung, lalu baca bergantian. |
+| 10 | 8 | B2 | menyusun kata acak menjadi kalimat | menyusun kata acak menjadi kalimat | menyusun kata acak menjadi kalimat | Ucapkan tiga kata acak, minta {panggilan} menyusun kalimat. |
+| 10 | 9 | E2 | membagi bilangan kecil dengan benar | membagi bilangan kecil dengan benar | membagi bilangan kecil dengan benar | Bagi 12 sendok ke 3 kelompok, lalu hitung tiap kelompok. |
+| 10 | 10 | D2 | menulis tiga kalimat berurutan | menulis tiga kalimat berurutan | menulis tiga kalimat berurutan | Minta {panggilan} menulis awal, tengah, akhir kejadian. |
+| 10 | 11 | C2 | menemukan dua informasi dari teks pendek | menemukan dua informasi dari teks pendek | menemukan dua informasi dari teks pendek | Bacakan cerita sangat singkat, lalu tanyakan dua hal. |
+| 10 | 12 | F2 | mengubah sentimeter dan meter sederhana | mengubah sentimeter dan meter sederhana | mengubah sentimeter dan meter sederhana | Ukur meja kira-kira, lalu ubah meter ke sentimeter. |
+| 10 | 13 | EN | menjawab pertanyaan English tentang tema | menjawab pertanyaan English tentang tema | menjawab pertanyaan English tentang tema | Tunjuk benda rumah, tanya "What color is it?" |
+| 10 | 14 | KR | berkata jujur saat situasi sulit | berkata jujur saat situasi sulit | berkata jujur saat situasi sulit | Ceritakan contoh jujur, lalu tanya pilihan {panggilan}. |
+| 11 | 1 | A1 | membaca kata berimbuhan gabungan | membaca kata berimbuhan gabungan | membaca kata berimbuhan gabungan | Tulis 5 kata panjang, lalu minta dibaca utuh. |
+| 11 | 2 | B1 | memahami fungsi kata hubung | memahami fungsi kata hubung | memahami fungsi kata hubung | Buat dua kalimat, lalu sambungkan dengan "karena". |
+| 11 | 3 | E1 | memahami ribuan dan urutan bilangan | memahami ribuan dan urutan bilangan | memahami ribuan dan urutan bilangan | Tulis 4 angka ribuan, minta urutkan dari kecil. |
+| 11 | 4 | D1 | menulis kalimat dengan tanda baca tepat | menulis kalimat dengan tanda baca tepat | menulis kalimat dengan tanda baca tepat | Tulis kalimat tanpa titik, minta {panggilan} memperbaiki. |
+| 11 | 5 | C1 | mengenali bagian teks informasi pendek | mengenali bagian teks informasi pendek | mengenali bagian teks informasi pendek | Tulis judul dan dua kalimat, bahas bagian pembukanya. |
+| 11 | 6 | F1 | mengenali satuan berat dan waktu | mengenali satuan berat dan waktu | mengenali satuan berat dan waktu | Tanya 1 jam berapa menit, lalu contohkan kegiatan. |
+| 11 | 7 | A2 | membaca tiga kalimat tanpa mengeja | membaca tiga kalimat tanpa mengeja | membaca tiga kalimat tanpa mengeja | Tulis tiga kalimat, lalu minta dibaca tanpa mengeja. |
+| 11 | 8 | B2 | mengubah kalimat menjadi bentuk dibalik | mengubah kalimat menjadi bentuk dibalik | mengubah kalimat menjadi bentuk dibalik | Ucapkan "Ibu memasak nasi", lalu ubah menjadi "dimasak". |
+| 11 | 9 | E2 | mengalikan dan membagi bilangan dua digit | mengalikan dan membagi bilangan dua digit | mengalikan dan membagi bilangan dua digit | Tulis satu kali-kalian dua digit, kerjakan perlahan. |
+| 11 | 10 | D2 | menulis paragraf dengan gagasan dan rincian | menulis paragraf dengan gagasan dan rincian | menulis paragraf dengan gagasan dan rincian | Minta {panggilan} menulis satu paragraf tentang kegiatan sore. |
+| 11 | 11 | C2 | menemukan gagasan pokok teks pendek | menemukan gagasan pokok teks pendek | menemukan gagasan pokok teks pendek | Bacakan paragraf pendek, tanyakan hal utama yang dibahas. |
+| 11 | 12 | F2 | menghitung keliling dan mengubah gram-kilogram | menghitung keliling dan mengubah gram-kilogram | menghitung keliling dan mengubah gram-kilogram | Tulis sisi segitiga, lalu jumlahkan kelilingnya bersama. |
+| 11 | 13 | EN | menjawab What, How many, dan color | menjawab What, How many, dan color | menjawab What, How many, dan color | Tunjuk benda, tanyakan "What is this?" singkat. |
+| 11 | 14 | KR | bekerja sama menyelesaikan tugas bersama | bekerja sama menyelesaikan tugas bersama | bekerja sama menyelesaikan tugas bersama | Ajak {panggilan} membagi tugas merapikan meja makan. |
+| 12 | 1 | A1 | membaca kata majemuk dan kata ulang | membaca kata majemuk dan kata ulang | membaca kata majemuk dan kata ulang | Tulis 5 kata ulang, lalu baca bersama bergantian. |
+| 12 | 2 | B1 | menemukan gagasan pokok paragraf | menemukan gagasan pokok paragraf | menemukan gagasan pokok paragraf | Bacakan paragraf pendek, tanya inti ceritanya. |
+| 12 | 3 | E1 | mengenali pecahan sederhana | mengenali pecahan sederhana | mengenali pecahan sederhana | Lipat kertas menjadi dua dan empat bagian, lalu sebutkan. |
+| 12 | 4 | D1 | menulis narasi mengikuti urutan kejadian | menulis narasi mengikuti urutan kejadian | menulis narasi mengikuti urutan kejadian | Sebutkan awal, tengah, akhir kejadian, lalu tulis singkat. |
+| 12 | 5 | C1 | membaca narasi sambil mengikuti urutan kejadian | membaca narasi sambil mengikuti urutan kejadian | membaca narasi sambil mengikuti urutan kejadian | Bacakan cerita pendek, minta {panggilan} menyebut awalnya. |
+| 12 | 6 | F1 | memahami luas sebagai jumlah kotak | memahami luas sebagai jumlah kotak | memahami luas sebagai jumlah kotak | Gambar petak 3 kali 2, lalu hitung kotaknya. |
+| 12 | 7 | A2 | membaca tanya dan seru dengan intonasi | membaca tanya dan seru dengan intonasi | membaca tanya dan seru dengan intonasi | Tulis satu tanya dan satu seru, lalu bacakan. |
+| 12 | 8 | B2 | menyusun kalimat acak menjadi paragraf | menyusun kalimat acak menjadi paragraf | menyusun kalimat acak menjadi paragraf | Ucapkan tiga kejadian acak, minta disusun berurutan. |
+| 12 | 9 | E2 | mengurutkan dan menjumlah pecahan sejenis | mengurutkan dan menjumlah pecahan sejenis | mengurutkan dan menjumlah pecahan sejenis | Tulis 1/5 dan 3/5, tanyakan mana lebih besar. |
+| 12 | 10 | D2 | menulis cerita dengan awal, tengah, akhir | menulis cerita dengan awal, tengah, akhir | menulis cerita dengan awal, tengah, akhir | Minta {panggilan} menulis cerita enam kalimat tentang rumah. |
+| 12 | 11 | C2 | mengurutkan kejadian dalam cerita | mengurutkan kejadian dalam cerita | mengurutkan kejadian dalam cerita | Ceritakan tiga kejadian, minta {panggilan} mengurutkan kembali. |
+| 12 | 12 | F2 | menghitung luas persegi dan persegi panjang | menghitung luas persegi dan persegi panjang | menghitung luas persegi dan persegi panjang | Gambar persegi panjang 4 kali 3, lalu hitung luas. |
+| 12 | 13 | EN | memperkenalkan diri dan teman dalam English | memperkenalkan diri dan teman dalam English | memperkenalkan diri dan teman dalam English | Latih "My name is..." dan "This is my friend." |
+| 12 | 14 | KR | mengikuti aturan dan jadwal belajar | mengikuti aturan dan jadwal belajar | mengikuti aturan dan jadwal belajar | Sepakati waktu belajar 5 menit, lalu tepati bersama. |
+| 13 | 1 | A1 | membaca kata bergugus konsonan | membaca kata bergugus konsonan | membaca kata bergugus konsonan | Tulis "strategi" dan "struktur", lalu baca perlahan. |
+| 13 | 2 | B1 | mengenali cara paragraf dikembangkan | mengenali cara paragraf dikembangkan | mengenali cara paragraf dikembangkan | Bacakan paragraf pendek, tanya apakah berisi contoh. |
+| 13 | 3 | E1 | memahami nilai tempat, FPB, dan KPK | memahami nilai tempat, FPB, dan KPK | memahami nilai tempat, FPB, dan KPK | Tulis dua angka kecil, cari kelipatan bersamanya. |
+| 13 | 4 | D1 | menggabungkan kalimat memakai kata hubung | menggabungkan kalimat memakai kata hubung | menggabungkan kalimat memakai kata hubung | Beri dua kalimat, minta sambungkan dengan "tetapi". |
+| 13 | 5 | C1 | membaca teks akademik dan menangkap konteks kata | membaca teks akademik dan menangkap konteks kata | membaca teks akademik dan menangkap konteks kata | Tulis satu kata sulit dalam kalimat, tebak maknanya. |
+| 13 | 6 | F1 | mengenali sisi, rusuk, dan titik sudut | mengenali sisi, rusuk, dan titik sudut | mengenali sisi, rusuk, dan titik sudut | Gambar kubus sederhana, hitung sisi bersama-sama. |
+| 13 | 7 | A2 | membaca kalimat tanya dan seru dengan tepat | membaca kalimat tanya dan seru dengan tepat | membaca kalimat tanya dan seru dengan tepat | Tulis satu kalimat tanya, lalu latih nada membacanya. |
+| 13 | 8 | B2 | menambah kalimat penjelas yang sesuai | menambah kalimat penjelas yang sesuai | menambah kalimat penjelas yang sesuai | Beri satu gagasan, minta {panggilan} menambah penjelasan. |
+| 13 | 9 | E2 | mengalikan dua digit dan membagi bersisa | mengalikan dua digit dan membagi bersisa | mengalikan dua digit dan membagi bersisa | Tulis satu perkalian dua digit, kerjakan bersama. |
+| 13 | 10 | D2 | menulis deskripsi dengan ciri yang jelas | menulis deskripsi dengan ciri yang jelas | menulis deskripsi dengan ciri yang jelas | Pilih satu benda rumah, tulis tiga cirinya. |
+| 13 | 11 | C2 | menebak makna kata dari konteks | menebak makna kata dari konteks | menebak makna kata dari konteks | Ucapkan kalimat dengan kata baru, lalu bahas petunjuknya. |
+| 13 | 12 | F2 | menghitung volume kubus dan balok | menghitung volume kubus dan balok | menghitung volume kubus dan balok | Gambar balok 2x3x4, lalu kalikan ukurannya. |
+| 13 | 13 | EN | mendeskripsikan benda atau orang dalam English | mendeskripsikan benda atau orang dalam English | mendeskripsikan benda atau orang dalam English | Latih "It is big" dan "It is small." |
+| 13 | 14 | KR | memahami perasaan orang lain | memahami perasaan orang lain | memahami perasaan orang lain | Tanyakan perasaan tokoh film, lalu bahas cara membantu. |
+| 14 | 1 | A1 | membaca kata serapan panjang | membaca kata serapan panjang | membaca kata serapan panjang | Tulis "komunikasi" dan "teknologi", lalu baca bersama. |
+| 14 | 2 | B1 | membedakan fakta dan opini | membedakan fakta dan opini | membedakan fakta dan opini | Ucapkan satu fakta dan opini, minta {panggilan} memilih. |
+| 14 | 3 | E1 | menghubungkan desimal dan pecahan sederhana | menghubungkan desimal dan pecahan sederhana | menghubungkan desimal dan pecahan sederhana | Tulis 0,5 dan 1/2, bahas nilainya sama. |
+| 14 | 4 | D1 | menulis paragraf informasi dari poin | menulis paragraf informasi dari poin | menulis paragraf informasi dari poin | Tulis tiga poin tentang tanaman, ubah jadi paragraf. |
+| 14 | 5 | C1 | membaca teks dengan kalimat lebih kompleks | membaca teks dengan kalimat lebih kompleks | membaca teks dengan kalimat lebih kompleks | Tulis kalimat dengan "karena", lalu minta dibaca lancar. |
+| 14 | 6 | F1 | membaca tabel dan diagram sederhana | membaca tabel dan diagram sederhana | membaca tabel dan diagram sederhana | Buat tabel jumlah sendok dan piring, lalu bandingkan. |
+| 14 | 7 | A2 | membaca teks berisi kata serapan | membaca teks berisi kata serapan | membaca teks berisi kata serapan | Tulis dua kalimat dengan kata "informasi", lalu baca. |
+| 14 | 8 | B2 | memilih kata formal yang tepat | memilih kata formal yang tepat | memilih kata formal yang tepat | Bandingkan "bilang" dan "mengatakan", pilih yang formal. |
+| 14 | 9 | E2 | menghitung desimal dan mengubah pecahan | menghitung desimal dan mengubah pecahan | menghitung desimal dan mengubah pecahan | Tulis 1,5 + 2,0, lalu hitung bersama. |
+| 14 | 10 | D2 | menulis informasi dengan gagasan utama | menulis informasi dengan gagasan utama | menulis informasi dengan gagasan utama | Minta {panggilan} menulis empat kalimat tentang hewan. |
+| 14 | 11 | C2 | membedakan informasi utama dan pendukung | membedakan informasi utama dan pendukung | membedakan informasi utama dan pendukung | Bacakan paragraf, tanya mana ide utama dan contoh. |
+| 14 | 12 | F2 | menghitung rata-rata data kecil | menghitung rata-rata data kecil | menghitung rata-rata data kecil | Tulis tiga angka nilai, jumlahkan, lalu bagi tiga. |
+| 14 | 13 | EN | bercerita kegiatan harian dalam English | bercerita kegiatan harian dalam English | bercerita kegiatan harian dalam English | Latih "I wake up" dan "I go home." |
+| 14 | 14 | KR | mencoba dulu sebelum meminta bantuan | mencoba dulu sebelum meminta bantuan | mencoba dulu sebelum meminta bantuan | Saat sulit, minta {panggilan} mencoba dua cara dulu. |
+| 15 | 1 | A1 | membaca frasa panjang sebagai satu kelompok | membaca frasa panjang sebagai satu kelompok | membaca frasa panjang sebagai satu kelompok | Tulis frasa "kegiatan sekolah pagi", lalu baca utuh. |
+| 15 | 2 | B1 | mengenali klaim, alasan, dan simpulan | mengenali klaim, alasan, dan simpulan | mengenali klaim, alasan, dan simpulan | Bacakan pendapat singkat, tanya alasan pendukungnya. |
+| 15 | 3 | E1 | memahami bilangan negatif dan lawannya | memahami bilangan negatif dan lawannya | memahami bilangan negatif dan lawannya | Gambar garis angka sederhana dari -5 sampai 5. |
+| 15 | 4 | D1 | menulis deskripsi dari bagan sederhana | menulis deskripsi dari bagan sederhana | menulis deskripsi dari bagan sederhana | Buat tiga poin tentang kamar, lalu tulis deskripsi. |
+| 15 | 5 | C1 | memprediksi isi dari judul bacaan | memprediksi isi dari judul bacaan | memprediksi isi dari judul bacaan | Sebutkan judul cerita, minta {panggilan} menebak isinya. |
+| 15 | 6 | F1 | mengenali jenis segitiga dan jajargenjang | mengenali jenis segitiga dan jajargenjang | mengenali jenis segitiga dan jajargenjang | Gambar tiga segitiga, lalu bandingkan sisinya. |
+| 15 | 7 | A2 | membaca teks panjang tanpa menebak-nebak | membaca teks panjang tanpa menebak-nebak | membaca teks panjang tanpa menebak-nebak | Tulis empat kalimat, ingatkan membaca tanpa mengulang kata. |
+| 15 | 8 | B2 | menyusun pendapat dengan satu alasan | menyusun pendapat dengan satu alasan | menyusun pendapat dengan satu alasan | Tanya pendapat {panggilan}, lalu minta satu alasan. |
+| 15 | 9 | E2 | menghitung penjumlahan dan pengurangan negatif | menghitung penjumlahan dan pengurangan negatif | menghitung penjumlahan dan pengurangan negatif | Buat soal suhu naik turun sederhana, hitung bersama. |
+| 15 | 10 | D2 | menulis pendapat dengan alasan jelas | menulis pendapat dengan alasan jelas | menulis pendapat dengan alasan jelas | Minta {panggilan} menulis pendapat dan satu alasan. |
+| 15 | 11 | C2 | menyimpulkan pesan dan menyebut bukti | menyimpulkan pesan dan menyebut bukti | menyimpulkan pesan dan menyebut bukti | Bacakan cerita pendek, tanya pesan dan buktinya. |
+| 15 | 12 | F2 | menghitung luas segitiga dan jajargenjang | menghitung luas segitiga dan jajargenjang | menghitung luas segitiga dan jajargenjang | Gambar segitiga, beri alas dan tinggi, lalu hitung. |
+| 15 | 13 | EN | menyampaikan perasaan dan pendapat dalam English | menyampaikan perasaan dan pendapat dalam English | menyampaikan perasaan dan pendapat dalam English | Latih "I feel happy" dan "I think it is good." |
+| 15 | 14 | KR | melakukan yang benar tanpa diawasi | melakukan yang benar tanpa diawasi | melakukan yang benar tanpa diawasi | Beri tugas kecil, lalu apresiasi saat dilakukan mandiri. |
+| 16 | 1 | A1 | membaca kata berimbuhan panjang | membaca kata berimbuhan panjang | membaca kata berimbuhan panjang | Tulis "pembelajaran" dan "keberhasilan", lalu baca perlahan. |
+| 16 | 2 | B1 | memahami istilah pelajaran dari konteks | memahami istilah pelajaran dari konteks | memahami istilah pelajaran dari konteks | Ucapkan kalimat dengan "menyerap", lalu tebak maknanya. |
+| 16 | 3 | E1 | menyederhanakan perbandingan dua besaran | menyederhanakan perbandingan dua besaran | menyederhanakan perbandingan dua besaran | Tulis 6:9, lalu sederhanakan bersama. |
+| 16 | 4 | D1 | menyusun kalimat berpola S-P-O-K | menyusun kalimat berpola S-P-O-K | menyusun kalimat berpola S-P-O-K | Beri empat kata acak, minta susun satu kalimat. |
+| 16 | 5 | C1 | mencari informasi kunci dalam teks ilmiah | mencari informasi kunci dalam teks ilmiah | mencari informasi kunci dalam teks ilmiah | Bacakan teks pendek, minta sebut dua informasi penting. |
+| 16 | 6 | F1 | mengenali bagian dan ukuran lingkaran | mengenali bagian dan ukuran lingkaran | mengenali bagian dan ukuran lingkaran | Gambar lingkaran, tunjuk pusat, jari-jari, diameter. |
+| 16 | 7 | A2 | membaca frasa sebagai satu unit makna | membaca frasa sebagai satu unit makna | membaca frasa sebagai satu unit makna | Tulis frasa panjang, lalu baca tanpa berhenti berlebihan. |
+| 16 | 8 | B2 | memakai istilah pelajaran dalam kalimat | memakai istilah pelajaran dalam kalimat | memakai istilah pelajaran dalam kalimat | Minta {panggilan} membuat kalimat dengan kata "data". |
+| 16 | 9 | E2 | menghitung nilai perbandingan sederhana | menghitung nilai perbandingan sederhana | menghitung nilai perbandingan sederhana | Tulis 2:3 = 4:?, lalu cari bersama. |
+| 16 | 10 | D2 | menulis prosedur atau deskripsi berurutan | menulis prosedur atau deskripsi berurutan | menulis prosedur atau deskripsi berurutan | Minta {panggilan} menulis tiga langkah merapikan meja. |
+| 16 | 11 | C2 | membedakan fakta dan opini dalam teks | membedakan fakta dan opini dalam teks | membedakan fakta dan opini dalam teks | Ucapkan dua kalimat, minta tandai fakta atau opini. |
+| 16 | 12 | F2 | menghitung keliling lingkaran | menghitung keliling lingkaran | menghitung keliling lingkaran | Tulis diameter 14 cm, lalu hitung keliling bersama. |
+| 16 | 13 | EN | bercakap singkat dalam English tentang topik | bercakap singkat dalam English tentang topik | bercakap singkat dalam English tentang topik | Tanya "What is your hobby?" lalu bantu jawab singkat. |
+| 16 | 14 | KR | menghargai pendapat dan latar berbeda | menghargai pendapat dan latar berbeda | menghargai pendapat dan latar berbeda | Saat beda pendapat, latih kalimat "Aku mendengarkan dulu." |
+| 17 | 1 | A1 | membaca istilah ilmu dengan akurat | membaca istilah ilmu dengan akurat | membaca istilah ilmu dengan akurat | Tulis "ekosistem" dan "gravitasi", lalu baca bersama. |
+| 17 | 2 | B1 | mengenali hubungan kata antar kalimat | mengenali hubungan kata antar kalimat | mengenali hubungan kata antar kalimat | Bacakan dua kalimat, cari kata yang merujuk sama. |
+| 17 | 3 | E1 | menemukan aturan pola bilangan | menemukan aturan pola bilangan | menemukan aturan pola bilangan | Tulis 3,6,9,12, minta lanjutkan dua angka. |
+| 17 | 4 | D1 | menulis paragraf pendapat dari kerangka | menulis paragraf pendapat dari kerangka | menulis paragraf pendapat dari kerangka | Buat klaim dan dua alasan, lalu tulis paragraf. |
+| 17 | 5 | C1 | mengenali tujuan penulis dalam teks | mengenali tujuan penulis dalam teks | mengenali tujuan penulis dalam teks | Bacakan teks pendek, tanya penulis ingin apa. |
+| 17 | 6 | F1 | membaca denah dan skala sederhana | membaca denah dan skala sederhana | membaca denah dan skala sederhana | Gambar denah kecil, ubah 2 cm menjadi jarak nyata. |
+| 17 | 7 | A2 | membaca teks sains atau sosial dengan alami | membaca teks sains atau sosial dengan alami | membaca teks sains atau sosial dengan alami | Tulis lima kalimat, latih jeda dan nada bacanya. |
+| 17 | 8 | B2 | memperbaiki kalimat agar lebih jelas | memperbaiki kalimat agar lebih jelas | memperbaiki kalimat agar lebih jelas | Beri kalimat kurang jelas, minta {panggilan} memperbaiki. |
+| 17 | 9 | E2 | menghitung operasi campuran dengan urutan benar | menghitung operasi campuran dengan urutan benar | menghitung operasi campuran dengan urutan benar | Tulis 6+4x2, tanyakan operasi mana lebih dulu. |
+| 17 | 10 | D2 | menulis penjelasan dengan dua dukungan | menulis penjelasan dengan dua dukungan | menulis penjelasan dengan dua dukungan | Minta {panggilan} menjelaskan topik dengan dua alasan. |
+| 17 | 11 | C2 | menganalisis sudut pandang penulis | menganalisis sudut pandang penulis | menganalisis sudut pandang penulis | Bacakan pendapat singkat, cari kata yang menunjukkan sikap. |
+| 17 | 12 | F2 | menghitung luas trapesium dan belah ketupat | menghitung luas trapesium dan belah ketupat | menghitung luas trapesium dan belah ketupat | Gambar trapesium sederhana, tulis ukuran, hitung bersama. |
+| 17 | 13 | EN | membaca paragraf English dan menjawab isi | membaca paragraf English dan menjawab isi | membaca paragraf English dan menjawab isi | Bacakan tiga kalimat English mudah, tanya "Who?" |
+| 17 | 14 | KR | memberi contoh baik saat memimpin diri | memberi contoh baik saat memimpin diri | memberi contoh baik saat memimpin diri | Minta {panggilan} memilih satu kebiasaan baik hari ini. |
+| 18 | 1 | A1 | membaca frasa panjang dan kalimat majemuk | membaca frasa panjang dan kalimat majemuk | membaca frasa panjang dan kalimat majemuk | Tulis kalimat panjang dengan "karena", lalu baca perlahan. |
+| 18 | 2 | B1 | menilai paragraf yang kurang padu | menilai paragraf yang kurang padu | menilai paragraf yang kurang padu | Bacakan paragraf pendek, cari kalimat yang tidak nyambung. |
+| 18 | 3 | E1 | memperkirakan hasil hitung bilangan besar | memperkirakan hasil hitung bilangan besar | memperkirakan hasil hitung bilangan besar | Tulis 498+503, minta tebak hasil mendekati berapa. |
+| 18 | 4 | D1 | menulis tiga paragraf dari kerangka | menulis tiga paragraf dari kerangka | menulis tiga paragraf dari kerangka | Buat kerangka pembuka, isi, penutup, lalu isi singkat. |
+| 18 | 5 | C1 | membedakan dua sudut pandang bacaan | membedakan dua sudut pandang bacaan | membedakan dua sudut pandang bacaan | Ceritakan dua pendapat berbeda, minta bandingkan singkat. |
+| 18 | 6 | F1 | memahami mean, median, dan modus | memahami mean, median, dan modus | memahami mean, median, dan modus | Tulis lima angka kecil, cari nilai yang sering muncul. |
+| 18 | 7 | A2 | membaca teks majemuk dengan tempo wajar | membaca teks majemuk dengan tempo wajar | membaca teks majemuk dengan tempo wajar | Tulis enam kalimat pendek, latih jeda tanda baca. |
+| 18 | 8 | B2 | menyusun pendapat dengan simpulan berkaitan | menyusun pendapat dengan simpulan berkaitan | menyusun pendapat dengan simpulan berkaitan | Tanya pendapat, dua alasan, dan simpulan singkat. |
+| 18 | 9 | E2 | menyelesaikan soal terapan angka dan pecahan | menyelesaikan soal terapan angka dan pecahan | menyelesaikan soal terapan angka dan pecahan | Buat cerita belanja sederhana, hitung sisa uang bersama. |
+| 18 | 10 | D2 | menulis argumentasi dengan alasan dan simpulan | menulis argumentasi dengan alasan dan simpulan | menulis argumentasi dengan alasan dan simpulan | Minta {panggilan} menulis pendapat, dua alasan, simpulan. |
+| 18 | 11 | C2 | menggabungkan informasi dari dua teks | menggabungkan informasi dari dua teks | menggabungkan informasi dari dua teks | Bacakan dua teks pendek, cari persamaan dan perbedaannya. |
+| 18 | 12 | F2 | menghitung dan menafsirkan data kecil | menghitung dan menafsirkan data kecil | menghitung dan menafsirkan data kecil | Tulis lima angka, hitung rata-rata, lalu bahas artinya. |
+| 18 | 13 | EN | menulis kalimat English tentang topik bebas | menulis kalimat English tentang topik bebas | menulis kalimat English tentang topik bebas | Latih dua kalimat English tentang keluarga atau hobi. |
+| 18 | 14 | KR | memberi kontribusi baik bagi sekitar | memberi kontribusi baik bagi sekitar | memberi kontribusi baik bagi sekitar | Ajak {panggilan} memilih satu bantuan kecil untuk rumah. |
 
 ## B. Kalimat Umum
 

@@ -12,7 +12,7 @@ const PROTECTED = ['buku', 'bola', 'susu', 'mata', 'kaki', 'sapi', 'lap', 'air',
 test('kabar orang tua: data sama dengan dokumen dan lengkap', async () => {
   const { data, js } = buildKabar();
   assert.equal((await readFile(new URL(`../${OUT}`, import.meta.url), 'utf8')).replace(/\r\n/g, '\n'), js, 'dokumen berubah: jalankan node scripts/build-kabar.mjs');
-  assert.equal(data.indicators.length, 112);
+  assert.equal(data.indicators.length, 252);
   assert.equal(data.themes.length, 32);
   for (const list of ['penyemangat', 'penyemangatUlang', 'penutup']) assert.equal(data[list].length, 3, list);
   for (const i of data.indicators) {
