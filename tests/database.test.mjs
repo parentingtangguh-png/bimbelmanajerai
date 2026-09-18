@@ -26,7 +26,7 @@ test('PostgreSQL: akun, siswa, kurikulum 8 level, tes diagnostik, dan ruang kela
   assert.equal((await as(teacher,'select count(*)::int n from k8_indicators')).rows[0].n,252);
   assert.equal((await as(stranger,'select count(*)::int n from k8_levels')).rows[0].n,18,'semua anggota membaca');
   assert.equal((await as(owner,'select count(*)::int n from k8_subthemes')).rows[0].n,64);
-  assert.equal((await as(teacher,"select count(*)::int n from k8_theme_english where kind='noun'")).rows[0].n,40);
+  assert.equal((await as(teacher,"select count(*)::int n from k8_theme_english where kind='noun'")).rows[0].n,80);
   await assert.rejects(as(owner,"update k8_levels set title='X' where level=1"),/permission denied/,'pemilik pun tidak mengubah isi');
   await assert.rejects(as(owner,"insert into k8_cp values(1,'X')"),/permission denied|row-level/);
   await assert.rejects(admin("insert into k8_theme_english values(2,'noun',9,'BOX',false)"),/duplicate|unique/);
