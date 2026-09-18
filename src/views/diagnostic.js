@@ -121,7 +121,7 @@ export function diagnosticTaskCard(level, n, answer) {
   const body = ind
     ? `<dl>${row('Cara uji', ind.method)}${row('Bahan', ind.material)}${row('Tanda lulus', ind.success)}</dl>`
     : '';
-  const title = `<legend><span class="badge ${n === ENGLISH || n === CHARACTER ? '' : 'green'}">${h(slot)}</span> ${inlineMarkdown(ind ? ind.competency : 'Indikator belum tersedia')}</legend>`;
+  const title = `<legend><span class="badge ${n === ENGLISH || n === CHARACTER ? '' : 'green'}">${h(slot)}</span> <span class="indicator-text">${inlineMarkdown(ind ? ind.competency : 'Indikator belum tersedia')}</span></legend>`;
   if (n === ENGLISH)
     return `<fieldset class="diagnostic-task">${title}<p class="muted">Belum dinilai: English anak baru tidak diuji karena kosakatanya berasal dari tema kelas.</p></fieldset>`;
   const status = answer?.status || '';
