@@ -18,7 +18,7 @@ Berkas ini menggambarkan **keadaan sekarang**, bukan riwayat. Kalau sesuatu di s
   - **Frasa kabar WhatsApp L9–L18**: 140 baris ditambahkan ke `docs/curriculum/kabar-orang-tua.md` (disusun Codex, diaudit Claude 18 Sep); `build-kabar.mjs` diperbaiki (regex level 1 digit → 1+ digit); `kabar-data.js` kini 252 indikator. Pesan WhatsApp orang tua siap untuk siswa SD kelas 2–6.
   - **targetLevel** diperbarui: Belum sekolah/TK A→2, TK B→4, SD 1→8, SD 2→10, SD 3→12, SD 4→14, SD 5→16, SD 6+→18. Journey line (total 18 tahap, posisi, tahap tujuan) ditambah di atas kotak kemajuan pesan WhatsApp.
   - **DIAGNOSTIC_LEVELS** diperluas ke [1–18]; `suggestedStart`: SD 2→9, SD 3→11, SD 4→13, SD 5→15, SD 6→17; `diagnosticOutcome` selesai di L18 (bukan L8).
-  - **Deskripsi level diagnostik** (data-level-desc di form): L1/L3/L7 sudah ada; L9/L11/L13/L15/L17 (milestone SD) belum diisi — belum diminta pemilik.
+  - **Deskripsi level diagnostik** (data-level-desc di form): semua L1–L18 sudah ada di database (`k8_levels.description`); form menampilkannya otomatis.
   - **Cadangan 18 Sep**: 14 siswa, 6 tes diagnostik (dilaporkan saat backup).
 - **17–18 Sep 2026 (sesudah guru mulai memakai):**
   - **Audit isolasi antar guru: aman.** Uji serangan di PGlite (2 guru, siswa bersama, guru nonaktif, akun tak terdaftar, anon, pemilik): 64/64 ditolak sesuai harapan. Produksi dicocokkan pemilik lewat SQL Editor: 16 tabel, 0 tanpa RLS, 18 kebijakan, 22 fungsi, 0 fungsi terbuka untuk anon — sama dengan migrasi. Skrip uji belum dimasukkan ke `npm test` (ditawarkan, belum diminta).
