@@ -485,7 +485,7 @@ test('navbar HP: empat tujuan, menandai layar yang sedang dibuka, dan ikut peran
   assert.equal(count(pemilik, 'aria-current="page"'), 1);
 });
 
-test('tes diagnostik: pilih anak dan satu level 1–8, dengan saran dari kelas formal', () => {
+test('tes diagnostik: pilih anak dan satu level 1–18, dengan saran dari kelas formal', () => {
   loadSampleState();
   const tes = openModal(diagnosticForm);
   assert.match(tes, /data-form="diagnostic-start"/);
@@ -494,10 +494,10 @@ test('tes diagnostik: pilih anak dan satu level 1–8, dengan saran dari kelas f
   assert.ok(!tes.includes('value="anak-3"'), 'anak non-aktif tidak dites');
   assert.match(
     tes,
-    /<option value="7" selected>Level 7 — Mengolah Informasi \(saran\)/,
-    'Bima SD 2 → saran Level 7'
+    /<option value="9" selected>Level 9 \(saran\)/,
+    'Bima SD 2 → saran Level 9'
   );
-  for (let l = 1; l <= 8; l++) assert.match(tes, new RegExp('<option value="' + l + '"'));
+  for (let l = 1; l <= 18; l++) assert.match(tes, new RegExp('<option value="' + l + '"'));
   assert.ok(
     tes.indexOf('name="start"') < tes.indexOf('data-level-desc'),
     'deskriptor di bawah pilihan level'
@@ -577,9 +577,12 @@ test('aturan tes diagnostik 8 level sesuai dokumen terkunci', () => {
   assert.deepEqual(TASK_ORDER, [1, 2, 3, 4, 5, 6, 13, 7, 8, 9, 10, 11, 12, 14]);
   assert.deepEqual(
     ['Belum sekolah', 'TK A', 'TK B', 'SD 1', 'SD 2', 'SD 6', ''].map(suggestedStart),
-    [1, 1, 3, 5, 7, 7, 1]
+    [1, 1, 3, 5, 9, 17, 1]
   );
-  assert.deepEqual([1, 2, 3, 4, 5, 6, 7, 8].map(restartLevel), [1, 1, 1, 1, 3, 3, 5, 5]);
+  assert.deepEqual(
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map(restartLevel),
+    [1, 1, 1, 1, 3, 3, 5, 5, 7, 7, 9, 9, 11, 11, 13, 13, 15, 15]
+  );
   const semua = (status, extra = {}) => ({
     ...Object.fromEntries([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(n => [n, { status }])),
     ...extra
@@ -609,10 +612,17 @@ test('aturan tes diagnostik 8 level sesuai dokumen terkunci', () => {
   });
   assert.deepEqual(diagnosticOutcome(8, semua('lulus', { 14: { status: 'belum' } })), {
     passed: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-    startLevel: 8,
+    startLevel: 9,
+    startIndicator: 1,
+    complete: false,
+    character: 'belum'
+  });
+  assert.deepEqual(diagnosticOutcome(18, semua('lulus', { 14: { status: 'lulus' } })), {
+    passed: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    startLevel: 18,
     startIndicator: null,
     complete: true,
-    character: 'belum'
+    character: 'lulus'
   });
   assert.equal(
     diagnosticOutcome(2, { ...semua('lulus'), 12: {} }).startIndicator,

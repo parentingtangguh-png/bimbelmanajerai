@@ -4,7 +4,7 @@
 //
 // Nomor tugas = nomor indikator k8: 1–12 akademik (urutan slot), 13 English, 14 Karakter.
 
-export const DIAGNOSTIC_LEVELS = [1, 2, 3, 4, 5, 6, 7, 8];
+export const DIAGNOSTIC_LEVELS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
 // Urutan dikerjakan: enam akademik pertama, English, enam akademik berikutnya, Karakter.
 export const TASK_ORDER = [1, 2, 3, 4, 5, 6, 13, 7, 8, 9, 10, 11, 12, 14];
 export const ACADEMIC = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
@@ -22,7 +22,11 @@ export const STATUSES = [
 export function suggestedStart(grade) {
   if (grade === 'TK B') return 3;
   if (grade === 'SD 1') return 5;
-  if (/^SD [2-6]$/.test(grade || '')) return 7;
+  if (grade === 'SD 2') return 9;
+  if (grade === 'SD 3') return 11;
+  if (grade === 'SD 4') return 13;
+  if (grade === 'SD 5') return 15;
+  if (grade === 'SD 6') return 17;
   return 1;
 }
 
@@ -47,10 +51,10 @@ export const ratedCount = (answers = {}) => TASK_ORDER.filter(n => statusOf(answ
 export function diagnosticOutcome(level, answers = {}) {
   const passed = ACADEMIC.filter(n => statusOf(answers, n) === 'lulus');
   const first = ACADEMIC.find(n => statusOf(answers, n) !== 'lulus');
-  const complete = !first && level === 8;
+  const complete = !first && level === 18;
   return {
     passed,
-    startLevel: first ? level : Math.min(level + 1, 8),
+    startLevel: first ? level : Math.min(level + 1, 18),
     startIndicator: first || (complete ? null : 1),
     complete,
     character: statusOf(answers, CHARACTER)

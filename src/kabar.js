@@ -8,11 +8,16 @@ import { KABAR } from './kabar-data.js';
 const phraseOf = (level, number) =>
   KABAR.indicators.find(i => i.level === Number(level) && i.number === number);
 
-// Tahap yang dituju menurut kelas formal (disetujui sementara sampai kurikulum kelas 2–6 ada).
+// Tahap yang dituju menurut kelas formal.
 export function targetLevel(grade) {
   if (grade === 'Belum sekolah' || grade === 'TK A') return 2;
   if (grade === 'TK B') return 4;
-  if (/^SD /.test(grade || '')) return 8;
+  if (grade === 'SD 1') return 8;
+  if (grade === 'SD 2') return 10;
+  if (grade === 'SD 3') return 12;
+  if (grade === 'SD 4') return 14;
+  if (grade === 'SD 5') return 16;
+  if (/^SD /.test(grade || '')) return 18;
   return null;
 }
 
@@ -48,13 +53,32 @@ function companionLine(emoji, s, row, number, nama) {
 function progressLines(s, nama) {
   const level = Number(s.pilot_level);
   const passed = passedIndicators(s.id, level).filter(n => n <= 12).length;
-  if (passed === 12 && level === 8)
-    return [`🏆 ${nama} sudah menuntaskan kedelapan tahap belajar di ${ORG_NAME}!`];
+  const target = targetLevel(s.school_grade);
+  const TOTAL = 18;
+
+  const journeyParts = [`Di bimbel ada ${TOTAL} tahap.`];
+  if (level === 1) {
+    journeyParts.push(`${nama} baru memulai — ini tahap pertama!`);
+  } else {
+    journeyParts.push(`${nama} sudah melewati tahap 1–${level - 1}, sekarang di tahap ${level}.`);
+  }
+  if (target && level < target) {
+    journeyParts.push(`Menuju tahap ${target} — tinggal ${target - level} tahap lagi!`);
+  } else if (target && level === target) {
+    journeyParts.push(`Ini tahap yang kita tuju bersama!`);
+  } else if (target && level > target) {
+    journeyParts.push(`${nama} sudah melampaui tahap tujuan!`);
+  }
+  const journeyLine = journeyParts.join(' ');
+
+  if (passed === 12 && level === TOTAL)
+    return [`🏆 ${nama} sudah menuntaskan kedelapan belas tahap belajar di ${ORG_NAME}!`];
   if (passed === 12)
     return [
+      journeyLine,
+      '',
       `🌟 ${nama} sudah menguasai semua 12 kemampuan di tahap ${level}! Guru akan segera mengajak ${nama} naik ke tahap berikutnya.`
     ];
-  const target = targetLevel(s.school_grade);
   const left = 12 - passed;
   const head =
     target && level > target
@@ -70,7 +94,7 @@ function progressLines(s, nama) {
         : target && level < target
           ? `Tinggal ${left} kemampuan lagi untuk naik ke tahap ${level + 1}. Tahap yang kita tuju: tahap ${target}.`
           : `Tinggal ${left} kemampuan lagi untuk naik ke tahap ${level + 1}.`;
-  return [head, progressBar(passed), tail];
+  return [journeyLine, '', head, progressBar(passed), tail];
 }
 
 export function parentMessage(scheduleId, studentId) {

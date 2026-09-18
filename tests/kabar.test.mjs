@@ -31,7 +31,7 @@ test('kabar orang tua: nomor WhatsApp, tahap tujuan, dan kotak kemajuan', () => 
   assert.equal(targetLevel('TK A'), 2);
   assert.equal(targetLevel('Belum sekolah'), 2);
   assert.equal(targetLevel('TK B'), 4);
-  assert.equal(targetLevel('SD 3'), 8);
+  assert.equal(targetLevel('SD 3'), 12);
   assert.equal(targetLevel(''), null);
   assert.equal(progressBar(3), '🟩🟩🟩⬜⬜⬜⬜⬜⬜⬜⬜⬜');
 });
@@ -98,11 +98,11 @@ test('kabar orang tua: siap naik, melewati tujuan, dan tahap 8 tuntas', () => {
   state.students[0].pilot_level = 3;
   state.diagnosticResults = state.diagnosticResults.filter(r => r.number <= 4);
   assert.match(parentMessage('j1', 'anak-1'), /🎉 Alya sudah melewati tahap yang kita tuju! Kemajuan di tahap 3:/);
-  state.students[0].pilot_level = 8;
-  state.classScheduleStudents[0].level = 8;
-  state.diagnosticTests[0].tested_level = 8;
+  state.students[0].pilot_level = 18;
+  state.classScheduleStudents[0].level = 18;
+  state.diagnosticTests[0].tested_level = 18;
   state.diagnosticResults.push(...[5, 6, 7, 8, 9, 10, 11].map(number => ({ test_id: 'tes-1', number, status: 'lulus', package: 'utama' })));
-  assert.match(parentMessage('j1', 'anak-1'), /🏆 Alya sudah menuntaskan kedelapan tahap belajar di Rumah Belajar Rainbow Kids Alfatih!/);
+  assert.match(parentMessage('j1', 'anak-1'), /🏆 Alya sudah menuntaskan kedelapan belas tahap belajar di Rumah Belajar Rainbow Kids Alfatih!/);
 });
 
 test('kabar orang tua: daftar siswa guru menandai anak aktif tanpa nomor WhatsApp', async () => {

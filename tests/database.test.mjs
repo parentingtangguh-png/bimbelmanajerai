@@ -23,9 +23,9 @@ test('PostgreSQL: akun, siswa, kurikulum 8 level, tes diagnostik, dan ruang kela
  const buat=async(who=teacher,extra={})=>(await as(who,'select create_student($1::jsonb) as id',[identitas(extra)])).rows[0].id;
 
  await t.test('kurikulum 8 level: isi lengkap, hanya dibaca, kata benda English unik',async()=>{
-  assert.equal((await as(teacher,'select count(*)::int n from k8_indicators')).rows[0].n,112);
-  assert.equal((await as(stranger,'select count(*)::int n from k8_levels')).rows[0].n,8,'semua anggota membaca');
-  assert.equal((await as(owner,'select count(*)::int n from k8_subthemes')).rows[0].n,32);
+  assert.equal((await as(teacher,'select count(*)::int n from k8_indicators')).rows[0].n,252);
+  assert.equal((await as(stranger,'select count(*)::int n from k8_levels')).rows[0].n,18,'semua anggota membaca');
+  assert.equal((await as(owner,'select count(*)::int n from k8_subthemes')).rows[0].n,64);
   assert.equal((await as(teacher,"select count(*)::int n from k8_theme_english where kind='noun'")).rows[0].n,40);
   await assert.rejects(as(owner,"update k8_levels set title='X' where level=1"),/permission denied/,'pemilik pun tidak mengubah isi');
   await assert.rejects(as(owner,"insert into k8_cp values(1,'X')"),/permission denied|row-level/);
@@ -101,7 +101,7 @@ test('PostgreSQL: akun, siswa, kurikulum 8 level, tes diagnostik, dan ruang kela
   const tes=async sid=>(await admin('select * from diagnostic_tests where student_id=$1',[sid])).rows[0];
   await assert.rejects(mulai(owner,kid,3),/guru pendamping/,'pemilik ditolak');
   await assert.rejects(mulai(stranger,kid,3),/guru pendamping/,'guru lain ditolak');
-  await assert.rejects(mulai(teacher,kid,9),/Level 1–8/);
+  await assert.rejects(mulai(teacher,kid,19),/Level 1–18/);
   await assert.rejects(nilai(kid,1,'lulus'),/belum dimulai/);
   await mulai(teacher,kid,5);
   await assert.rejects(mulai(teacher,kid,3),/sudah dimulai/,'level tidak bisa diganti selama tes berjalan');
@@ -137,16 +137,19 @@ test('PostgreSQL: akun, siswa, kurikulum 8 level, tes diagnostik, dan ruang kela
   await assert.rejects(nilai(kid,3,'lulus'),/sudah disimpan final/);
   await assert.rejects(final(kid),/sudah disimpan final/);
   await assert.rejects(mulai(teacher,kid,3),/sudah dites diagnostik/);
-  // L1 tidak berhenti; 12 Lulus → level berikutnya indikator 1; 12 Lulus di L8 → kurikulum selesai.
-  const l1=await buat(),l7=await buat(),l8=await buat();
+  // L1 tidak berhenti; 12 Lulus → level berikutnya indikator 1; 12 Lulus di L18 → kurikulum selesai.
+  const l1=await buat(),l7=await buat(),l8=await buat(),l18b=await buat();
   await mulai(teacher,l1,1);for(const n of [1,2,3,4])await nilai(l1,n,'belum');await nilai(l1,5,'lulus');
   assert.equal(await final(l1),1);
   assert.equal((await tes(l1)).start_indicator,1);
   for(const [sid,level] of [[l7,7],[l8,8]]){await mulai(teacher,sid,level);for(let n=1;n<=12;n++)await nilai(sid,n,'lulus');}
   assert.equal(await final(l7),8);
   assert.deepEqual([(await tes(l7)).start_indicator,(await tes(l7)).curriculum_complete],[1,false]);
-  assert.equal(await final(l8),8);
-  assert.deepEqual([(await tes(l8)).start_indicator,(await tes(l8)).curriculum_complete],[null,true]);
+  assert.equal(await final(l8),9);
+  assert.deepEqual([(await tes(l8)).start_indicator,(await tes(l8)).curriculum_complete],[1,false]);
+  await mulai(teacher,l18b,18);for(let n=1;n<=12;n++)await nilai(l18b,n,'lulus');
+  assert.equal(await final(l18b),18);
+  assert.deepEqual([(await tes(l18b)).start_indicator,(await tes(l18b)).curriculum_complete],[null,true]);
   // Akses: guru pendamping membaca hasil; pemilik hanya ringkasan; guru lain tidak; tulis langsung ditolak.
   assert.ok((await as(teacher,'select * from diagnostic_results')).rows.length>0);
   assert.equal((await as(stranger,'select * from diagnostic_tests where student_id=$1',[kid])).rows.length,0);
@@ -215,9 +218,9 @@ test('PostgreSQL: akun, siswa, kurikulum 8 level, tes diagnostik, dan ruang kela
   assert.equal((await admin('select count(*)::int n from student_level_changes where student_id=$1 and from_level=2 and to_level=3',[b])).rows[0].n,1);
   await isi(h4b,[{student_id:b,result:'lulus'}]);
   assert.equal((await baris(h4b,b)).indicator_number,1,'level baru mulai indikator 1');
-  // Level 8 selesai: tidak bisa naik lagi.
-  const l8=await dites(8,[1,2,3,4,5,6,7,8,9,10,11,12]);
-  await assert.rejects(as(teacher,'select confirm_level_up($1)',[l8]),/tidak ada level berikutnya/);
+  // Level 18 selesai: tidak bisa naik lagi.
+  const l18=await dites(18,[1,2,3,4,5,6,7,8,9,10,11,12]);
+  await assert.rejects(as(teacher,'select confirm_level_up($1)',[l18]),/tidak ada level berikutnya/);
   // Akses baca dan hapus siswa.
   assert.equal((await as(stranger,'select * from class_schedule_students')).rows.length,0);
   assert.ok((await as(owner,'select * from class_schedule_students')).rows.length>0);
