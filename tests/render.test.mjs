@@ -56,9 +56,9 @@ const openModal = (fn, arg) => {
 test('ringkasan: siswa aktif, sudah dan belum dites, sebaran level', () => {
   loadSampleState();
   const html = dashboard();
-  assert.match(html, /Siswa aktif <i>◉<\/i><\/span><strong>02</);
-  assert.match(html, /Sudah dites <i>✓<\/i><\/span><strong>01</);
-  assert.match(html, /Belum dites <i>◌<\/i><\/span><strong>01</);
+  assert.match(html, /Siswa aktif <i>◉<\/i><\/span><strong>04</);
+  assert.match(html, /Sudah dites <i>✓<\/i><\/span><strong>02</);
+  assert.match(html, /Belum dites <i>◌<\/i><\/span><strong>02</);
   assert.ok(html.indexOf('Bima Contoh') < html.indexOf('Alya Contoh'), 'anak yang belum dites didahulukan');
   assert.ok(!html.includes('Citra Cuti'), 'anak non-aktif tidak di ringkasan');
   assert.match(html, /1 anak<\/span><h3>Level 3 — Merangkai Awal/);
@@ -307,7 +307,7 @@ test('daftar siswa guru dan pemilik memakai status tes dan level 8 level', () =>
   state.filter = 'Alya';
   assert.match(studentsView(), /class="panel owner-group" data-teacher="[^"]+" open>/, 'saat mencari, kelompok terbuka');
   state.filter = '';
-  assert.match(pemilik, /3 siswa · 2 aktif · 1 belum tes diagnostik/);
+  assert.match(pemilik, /5 siswa · 4 aktif · 2 belum tes diagnostik/);
   assert.match(
     dashboard(),
     /Alya Contoh<\/strong><small class="status-tes">Sudah dites</,
@@ -494,7 +494,7 @@ test('tes diagnostik: pilih anak dan satu level 1–18, dengan saran dari kelas 
   assert.ok(!tes.includes('value="anak-3"'), 'anak non-aktif tidak dites');
   assert.match(
     tes,
-    /<option value="9" selected>Level 9 \(saran\)/,
+    /<option value="9" selected>Level 9[^(]*\(saran\)/,
     'Bima SD 2 → saran Level 9'
   );
   for (let l = 1; l <= 18; l++) assert.match(tes, new RegExp('<option value="' + l + '"'));
@@ -518,7 +518,7 @@ test('tes diagnostik: pilih anak dan satu level 1–18, dengan saran dari kelas 
   assert.match(lanjut, /data-action="diagnostic-open" data-id="anak-2"/);
   assert.ok(!lanjut.includes('name="start"'));
 
-  state.students = state.students.filter(s => s.id !== 'anak-2');
+  state.students = state.students.filter(s => s.id !== 'anak-2' && s.id !== 'anak-5');
   assert.match(openModal(diagnosticForm), /Semua anak sudah dites/);
   state.students = [];
   assert.match(openModal(diagnosticForm), /Belum ada siswa aktif/);

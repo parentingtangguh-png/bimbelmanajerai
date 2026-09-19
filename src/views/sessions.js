@@ -85,14 +85,12 @@ export function dayCard(number) {
   const latest = number === lastNumber();
   const teacher = state.role === 'teacher';
   const sub = k8SubthemeFor(number);
-  const add =
-    teacher && latest
-      ? `<div class="button-row"><button type="button" class="secondary" data-action="add-session" data-id="${first.id}">＋ Tambah sesi</button></div>`
-      : '';
-  return `<article class="panel schedule-card"><strong>${h(dateText(first.scheduled_date))} · Pertemuan ${number}</strong><p>${themeLabel(first.theme_number)}${sub ? ` · ${h(sub.name)}` : ''}</p>${list.map(sessionRow).join('')}${add}</article>`;
+  const rows = list.map((c, i) => sessionRow(c, teacher && latest && i === list.length - 1 ? first.id : null));
+  return `<article class="panel schedule-card"><strong>${h(dateText(first.scheduled_date))} · Pertemuan ${number}</strong><p>${themeLabel(first.theme_number)}${sub ? ` · ${h(sub.name)}` : ''}</p>${rows.join('')}</article>`;
 }
 
-export function sessionRow(c) {
+// addSessionId: id sesi pertama hari itu, diisi hanya pada sesi terakhir pertemuan terbaru milik guru.
+export function sessionRow(c, addSessionId = null) {
   const kids = rowsOf(c.id);
   const names = kids
     .map(k => state.students.find(s => s.id === k.student_id))
@@ -107,12 +105,16 @@ export function sessionRow(c) {
   const time = timeText(c) ? ` · ${h(timeText(c))}` : '';
   const teacher = state.role === 'teacher';
   const latest = c.meeting_number === lastNumber();
+  const add = addSessionId
+    ? `<button type="button" class="secondary" data-action="add-session" data-id="${addSessionId}">＋ Tambah sesi</button>`
+    : '';
   const actions = c.completed_at
     ? `<button type="button" class="secondary" data-action="open-schedule" data-id="${c.id}">Lihat</button>`
     : teacher
       ? `<button type="button" class="primary" data-action="open-schedule" data-id="${c.id}">Buka</button><button type="button" class="secondary" data-action="edit-schedule" data-id="${c.id}">Ubah</button>${latest ? `<button type="button" class="secondary" data-action="delete-schedule" data-id="${c.id}">Hapus</button>` : ''}`
       : '';
-  return `<div class="schedule-session"><p><strong>Sesi ${sessionIndex(c)}</strong>${time} · ${status}</p>${names ? `<p class="muted">${names}</p>` : ''}${actions ? `<div class="button-row">${actions}</div>` : ''}</div>`;
+  const row = actions || add ? `<div class="button-row">${actions}${add}</div>` : '';
+  return `<div class="schedule-session"><p><strong>Sesi ${sessionIndex(c)}</strong>${time} · ${status}</p>${names ? `<p class="muted">${names}</p>` : ''}${row}</div>`;
 }
 
 export const RESULTS = [
