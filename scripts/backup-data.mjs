@@ -49,11 +49,14 @@ export function restoreSql(data) {
 }
 
 function query(sql) {
-  const out = execSync(`npx --no-install supabase db query --linked "${sql}"`, {
+  const out = execSync(`npx --no-install supabase db query --linked --output json "${sql}"`, {
     encoding: 'utf8',
     maxBuffer: 256 * 1024 * 1024,
     stdio: ['ignore', 'pipe', 'pipe']
   });
+  // Output bisa diawali pesan CLI (mis. "Initialising login role..."), ambil bagian JSON-nya saja.
+  const start = out.indexOf('[');
+  if (start !== -1) return JSON.parse(out.slice(start, out.lastIndexOf(']') + 1));
   return JSON.parse(out.slice(out.indexOf('{'), out.lastIndexOf('}') + 1)).rows;
 }
 
