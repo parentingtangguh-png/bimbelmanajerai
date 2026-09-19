@@ -15,7 +15,7 @@ import {
 import { heading, empty, field } from '../ui.js';
 import { escapeHtml as h, localDate } from '../domain.js';
 import { inlineMarkdown } from '../markdown.js';
-import { parentWhatsappLink } from '../kabar.js';
+import { parentWhatsappLink, absentWhatsappLink } from '../kabar.js';
 
 export const MEETINGS = 192;
 
@@ -241,7 +241,20 @@ export function meetingSheet(id, v = null) {
       })
       .join('');
     const status = c.completed_at ? '' : '<p class="muted">Sesi belum selesai.</p>';
-    return `${head}${status}${list || '<p class="muted">Belum ada siswa.</p>'}`;
+    // Siswa tidak hadir: aktif, punya tes final, tidak ada di sesi ini, tidak hadir di sesi lain hari itu.
+    const attendedIds = new Set(rowsOf(id).map(r => r.student_id));
+    const absentStudents = c.completed_at && state.role === 'teacher'
+      ? state.students.filter(s => {
+          if (!ready(s) || attendedIds.has(s.id)) return false;
+          return !state.classSchedules.some(
+            x => x.id !== id && x.scheduled_date === c.scheduled_date && rowsOf(x.id).some(r => r.student_id === s.id)
+          );
+        })
+      : [];
+    const absentSection = absentStudents.length
+      ? `<div class="absent-section"><p class="muted schedule-label">Tidak hadir</p>${absentStudents.map(s => absentButton(c, s)).join('')}</div>`
+      : '';
+    return `${head}${status}${list || '<p class="muted">Belum ada siswa.</p>'}${absentSection}`;
   }
   const values = v || meetingValues(id);
   const picked = new Set([].concat(values.students || []));
@@ -277,6 +290,16 @@ function parentButton(c, s) {
   return link
     ? `<div class="button-row"><a class="wa-button" href="${h(link)}" target="_blank" rel="noopener">WhatsApp ke ${h(s.parent_name || 'orang tua')}</a></div>`
     : '<div class="button-row"><span class="wa-button off">Nomor WhatsApp orang tua belum diisi</span></div>';
+}
+
+// Tombol WA untuk siswa yang tidak hadir di sesi selesai.
+function absentButton(c, s) {
+  if (!s) return '';
+  const link = absentWhatsappLink(c.id, s.id);
+  const nama = h(s.nickname || s.name.split(' ')[0]);
+  return link
+    ? `<div class="absent-student"><span>${h(s.name)}</span><a class="wa-button" href="${h(link)}" target="_blank" rel="noopener">WhatsApp ke ${h(s.parent_name || 'orang tua')}</a></div>`
+    : `<div class="absent-student"><span>${h(s.name)}</span><span class="wa-button off">Nomor WA belum diisi</span></div>`;
 }
 
 // Kotak Prompt kegiatan di lembar sesi: teks siap salin untuk ChatGPT/Gemini.

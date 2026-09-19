@@ -2021,3 +2021,19 @@ dialog::backdrop {
   color: #9aa096;
   font-weight: 600;
 }
+.absent-section {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.absent-student {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.absent-student:last-child {
+  border-bottom: none;
+}

@@ -149,3 +149,48 @@ export function parentWhatsappLink(scheduleId, studentId) {
   const text = parentMessage(scheduleId, studentId);
   return number && text ? `https://wa.me/${number}?text=${encodeURIComponent(text)}` : '';
 }
+
+// Pesan WA untuk siswa yang tidak hadir: menyebut tema hari ini + subtema berikutnya sebagai teaser.
+export function absentMessage(scheduleId, studentId) {
+  const c = state.classSchedules.find(x => x.id === scheduleId);
+  const s = state.students.find(x => x.id === studentId);
+  if (!c || !s) return '';
+  const nama = s.nickname || s.name.split(' ')[0];
+  const sapaan = s.parent_name || 'Ayah/Bunda';
+  const theme = k8ThemeFor(c.meeting_number);
+  const sub = k8SubthemeFor(c.meeting_number);
+  const nextSub = k8SubthemeFor(c.meeting_number + 1);
+
+  const lines = [`Assalamu'alaikum ${sapaan} 😊`, ''];
+  lines.push(`Hari ini ${nama} belum bisa hadir di bimbel.`, '');
+
+  if (theme) {
+    const subPart = sub ? ` subtema *"${sub.name}"*` : '';
+    lines.push(`Teman-teman hari ini belajar tema *"${theme.name}"*,${subPart}.`);
+    const nouns = state.k8English
+      .filter(e => e.theme === theme.number && e.kind === 'noun')
+      .sort((a, b) => a.position - b.position)
+      .slice(0, 3)
+      .map(e => e.text);
+    if (nouns.length) lines.push(`Kosakata English yang dikenalkan: _${nouns.join(', ')}_. 📚`);
+  }
+
+  if (nextSub) {
+    lines.push(
+      '',
+      `Pertemuan berikutnya kami lanjut ke subtema *"${nextSub.name}"*. Sayang kalau ${nama} terlewat — semoga bisa hadir ya! 🙏`
+    );
+  } else {
+    lines.push('', `Semoga ${nama} bisa hadir di pertemuan berikutnya ya! Kami tunggu 🙏`);
+  }
+
+  lines.push('', ORG_NAME);
+  return lines.filter((l, i, all) => l !== '' || (all[i - 1] !== '' && i > 0)).join('\n');
+}
+
+export function absentWhatsappLink(scheduleId, studentId) {
+  const s = state.students.find(x => x.id === studentId);
+  const number = waNumber(s?.phone);
+  const text = absentMessage(scheduleId, studentId);
+  return number && text ? `https://wa.me/${number}?text=${encodeURIComponent(text)}` : '';
+}
