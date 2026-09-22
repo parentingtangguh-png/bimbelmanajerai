@@ -32,8 +32,8 @@ function statusNote(s) {
   const ind = state.k8Indicators.find(i => i.level === level && i.number === n);
   const text = n
     ? `Indikator ${n}${ind ? ` · ${ind.slot}` : ''}`
-    : level === 8
-      ? 'Kurikulum 8 level selesai'
+    : level === 18
+      ? 'Kurikulum 18 level selesai'
       : `Siap naik ke Level ${level + 1}`;
   return `<small class="status-tes">${h(text)}</small>`;
 }

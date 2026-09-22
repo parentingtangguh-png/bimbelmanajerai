@@ -196,7 +196,7 @@ export function meetingRows(picked, v = {}, c = {}) {
       const ind = n ? indicatorOf(s.pilot_level, n) : null;
       const academic = n
         ? `<p><span class="badge green">${h(ind?.slot || String(n))}</span> Indikator ${n}. ${inlineMarkdown(ind ? ind.competency : '')}</p>${indicatorDetails(ind)}<div class="diagnostic-ratings">${radios(`r_${s.id}`, RESULTS, v[`r_${s.id}`])}</div>`
-        : `<p><span class="badge green">${Number(s.pilot_level) === 8 ? 'Kurikulum 8 level selesai' : `12 indikator Level ${s.pilot_level} Lulus — siap naik`}</span></p>`;
+        : `<p><span class="badge green">${Number(s.pilot_level) === 18 ? 'Kurikulum 18 level selesai' : `12 indikator Level ${s.pilot_level} Lulus — siap naik`}</span></p>`;
       return `<fieldset class="diagnostic-task"><legend>${h(s.name)} · Level ${s.pilot_level}</legend>${academic}${companionBlock(s, c, 13, 'en', v)}${companionBlock(s, c, 14, 'kr', v)}</fieldset>`;
     })
     .join('');

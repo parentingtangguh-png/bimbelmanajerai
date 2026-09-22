@@ -30,7 +30,7 @@ const curriculumPart = () =>
     'Isi tab ini',
     list([
       '<b>Capaian pembelajaran</b>.',
-      '<b>Level 1–8</b>: ketuk level, lalu ketuk indikator untuk melihat <b>Cara uji</b>, <b>Bahan</b>, <b>Tanda lulus</b>.',
+      '<b>Level 1–18</b>: ketuk level, lalu ketuk indikator untuk melihat <b>Cara uji</b>, <b>Bahan</b>, <b>Tanda lulus</b>.',
       '<b>Ketentuan dan bahan cadangan per alur</b>.',
       '<b>Tema</b>: subtema dan nomor pertemuan, benda nyata, kosakata, English, situasi Karakter.'
     ])
@@ -52,7 +52,7 @@ const teacher = {
         '<b>Belum tes diagnostik</b> / <b>Tes Level X belum final</b>: selesaikan tesnya di Data siswa.',
         '<b>Indikator N · slot</b>: indikator yang dilatih dan dinilai di sesi berikutnya.',
         '<b>Siap naik ke Level X</b>: 12 indikator akademik Lulus. Buka profil anak untuk menaikkan level.',
-        '<b>Kurikulum 8 level selesai</b>.'
+        '<b>Kurikulum 18 level selesai</b>.'
       ])
     ) +
     part('Sebaran level', tip('Jumlah anak aktif di tiap level. Ketuk nama anak untuk membuka profilnya.')),
