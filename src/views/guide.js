@@ -111,7 +111,7 @@ const teacher = {
         `Opsional: ${b('Prompt kegiatan')} → ${b('Salin prompt')} → tempel ke <b>obrolan baru</b> di ChatGPT atau Gemini (satu sesi, satu obrolan baru). Jawaban AI berisi ide kegiatan dan kalimat praktis Bahasa Inggris untuk menjalankan kelas; saat menilai, ikuti <b>Cara uji, bahan, tanda lulus</b> di lembar sesi.`,
         'Tiap anak punya satu indikator. Buka <b>Cara uji, bahan, tanda lulus</b>, uji, lalu pilih <b>Lulus</b>, <b>Belum</b>, atau <b>Belum dinilai</b>.',
         'English dan Karakter boleh dibiarkan <b>Tidak dinilai</b>. English sebagian level baru bisa dinilai setelah anak hadir 3 pertemuan dalam satu tema.',
-        `Selama kelas: ${b('Simpan sementara')}. Setelah semua anak dinilai: ${b('Tandai sesi selesai')}.`
+        `Setiap centang dan nilai tersimpan sendiri beberapa saat setelah diketuk; lihat tulisan <b>Tersimpan sendiri pukul …</b> di atas tombol. ${b('Simpan sementara')} dipakai bila tulisan itu menyebut belum tersimpan. Setelah semua anak dinilai: ${b('Tandai sesi selesai')}.`
       ])
     ) +
     locked([
