@@ -2050,3 +2050,26 @@ dialog::backdrop {
 .absent-student:last-child {
   border-bottom: none;
 }
+
+/* Sasaran ketuk di HP: baris yang bisa dibuka setinggi 17px terlalu mudah meleset, dan di lembar sesi
+   ketukan yang meleset bisa mengenai pilihan nilai di bawahnya (nilai tersimpan sendiri). */
+@media (max-width: 620px) {
+  .diagnostic-rules > summary,
+  .k8-note > summary,
+  .k8-doc > summary,
+  .k8-level > summary,
+  .k8-indicator summary,
+  .theme-detail > summary,
+  .schedule-kids > summary,
+  .owner-group > summary,
+  .meeting-companion details > summary,
+  .diagnostic-task details > summary {
+    min-height: 44px;
+    box-sizing: border-box;
+    padding: 12px 2px;
+  }
+  .home-doa .text-btn {
+    min-height: 44px;
+    padding: 10px 14px;
+  }
+}
