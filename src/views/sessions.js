@@ -85,7 +85,9 @@ export function dayCard(number) {
   const latest = number === lastNumber();
   const teacher = state.role === 'teacher';
   const sub = k8SubthemeFor(number);
-  const rows = list.map((c, i) => sessionRow(c, teacher && latest && i === list.length - 1 ? first.id : null));
+  const rows = list.map((c, i) =>
+    sessionRow(c, teacher && latest && i === list.length - 1 ? first.id : null)
+  );
   return `<article class="panel schedule-card"><strong>${h(dateText(first.scheduled_date))} · Pertemuan ${number}</strong><p>${themeLabel(first.theme_number)}${sub ? ` · ${h(sub.name)}` : ''}</p>${rows.join('')}</article>`;
 }
 
@@ -243,14 +245,18 @@ export function meetingSheet(id, v = null) {
     const status = c.completed_at ? '' : '<p class="muted">Sesi belum selesai.</p>';
     // Siswa tidak hadir: aktif, punya tes final, tidak ada di sesi ini, tidak hadir di sesi lain hari itu.
     const attendedIds = new Set(rowsOf(id).map(r => r.student_id));
-    const absentStudents = c.completed_at && state.role === 'teacher'
-      ? state.students.filter(s => {
-          if (!ready(s) || attendedIds.has(s.id)) return false;
-          return !state.classSchedules.some(
-            x => x.id !== id && x.scheduled_date === c.scheduled_date && rowsOf(x.id).some(r => r.student_id === s.id)
-          );
-        })
-      : [];
+    const absentStudents =
+      c.completed_at && state.role === 'teacher'
+        ? state.students.filter(s => {
+            if (!ready(s) || attendedIds.has(s.id)) return false;
+            return !state.classSchedules.some(
+              x =>
+                x.id !== id &&
+                x.scheduled_date === c.scheduled_date &&
+                rowsOf(x.id).some(r => r.student_id === s.id)
+            );
+          })
+        : [];
     const absentSection = absentStudents.length
       ? `<div class="absent-section"><p class="muted schedule-label">Tidak hadir</p>${absentStudents.map(s => absentButton(c, s)).join('')}</div>`
       : '';
@@ -278,7 +284,8 @@ export function meetingSheet(id, v = null) {
   // Urutan kerja guru: siswa hadir → rencana kegiatan dari prompt → penilaian setelah anak diuji → simpan.
   const prompt = `<div class="schedule-field"><span class="schedule-label">2. Rencana kegiatan</span><p class="muted">Sebelum kegiatan dimulai: salin prompt ke obrolan baru dan jalankan rencananya.</p><div class="button-row"><button type="button" class="secondary" data-action="activity-prompt" data-prompt-button ${ids.length ? '' : 'disabled'}>Prompt kegiatan</button></div><div data-prompt-box hidden></div></div>`;
   const rating = `<span class="schedule-label">3. Penilaian</span><p class="muted">Isi setelah anak diuji dengan Cara uji, bahan, tanda lulus di bawah.</p>`;
-  const buttons = `<div class="button-row"><button class="secondary" name="finish" value="0">Simpan sementara</button><button class="primary" name="finish" value="1" data-finish ${done ? '' : 'disabled'}>Tandai sesi selesai</button></div><p class="muted" data-finish-hint>${hint}</p>`;
+  // Setiap ketukan nilai disimpan sementara sendiri; barisnya memberi tahu guru keadaan simpanan itu.
+  const buttons = `<div class="button-row"><button class="secondary" name="finish" value="0">Simpan sementara</button><button class="primary" name="finish" value="1" data-finish ${done ? '' : 'disabled'}>Tandai sesi selesai</button></div><p class="muted" data-autosave>Nilai tersimpan sendiri setiap kali diketuk.</p><p class="muted" data-finish-hint>${hint}</p>`;
   return `<form data-form="meeting" data-id="${h(id)}">${head}${kidBlock}${prompt}${rating}${meetingRows(picked, values, c)}<p class="muted">Simpan sementara bisa diubah lagi. Setelah ditandai selesai, sesi dikunci dan indikator siswa yang Lulus berganti otomatis.</p>${buttons}</form>`;
 }
 

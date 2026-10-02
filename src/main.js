@@ -426,9 +426,13 @@ document.addEventListener('change', e => {
     form.querySelector('[data-meeting-rows]').outerHTML = meetingRows(new Set(ids), Object.fromEntries(f), c);
     // Prompt lama tidak sesuai lagi dan kehadiran baru belum tersimpan: guru mengetuk Prompt kegiatan lagi.
     form.querySelector('[data-prompt-box]').hidden = true;
-    return updateFinish(form);
+    updateFinish(form);
+    return autosaveMeeting(form);
   }
-  if (form?.dataset.form === 'meeting' && /^(r|en|kr)_/.test(e.target.name)) return updateFinish(form);
+  if (form?.dataset.form === 'meeting' && /^(r|en|kr)_/.test(e.target.name)) {
+    updateFinish(form);
+    return autosaveMeeting(form);
+  }
   if (form?.dataset.form === 'diagnostic-start' && e.target.name === 'student')
     return diagnosticForm(e.target.value);
   if (form?.dataset.form === 'diagnostic' && /^[sp]\d+$/.test(e.target.name)) return rateTask(form, e.target);
@@ -615,6 +619,51 @@ document.addEventListener(
   },
   true
 );
+// Simpan otomatis lembar sesi: setiap centang kehadiran dan setiap nilai yang diketuk dikirim sebagai
+// simpanan sementara, supaya tab HP yang dimuat ulang di tengah kelas tidak menghapus pekerjaan guru.
+// Satu permintaan pada satu waktu; ketukan yang datang saat menyimpan dijalankan sesudahnya.
+let autosaveTimer;
+let autosaveBusy = false;
+let autosaveAgain = false;
+function autosaveMeeting(form) {
+  const status = form.querySelector('[data-autosave]');
+  if (status) status.textContent = 'Menyimpan…';
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(() => saveMeetingDraft(form), 800);
+}
+async function saveMeetingDraft(form) {
+  if (!form.isConnected) return;
+  if (autosaveBusy) {
+    autosaveAgain = true;
+    return;
+  }
+  autosaveBusy = true;
+  const status = form.querySelector('[data-autosave]');
+  try {
+    await result(
+      db.rpc('save_meeting', {
+        p_schedule: form.dataset.id,
+        p_students: meetingStudents(form),
+        p_finish: false
+      })
+    );
+    state.classScheduleStudents = await allRows('class_schedule_students', 'schedule_id');
+    listStale = true;
+    if (status)
+      status.textContent =
+        'Tersimpan sendiri pukul ' +
+        new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+  } catch (err) {
+    if (status) status.textContent = 'Belum tersimpan sendiri. Ketuk Simpan sementara.';
+    notify(errorText(err), true);
+  } finally {
+    autosaveBusy = false;
+    if (autosaveAgain) {
+      autosaveAgain = false;
+      saveMeetingDraft(form);
+    }
+  }
+}
 // Tombol "Tandai sesi selesai" mengikuti isi lembar: aktif bila setiap siswa yang dicentang sudah dinilai.
 function updateFinish(form) {
   const f = new FormData(form);

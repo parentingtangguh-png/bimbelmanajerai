@@ -280,6 +280,11 @@ test('prompt kegiatan: data kelas, kondisi sebelumnya, English/Karakter, dan atu
     /data-action="activity-prompt" data-prompt-button >Prompt kegiatan/
   );
   assert.match(meetingSheet('j3', { students: [] }), /data-prompt-button disabled>/);
+  // Keterangan simpan otomatis; main.js memperbarui isinya lewat [data-autosave].
+  assert.match(
+    meetingSheet('j3', { students: ['anak-1'] }),
+    /<p class="muted" data-autosave>Nilai tersimpan sendiri setiap kali diketuk\.<\/p>/
+  );
   // Urutan kerja guru (disetujui pemilik): siswa hadir → rencana kegiatan (prompt) → penilaian → simpan.
   const urut = meetingSheet('j3', { students: ['anak-1'] });
   const pos = [
