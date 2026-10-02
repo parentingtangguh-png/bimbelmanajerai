@@ -27,3 +27,9 @@ app.py
 BimbelManager.gs
 requirements.txt
 .streamlit/
+
+# Berkas kerja pemilik yang bukan bagian aplikasi (repo publik: jangan ikut ter-commit).
+tmp/
+sessions
+/Qori Nasional/
+*.pdf
