@@ -766,6 +766,19 @@ hr {
 .toast.error {
   background: #8d4639;
 }
+/* Pesan galat menunggu ditutup guru, jadi perlu tombolnya sendiri. */
+.toast-close {
+  display: block;
+  margin: 10px 0 0 auto;
+  padding: 6px 14px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
 .login {
   display: grid;
   grid-template-columns: 1.05fr 1fr;

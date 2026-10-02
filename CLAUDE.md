@@ -142,7 +142,7 @@ Yang ada (dijaga tes `struktur lama sudah tidak ada`):
 - **`String.replace` memakan `$$` menjadi `$`** di teks pengganti. Untuk skrip penggantian, pakai `split(a).join(b)` dan periksa jumlah kecocokan. Heredoc bash juga bisa memakan backslash regex — tulis skrip bantu dengan tool Write.
 - **Backtick di dalam perintah bash berkutip ganda dijalankan sebagai perintah** (pernah menjalankan kata-kata dari CLAUDE.md sebagai program). Menyunting teks yang memuat backtick selalu lewat skrip yang ditulis dengan tool Write.
 - **`<footer class="home-doa">` juga anak `.workspace`**: aturan penyembunyi kaki halaman wajib `.workspace > footer:not(.home-doa)`.
-- **Modal (`<dialog>`) ada di lapisan paling atas**; `notify()` menempel ke `dialog[open]` bila ada.
+- **Modal (`<dialog>`) ada di lapisan paling atas**; `notify()` menempel ke `dialog[open]` bila ada. Pesan **berhasil** hilang sendiri 6,5 detik; pesan **galat** menunggu tombol **Tutup** (guru pernah kehilangan pesan gagal simpan). Semua galat simpan dilewatkan `errorText()` di `domain.js` (jaringan dan sesi berakhir diterjemahkan, pesan aturan database tetap apa adanya; dikunci `tests/domain.test.mjs`).
 - **Pane browser kadang memotret bingkai lama** saat halaman digulir lewat JS; periksa lewat DOM (`innerText`) bila potretnya janggal.
 - Keluaran `supabase db query` diakhiri pemberitahuan versi CLI; ambil bagian JSON-nya. SQL harus **satu baris**.
 - Pesan commit: `git commit -F <file>`.

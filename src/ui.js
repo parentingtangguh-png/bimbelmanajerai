@@ -24,7 +24,18 @@ export function notify(text, error = false) {
   // Pesan galat simpan justru muncul saat modal masih terbuka, maka pesan ditempel ke modal itu.
   (document.querySelector('dialog[open]') || document.body).append(el);
   clearTimeout(messageTimer);
-  messageTimer = setTimeout(() => el.remove(), 6500);
+  // Pesan berhasil hilang sendiri; pesan galat menunggu ditutup guru, supaya tidak lenyap sebelum
+  // terbaca dan guru mengira pekerjaannya tersimpan.
+  if (!error) {
+    messageTimer = setTimeout(() => el.remove(), 6500);
+    return;
+  }
+  const close = document.createElement('button');
+  close.type = 'button';
+  close.className = 'toast-close';
+  close.textContent = 'Tutup';
+  close.addEventListener('click', () => el.remove());
+  el.append(close);
 }
 // A screen may leave the subtitle out; an empty <p> would still take its margin.
 export function heading(kicker, title, subtitle, button = '') {

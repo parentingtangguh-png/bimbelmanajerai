@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { escapeHtml as h } from './domain.js';
+import { escapeHtml as h, errorText } from './domain.js';
 import {
   ORG_NAME,
   initialState,
@@ -329,7 +329,7 @@ document.addEventListener('click', async e => {
         state.classScheduleStudents = await allRows('class_schedule_students', 'schedule_id');
         listStale = saved = true;
       } catch (err) {
-        notify('Kehadiran belum tersimpan: ' + err.message, true);
+        notify('Kehadiran belum tersimpan. ' + errorText(err), true);
       }
       const box = form.querySelector('[data-prompt-box]');
       box.innerHTML = promptBox(activityPrompt(form.dataset.id, ids), saved);
@@ -410,7 +410,7 @@ document.addEventListener('click', async e => {
       await refresh();
     }
   } catch (err) {
-    notify(err.message, true);
+    notify(errorText(err), true);
   } finally {
     b.disabled = false;
   }
@@ -561,7 +561,7 @@ document.addEventListener('submit', async e => {
     await refresh();
     notify('Perubahan berhasil disimpan.');
   } catch (err) {
-    notify(err.message, true);
+    notify(errorText(err), true);
   } finally {
     buttons.forEach(b => (b.disabled = false));
     if (form.dataset.form === 'meeting' && form.isConnected) updateFinish(form);
@@ -587,7 +587,7 @@ async function rateTask(form, input) {
     if (isStopped(test.tested_level, answers)) return diagnosticForm();
     form.querySelector('[data-diagnostic-summary]').outerHTML = diagnosticSummary(test.tested_level, answers);
   } catch (err) {
-    notify(err.message, true);
+    notify(errorText(err), true);
     diagnosticForm();
   }
 }
@@ -632,7 +632,7 @@ if (db) {
       try {
         await loadUser(data.session.user);
       } catch (err) {
-        notify(err.message, true);
+        notify(errorText(err), true);
         await db.auth.signOut();
         resetSession();
         login();
