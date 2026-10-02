@@ -120,6 +120,9 @@ const teacher = {
     tip(
       'Sesi yang sudah selesai hanya bisa dilihat (tombol <b>Lihat</b>). Bila ada kesalahan, hubungi pemilik.'
     ) +
+    tip(
+      'Buka satu sesi di <b>satu tab saja</b>. Bila sesi yang sama dibuka di dua tab atau dua HP, yang tersimpan belakangan menimpa nilai dari yang lain.'
+    ) +
     part(
       'Kabar harian untuk orang tua',
       steps([
