@@ -14,7 +14,7 @@ import {
   levelName
 } from '../src/state.js';
 import { sessionsView, meetingSheet, finishState, scheduleForm } from '../src/views/sessions.js';
-import { passedIndicators, suggestedIndicator, englishReady } from '../src/state.js';
+import { passedIndicators, suggestedIndicator, englishReady, FIXED_ENGLISH_LEVELS } from '../src/state.js';
 import { activityPrompt, previousCondition } from '../src/prompt.js';
 import { dashboard } from '../src/views/dashboard.js';
 import { studentsView, studentForm, diagnosticResultSection } from '../src/views/students.js';
@@ -140,6 +140,21 @@ test('ruang kelas 8 level: antrean dengan hasil diagnostik, tiga pilihan, Englis
     'L7 ungkapan tetap'
   );
   assert.equal(englishReady(alya, state.classSchedules[1]), false);
+  // L9, L12, L15 juga bebas dinilai (docs/curriculum/indikator/alur-english-karakter-l9-l18.md,
+  // ketentuan 3–4); daftarnya harus sama dengan save_meeting di migrasi L9–L18.
+  assert.deepEqual(FIXED_ENGLISH_LEVELS, [1, 4, 7, 9, 12, 15]);
+  for (const level of [9, 12, 15])
+    assert.equal(
+      englishReady({ id: 'anak-1', pilot_level: level }, state.classSchedules[1]),
+      true,
+      `L${level} bebas`
+    );
+  for (const level of [10, 13, 16, 18])
+    assert.equal(
+      englishReady({ id: 'anak-1', pilot_level: level }, state.classSchedules[1]),
+      false,
+      `L${level} butuh 3 pertemuan`
+    );
   assert.deepEqual(finishState(['anak-1'], {}).done, false);
   assert.deepEqual(finishState(['anak-1'], { 'r_anak-1': 'belum_dinilai' }).done, true);
   // Semua 12 Lulus → siap naik, tanpa pilihan akademik; profil menawarkan naik level.
@@ -235,7 +250,10 @@ test('prompt kegiatan: data kelas, kondisi sebelumnya, English/Karakter, dan atu
   // per siswa, dan bahan latihan tidak boleh memakai kata/soal bahan uji.
   assert.match(p, /Daftar Bahan wajib memuat semua benda yang disebut di bahan uji/);
   assert.match(p, /pada menit\n   berapa dan bagaimana guru menilainya/);
-  assert.match(p, /juga sebagian atau dipotong; latih dengan huruf atau angka lain\. Huruf atau\n   angka yang sama/);
+  assert.match(
+    p,
+    /juga sebagian atau dipotong; latih dengan huruf atau angka lain\. Huruf atau\n   angka yang sama/
+  );
   assert.match(p, /berupa poin tanpa tabel,/);
   assert.match(p, /Bahasa Inggris\/karakter yang boleh dinilai: menit dan cara menilai/);
   assert.match(p, /untuk\s+1 siswa sekitar 40 menit per siswa/);
@@ -243,7 +261,10 @@ test('prompt kegiatan: data kelas, kondisi sebelumnya, English/Karakter, dan atu
   assert.match(p, /   - Alya: tugas · tugas mandiri/);
   // Kalimat praktis guru dalam Bahasa Inggris (disetujui pemilik 18 Sep 2026).
   assert.match(p, /sekitar 470 kata \(untuk 1 siswa\)/);
-  assert.match(p, /10\. Tulis kalimat praktis guru dalam Bahasa Inggris[\s\S]*guru disebut Ustazah\.[\s\S]*bukan bahan penilaian/);
+  assert.match(
+    p,
+    /10\. Tulis kalimat praktis guru dalam Bahasa Inggris[\s\S]*guru disebut Ustazah\.[\s\S]*bukan bahan penilaian/
+  );
   assert.match(p, /3\. Pembuka \(menit 0–10\) · kalimat praktis guru/);
   assert.match(p, /5\. Penutup \(menit 50–60\) · kalimat praktis guru$/);
   assert.ok(!p.includes('undefined') && !p.includes('**'));
@@ -269,7 +290,10 @@ test('prompt kegiatan: data kelas, kondisi sebelumnya, English/Karakter, dan atu
     'name="r_anak-1"',
     'Simpan sementara</button>'
   ].map(t => urut.indexOf(t));
-  assert.ok(pos.every((p, i) => p >= 0 && p > (pos[i - 1] ?? -1)), 'urutan lembar sesi: ' + pos.join(', '));
+  assert.ok(
+    pos.every((p, i) => p >= 0 && p > (pos[i - 1] ?? -1)),
+    'urutan lembar sesi: ' + pos.join(', ')
+  );
 });
 
 test('daftar siswa guru dan pemilik memakai status tes dan level 8 level', () => {
@@ -305,7 +329,11 @@ test('daftar siswa guru dan pemilik memakai status tes dan level 8 level', () =>
     'siswa dikelompokkan per guru, kelompok tertutup'
   );
   state.filter = 'Alya';
-  assert.match(studentsView(), /class="panel owner-group" data-teacher="[^"]+" open>/, 'saat mencari, kelompok terbuka');
+  assert.match(
+    studentsView(),
+    /class="panel owner-group" data-teacher="[^"]+" open>/,
+    'saat mencari, kelompok terbuka'
+  );
   state.filter = '';
   assert.match(pemilik, /5 siswa · 4 aktif · 2 belum tes diagnostik/);
   assert.match(
@@ -492,11 +520,7 @@ test('tes diagnostik: pilih anak dan satu level 1–18, dengan saran dari kelas 
   assert.match(tes, /value="anak-2"/);
   assert.ok(!tes.includes('value="anak-1"'), 'anak yang sudah dites final tidak ditawarkan lagi');
   assert.ok(!tes.includes('value="anak-3"'), 'anak non-aktif tidak dites');
-  assert.match(
-    tes,
-    /<option value="9" selected>Level 9[^(]*\(saran\)/,
-    'Bima SD 2 → saran Level 9'
-  );
+  assert.match(tes, /<option value="9" selected>Level 9[^(]*\(saran\)/, 'Bima SD 2 → saran Level 9');
   for (let l = 1; l <= 18; l++) assert.match(tes, new RegExp('<option value="' + l + '"'));
   assert.ok(
     tes.indexOf('name="start"') < tes.indexOf('data-level-desc'),
@@ -695,12 +719,22 @@ test('kurikulum 8 level: CP, level berurutan dengan 14 indikator, catatan alur, 
 
 test('panduan per tab: satu panduan untuk tab yang dibuka, dan tombol yang disebut benar-benar ada', () => {
   loadSampleState();
-  const tombol = html => [...html.matchAll(/<b class="guide-btn">([^<]+)<\/b>/g)].map(m => m[1].replace(/ …$/, ''));
-  const tabs = { teacher: ['dashboard', 'students', 'sessions', 'curriculum'], owner: ['dashboard', 'students', 'team', 'curriculum'] };
+  const tombol = html =>
+    [...html.matchAll(/<b class="guide-btn">([^<]+)<\/b>/g)].map(m => m[1].replace(/ …$/, ''));
+  const tabs = {
+    teacher: ['dashboard', 'students', 'sessions', 'curriculum'],
+    owner: ['dashboard', 'students', 'team', 'curriculum']
+  };
   const sources = [
-    'src/views/students.js', 'src/views/diagnostic.js', 'src/views/sessions.js',
-    'src/views/dashboard.js', 'src/views/team.js', 'src/main.js'
-  ].map(p => fs.readFileSync(p, 'utf8')).join('\n');
+    'src/views/students.js',
+    'src/views/diagnostic.js',
+    'src/views/sessions.js',
+    'src/views/dashboard.js',
+    'src/views/team.js',
+    'src/main.js'
+  ]
+    .map(p => fs.readFileSync(p, 'utf8'))
+    .join('\n');
   for (const [role, views] of Object.entries(tabs)) {
     state.role = role;
     const bodies = new Set();
@@ -710,7 +744,8 @@ test('panduan per tab: satu panduan untuk tab yang dibuka, dan tombol yang diseb
       const body = guideBody();
       assert.ok(body.length > 200, `${role} ${view} punya isi`);
       bodies.add(body);
-      for (const t of tombol(body)) assert.ok(sources.includes(t), `${role} ${view}: tombol "${t}" ada di layar`);
+      for (const t of tombol(body))
+        assert.ok(sources.includes(t), `${role} ${view}: tombol "${t}" ada di layar`);
     }
     assert.equal(bodies.size, views.length, 'isi panduan berbeda per tab');
   }

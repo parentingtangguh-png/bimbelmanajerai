@@ -176,9 +176,10 @@ export const readyToLevelUp = s => !!s.pilot_level && suggestedIndicator(s) === 
 export const k8ThemeFor = n => state.k8Themes.find(t => n >= t.first_meeting && n <= t.last_meeting);
 export const k8SubthemeFor = n => state.k8Subthemes.find(t => n >= t.first_meeting && n <= t.last_meeting);
 
-// English L1, L4, L7 memakai ungkapan/warna tetap; level lain butuh hadir 3 pertemuan (hari) dalam satu
+// English L1, L4, L7 (ungkapan/warna tetap) dan L9, L12, L15 (instruksi kelas, perkenalan diri,
+// perasaan/pendapat) bebas dinilai kapan saja; level lain butuh hadir 3 pertemuan (hari) dalam satu
 // tema, termasuk pertemuan sesi ini. Sama dengan pemeriksaan di save_meeting.
-export const FIXED_ENGLISH_LEVELS = [1, 4, 7];
+export const FIXED_ENGLISH_LEVELS = [1, 4, 7, 9, 12, 15];
 export function englishReady(s, c) {
   if (FIXED_ENGLISH_LEVELS.includes(Number(s.pilot_level))) return true;
   const done = new Set(state.classSchedules.filter(x => x.completed_at).map(x => x.id));
