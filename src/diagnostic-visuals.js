@@ -682,6 +682,75 @@ v['8:F1'] = `<div class="ind-visual">
   <p class="ind-note">Anak sebut perkiraan dahulu. Guru ukur setelah jawaban final. Ambang 2 dari 3.</p>
 </div>`;
 
+v['9:E1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <table class="ind-nilaitempat">
+        <thead>
+          <tr>
+            <th>Bilangan</th>
+            <th class="ind-nilaitempat--r">Ratusan</th>
+            <th class="ind-nilaitempat--p">Puluhan</th>
+            <th class="ind-nilaitempat--s">Satuan</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="ind-nilaitempat--bil">236</td><td class="ind-nilaitempat--r">2</td><td class="ind-nilaitempat--p">3</td><td class="ind-nilaitempat--s">6</td></tr>
+          <tr><td class="ind-nilaitempat--bil">408</td><td class="ind-nilaitempat--r">4</td><td class="ind-nilaitempat--p">0</td><td class="ind-nilaitempat--s">8</td></tr>
+          <tr><td class="ind-nilaitempat--bil">751</td><td class="ind-nilaitempat--r">7</td><td class="ind-nilaitempat--p">5</td><td class="ind-nilaitempat--s">1</td></tr>
+          <tr><td class="ind-nilaitempat--bil">690</td><td class="ind-nilaitempat--r">6</td><td class="ind-nilaitempat--p">9</td><td class="ind-nilaitempat--s">0</td></tr>
+          <tr><td class="ind-nilaitempat--bil">125</td><td class="ind-nilaitempat--r">1</td><td class="ind-nilaitempat--p">2</td><td class="ind-nilaitempat--s">5</td></tr>
+        </tbody>
+      </table>
+      <figcaption>Kunci — guru gunakan sebagai acuan jawaban anak</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru bacakan bilangan, anak sebutkan angka ratusan, puluhan, dan satuannya. Ambang 4 dari 5.</p>
+</div>`;
+
+v['9:F1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig ind-fig--row" style="gap:16px;flex-wrap:wrap;justify-content:center">
+      <div class="ind-bangun-wrap">
+        <svg viewBox="0 0 60 60" width="56" height="56" class="ind-bangun-svg">
+          <rect x="8" y="8" width="44" height="44" fill="none" stroke="currentColor" stroke-width="2.5"/>
+        </svg>
+        <small>Persegi</small>
+      </div>
+      <div class="ind-bangun-wrap">
+        <svg viewBox="0 0 80 60" width="72" height="56" class="ind-bangun-svg">
+          <rect x="6" y="12" width="68" height="36" fill="none" stroke="currentColor" stroke-width="2.5"/>
+        </svg>
+        <small>Persegi panjang</small>
+      </div>
+      <div class="ind-bangun-wrap">
+        <svg viewBox="0 0 60 60" width="56" height="56" class="ind-bangun-svg">
+          <polygon points="30,6 54,54 6,54" fill="none" stroke="currentColor" stroke-width="2.5"/>
+        </svg>
+        <small>Segitiga</small>
+      </div>
+      <div class="ind-bangun-wrap">
+        <svg viewBox="0 0 60 60" width="56" height="56" class="ind-bangun-svg">
+          <circle cx="30" cy="30" r="24" fill="none" stroke="currentColor" stroke-width="2.5"/>
+        </svg>
+        <small>Lingkaran</small>
+      </div>
+    </figure>
+    <figure class="ind-fig">
+      <table class="ind-tabel-kunci">
+        <tbody>
+          <tr><td class="muted">(1) sisi sama panjang semua</td><td><strong>persegi</strong></td></tr>
+          <tr><td class="muted">(2) memiliki 3 sisi</td><td><strong>segitiga</strong></td></tr>
+          <tr><td class="muted">(3) tidak memiliki sudut</td><td><strong>lingkaran</strong></td></tr>
+          <tr><td class="muted">(4) memiliki 4 sudut</td><td><strong>persegi / persegi panjang</strong></td></tr>
+          <tr><td class="muted">(5) tidak punya sudut sama sekali</td><td><strong>lingkaran</strong></td></tr>
+        </tbody>
+      </table>
+    </figure>
+  </div>
+  <p class="ind-note">Guru gambar 4 bangun di kertas. Anak tunjuk bangun lalu sebutkan satu sifatnya. Ambang 4 dari 5.</p>
+</div>`;
+
 export function indicatorVisual(level, slot) {
   return v[`${level}:${slot}`] || '';
 }

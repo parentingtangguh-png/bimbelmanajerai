@@ -2175,6 +2175,16 @@ dialog::backdrop {
 .ind-tali-row { display: flex; flex-direction: column; gap: 3px; }
 .ind-tali { height: 8px; background: var(--green); border-radius: 2px; opacity: 0.85; }
 .ind-tali-satuan { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.ind-nilaitempat { border-collapse: collapse; font-size: 14px; width: 100%; }
+.ind-nilaitempat th, .ind-nilaitempat td { padding: 5px 10px; border: 1px solid var(--line); text-align: center; }
+.ind-nilaitempat thead th { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.ind-nilaitempat--bil { font-weight: 700; text-align: left; }
+.ind-nilaitempat--r { color: var(--green); font-weight: 700; }
+.ind-nilaitempat--p { font-weight: 600; }
+.ind-nilaitempat--s { color: var(--muted); }
+.ind-bangun-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.ind-bangun-wrap small { font-size: 11px; color: var(--muted); text-align: center; }
+.ind-bangun-svg { color: var(--green); }
 .ind-blok--merah  { background: #e53935; }
 .ind-blok--biru   { background: #1e88e5; }
 .ind-blok--kuning { background: #fdd835; border-color: rgba(0,0,0,.25); }
