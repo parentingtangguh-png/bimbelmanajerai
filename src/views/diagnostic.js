@@ -5,6 +5,7 @@ import { select, empty, modal } from '../ui.js';
 import { escapeHtml as h } from '../domain.js';
 import { inlineMarkdown, renderMarkdown } from '../markdown.js';
 import { needsDiagnostic } from './students.js';
+import { indicatorVisual } from '../diagnostic-visuals.js';
 import {
   DIAGNOSTIC_LEVELS,
   TASK_ORDER,
@@ -118,8 +119,9 @@ export function diagnosticTaskCard(level, n, answer) {
   const ind = state.k8Indicators.find(i => i.level === level && i.number === n);
   const slot = ind?.slot || String(n);
   const row = (label, value) => `<div><dt>${label}</dt><dd>${inlineMarkdown(value || '—')}</dd></div>`;
+  const visual = ind ? indicatorVisual(level, ind.slot) : '';
   const body = ind
-    ? `<dl>${row('Cara uji', ind.method)}${row('Bahan', ind.material)}${row('Tanda lulus', ind.success)}</dl>`
+    ? `<dl>${row('Cara uji', ind.method)}${row('Bahan', ind.material)}${row('Tanda lulus', ind.success)}</dl>${visual}`
     : '';
   const title = `<legend><span class="badge ${n === ENGLISH || n === CHARACTER ? '' : 'green'}">${h(slot)}</span> <span class="indicator-text">${inlineMarkdown(ind ? ind.competency : 'Indikator belum tersedia')}</span></legend>`;
   if (n === ENGLISH)
