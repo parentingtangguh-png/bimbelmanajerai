@@ -379,6 +379,55 @@ v['4:F1'] = `<div class="ind-visual">
   <p class="ind-note">Tiga unit ditata guru, anak meletakkan 3 balok lanjutan (kotak putus-putus).</p>
 </div>`;
 
+// ── Level 5 ──────────────────────────────────────────────────────────────────
+
+// E1 L5: grid 4×3 angka 11–20 dengan pengecoh 9 dan 10
+v['5:E1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-grid-num">
+        <span>17</span><span>12</span><span>20</span><span>15</span>
+        <span>11</span><span class="ind-num--decoy">9</span><span>18</span><span>13</span>
+        <span>16</span><span>19</span><span class="ind-num--decoy">10</span><span>14</span>
+      </div>
+      <figcaption>Baris 1–3 · <span class="ind-num--decoy">9</span> dan <span class="ind-num--decoy">10</span> = pengecoh</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru menyebut: 14 · 20 · 11 · 17 · 13 · 19 · 12 · 16 · 14 · 18 · 15 (11 pertanyaan; 14 diulang).</p>
+</div>`;
+
+// F1 L5: empat pasangan stik atas-bawah ujung kiri sejajar, proporsional 8–15 cm
+v['5:F1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-panjang-wrap">
+        <div class="ind-panjang-pair">
+          <div class="ind-panjang-bar" style="width:53%"></div>
+          <div class="ind-panjang-bar ind-panjang-bar--jawab" style="width:80%"></div>
+          <small class="ind-panjang-label">8 cm · <strong>12 cm ↓</strong></small>
+        </div>
+        <div class="ind-panjang-pair">
+          <div class="ind-panjang-bar ind-panjang-bar--jawab" style="width:93%"></div>
+          <div class="ind-panjang-bar" style="width:67%"></div>
+          <small class="ind-panjang-label"><strong>14 cm ↑</strong> · 10 cm</small>
+        </div>
+        <div class="ind-panjang-pair">
+          <div class="ind-panjang-bar" style="width:60%"></div>
+          <div class="ind-panjang-bar ind-panjang-bar--jawab" style="width:87%"></div>
+          <small class="ind-panjang-label">9 cm · <strong>13 cm ↓</strong></small>
+        </div>
+        <div class="ind-panjang-pair">
+          <div class="ind-panjang-bar" style="width:73%"></div>
+          <div class="ind-panjang-bar ind-panjang-bar--jawab" style="width:100%"></div>
+          <small class="ind-panjang-label">11 cm · <strong>15 cm ↓</strong></small>
+        </div>
+      </div>
+      <figcaption>Ujung kiri sejajar · kunci: <strong>bawah; atas; bawah; bawah</strong></figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru letakkan dua stik atas-bawah, ujung kiri rata. Tanya, "Mana yang lebih panjang?"</p>
+</div>`;
+
 export function indicatorVisual(level, slot) {
   return v[`${level}:${slot}`] || '';
 }

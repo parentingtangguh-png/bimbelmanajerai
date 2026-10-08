@@ -2137,6 +2137,14 @@ dialog::backdrop {
 .ind-pola--abc .ind-blok { width: 14px; height: 14px; border-radius: 2px; }
 .ind-pola--abc .ind-blok-gap { width: 5px; }
 .ind-pola--abc .ind-blok--lanjut { outline-width: 2px; outline-offset: 1px; }
+.ind-grid-num { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+.ind-grid-num span { font-size: 16px; font-weight: 700; padding: 5px 4px; border: 1px solid var(--line); border-radius: 4px; text-align: center; }
+.ind-num--decoy { opacity: 0.35; }
+.ind-panjang-wrap { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.ind-panjang-pair { display: flex; flex-direction: column; gap: 3px; }
+.ind-panjang-bar { height: 10px; background: var(--muted); border-radius: 2px; opacity: 0.45; }
+.ind-panjang-bar--jawab { background: var(--green); opacity: 1; }
+.ind-panjang-label { font-size: 11px; color: var(--muted); margin-top: 1px; }
 .ind-blok--merah  { background: #e53935; }
 .ind-blok--biru   { background: #1e88e5; }
 .ind-blok--kuning { background: #fdd835; border-color: rgba(0,0,0,.25); }
