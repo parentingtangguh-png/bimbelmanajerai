@@ -751,6 +751,73 @@ v['9:F1'] = `<div class="ind-visual">
   <p class="ind-note">Guru gambar 4 bangun di kertas. Anak tunjuk bangun lalu sebutkan satu sifatnya. Ambang 4 dari 5.</p>
 </div>`;
 
+v['10:E1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <table class="ind-nilaitempat">
+        <thead>
+          <tr><th>Soal</th><th>Bentuk penjumlahan</th><th class="ind-nilaitempat--r">Hasil</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="ind-nilaitempat--bil">3 × 2</td><td class="muted">2 + 2 + 2</td><td class="ind-nilaitempat--r">6</td></tr>
+          <tr><td class="ind-nilaitempat--bil">4 × 3</td><td class="muted">3 + 3 + 3 + 3</td><td class="ind-nilaitempat--r">12</td></tr>
+          <tr><td class="ind-nilaitempat--bil">5 × 2</td><td class="muted">2 + 2 + 2 + 2 + 2</td><td class="ind-nilaitempat--r">10</td></tr>
+          <tr><td class="ind-nilaitempat--bil">2 × 6</td><td class="muted">6 + 6</td><td class="ind-nilaitempat--r">12</td></tr>
+          <tr><td class="ind-nilaitempat--bil">3 × 4</td><td class="muted">4 + 4 + 4</td><td class="ind-nilaitempat--r">12</td></tr>
+        </tbody>
+      </table>
+      <figcaption>Kunci — anak sebutkan bentuk penjumlahan <em>dan</em> hasil</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru tampilkan satu soal per butir. Anak sebutkan bentuk penjumlahan berulang lalu hasilnya. Ambang 4 dari 5.</p>
+</div>`;
+
+v['10:F1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig ind-fig--row" style="gap:20px;justify-content:center;flex-wrap:wrap">
+      <div class="ind-jam-wrap">
+        <svg viewBox="0 0 80 80" width="72" height="72" class="ind-bangun-svg">
+          <circle cx="40" cy="40" r="36" fill="none" stroke="currentColor" stroke-width="2"/>
+          <line x1="40" y1="40" x2="40" y2="14" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          <line x1="40" y1="40" x2="56" y2="40" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="40" cy="40" r="2.5" fill="currentColor"/>
+        </svg>
+        <small><strong>03.00</strong></small>
+      </div>
+      <div class="ind-jam-wrap">
+        <svg viewBox="0 0 80 80" width="72" height="72" class="ind-bangun-svg">
+          <circle cx="40" cy="40" r="36" fill="none" stroke="currentColor" stroke-width="2"/>
+          <line x1="40" y1="40" x2="55" y2="15" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          <line x1="40" y1="40" x2="40" y2="66" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="40" cy="40" r="2.5" fill="currentColor"/>
+        </svg>
+        <small><strong>07.30</strong></small>
+      </div>
+      <div class="ind-jam-wrap">
+        <svg viewBox="0 0 80 80" width="72" height="72" class="ind-bangun-svg">
+          <circle cx="40" cy="40" r="36" fill="none" stroke="currentColor" stroke-width="2"/>
+          <line x1="40" y1="40" x2="40" y2="14" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          <line x1="40" y1="40" x2="56" y2="40" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="40" cy="40" r="2.5" fill="currentColor"/>
+        </svg>
+        <small><strong>10.00</strong></small>
+      </div>
+    </figure>
+    <figure class="ind-fig">
+      <table class="ind-tabel-kunci">
+        <tbody>
+          <tr><td class="muted">Baca jam kiri</td><td><strong>pukul tiga</strong></td></tr>
+          <tr><td class="muted">Baca jam tengah</td><td><strong>pukul tujuh tiga puluh / setengah delapan</strong></td></tr>
+          <tr><td class="muted">Baca jam kanan</td><td><strong>pukul sepuluh</strong></td></tr>
+          <tr><td class="muted">1 minggu = … hari</td><td><strong>7</strong></td></tr>
+          <tr><td class="muted">1 bulan ≈ … minggu</td><td><strong>4</strong></td></tr>
+        </tbody>
+      </table>
+    </figure>
+  </div>
+  <p class="ind-note">Guru gambar jam di kertas dengan posisi jarum sesuai waktu. Ambang 4 dari 5.</p>
+</div>`;
+
 export function indicatorVisual(level, slot) {
   return v[`${level}:${slot}`] || '';
 }

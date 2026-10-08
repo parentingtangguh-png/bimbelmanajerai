@@ -2185,6 +2185,8 @@ dialog::backdrop {
 .ind-bangun-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .ind-bangun-wrap small { font-size: 11px; color: var(--muted); text-align: center; }
 .ind-bangun-svg { color: var(--green); }
+.ind-jam-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.ind-jam-wrap small { font-size: 12px; color: var(--muted); }
 .ind-blok--merah  { background: #e53935; }
 .ind-blok--biru   { background: #1e88e5; }
 .ind-blok--kuning { background: #fdd835; border-color: rgba(0,0,0,.25); }
