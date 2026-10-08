@@ -119,6 +119,9 @@ dialog label {
 }
 .k8-note {
   margin: 0.4rem 0 0.4rem 0.75rem;
+  width: calc(100% - 0.75rem);
+  min-width: 0;
+  box-sizing: border-box;
 }
 .k8-note h3,
 .k8-note h4,
@@ -133,6 +136,7 @@ dialog label {
 .md-table {
   overflow-x: auto;
   margin: 0.5rem 0;
+  max-width: 100%;
 }
 .md-table table {
   border-collapse: collapse;
