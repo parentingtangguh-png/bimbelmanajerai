@@ -99,7 +99,7 @@ export function diagnosticSheet(s, test) {
     return `<div class="diagnostic-result">${head}<span class="badge">TES BERHENTI</span><h3>A1, B1, E1, dan D1 semuanya Belum</h3><p>Tes Level ${level} tidak dihitung. Mulai tes baru di <strong>${h(levelLabel(next))}</strong>.</p></div><div class="button-row"><button type="button" class="primary" data-action="diagnostic-restart" data-id="${s.id}" data-level="${next}">Mulai tes Level ${next} →</button></div>`;
   }
   const cards = TASK_ORDER.map(n => diagnosticTaskCard(level, n, answers[n])).join('');
-  return `<form data-form="diagnostic" data-id="${s.id}">${head}${diagnosticRules()}${spareMaterials()}${cards}${diagnosticSummary(level, answers)}<div class="button-row"><button type="button" class="secondary" data-action="close">Jeda, lanjutkan nanti</button><button class="primary">Simpan final</button></div></form>`;
+  return `<form data-form="diagnostic" data-id="${s.id}">${head}${diagnosticRules()}${cards}${diagnosticSummary(level, answers)}<div class="button-row"><button type="button" class="secondary" data-action="close">Jeda, lanjutkan nanti</button><button class="primary">Simpan final</button></div></form>`;
 }
 
 // Bahan cadangan tiap alur, dari catatan kurikulum.

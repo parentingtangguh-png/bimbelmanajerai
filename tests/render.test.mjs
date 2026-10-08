@@ -583,7 +583,7 @@ test('tes diagnostik: lembar 14 tugas, English tidak dinilai, ringkasan dampak, 
   assert.match(lembar, /name="s3" value="" checked/, 'belum dinilai sebagai pilihan ketiga');
   assert.match(lembar, /<strong>4 dari 5<\/strong> tepat/, 'tanda lulus dari Markdown');
   assert.ok(lembar.includes('&lt;b&gt;') && !lembar.includes('<b>'), 'isi di-escape');
-  assert.match(lembar, /Bahan cadangan[\s\S]*Deret cadangan <strong>k d s<\/strong>/);
+  assert.ok(!lembar.includes('Bahan cadangan'), 'bahan cadangan disembunyikan dari lembar tes');
   assert.match(
     lembar,
     /1 dari 12 indikator akademik Lulus\. Mulai kelas di <strong>Level 3 — Merangkai Awal<\/strong>, indikator 2\./
