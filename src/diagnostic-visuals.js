@@ -818,6 +818,58 @@ v['10:F1'] = `<div class="ind-visual">
   <p class="ind-note">Guru gambar jam di kertas dengan posisi jarum sesuai waktu. Ambang 4 dari 5.</p>
 </div>`;
 
+v['11:E1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <table class="ind-nilaitempat">
+        <thead>
+          <tr><th>Bilangan</th><th>Angka digarisbawahi</th><th class="ind-nilaitempat--r">Nilai tempat</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="ind-nilaitempat--bil"><u>3</u>.482</td><td class="muted">3</td><td class="ind-nilaitempat--r">3.000 (ribuan)</td></tr>
+          <tr><td class="ind-nilaitempat--bil">5.<u>7</u>61</td><td class="muted">7</td><td class="ind-nilaitempat--r">700 (ratusan)</td></tr>
+          <tr><td class="ind-nilaitempat--bil">8.0<u>9</u>5</td><td class="muted">9</td><td class="ind-nilaitempat--r">90 (puluhan)</td></tr>
+        </tbody>
+      </table>
+    </figure>
+    <figure class="ind-fig">
+      <div class="ind-barisan-wrap" style="flex-direction:row;gap:6px;flex-wrap:wrap;align-items:center">
+        <span style="font-size:11px;color:var(--muted);margin-right:4px">Urutkan:</span>
+        <span class="ind-barisan-num">2.314</span>
+        <span class="ind-barisan-sep">·</span>
+        <span class="ind-barisan-num">2.413</span>
+        <span class="ind-barisan-sep">·</span>
+        <span class="ind-barisan-num">2.134</span>
+        <span class="ind-barisan-sep">·</span>
+        <span class="ind-barisan-num">2.431</span>
+      </div>
+      <figcaption>Kunci urutan terkecil: <strong>2.134 · 2.314 · 2.413 · 2.431</strong></figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru bacakan satu tugas per butir. Anak sebutkan nilai tempat atau urutan bilangan. Ambang 3 dari 4.</p>
+</div>`;
+
+v['11:F1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <table class="ind-nilaitempat">
+        <thead>
+          <tr><th>Pertanyaan</th><th class="ind-nilaitempat--r">Jawaban</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1 kg = … gram</td><td class="ind-nilaitempat--r"><strong>1.000</strong></td></tr>
+          <tr><td>1 jam = … menit</td><td class="ind-nilaitempat--r"><strong>60</strong></td></tr>
+          <tr><td>1 hari = … jam</td><td class="ind-nilaitempat--r"><strong>24</strong></td></tr>
+          <tr><td>Berat sebuah apel → gram atau kg?</td><td class="ind-nilaitempat--r"><strong>gram</strong></td></tr>
+          <tr><td>Berat beras sekarung → gram atau kg?</td><td class="ind-nilaitempat--r"><strong>kg</strong></td></tr>
+        </tbody>
+      </table>
+      <figcaption>Kunci — guru tanyakan lisan, anak jawab lisan. Ambang 4 dari 5</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Semua pertanyaan lisan. Tidak perlu alat timbang. Ambang 4 dari 5.</p>
+</div>`;
+
 export function indicatorVisual(level, slot) {
   return v[`${level}:${slot}`] || '';
 }
