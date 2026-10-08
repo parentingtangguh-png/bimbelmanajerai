@@ -2133,6 +2133,10 @@ dialog::backdrop {
 .ind-blok { display: inline-block; width: 18px; height: 18px; border-radius: 3px; border: 1px solid rgba(0,0,0,.15); flex-shrink: 0; }
 .ind-blok--lanjut { outline: 2px dashed var(--green); outline-offset: 1px; }
 .ind-blok-gap { width: 6px; flex-shrink: 0; }
+.ind-pola--abc { gap: 2px; flex-wrap: nowrap; }
+.ind-pola--abc .ind-blok { width: 14px; height: 14px; border-radius: 2px; }
+.ind-pola--abc .ind-blok-gap { width: 5px; }
+.ind-pola--abc .ind-blok--lanjut { outline-width: 2px; outline-offset: 1px; }
 .ind-blok--merah  { background: #e53935; }
 .ind-blok--biru   { background: #1e88e5; }
 .ind-blok--kuning { background: #fdd835; border-color: rgba(0,0,0,.25); }

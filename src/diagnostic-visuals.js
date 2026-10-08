@@ -336,7 +336,7 @@ v['3:F1'] = `<div class="ind-visual">
 v['4:F1'] = `<div class="ind-visual">
   <div class="ind-col">
     <figure class="ind-fig ind-fig--row">
-      <div class="ind-pola">
+      <div class="ind-pola ind-pola--abc">
         <span class="ind-blok ind-blok--merah"></span><span class="ind-blok ind-blok--biru"></span><span class="ind-blok ind-blok--hijau"></span>
         <span class="ind-blok ind-blok--merah"></span><span class="ind-blok ind-blok--biru"></span><span class="ind-blok ind-blok--hijau"></span>
         <span class="ind-blok ind-blok--merah"></span><span class="ind-blok ind-blok--biru"></span><span class="ind-blok ind-blok--hijau"></span>
@@ -346,7 +346,7 @@ v['4:F1'] = `<div class="ind-visual">
       <figcaption>merah–biru–hijau · lanjut: <strong>merah–biru–hijau</strong></figcaption>
     </figure>
     <figure class="ind-fig ind-fig--row">
-      <div class="ind-pola">
+      <div class="ind-pola ind-pola--abc">
         <span class="ind-blok ind-blok--kuning"></span><span class="ind-blok ind-blok--putih"></span><span class="ind-blok ind-blok--hitam"></span>
         <span class="ind-blok ind-blok--kuning"></span><span class="ind-blok ind-blok--putih"></span><span class="ind-blok ind-blok--hitam"></span>
         <span class="ind-blok ind-blok--kuning"></span><span class="ind-blok ind-blok--putih"></span><span class="ind-blok ind-blok--hitam"></span>
@@ -356,7 +356,7 @@ v['4:F1'] = `<div class="ind-visual">
       <figcaption>kuning–putih–hitam · lanjut: <strong>kuning–putih–hitam</strong></figcaption>
     </figure>
     <figure class="ind-fig ind-fig--row">
-      <div class="ind-pola">
+      <div class="ind-pola ind-pola--abc">
         <span class="ind-blok ind-blok--biru"></span><span class="ind-blok ind-blok--merah"></span><span class="ind-blok ind-blok--kuning"></span>
         <span class="ind-blok ind-blok--biru"></span><span class="ind-blok ind-blok--merah"></span><span class="ind-blok ind-blok--kuning"></span>
         <span class="ind-blok ind-blok--biru"></span><span class="ind-blok ind-blok--merah"></span><span class="ind-blok ind-blok--kuning"></span>
@@ -366,7 +366,7 @@ v['4:F1'] = `<div class="ind-visual">
       <figcaption>biru–merah–kuning · lanjut: <strong>biru–merah–kuning</strong></figcaption>
     </figure>
     <figure class="ind-fig ind-fig--row">
-      <div class="ind-pola">
+      <div class="ind-pola ind-pola--abc">
         <span class="ind-blok ind-blok--hijau"></span><span class="ind-blok ind-blok--putih"></span><span class="ind-blok ind-blok--merah"></span>
         <span class="ind-blok ind-blok--hijau"></span><span class="ind-blok ind-blok--putih"></span><span class="ind-blok ind-blok--merah"></span>
         <span class="ind-blok ind-blok--hijau"></span><span class="ind-blok ind-blok--putih"></span><span class="ind-blok ind-blok--merah"></span>
