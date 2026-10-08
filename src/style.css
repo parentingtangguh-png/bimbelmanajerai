@@ -2120,6 +2120,11 @@ dialog::backdrop {
 .ind-names-target {
   font-weight: 700;
 }
+.ind-trio { display: flex; gap: 8px; align-items: center; justify-content: center; font-size: 13px; padding: 4px 0; }
+.ind-trio-target { font-weight: 700; color: var(--green); }
+.ind-trio-shape { font-size: 16px; color: var(--muted); }
+.ind-shapes { display: flex; gap: 6px; align-items: center; justify-content: center; flex-wrap: wrap; padding: 4px 0; }
+.ind-shape-target { color: var(--green); }
 
 @media (max-width: 620px) {
   .diagnostic-rules > summary,
