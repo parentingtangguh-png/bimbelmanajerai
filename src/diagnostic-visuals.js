@@ -330,6 +330,55 @@ v['3:F1'] = `<div class="ind-visual">
   <p class="ind-note">Tiga unit ditata guru, anak meletakkan 2 balok lanjutan (kotak putus-putus).</p>
 </div>`;
 
+// ── Level 4 ──────────────────────────────────────────────────────────────────
+
+// F1 L4: empat deret pola ABC balok warna, 3 unit (9 balok) + 3 balok lanjutan putus-putus
+v['4:F1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig ind-fig--row">
+      <div class="ind-pola">
+        <span class="ind-blok ind-blok--merah"></span><span class="ind-blok ind-blok--biru"></span><span class="ind-blok ind-blok--hijau"></span>
+        <span class="ind-blok ind-blok--merah"></span><span class="ind-blok ind-blok--biru"></span><span class="ind-blok ind-blok--hijau"></span>
+        <span class="ind-blok ind-blok--merah"></span><span class="ind-blok ind-blok--biru"></span><span class="ind-blok ind-blok--hijau"></span>
+        <span class="ind-blok-gap"></span>
+        <span class="ind-blok ind-blok--merah ind-blok--lanjut"></span><span class="ind-blok ind-blok--biru ind-blok--lanjut"></span><span class="ind-blok ind-blok--hijau ind-blok--lanjut"></span>
+      </div>
+      <figcaption>merah–biru–hijau · lanjut: <strong>merah–biru–hijau</strong></figcaption>
+    </figure>
+    <figure class="ind-fig ind-fig--row">
+      <div class="ind-pola">
+        <span class="ind-blok ind-blok--kuning"></span><span class="ind-blok ind-blok--putih"></span><span class="ind-blok ind-blok--hitam"></span>
+        <span class="ind-blok ind-blok--kuning"></span><span class="ind-blok ind-blok--putih"></span><span class="ind-blok ind-blok--hitam"></span>
+        <span class="ind-blok ind-blok--kuning"></span><span class="ind-blok ind-blok--putih"></span><span class="ind-blok ind-blok--hitam"></span>
+        <span class="ind-blok-gap"></span>
+        <span class="ind-blok ind-blok--kuning ind-blok--lanjut"></span><span class="ind-blok ind-blok--putih ind-blok--lanjut"></span><span class="ind-blok ind-blok--hitam ind-blok--lanjut"></span>
+      </div>
+      <figcaption>kuning–putih–hitam · lanjut: <strong>kuning–putih–hitam</strong></figcaption>
+    </figure>
+    <figure class="ind-fig ind-fig--row">
+      <div class="ind-pola">
+        <span class="ind-blok ind-blok--biru"></span><span class="ind-blok ind-blok--merah"></span><span class="ind-blok ind-blok--kuning"></span>
+        <span class="ind-blok ind-blok--biru"></span><span class="ind-blok ind-blok--merah"></span><span class="ind-blok ind-blok--kuning"></span>
+        <span class="ind-blok ind-blok--biru"></span><span class="ind-blok ind-blok--merah"></span><span class="ind-blok ind-blok--kuning"></span>
+        <span class="ind-blok-gap"></span>
+        <span class="ind-blok ind-blok--biru ind-blok--lanjut"></span><span class="ind-blok ind-blok--merah ind-blok--lanjut"></span><span class="ind-blok ind-blok--kuning ind-blok--lanjut"></span>
+      </div>
+      <figcaption>biru–merah–kuning · lanjut: <strong>biru–merah–kuning</strong></figcaption>
+    </figure>
+    <figure class="ind-fig ind-fig--row">
+      <div class="ind-pola">
+        <span class="ind-blok ind-blok--hijau"></span><span class="ind-blok ind-blok--putih"></span><span class="ind-blok ind-blok--merah"></span>
+        <span class="ind-blok ind-blok--hijau"></span><span class="ind-blok ind-blok--putih"></span><span class="ind-blok ind-blok--merah"></span>
+        <span class="ind-blok ind-blok--hijau"></span><span class="ind-blok ind-blok--putih"></span><span class="ind-blok ind-blok--merah"></span>
+        <span class="ind-blok-gap"></span>
+        <span class="ind-blok ind-blok--hijau ind-blok--lanjut"></span><span class="ind-blok ind-blok--putih ind-blok--lanjut"></span><span class="ind-blok ind-blok--merah ind-blok--lanjut"></span>
+      </div>
+      <figcaption>hijau–putih–merah · lanjut: <strong>hijau–putih–merah</strong></figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Tiga unit ditata guru, anak meletakkan 3 balok lanjutan (kotak putus-putus).</p>
+</div>`;
+
 export function indicatorVisual(level, slot) {
   return v[`${level}:${slot}`] || '';
 }
