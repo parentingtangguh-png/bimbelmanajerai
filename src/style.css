@@ -2156,6 +2156,16 @@ dialog::backdrop {
 .ind-pasangan { display: flex; gap: 12px; font-size: 20px; font-weight: 700; align-items: baseline; }
 .ind-pasangan span { min-width: 2.5em; text-align: center; padding: 4px 8px; border: 1px solid var(--line); border-radius: 4px; }
 .ind-pasangan--jawab { border-color: var(--green) !important; color: var(--green); }
+.ind-garis-wrap { padding: 32px 4px 26px; width: 100%; }
+.ind-garis-ticks { display: flex; border-bottom: 2px solid var(--muted); width: 100%; }
+.ind-garis-tick { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; min-width: 0; }
+.ind-garis-tick::after { content: ''; width: 1px; height: 8px; background: var(--muted); display: block; }
+.ind-garis-tick--target::after { width: 2px; height: 16px; background: var(--green); }
+.ind-garis-label { font-size: 9px; color: var(--muted); position: absolute; top: calc(100% + 4px); white-space: nowrap; }
+.ind-garis-marker { font-size: 11px; font-weight: 700; color: var(--green); position: absolute; bottom: calc(100% + 4px); white-space: nowrap; }
+.ind-pita-row { display: flex; flex-direction: column; gap: 3px; }
+.ind-pita-strip { display: flex; gap: 2px; border: 1px solid var(--line); border-radius: 4px; padding: 4px; width: fit-content; }
+.ind-satuan { width: 20px; height: 20px; background: var(--green); border-radius: 2px; opacity: 0.85; flex-shrink: 0; }
 .ind-blok--merah  { background: #e53935; }
 .ind-blok--biru   { background: #1e88e5; }
 .ind-blok--kuning { background: #fdd835; border-color: rgba(0,0,0,.25); }

@@ -503,6 +503,96 @@ v['6:F1'] = `<div class="ind-visual">
   <p class="ind-note">Urutan awal diacak. Minta, "Susun dari yang paling pendek sampai paling panjang."</p>
 </div>`;
 
+// ── Level 7 ──────────────────────────────────────────────────────────────────
+
+// B1 L7: tiga kartu diftong (oi ai au); guru ucap 6 kata, anak tunjuk kartu
+v['7:B1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-grafem-row">
+        <span class="ind-grafem-card ind-grafem-card--target">oi</span>
+        <span class="ind-grafem-card ind-grafem-card--target">ai</span>
+        <span class="ind-grafem-card ind-grafem-card--target">au</span>
+      </div>
+      <figcaption>Tiga pilihan kartu · anak hanya menunjuk</figcaption>
+    </figure>
+    <figure class="ind-fig">
+      <table class="ind-tabel-kunci">
+        <tbody>
+          <tr><td class="muted">Guru ucap</td><td>pantai</td><td>pulau</td><td>koboi</td><td>sampai</td><td>konvoi</td><td>kerbau</td></tr>
+          <tr><td class="muted">Kunci tunjuk</td><td><strong>ai</strong></td><td><strong>au</strong></td><td><strong>oi</strong></td><td><strong>ai</strong></td><td><strong>oi</strong></td><td><strong>au</strong></td></tr>
+        </tbody>
+      </table>
+    </figure>
+  </div>
+  <p class="ind-note">Kata tidak ditulis; guru ucap wajar. Tiap diftong diuji dua kali; ambang 5 dari 6.</p>
+</div>`;
+
+// E1 L7: garis bilangan 0–20; target 3, 7, 12, 16 ditandai emas
+v['7:E1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-garis-wrap">
+        <div class="ind-garis-ticks">
+          <div class="ind-garis-tick"><span class="ind-garis-label">0</span></div>
+          <div class="ind-garis-tick"></div>
+          <div class="ind-garis-tick"></div>
+          <div class="ind-garis-tick ind-garis-tick--target"><span class="ind-garis-marker">3</span></div>
+          <div class="ind-garis-tick"></div>
+          <div class="ind-garis-tick"><span class="ind-garis-label">5</span></div>
+          <div class="ind-garis-tick"></div>
+          <div class="ind-garis-tick ind-garis-tick--target"><span class="ind-garis-marker">7</span></div>
+          <div class="ind-garis-tick"></div>
+          <div class="ind-garis-tick"></div>
+          <div class="ind-garis-tick"><span class="ind-garis-label">10</span></div>
+          <div class="ind-garis-tick"></div>
+          <div class="ind-garis-tick ind-garis-tick--target"><span class="ind-garis-marker">12</span></div>
+          <div class="ind-garis-tick"></div>
+          <div class="ind-garis-tick"></div>
+          <div class="ind-garis-tick"><span class="ind-garis-label">15</span></div>
+          <div class="ind-garis-tick ind-garis-tick--target"><span class="ind-garis-marker">16</span></div>
+          <div class="ind-garis-tick"></div>
+          <div class="ind-garis-tick"></div>
+          <div class="ind-garis-tick"></div>
+          <div class="ind-garis-tick"><span class="ind-garis-label">20</span></div>
+        </div>
+      </div>
+      <figcaption>Target: <strong>3 · 7 · 12 · 16</strong> (ditandai emas)</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Tampilkan satu target per butir. Anak tunjuk takik tanpa guru membilangkan. Ambang 3 dari 4.</p>
+</div>`;
+
+// F1 L7: tiga pita kertas diukur dengan satuan balok kecil seragam
+v['7:F1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-panjang-wrap">
+        <div class="ind-pita-row">
+          <div class="ind-pita-strip">
+            <span class="ind-satuan"></span><span class="ind-satuan"></span><span class="ind-satuan"></span><span class="ind-satuan"></span>
+          </div>
+          <small class="ind-panjang-label">Pita 1: <strong>4 satuan</strong></small>
+        </div>
+        <div class="ind-pita-row">
+          <div class="ind-pita-strip">
+            <span class="ind-satuan"></span><span class="ind-satuan"></span><span class="ind-satuan"></span><span class="ind-satuan"></span><span class="ind-satuan"></span><span class="ind-satuan"></span>
+          </div>
+          <small class="ind-panjang-label">Pita 2: <strong>6 satuan</strong></small>
+        </div>
+        <div class="ind-pita-row">
+          <div class="ind-pita-strip">
+            <span class="ind-satuan"></span><span class="ind-satuan"></span><span class="ind-satuan"></span><span class="ind-satuan"></span><span class="ind-satuan"></span>
+          </div>
+          <small class="ind-panjang-label">Pita 3: <strong>5 satuan</strong></small>
+        </div>
+      </div>
+      <figcaption>Kunci: <strong>4 · 6 · 5 satuan</strong> · balok disusun ujung ke ujung tanpa celah</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Anak letakkan balok berurutan dari ujung ke ujung, lalu sebut jumlahnya. Ambang 2 dari 3.</p>
+</div>`;
+
 export function indicatorVisual(level, slot) {
   return v[`${level}:${slot}`] || '';
 }
