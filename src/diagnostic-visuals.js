@@ -593,6 +593,95 @@ v['7:F1'] = `<div class="ind-visual">
   <p class="ind-note">Anak letakkan balok berurutan dari ujung ke ujung, lalu sebut jumlahnya. Ambang 2 dari 3.</p>
 </div>`;
 
+v['8:B1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-grafem-row">
+        <span class="ind-grafem-card ind-grafem-card--target">p</span>
+        <span class="ind-grafem-card ind-grafem-card--target">b</span>
+        <span class="ind-grafem-card">q</span>
+        <span class="ind-grafem-card ind-grafem-card--target">d</span>
+      </div>
+      <figcaption>Empat pilihan tetap terlihat · <span class="muted">q hanya pengecoh, tidak menjadi sasaran bunyi</span></figcaption>
+    </figure>
+    <figure class="ind-fig">
+      <table class="ind-tabel-kunci">
+        <tbody>
+          <tr><td class="muted">Guru ucap</td><td>/b/</td><td>/p/</td><td>/d/</td><td>/p/</td><td>/b/</td><td>/d/</td></tr>
+          <tr><td class="muted">Kunci tunjuk</td><td><strong>b</strong></td><td><strong>p</strong></td><td><strong>d</strong></td><td><strong>p</strong></td><td><strong>b</strong></td><td><strong>d</strong></td></tr>
+        </tbody>
+      </table>
+    </figure>
+  </div>
+  <p class="ind-note">Guru ucap bunyi saja, bukan nama huruf. Anak tunjuk tanpa bersuara. Ambang 5 dari 6.</p>
+</div>`;
+
+v['8:E1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-barisan-wrap">
+        <div class="ind-barisan-row">
+          <span class="ind-barisan-num">4</span><span class="ind-barisan-sep">,</span>
+          <span class="ind-barisan-num">6</span><span class="ind-barisan-sep">,</span>
+          <span class="ind-barisan-num">8</span><span class="ind-barisan-sep">,</span>
+          <span class="ind-barisan-num ind-barisan-num--jawab">10</span><span class="ind-barisan-sep">,</span>
+          <span class="ind-barisan-num ind-barisan-num--jawab">12</span>
+        </div>
+        <div class="ind-barisan-row">
+          <span class="ind-barisan-num">7</span><span class="ind-barisan-sep">,</span>
+          <span class="ind-barisan-num">9</span><span class="ind-barisan-sep">,</span>
+          <span class="ind-barisan-num">11</span><span class="ind-barisan-sep">,</span>
+          <span class="ind-barisan-num ind-barisan-num--jawab">13</span><span class="ind-barisan-sep">,</span>
+          <span class="ind-barisan-num ind-barisan-num--jawab">15</span>
+        </div>
+        <div class="ind-barisan-row">
+          <span class="ind-barisan-num">12</span><span class="ind-barisan-sep">,</span>
+          <span class="ind-barisan-num">14</span><span class="ind-barisan-sep">,</span>
+          <span class="ind-barisan-num">16</span><span class="ind-barisan-sep">,</span>
+          <span class="ind-barisan-num ind-barisan-num--jawab">18</span><span class="ind-barisan-sep">,</span>
+          <span class="ind-barisan-num ind-barisan-num--jawab">20</span>
+        </div>
+        <div class="ind-barisan-row">
+          <span class="ind-barisan-num">9</span><span class="ind-barisan-sep">,</span>
+          <span class="ind-barisan-num">11</span><span class="ind-barisan-sep">,</span>
+          <span class="ind-barisan-num">13</span><span class="ind-barisan-sep">,</span>
+          <span class="ind-barisan-num ind-barisan-num--jawab">15</span><span class="ind-barisan-sep">,</span>
+          <span class="ind-barisan-num ind-barisan-num--jawab">17</span>
+        </div>
+      </div>
+      <figcaption>Dua angka terakhir (emas) = jawaban anak · tampilkan satu baris per butir</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru tidak membacakan awalan. Anak menyebut dua bilangan lanjutan. Ambang 3 dari 4 baris.</p>
+</div>`;
+
+v['8:F1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-tali-wrap">
+        <div class="ind-tali-row">
+          <div class="ind-tali" style="width:38%"></div>
+          <small class="ind-panjang-label">Tali 1: <strong>5 satuan</strong> · diterima 4–6</small>
+        </div>
+        <div class="ind-tali-row">
+          <div class="ind-tali" style="width:62%"></div>
+          <small class="ind-panjang-label">Tali 2: <strong>8 satuan</strong> · diterima 6–10</small>
+        </div>
+        <div class="ind-tali-row">
+          <div class="ind-tali" style="width:85%"></div>
+          <small class="ind-panjang-label">Tali 3: <strong>11 satuan</strong> · diterima 9–13</small>
+        </div>
+        <div class="ind-tali-satuan">
+          <span class="ind-satuan"></span>
+          <small class="ind-panjang-label">Satuan contoh (terpisah)</small>
+        </div>
+      </div>
+      <figcaption>Tali ditegangkan lurus · satuan contoh di samping, tidak menempel target</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Anak sebut perkiraan dahulu. Guru ukur setelah jawaban final. Ambang 2 dari 3.</p>
+</div>`;
+
 export function indicatorVisual(level, slot) {
   return v[`${level}:${slot}`] || '';
 }
