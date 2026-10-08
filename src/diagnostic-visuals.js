@@ -209,6 +209,127 @@ v['2:F1'] = `<div class="ind-visual">
   <p class="ind-note">★ (tebal) = jawaban benar. Kunci posisi: 3; 4; 3; 2; 3; 2.</p>
 </div>`;
 
+// ── Level 3 ──────────────────────────────────────────────────────────────────
+
+// E2 L3: lima kumpulan benda 6–10 dengan susunan R/M/S (8-R, 6-S, 10-M, 7-S, 9-R)
+v['3:E2'] = `<div class="ind-visual">
+  <div class="ind-grid ind-grid--3">
+    <figure class="ind-fig">
+      <svg viewBox="0 0 148 22" width="140" height="20" aria-hidden="true">
+        <circle cx="9"  cy="11" r="7" fill="currentColor"/>
+        <circle cx="29" cy="11" r="7" fill="currentColor"/>
+        <circle cx="49" cy="11" r="7" fill="currentColor"/>
+        <circle cx="69" cy="11" r="7" fill="currentColor"/>
+        <circle cx="89" cy="11" r="7" fill="currentColor"/>
+        <circle cx="109" cy="11" r="7" fill="currentColor"/>
+        <circle cx="129" cy="11" r="7" fill="currentColor"/>
+        <circle cx="149" cy="11" r="7" fill="currentColor"/>
+      </svg>
+      <figcaption>8 benda · baris renggang</figcaption>
+    </figure>
+    <figure class="ind-fig">
+      <svg viewBox="0 0 80 56" width="76" height="54" aria-hidden="true">
+        <circle cx="18" cy="10" r="7" fill="currentColor"/>
+        <circle cx="62" cy="10" r="7" fill="currentColor"/>
+        <circle cx="10" cy="32" r="7" fill="currentColor"/>
+        <circle cx="40" cy="32" r="7" fill="currentColor"/>
+        <circle cx="70" cy="32" r="7" fill="currentColor"/>
+        <circle cx="28" cy="50" r="7" fill="currentColor"/>
+      </svg>
+      <figcaption>6 benda · sebaran rapat</figcaption>
+    </figure>
+    <figure class="ind-fig">
+      <svg viewBox="0 0 100 54" width="96" height="52" aria-hidden="true">
+        <circle cx="9"  cy="46" r="7" fill="currentColor"/>
+        <circle cx="23" cy="26" r="7" fill="currentColor"/>
+        <circle cx="38" cy="12" r="7" fill="currentColor"/>
+        <circle cx="55" cy="7"  r="7" fill="currentColor"/>
+        <circle cx="72" cy="12" r="7" fill="currentColor"/>
+        <circle cx="87" cy="26" r="7" fill="currentColor"/>
+        <circle cx="91" cy="46" r="7" fill="currentColor"/>
+        <circle cx="70" cy="46" r="7" fill="currentColor"/>
+        <circle cx="50" cy="46" r="7" fill="currentColor"/>
+        <circle cx="30" cy="46" r="7" fill="currentColor"/>
+      </svg>
+      <figcaption>10 benda · baris melengkung</figcaption>
+    </figure>
+    <figure class="ind-fig">
+      <svg viewBox="0 0 80 56" width="76" height="54" aria-hidden="true">
+        <circle cx="12" cy="10" r="7" fill="currentColor"/>
+        <circle cx="40" cy="10" r="7" fill="currentColor"/>
+        <circle cx="68" cy="10" r="7" fill="currentColor"/>
+        <circle cx="22" cy="32" r="7" fill="currentColor"/>
+        <circle cx="58" cy="32" r="7" fill="currentColor"/>
+        <circle cx="40" cy="50" r="7" fill="currentColor"/>
+        <circle cx="10" cy="50" r="7" fill="currentColor"/>
+      </svg>
+      <figcaption>7 benda · sebaran rapat</figcaption>
+    </figure>
+    <figure class="ind-fig">
+      <svg viewBox="0 0 165 22" width="157" height="20" aria-hidden="true">
+        <circle cx="9"   cy="11" r="7" fill="currentColor"/>
+        <circle cx="27"  cy="11" r="7" fill="currentColor"/>
+        <circle cx="46"  cy="11" r="7" fill="currentColor"/>
+        <circle cx="65"  cy="11" r="7" fill="currentColor"/>
+        <circle cx="84"  cy="11" r="7" fill="currentColor"/>
+        <circle cx="103" cy="11" r="7" fill="currentColor"/>
+        <circle cx="122" cy="11" r="7" fill="currentColor"/>
+        <circle cx="141" cy="11" r="7" fill="currentColor"/>
+        <circle cx="157" cy="11" r="7" fill="currentColor"/>
+      </svg>
+      <figcaption>9 benda · baris renggang</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Urutan penyajian bebas. Kunci: 8; 6; 10; 7; 9. Anak boleh menata ulang sendiri.</p>
+</div>`;
+
+// F1 L3: empat deret pola AB — dua balok lanjutan
+v['3:F1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig ind-fig--row">
+      <div class="ind-pola">
+        <span class="ind-blok ind-blok--merah"></span><span class="ind-blok ind-blok--biru"></span>
+        <span class="ind-blok ind-blok--merah"></span><span class="ind-blok ind-blok--biru"></span>
+        <span class="ind-blok ind-blok--merah"></span><span class="ind-blok ind-blok--biru"></span>
+        <span class="ind-blok-gap"></span>
+        <span class="ind-blok ind-blok--merah ind-blok--lanjut"></span><span class="ind-blok ind-blok--biru ind-blok--lanjut"></span>
+      </div>
+      <figcaption>merah–biru · lanjut: <strong>merah–biru</strong></figcaption>
+    </figure>
+    <figure class="ind-fig ind-fig--row">
+      <div class="ind-pola">
+        <span class="ind-blok ind-blok--kuning"></span><span class="ind-blok ind-blok--hijau"></span>
+        <span class="ind-blok ind-blok--kuning"></span><span class="ind-blok ind-blok--hijau"></span>
+        <span class="ind-blok ind-blok--kuning"></span><span class="ind-blok ind-blok--hijau"></span>
+        <span class="ind-blok-gap"></span>
+        <span class="ind-blok ind-blok--kuning ind-blok--lanjut"></span><span class="ind-blok ind-blok--hijau ind-blok--lanjut"></span>
+      </div>
+      <figcaption>kuning–hijau · lanjut: <strong>kuning–hijau</strong></figcaption>
+    </figure>
+    <figure class="ind-fig ind-fig--row">
+      <div class="ind-pola">
+        <span class="ind-blok ind-blok--putih"></span><span class="ind-blok ind-blok--hitam"></span>
+        <span class="ind-blok ind-blok--putih"></span><span class="ind-blok ind-blok--hitam"></span>
+        <span class="ind-blok ind-blok--putih"></span><span class="ind-blok ind-blok--hitam"></span>
+        <span class="ind-blok-gap"></span>
+        <span class="ind-blok ind-blok--putih ind-blok--lanjut"></span><span class="ind-blok ind-blok--hitam ind-blok--lanjut"></span>
+      </div>
+      <figcaption>putih–hitam · lanjut: <strong>putih–hitam</strong></figcaption>
+    </figure>
+    <figure class="ind-fig ind-fig--row">
+      <div class="ind-pola">
+        <span class="ind-blok ind-blok--merah"></span><span class="ind-blok ind-blok--kuning"></span>
+        <span class="ind-blok ind-blok--merah"></span><span class="ind-blok ind-blok--kuning"></span>
+        <span class="ind-blok ind-blok--merah"></span><span class="ind-blok ind-blok--kuning"></span>
+        <span class="ind-blok-gap"></span>
+        <span class="ind-blok ind-blok--merah ind-blok--lanjut"></span><span class="ind-blok ind-blok--kuning ind-blok--lanjut"></span>
+      </div>
+      <figcaption>merah–kuning · lanjut: <strong>merah–kuning</strong></figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Tiga unit ditata guru, anak meletakkan 2 balok lanjutan (kotak putus-putus).</p>
+</div>`;
+
 export function indicatorVisual(level, slot) {
   return v[`${level}:${slot}`] || '';
 }

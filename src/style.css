@@ -2125,6 +2125,20 @@ dialog::backdrop {
 .ind-trio-shape { font-size: 16px; color: var(--muted); }
 .ind-shapes { display: flex; gap: 6px; align-items: center; justify-content: center; flex-wrap: wrap; padding: 4px 0; }
 .ind-shape-target { color: var(--green); }
+.ind-grid--3 { grid-template-columns: 1fr 1fr 1fr; }
+.ind-col { display: flex; flex-direction: column; gap: 8px; }
+.ind-fig--row { flex-direction: row; align-items: center; gap: 10px; }
+.ind-fig--row figcaption { text-align: left; }
+.ind-pola { display: flex; align-items: center; gap: 3px; flex-shrink: 0; }
+.ind-blok { display: inline-block; width: 18px; height: 18px; border-radius: 3px; border: 1px solid rgba(0,0,0,.15); flex-shrink: 0; }
+.ind-blok--lanjut { outline: 2px dashed var(--green); outline-offset: 1px; }
+.ind-blok-gap { width: 6px; flex-shrink: 0; }
+.ind-blok--merah  { background: #e53935; }
+.ind-blok--biru   { background: #1e88e5; }
+.ind-blok--kuning { background: #fdd835; border-color: rgba(0,0,0,.25); }
+.ind-blok--hijau  { background: #43a047; }
+.ind-blok--putih  { background: #f5f5f5; border-color: rgba(0,0,0,.3); }
+.ind-blok--hitam  { background: #212121; }
 
 @media (max-width: 620px) {
   .diagnostic-rules > summary,
