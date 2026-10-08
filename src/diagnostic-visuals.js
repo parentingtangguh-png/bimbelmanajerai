@@ -428,6 +428,81 @@ v['5:F1'] = `<div class="ind-visual">
   <p class="ind-note">Guru letakkan dua stik atas-bawah, ujung kiri rata. Tanya, "Mana yang lebih panjang?"</p>
 </div>`;
 
+// ── Level 6 ──────────────────────────────────────────────────────────────────
+
+// B1 L6: deret 5 kartu huruf (n ny g ng y); guru ucap nga/nya, anak tunjuk ng/ny
+v['6:B1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-grafem-row">
+        <span class="ind-grafem-card">n</span>
+        <span class="ind-grafem-card ind-grafem-card--target">ny</span>
+        <span class="ind-grafem-card">g</span>
+        <span class="ind-grafem-card ind-grafem-card--target">ng</span>
+        <span class="ind-grafem-card">y</span>
+      </div>
+      <figcaption>Deret 5 kartu · <strong>ng</strong> dan <strong>ny</strong> = sasaran</figcaption>
+    </figure>
+    <figure class="ind-fig">
+      <table class="ind-tabel-kunci">
+        <tbody>
+          <tr><td class="muted">Guru ucap</td><td>nga</td><td>nya</td><td>nya</td><td>nga</td><td>nya</td><td>nga</td></tr>
+          <tr><td class="muted">Kunci tunjuk</td><td><strong>ng</strong></td><td><strong>ny</strong></td><td><strong>ny</strong></td><td><strong>ng</strong></td><td><strong>ny</strong></td><td><strong>ng</strong></td></tr>
+        </tbody>
+      </table>
+    </figure>
+  </div>
+  <p class="ind-note">Anak hanya menunjuk, tidak diminta mengucapkan. Menunjuk satu huruf penyusun saja (n atau g) tidak mendapat poin.</p>
+</div>`;
+
+// E1 L6: enam pasangan angka 0–20, anak tunjuk yang lebih besar
+v['6:E1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-pasangan-wrap">
+        <div class="ind-pasangan"><span class="muted">14</span><span class="ind-pasangan--jawab">17</span></div>
+        <div class="ind-pasangan"><span class="ind-pasangan--jawab">20</span><span class="muted">13</span></div>
+        <div class="ind-pasangan"><span class="ind-pasangan--jawab">8</span><span class="muted">6</span></div>
+        <div class="ind-pasangan"><span class="muted">18</span><span class="ind-pasangan--jawab">20</span></div>
+        <div class="ind-pasangan"><span class="ind-pasangan--jawab">19</span><span class="muted">12</span></div>
+        <div class="ind-pasangan"><span class="muted">0</span><span class="ind-pasangan--jawab">5</span></div>
+      </div>
+      <figcaption>Kunci (emas = lebih besar): <strong>kanan; kiri; kiri; kanan; kiri; kanan</strong></figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Tampilkan satu pasangan per butir. Anak menunjuk satu lambang tanpa diminta membaca atau menulis tanda.</p>
+</div>`;
+
+// F1 L6: tiga set stik diurutkan pendek → panjang (batang proporsional; maks 16 cm = 100%)
+v['6:F1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-panjang-wrap">
+        <div class="ind-panjang-pair">
+          <div class="ind-panjang-bar" style="width:38%"></div>
+          <div class="ind-panjang-bar ind-panjang-bar--med" style="width:63%"></div>
+          <div class="ind-panjang-bar ind-panjang-bar--jawab" style="width:88%"></div>
+          <small class="ind-panjang-label">Set 1: <strong>6 → 10 → 14 cm</strong></small>
+        </div>
+        <div class="ind-panjang-pair">
+          <div class="ind-panjang-bar" style="width:50%"></div>
+          <div class="ind-panjang-bar ind-panjang-bar--med" style="width:75%"></div>
+          <div class="ind-panjang-bar ind-panjang-bar--jawab" style="width:100%"></div>
+          <small class="ind-panjang-label">Set 2: <strong>8 → 12 → 16 cm</strong></small>
+        </div>
+        <div class="ind-panjang-pair">
+          <div class="ind-panjang-bar" style="width:44%"></div>
+          <div class="ind-panjang-bar ind-panjang-bar--med" style="width:69%"></div>
+          <div class="ind-panjang-bar ind-panjang-bar--jawab" style="width:94%"></div>
+          <small class="ind-panjang-label">Set 3: <strong>7 → 11 → 15 cm</strong></small>
+        </div>
+      </div>
+      <figcaption>Urutan setelah disusun: <strong>terpendek → sedang → terpanjang</strong></figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Urutan awal diacak. Minta, "Susun dari yang paling pendek sampai paling panjang."</p>
+</div>`;
+
 export function indicatorVisual(level, slot) {
   return v[`${level}:${slot}`] || '';
 }

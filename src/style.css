@@ -2144,7 +2144,18 @@ dialog::backdrop {
 .ind-panjang-pair { display: flex; flex-direction: column; gap: 3px; }
 .ind-panjang-bar { height: 10px; background: var(--muted); border-radius: 2px; opacity: 0.45; }
 .ind-panjang-bar--jawab { background: var(--green); opacity: 1; }
+.ind-panjang-bar--med { background: var(--muted); opacity: 0.7; }
 .ind-panjang-label { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.ind-grafem-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.ind-grafem-card { font-size: 18px; font-weight: 700; padding: 6px 10px; border: 2px solid var(--line); border-radius: 6px; min-width: 2em; text-align: center; }
+.ind-grafem-card--target { border-color: var(--green); color: var(--green); }
+.ind-tabel-kunci { border-collapse: collapse; font-size: 13px; }
+.ind-tabel-kunci td { padding: 3px 8px; border: 1px solid var(--line); }
+.ind-tabel-kunci td:first-child { font-size: 11px; }
+.ind-pasangan-wrap { display: flex; flex-direction: column; gap: 6px; }
+.ind-pasangan { display: flex; gap: 12px; font-size: 20px; font-weight: 700; align-items: baseline; }
+.ind-pasangan span { min-width: 2.5em; text-align: center; padding: 4px 8px; border: 1px solid var(--line); border-radius: 4px; }
+.ind-pasangan--jawab { border-color: var(--green) !important; color: var(--green); }
 .ind-blok--merah  { background: #e53935; }
 .ind-blok--biru   { background: #1e88e5; }
 .ind-blok--kuning { background: #fdd835; border-color: rgba(0,0,0,.25); }
