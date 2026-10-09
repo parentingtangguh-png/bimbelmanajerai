@@ -95,6 +95,12 @@ Tambahan: cara uji E2 L7 menyebut "perintah baku (Penyiapan Khusus)" tanpa menca
 
 Migrasi tambahan: `20261009080000_fix_l6_f2_cara_uji.sql`.
 
+Audit ulang L7 (9 Okt 2026): ditemukan 1 masalah tambahan pada E1 L7 bahan yang menyebut "Garis sesuai Penyiapan Khusus" tanpa keterangan inline. Diperbaiki dengan mencantumkan spesifikasi garis langsung. Migrasi: `20261009090000_fix_l7_e1_bahan.sql`.
+
+| Kartu | Sebelum | Sesudah |
+|-------|---------|---------|
+| E1 L7 bahan | `Garis sesuai Penyiapan Khusus; target 7; 16; 3; 12.` | `Garis mendatar dengan 21 takik dan 20 ruas berjarak sama; hanya takik 0, 10, dan 20 diberi label. Periksa semua takik sebelum tes. Target 7; 16; 3; 12.` |
+
 **Audit L8: LULUS** — D1 L8 dan D2 L8 sudah memakai "batas kata tepat" dan rubrik inline; tidak ada referensi eksternal.
 
 **Audit L9–L18: SEMUA LULUS** — 200 kartu (20 level × 14 indikator minus English/Karakter per alur). Semua kriteria inline lengkap, bahan ditulis guru di papan, tidak ada referensi rubrik eksternal, ambang kelulusan numerik.
