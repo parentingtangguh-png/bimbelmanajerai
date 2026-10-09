@@ -157,6 +157,16 @@ Audit ulang L7 (9 Okt 2026): ditemukan 1 masalah tambahan pada E1 L7 bahan yang 
 | A2 L9 tanda lulus | "Minimal 2 kalimat dibaca lancar" | "Seluruh 3 kalimat dibaca dari awal sampai akhir" |
 | D2 L9 tanda lulus | "saling berhubungan; gagasan lengkap; ≤4 dalam 15–30 kata" | Kriteria operasional + hapus rentang 15–30 kata |
 
+**Audit ulang L10 (9 Okt 2026): 5 masalah** — E1 kunci+definisi benar; D1 paragraf konkret; C1 "jeda wajar"; D2 "urutan tampak"+"tidak berpindah topik"; C2 teks inline. Migrasi: `20261009180000_fix_l10_e1_d1_c1_d2_c2.sql`.
+
+| Kartu | Sebelum | Sesudah |
+|-------|---------|---------|
+| E1 L10 tanda lulus | "4 dari 5 benar" tanpa kunci | Kunci per butir dicantumkan; "benar" = kedua komponen tepat |
+| D1 L10 bahan | "Paragraf pendek di papan" | Teks 43 kata dicantumkan langsung |
+| C1 L10 tanda lulus | "jeda wajar" | "jeda yang terlihat atau terdengar (berhenti sebentar)" |
+| D2 L10 tanda lulus | "urutan awal–tengah–akhir tampak; tidak berpindah topik" | Tiga kriteria operasional |
+| C2 L10 bahan | "Teks sama dengan C1 L10" | Teks dicantumkan langsung |
+
 **Audit L9–L18: SEMUA LULUS** — 200 kartu (20 level × 14 indikator minus English/Karakter per alur). Semua kriteria inline lengkap, bahan ditulis guru di papan, tidak ada referensi rubrik eksternal, ambang kelulusan numerik.
 
 File yang diubah: `docs/curriculum/indikator/alur-d.md`, `alur-e.md`, migrasi `20261009040000_fix_l6_l7_cara_uji.sql`.
