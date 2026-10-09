@@ -131,6 +131,20 @@ File yang diubah: `docs/curriculum/indikator/alur-d.md`, `alur-e.md`, migrasi `2
 
 ---
 
+### 9 Oktober 2026 — Audit ulang Level 2 (audit kedua)
+
+**Audit ulang 13 kartu L2** (EN dilewati). Ditemukan 3 masalah K2 yang terlewat audit pertama:
+
+| Kartu | Masalah | Perbaikan |
+|-------|---------|-----------|
+| B1 L2 cara uji | "Dengan perintah yang sama" — perintah B1 L1 tidak ditulis inline | Ganti dengan: `Katakan, "Tunjuk tulisan untuk bunyi yang kamu dengar."` |
+| D1 L2 cara uji | "dengan perintah yang sama" — perintah D1 L1 tidak ditulis inline | Ganti dengan: `Katakan, "Buat seperti ini di tempat kosong." Bentuk yang sedang ditiru tetap terlihat.` |
+| E2 L2 bahan | Kode **R/M/S** tidak dijelaskan inline | Diganti: "4 benda baris renggang; 5 benda sebaran rapat tidak beraturan; 5 benda baris melengkung renggang; 4 benda sebaran rapat tidak beraturan" |
+
+Migrasi: `20261009130000_fix_l2_cara_uji.sql`. Semua 10 kartu lainnya LULUS.
+
+---
+
 ### 9 Oktober 2026 — Audit kartu tes diagnostik Level 2
 
 **Audit 3 kartu L2** (C1, D1, F1) menggunakan 7 kriteria. Semua kartu lulus — tidak ada masalah pada cara uji, bahan, atau tanda lulus.
