@@ -79,7 +79,7 @@ File yang diubah: `src/views/diagnostic.js`, `src/main.js`, `src/views/students.
 |-------|---------|---------|
 | E2 L5 cara uji | `Prosedur sama dengan L4; pembagian tetap bebas dan konkret.` | `Guru menyebut total yang sudah disiapkan. Minta, "Pisahkan…" Setelah selesai, tanyakan banyak benda…` |
 
-**Audit L6–L8: 3 masalah pada D1 dan D2 L6–L7**
+**Audit L6–L8: 4 masalah pada D1/D2 L6–L7 dan F2 L6**
 
 Tanda lulus D1 L6, D1 L7, dan D2 L7 menyebut "rubrik spasi" tanpa menjelaskan standarnya di dalam kartu (Kriteria 2: tidak ambigu). Definisi ada di seksi Rubrik Tulisan alur-d.md tetapi tidak terlihat guru saat memegang kartu.
 
@@ -91,6 +91,9 @@ Tambahan: cara uji E2 L7 menyebut "perintah baku (Penyiapan Khusus)" tanpa menca
 | D1 L7 tanda lulus | `...dua batas kata memenuhi rubrik spasi` | `...dua batas kata memiliki celah jelas (≈ selebar huruf 'o' tulisan anak)` |
 | D2 L7 tanda lulus | `...dua batas kata memenuhi rubrik spasi` | `...dua batas kata memiliki celah jelas (≈ selebar huruf 'o' tulisan anak)` |
 | E2 L7 cara uji | `Gunakan hanya perintah baku (Penyiapan Khusus).` | `Instruksi: "Isi bagian yang kosong supaya kedua sisi sama."` |
+| F2 L6 cara uji | `Prosedur sama dengan L5; guru menulis bentuk pengurangan.` | `Guru menulis satu kalimat angka setiap butir, menunjuk seluruhnya, dan bertanya, "Berapa hasilnya?" Tidak ada peristiwa mengambil benda oleh guru. Sepuluh benda penopang selalu tersedia.` |
+
+Migrasi tambahan: `20261009080000_fix_l6_f2_cara_uji.sql`.
 
 **Audit L8: LULUS** — D1 L8 dan D2 L8 sudah memakai "batas kata tepat" dan rubrik inline; tidak ada referensi eksternal.
 
