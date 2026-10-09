@@ -72,6 +72,13 @@ File yang diubah: `src/views/diagnostic.js`, `src/main.js`, `src/views/students.
 
 ### 9 Oktober 2026 — Audit kartu tes diagnostik L3–L18
 
+**Audit ulang L3 (9 Okt 2026): 2 masalah tambahan** — B1 L3 cara uji tidak menyertakan instruksi untuk anak; E2 L3 bahan memakai kode R/M/S. Migrasi: `20261009140000_fix_l3_b1_e2.sql`.
+
+| Kartu | Sebelum | Sesudah |
+|-------|---------|---------|
+| B1 L3 cara uji | `Ucapkan /l/, /s/, /d/, /s/, /t/, /k/ satu per satu.` | Ditambah: `Katakan, "Tunjuk tulisan untuk bunyi yang kamu dengar."` |
+| E2 L3 bahan | `8-R; 6-S; 10-M; 7-S; 9-R.` | Diganti dengan deskripsi susunan lengkap |
+
 **Audit L3: 2 masalah pada E1 dan E2** — cara uji merujuk prosedur level sebelumnya yang tidak terlihat guru ("Dengan prosedur sama", "Prosedur seperti L2"). Diperbaiki dengan menyalin instruksi langsung ke dalam kartu. Migrasi: `20261009050000_fix_l3_cara_uji.sql`.
 
 | Kartu | Sebelum | Sesudah |
