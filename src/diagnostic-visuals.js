@@ -92,6 +92,57 @@ v['1:C2'] = `<div class="ind-visual">
   <p class="ind-note">Contoh sasaran "Rani" (★). Susunan dan pengecoh disesuaikan nama anak yang dites.</p>
 </div>`;
 
+// B1 L1: deret lima grafem vokal — guru tunjukkan ke anak, anak menunjuk per bunyi yang disebut
+v['1:B1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-grafem-row">
+        <span class="ind-grafem-card ind-grafem-card--target">o</span>
+        <span class="ind-grafem-card ind-grafem-card--target">a</span>
+        <span class="ind-grafem-card ind-grafem-card--target">u</span>
+        <span class="ind-grafem-card ind-grafem-card--target">e</span>
+        <span class="ind-grafem-card ind-grafem-card--target">i</span>
+      </div>
+      <figcaption>Deret 5 vokal · semua adalah sasaran · anak menunjuk satu per bunyi yang disebut guru</figcaption>
+    </figure>
+  </div>
+</div>`;
+
+// F2 L1: prosedur empat langkah — penjumlahan tersembunyi di balik penutup
+v['1:F2'] = `<div class="ind-visual">
+  <div class="ind-row">
+    <figure class="ind-fig">
+      <svg viewBox="0 0 56 56" width="52" height="52" aria-hidden="true">
+        <circle cx="28" cy="36" r="12" fill="currentColor"/>
+      </svg>
+      <figcaption>① Perlihatkan<br>&amp; sebut jumlah</figcaption>
+    </figure>
+    <figure class="ind-fig">
+      <svg viewBox="0 0 56 56" width="52" height="52" aria-hidden="true">
+        <circle cx="28" cy="38" r="12" fill="currentColor" opacity="0.2"/>
+        <rect x="4" y="18" width="48" height="26" rx="4" fill="none" stroke="currentColor" stroke-width="2.5"/>
+      </svg>
+      <figcaption>② Tutup<br>dengan penutup</figcaption>
+    </figure>
+    <figure class="ind-fig">
+      <svg viewBox="0 0 56 66" width="52" height="60" aria-hidden="true">
+        <rect x="4" y="8" width="48" height="26" rx="4" fill="none" stroke="currentColor" stroke-width="2.5"/>
+        <circle cx="28" cy="52" r="9" fill="currentColor"/>
+        <polyline points="22,46 28,38 34,46" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <figcaption>③ Masukkan 1<br>dari bawah penutup</figcaption>
+    </figure>
+    <figure class="ind-fig">
+      <svg viewBox="0 0 56 56" width="52" height="52" aria-hidden="true">
+        <rect x="4" y="10" width="48" height="32" rx="4" fill="none" stroke="currentColor" stroke-width="2.5"/>
+        <text x="28" y="34" text-anchor="middle" font-size="22" fill="currentColor">?</text>
+      </svg>
+      <figcaption>④ Tanya —<br>jangan buka penutup</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Buka penutup hanya setelah jawaban anak dicatat.</p>
+</div>`;
+
 // ── Level 2 ──────────────────────────────────────────────────────────────────
 
 // D1 L2: empat bentuk pramenulis — silang, lingkaran, siku, segi empat
