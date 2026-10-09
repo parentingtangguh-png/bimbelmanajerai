@@ -67,7 +67,13 @@ File yang diubah: `src/views/diagnostic.js`, `src/main.js`, `src/views/students.
 | E1 L3 cara uji | `Dengan prosedur sama, ucapkan 8; 6; 10; 7; 8; 9.` | `Minta menunjuk angka yang disebut. Ucapkan 8; 6; 10; 7; 8; 9, satu per satu.` |
 | E2 L3 cara uji | `Prosedur seperti L2, dengan lima kumpulan. Benda boleh ditata ulang…` | `Tampilkan kumpulan satu per satu tanpa menyebut jumlah. Tanyakan, "Semuanya ada berapa?" Benda boleh ditata ulang…` |
 
-**Audit L4, L5: LULUS** — tidak ada masalah pada cara uji, bahan, atau tanda lulus. Semua kriteria inline dan bisa dibaca langsung guru.
+**Audit L4: 1 masalah pada B1** — cara uji menyebut "ketentuan pelafalan" tanpa menjelaskan isi aturan /c/ dan /h/ di dalam kartu (Kriteria 2: tidak ambigu). Diperbaiki dengan mencantumkan aturan pelafalan langsung. Migrasi: `20261009060000_fix_l4_b1_cara_uji.sql`.
+
+| Kartu | Sebelum | Sesudah |
+|-------|---------|---------|
+| B1 L4 cara uji | `Gunakan ketentuan pelafalan, termasuk toleransi /c/ dan /h/` | `/c/ bunyi awal "cuci" (bukan "ce"); /h/ embusan singkat "hhh" (bukan "ha")` |
+
+**Audit L5: LULUS** — tidak ada masalah pada cara uji, bahan, atau tanda lulus. Semua kriteria inline dan bisa dibaca langsung guru.
 
 **Audit L6–L8: 3 masalah pada D1 dan D2 L6–L7**
 
