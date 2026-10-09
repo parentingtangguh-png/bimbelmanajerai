@@ -126,6 +126,13 @@ Audit ulang L7 (9 Okt 2026): ditemukan 1 masalah tambahan pada E1 L7 bahan yang 
 |-------|---------|---------|
 | E1 L7 bahan | `Garis sesuai Penyiapan Khusus; target 7; 16; 3; 12.` | `Garis mendatar dengan 21 takik dan 20 ruas berjarak sama; hanya takik 0, 10, dan 20 diberi label. Periksa semua takik sebelum tes. Target 7; 16; 3; 12.` |
 
+**Audit ulang L8 (9 Okt 2026): 1 masalah tambahan pada F1 L7 dan F1 L8** — bahan F1 L8 menyebut "Satuan sama jenis dengan L7" tanpa menyebut jenis satuan inline; bahan F1 L7 menyebut "balok kecil/penjepit" yang sulit didapat. Diperbaiki dengan mengganti keduanya menjadi "koin yang sama jenis dan ukuran". Migrasi: `20261009160000_fix_l7_l8_f1_satuan.sql`.
+
+| Kartu | Sebelum | Sesudah |
+|-------|---------|---------|
+| F1 L7 bahan | `balok kecil/penjepit yang sama ukuran` | `koin yang sama jenis dan ukuran` |
+| F1 L8 bahan | `Satuan sama jenis dengan L7, tetapi target utama bukan benda target L7` | `Satuan berupa koin yang sama jenis dan ukuran; target utama bukan benda target L7` |
+
 **Audit L8: 1 masalah pada A2 L8** — tanda lulus menyebut "rincian rubrik di bawah" tanpa mencantumkan isinya di kartu. Diperbaiki dengan menginline ketiga kriteria. Migrasi: `20261009100000_fix_l8_a2_tanda_lulus.sql`.
 
 | Kartu | Sebelum | Sesudah |
