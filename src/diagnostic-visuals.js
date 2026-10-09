@@ -1392,6 +1392,104 @@ v['16:F1'] = `<div class="ind-visual">
   <p class="ind-note">Guru gambar lingkaran berpusat O, tandai jari-jari OA dan diameter AB. Anak jawab lima pertanyaan.</p>
 </div>`;
 
+// ── Level 17 ──────────────────────────────────────────────────────────────────
+
+v['17:B1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-paragraf">
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">1</span>
+          <span>"Kucing adalah hewan peliharaan yang lincah."</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">2</span>
+          <span>"<b>Hewan</b> ini suka bergerak cepat."</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">3</span>
+          <span>"<b>Si manis</b> itu juga pandai menjaga keseimbangan."</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">4</span>
+          <span>"Kucing sering melompat dari tempat tinggi."</span>
+        </div>
+      </div>
+      <table class="ind-nilaitempat" style="margin-top:8px">
+        <thead><tr><th>PERTANYAAN</th><th>JAWABAN</th></tr></thead>
+        <tbody>
+          <tr><td>Kata apa yang diulang?</td><td><b>kucing</b></td></tr>
+          <tr><td>"Hewan" merujuk pada apa?</td><td><b>kucing</b></td></tr>
+          <tr><td>"Si manis" merujuk pada apa?</td><td><b>kucing</b></td></tr>
+          <tr><td>Semua sebutan membicarakan siapa?</td><td><b>kucing</b></td></tr>
+        </tbody>
+      </table>
+      <figcaption>Ambang 3 dari 4 tepat</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru bacakan paragraf. Anak jawab tiap pertanyaan kohesi.</p>
+</div>`;
+
+v['17:E1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <table class="ind-nilaitempat">
+        <thead><tr><th>BARISAN</th><th>LANJUTAN</th><th>ATURAN</th></tr></thead>
+        <tbody>
+          <tr><td>3, 6, 9, 12, …</td><td class="ind-nilaitempat--r"><b>15, 18</b></td><td>+3 tiap suku</td></tr>
+          <tr><td>40, 35, 30, 25, …</td><td class="ind-nilaitempat--r"><b>20, 15</b></td><td>−5 tiap suku</td></tr>
+          <tr><td>2, 4, 8, 16, …</td><td class="ind-nilaitempat--r"><b>32, 64</b></td><td>×2 tiap suku</td></tr>
+          <tr><td>1, 4, 9, 16, …</td><td class="ind-nilaitempat--r"><b>25, 36</b></td><td>1², 2², 3², … (kuadrat)</td></tr>
+        </tbody>
+      </table>
+      <figcaption>Ambang 3 dari 4 barisan benar lengkap dengan aturan</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru bacakan tiap barisan. Anak lanjutkan dua bilangan berikutnya dan sebutkan aturannya.</p>
+</div>`;
+
+v['17:F1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig" style="align-items:center;gap:0">
+      <svg viewBox="0 0 200 155" class="ind-bangun-svg" style="max-width:200px">
+        <!-- Titik-titik -->
+        <circle cx="30" cy="30" r="4" fill="currentColor"/>
+        <circle cx="150" cy="30" r="4" fill="currentColor"/>
+        <circle cx="30" cy="118" r="4" fill="currentColor"/>
+        <circle cx="150" cy="100" r="4" fill="currentColor"/>
+        <!-- Garis jalan -->
+        <line x1="30" y1="30" x2="150" y2="30" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="30" y1="30" x2="30" y2="118" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="150" y1="30" x2="150" y2="100" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="30" y1="118" x2="150" y2="100" stroke="currentColor" stroke-width="1.5"/>
+        <!-- Label lokasi -->
+        <text x="30" y="22" text-anchor="middle" font-size="11" fill="currentColor" font-weight="bold">Rumah</text>
+        <text x="150" y="22" text-anchor="middle" font-size="11" fill="currentColor" font-weight="bold">Sekolah</text>
+        <text x="30" y="136" text-anchor="middle" font-size="11" fill="currentColor" font-weight="bold">Pasar</text>
+        <text x="150" y="116" text-anchor="middle" font-size="11" fill="currentColor" font-weight="bold">Taman</text>
+        <!-- Label jarak -->
+        <text x="90" y="24" text-anchor="middle" font-size="10" fill="#c79a3b">3 cm</text>
+        <text x="14" y="76" text-anchor="middle" font-size="10" fill="#c79a3b">4 cm</text>
+        <text x="162" y="68" text-anchor="start" font-size="10" fill="#c79a3b">2 cm</text>
+        <text x="90" y="120" text-anchor="middle" font-size="10" fill="#c79a3b">5 cm</text>
+        <!-- Skala -->
+        <text x="100" y="150" text-anchor="middle" font-size="10" fill="currentColor" font-style="italic">Skala: 1 cm = 2 km</text>
+      </svg>
+      <table class="ind-nilaitempat" style="margin-top:6px">
+        <thead><tr><th>JALUR</th><th>DENAH</th><th>SEBENARNYA</th></tr></thead>
+        <tbody>
+          <tr><td>Rumah – Sekolah</td><td>3 cm</td><td class="ind-nilaitempat--r"><b>6 km</b></td></tr>
+          <tr><td>Rumah – Pasar</td><td>4 cm</td><td class="ind-nilaitempat--r"><b>8 km</b></td></tr>
+          <tr><td>Sekolah – Taman</td><td>2 cm</td><td class="ind-nilaitempat--r"><b>4 km</b></td></tr>
+          <tr><td>Pasar – Taman</td><td>5 cm</td><td class="ind-nilaitempat--r"><b>10 km</b></td></tr>
+        </tbody>
+      </table>
+      <figcaption>Ambang 3 dari 4 jarak sebenarnya benar</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru gambar denah di papan dengan skala 1 cm = 2 km. Anak hitung jarak sebenarnya tiap jalur.</p>
+</div>`;
+
 export function indicatorVisual(level, slot) {
   return v[`${level}:${slot}`] || '';
 }
