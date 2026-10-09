@@ -101,7 +101,11 @@ Audit ulang L7 (9 Okt 2026): ditemukan 1 masalah tambahan pada E1 L7 bahan yang 
 |-------|---------|---------|
 | E1 L7 bahan | `Garis sesuai Penyiapan Khusus; target 7; 16; 3; 12.` | `Garis mendatar dengan 21 takik dan 20 ruas berjarak sama; hanya takik 0, 10, dan 20 diberi label. Periksa semua takik sebelum tes. Target 7; 16; 3; 12.` |
 
-**Audit L8: LULUS** — D1 L8 dan D2 L8 sudah memakai "batas kata tepat" dan rubrik inline; tidak ada referensi eksternal.
+**Audit L8: 1 masalah pada A2 L8** — tanda lulus menyebut "rincian rubrik di bawah" tanpa mencantumkan isinya di kartu. Diperbaiki dengan menginline ketiga kriteria. Migrasi: `20261009100000_fix_l8_a2_tanda_lulus.sql`.
+
+| Kartu | Sebelum | Sesudah |
+|-------|---------|---------|
+| A2 L8 tanda lulus | `Semua unsur wajib diperiksa menggunakan rincian rubrik di bawah.` | Hambatan, tindakan mengatasi, dan hasil akhir dicantumkan langsung. |
 
 **Audit L9–L18: SEMUA LULUS** — 200 kartu (20 level × 14 indikator minus English/Karakter per alur). Semua kriteria inline lengkap, bahan ditulis guru di papan, tidak ada referensi rubrik eksternal, ambang kelulusan numerik.
 
