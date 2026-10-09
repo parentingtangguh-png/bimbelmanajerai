@@ -86,6 +86,12 @@ File yang diubah: `src/views/diagnostic.js`, `src/main.js`, `src/views/students.
 | E1 L3 cara uji | `Dengan prosedur sama, ucapkan 8; 6; 10; 7; 8; 9.` | `Minta menunjuk angka yang disebut. Ucapkan 8; 6; 10; 7; 8; 9, satu per satu.` |
 | E2 L3 cara uji | `Prosedur seperti L2, dengan lima kumpulan. Benda boleh ditata ulang…` | `Tampilkan kumpulan satu per satu tanpa menyebut jumlah. Tanyakan, "Semuanya ada berapa?" Benda boleh ditata ulang…` |
 
+**Audit ulang L4 (9 Okt 2026): 1 masalah tambahan** — B1 L4 cara uji tidak menyertakan instruksi untuk anak. Migrasi: `20261009150000_fix_l4_b1_instruksi.sql`.
+
+| Kartu | Sebelum | Sesudah |
+|-------|---------|---------|
+| B1 L4 cara uji | `Ucapkan /r/, /g/, /h/, /c/, /g/, /j/ satu per satu.` | Ditambah: `Katakan, "Tunjuk tulisan untuk bunyi yang kamu dengar."` |
+
 **Audit L4: 1 masalah pada B1** — cara uji menyebut "ketentuan pelafalan" tanpa menjelaskan isi aturan /c/ dan /h/ di dalam kartu (Kriteria 2: tidak ambigu). Diperbaiki dengan mencantumkan aturan pelafalan langsung. Migrasi: `20261009060000_fix_l4_b1_cara_uji.sql`.
 
 | Kartu | Sebelum | Sesudah |
