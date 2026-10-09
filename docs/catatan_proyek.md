@@ -60,7 +60,14 @@ File yang diubah: `src/views/diagnostic.js`, `src/main.js`, `src/views/students.
 
 ### 9 Oktober 2026 — Audit kartu tes diagnostik L3–L18
 
-**Audit L3, L4, L5: LULUS** — tidak ada masalah pada cara uji, bahan, atau tanda lulus. Semua kriteria inline dan bisa dibaca langsung guru.
+**Audit L3: 2 masalah pada E1 dan E2** — cara uji merujuk prosedur level sebelumnya yang tidak terlihat guru ("Dengan prosedur sama", "Prosedur seperti L2"). Diperbaiki dengan menyalin instruksi langsung ke dalam kartu. Migrasi: `20261009050000_fix_l3_cara_uji.sql`.
+
+| Kartu | Sebelum | Sesudah |
+|-------|---------|---------|
+| E1 L3 cara uji | `Dengan prosedur sama, ucapkan 8; 6; 10; 7; 8; 9.` | `Minta menunjuk angka yang disebut. Ucapkan 8; 6; 10; 7; 8; 9, satu per satu.` |
+| E2 L3 cara uji | `Prosedur seperti L2, dengan lima kumpulan. Benda boleh ditata ulang…` | `Tampilkan kumpulan satu per satu tanpa menyebut jumlah. Tanyakan, "Semuanya ada berapa?" Benda boleh ditata ulang…` |
+
+**Audit L4, L5: LULUS** — tidak ada masalah pada cara uji, bahan, atau tanda lulus. Semua kriteria inline dan bisa dibaca langsung guru.
 
 **Audit L6–L8: 3 masalah pada D1 dan D2 L6–L7**
 
