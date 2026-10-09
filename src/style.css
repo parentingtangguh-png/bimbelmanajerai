@@ -2193,6 +2193,24 @@ dialog::backdrop {
 .ind-blok--hijau  { background: #43a047; }
 .ind-blok--putih  { background: #f5f5f5; border-color: rgba(0,0,0,.3); }
 .ind-blok--hitam  { background: #212121; }
+/* L12 B1 – gagasan pokok */
+.ind-paragraf { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+.ind-paragraf-row { display: flex; align-items: baseline; gap: 6px; font-size: 12px; padding: 3px 6px; border-radius: 4px; }
+.ind-paragraf-num { min-width: 18px; font-weight: 700; color: var(--muted); font-size: 11px; }
+.ind-paragraf-row--pokok { background: color-mix(in srgb, var(--green) 15%, transparent); border: 1px solid color-mix(in srgb, var(--green) 40%, transparent); }
+.ind-paragraf-row--pokok .ind-paragraf-num { color: var(--green); }
+.ind-paragraf-tag { font-size: 10px; color: var(--green); font-style: italic; white-space: nowrap; }
+/* L12 E1 – pecahan */
+.ind-pecahan-col { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.ind-pecahan-col strong { font-size: 14px; }
+.ind-pecahan-bar { display: grid; width: 60px; height: 22px; border: 1.5px solid var(--line); border-radius: 3px; overflow: hidden; }
+.ind-pecahan-bar span { border-right: 1px solid var(--line); }
+.ind-pecahan-bar span:last-child { border-right: none; }
+.ind-pecahan-isi { background: color-mix(in srgb, var(--green) 50%, transparent); }
+/* L12 F1 – luas satuan persegi */
+.ind-luas-bangun { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; }
+.ind-luas-grid { display: grid; border: 1.5px solid var(--line); }
+.ind-luas-cell { width: 16px; height: 16px; border: 0.5px solid var(--muted); }
 
 @media (max-width: 620px) {
   .diagnostic-rules > summary,

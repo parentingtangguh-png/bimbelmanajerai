@@ -870,6 +870,110 @@ v['11:F1'] = `<div class="ind-visual">
   <p class="ind-note">Semua pertanyaan lisan. Tidak perlu alat timbang. Ambang 4 dari 5.</p>
 </div>`;
 
+v['12:B1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-paragraf">
+        <div class="ind-paragraf-row ind-paragraf-row--pokok">
+          <span class="ind-paragraf-num">1</span>
+          <span>Membaca setiap hari banyak manfaatnya.</span>
+          <span class="ind-paragraf-tag">← gagasan pokok</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">2</span>
+          <span>Anak dapat mengenal kata baru.</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">3</span>
+          <span>Anak juga lebih mudah memahami cerita.</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">4</span>
+          <span>Karena itu, membaca baik dilakukan secara rutin.</span>
+        </div>
+      </div>
+      <figcaption>Anak tunjuk nomor kalimat gagasan pokok → jawaban: kalimat 1</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru tulis paragraf di kertas/papan. Anak pilih nomor kalimat yang menjadi gagasan pokok.</p>
+</div>`;
+
+v['12:E1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig ind-fig--row" style="justify-content:center;gap:10px;flex-wrap:wrap">
+      <div class="ind-pecahan-col">
+        <div class="ind-pecahan-bar" style="grid-template-columns:repeat(2,1fr)">
+          <span class="ind-pecahan-isi"></span><span></span>
+        </div>
+        <strong>½</strong>
+      </div>
+      <div class="ind-pecahan-col">
+        <div class="ind-pecahan-bar" style="grid-template-columns:repeat(3,1fr)">
+          <span class="ind-pecahan-isi"></span><span></span><span></span>
+        </div>
+        <strong>⅓</strong>
+      </div>
+      <div class="ind-pecahan-col">
+        <div class="ind-pecahan-bar" style="grid-template-columns:repeat(4,1fr)">
+          <span class="ind-pecahan-isi"></span><span></span><span></span><span></span>
+        </div>
+        <strong>¼</strong>
+      </div>
+      <div class="ind-pecahan-col">
+        <div class="ind-pecahan-bar" style="grid-template-columns:repeat(4,1fr)">
+          <span class="ind-pecahan-isi"></span><span class="ind-pecahan-isi"></span><span></span><span></span>
+        </div>
+        <strong style="font-size:12px">2/4</strong>
+      </div>
+      <div class="ind-pecahan-col">
+        <div class="ind-pecahan-bar" style="grid-template-columns:repeat(4,1fr)">
+          <span class="ind-pecahan-isi"></span><span class="ind-pecahan-isi"></span><span class="ind-pecahan-isi"></span><span></span>
+        </div>
+        <strong>¾</strong>
+      </div>
+    </figure>
+    <figcaption style="text-align:center;font-size:11px;color:var(--muted);margin-top:4px">Anak sebutkan arti tiap pecahan. Ambang 4 dari 5</figcaption>
+  </div>
+  <p class="ind-note">Guru tunjukkan kartu pecahan satu per satu. Anak tunjuk bagian yang diarsir dan sebutkan artinya.</p>
+</div>`;
+
+v['12:F1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig ind-fig--row" style="justify-content:center;gap:12px;flex-wrap:wrap">
+      <div class="ind-luas-bangun">
+        <div class="ind-luas-grid" style="grid-template-columns:repeat(3,16px)">
+          <div class="ind-luas-cell"></div><div class="ind-luas-cell"></div><div class="ind-luas-cell"></div>
+          <div class="ind-luas-cell"></div><div class="ind-luas-cell"></div><div class="ind-luas-cell"></div>
+        </div>
+        <span>A = <strong>6</strong></span>
+      </div>
+      <div class="ind-luas-bangun">
+        <div class="ind-luas-grid" style="grid-template-columns:repeat(4,16px)">
+          <div class="ind-luas-cell"></div><div class="ind-luas-cell"></div><div class="ind-luas-cell"></div><div class="ind-luas-cell"></div>
+          <div class="ind-luas-cell"></div><div class="ind-luas-cell"></div><div class="ind-luas-cell"></div><div class="ind-luas-cell"></div>
+        </div>
+        <span>B = <strong>8</strong></span>
+      </div>
+      <div class="ind-luas-bangun">
+        <div class="ind-luas-grid" style="grid-template-columns:repeat(3,16px)">
+          <div class="ind-luas-cell"></div><div class="ind-luas-cell"></div><div class="ind-luas-cell"></div>
+          <div class="ind-luas-cell"></div><div class="ind-luas-cell"></div><div class="ind-luas-cell"></div>
+          <div class="ind-luas-cell"></div><div class="ind-luas-cell"></div><div class="ind-luas-cell"></div>
+        </div>
+        <span>C = <strong>9</strong></span>
+      </div>
+      <div class="ind-luas-bangun">
+        <div class="ind-luas-grid" style="grid-template-columns:repeat(5,16px)">
+          <div class="ind-luas-cell"></div><div class="ind-luas-cell"></div><div class="ind-luas-cell"></div><div class="ind-luas-cell"></div><div class="ind-luas-cell"></div>
+        </div>
+        <span>D = <strong>5</strong></span>
+      </div>
+    </figure>
+    <figcaption style="text-align:center;font-size:11px;color:var(--muted);margin-top:4px">Anak hitung kotak tiap bangun. Ambang 3 dari 4</figcaption>
+  </div>
+  <p class="ind-note">Guru gambar petak kotak di kertas. Anak hitung banyak kotak dan bandingkan luas keempat bangun.</p>
+</div>`;
+
 export function indicatorVisual(level, slot) {
   return v[`${level}:${slot}`] || '';
 }
