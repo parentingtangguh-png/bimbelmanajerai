@@ -1490,6 +1490,82 @@ v['17:F1'] = `<div class="ind-visual">
   <p class="ind-note">Guru gambar denah di papan dengan skala 1 cm = 2 km. Anak hitung jarak sebenarnya tiap jalur.</p>
 </div>`;
 
+v['18:B1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-paragraf">
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">1</span>
+          <span>"Siswa kelas besar perlu mengatur waktu belajar."</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">2</span>
+          <span>"Tugas sekolah biasanya lebih banyak."</span>
+        </div>
+        <div class="ind-paragraf-row ind-paragraf-row--pokok">
+          <span class="ind-paragraf-num">3</span>
+          <span>"<b>Karena jadwal membantu tugas tidak menumpuk.</b>"</span>
+          <span class="ind-paragraf-tag">← struktur tidak lengkap</span>
+        </div>
+        <div class="ind-paragraf-row ind-paragraf-row--pokok">
+          <span class="ind-paragraf-num">4</span>
+          <span>"<b>Pisang matang berwarna kuning.</b>"</span>
+          <span class="ind-paragraf-tag">← tidak koheren</span>
+        </div>
+      </div>
+      <figcaption>Lulus bila anak menemukan 2 masalah: kalimat 3 (struktur tidak lengkap) dan kalimat 4 (tidak koheren)</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru bacakan paragraf. Anak tunjuk atau sebutkan kalimat yang bermasalah dan jelaskan mengapa.</p>
+</div>`;
+
+v['18:E1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <table class="ind-nilaitempat">
+        <thead><tr><th>SOAL</th><th>JAWABAN</th></tr></thead>
+        <tbody>
+          <tr><td>Baca: 1.250.000</td><td class="ind-nilaitempat--r"><b>satu juta dua ratus lima puluh ribu</b></td></tr>
+          <tr><td>Baca: 3.600.000</td><td class="ind-nilaitempat--r"><b>tiga juta enam ratus ribu</b></td></tr>
+          <tr><td>498 + 503 ≈ ?</td><td class="ind-nilaitempat--r"><b>1.000</b></td></tr>
+          <tr><td>1.980 − 995 ≈ ?</td><td class="ind-nilaitempat--r"><b>1.000</b></td></tr>
+          <tr><td>49 × 21 ≈ ? <span style="font-size:0.85em">(100 / 1.000 / 10.000)</span></td><td class="ind-nilaitempat--r"><b>1.000</b></td></tr>
+        </tbody>
+      </table>
+      <figcaption>Ambang 4 dari 5 benar</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru ucapkan bilangan dan soal estimasi satu per satu. Anak baca keras / sebutkan perkiraan.</p>
+</div>`;
+
+v['18:F1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div style="display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:4px">
+        <svg viewBox="0 0 140 60" class="ind-bangun-svg" style="max-width:140px">
+          <text x="70" y="14" text-anchor="middle" font-size="11" fill="currentColor" font-weight="bold">6  7  7  8  10</text>
+          <line x1="10" y1="20" x2="130" y2="20" stroke="currentColor" stroke-width="1"/>
+          <text x="70" y="32" text-anchor="middle" font-size="9" fill="#c79a3b">modus = 7</text>
+          <text x="70" y="44" text-anchor="middle" font-size="9" fill="#c79a3b">median = 7</text>
+          <text x="70" y="56" text-anchor="middle" font-size="9" fill="#c79a3b">mean = 38 ÷ 5 = 7,6</text>
+        </svg>
+      </div>
+      <table class="ind-nilaitempat">
+        <thead><tr><th>PERTANYAAN</th><th>JAWABAN</th></tr></thead>
+        <tbody>
+          <tr><td>Modus (paling sering)</td><td class="ind-nilaitempat--r"><b>7</b></td></tr>
+          <tr><td>Median (nilai tengah)</td><td class="ind-nilaitempat--r"><b>7</b></td></tr>
+          <tr><td>Jumlah semua data</td><td class="ind-nilaitempat--r"><b>38</b></td></tr>
+          <tr><td>Banyak data</td><td class="ind-nilaitempat--r"><b>5</b></td></tr>
+          <tr><td>Mean = jumlah ÷ banyak</td><td class="ind-nilaitempat--r"><b>7,6</b></td></tr>
+        </tbody>
+      </table>
+      <figcaption>Ambang 4 dari 5 benar</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru tulis data di papan: 6 7 7 8 10 (sudah urut). Anak jawab tiap pertanyaan.</p>
+</div>`;
+
 export function indicatorVisual(level, slot) {
   return v[`${level}:${slot}`] || '';
 }
