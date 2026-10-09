@@ -392,7 +392,7 @@ test('profil siswa: identitas, hasil tes 14 tugas, level saat ini, status, dan h
   );
   assert.match(
     bagian,
-    /✗<\/span> <span class="badge">B1<\/span> Kompetensi B1 L3 <strong>&lt;b&gt;<\/strong> <small class="muted">Belum · paket cadangan/
+    /✗<\/span> <span class="badge">B1<\/span> Kompetensi B1 L3 <strong>&lt;b&gt;<\/strong> <small class="muted">Belum/
   );
   assert.match(bagian, /EN<\/span>[^·]*<small class="muted">Belum dinilai \(anak baru\)/);
   assert.ok(!/revis/i.test(profil), 'tidak ada revisi tes');
@@ -579,7 +579,6 @@ test('tes diagnostik: lembar 14 tugas, English tidak dinilai, ringkasan dampak, 
   assert.match(lembar, /English anak baru tidak diuji/);
   assert.match(lembar, /name="s1" value="lulus" checked/);
   assert.match(lembar, /name="s2" value="belum" checked/);
-  assert.match(lembar, /name="p2" value="cadangan" checked/);
   assert.match(lembar, /name="s3" value="" checked/, 'belum dinilai sebagai pilihan ketiga');
   assert.match(lembar, /<strong>4 dari 5<\/strong> tepat/, 'tanda lulus dari Markdown');
   assert.ok(lembar.includes('&lt;b&gt;') && !lembar.includes('<b>'), 'isi di-escape');

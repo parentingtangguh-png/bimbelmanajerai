@@ -131,15 +131,8 @@ export function diagnosticTaskCard(level, n, answer) {
     ([value, label]) =>
       `<label class="diagnostic-rating"><input type="radio" name="s${n}" value="${value}" ${status === value ? 'checked' : ''}><span>${label}</span></label>`
   ).join('');
-  const pkg = answer?.package || 'utama';
-  const packages = ['utama', 'cadangan']
-    .map(
-      p =>
-        `<label class="diagnostic-rating"><input type="radio" name="p${n}" value="${p}" ${pkg === p ? 'checked' : ''}><span>Paket ${p}</span></label>`
-    )
-    .join('');
   const tag = n === CHARACTER ? '<p class="muted">Dicatat, tidak menentukan level atau antrean.</p>' : '';
-  return `<fieldset class="diagnostic-task">${title}${tag}<details><summary>Cara uji, bahan, tanda lulus</summary>${body}</details><div class="diagnostic-ratings">${options}</div><div class="diagnostic-ratings diagnostic-packages"><small class="muted">Bahan:</small>${packages}</div></fieldset>`;
+  return `<fieldset class="diagnostic-task">${title}${tag}<details><summary>Cara uji, bahan, tanda lulus</summary>${body}</details><div class="diagnostic-ratings">${options}</div></fieldset>`;
 }
 
 // Dampak Simpan final saat ini; main.js memperbaruinya di tempat setiap nilai berubah.

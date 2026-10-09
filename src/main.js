@@ -580,13 +580,12 @@ async function rateTask(form, input) {
   const n = Number(input.name.slice(1));
   const f = new FormData(form);
   const status = f.get('s' + n) || null;
-  const pkg = f.get('p' + n) || 'utama';
   try {
     await result(
-      db.rpc('rate_diagnostic', { p_student: sid, p_number: n, p_status: status, p_package: pkg })
+      db.rpc('rate_diagnostic', { p_student: sid, p_number: n, p_status: status, p_package: 'utama' })
     );
     state.diagnosticResults = state.diagnosticResults.filter(r => !(r.test_id === test.id && r.number === n));
-    if (status) state.diagnosticResults.push({ test_id: test.id, number: n, status, package: pkg });
+    if (status) state.diagnosticResults.push({ test_id: test.id, number: n, status, package: 'utama' });
     const answers = answersOf(state.diagnosticResults, test.id);
     if (isStopped(test.tested_level, answers)) return diagnosticForm();
     form.querySelector('[data-diagnostic-summary]').outerHTML = diagnosticSummary(test.tested_level, answers);

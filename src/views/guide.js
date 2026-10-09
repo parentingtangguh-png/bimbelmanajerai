@@ -72,7 +72,7 @@ const teacher = {
         `Ketuk ${b('Tes Diagnostik')}, pilih <b>Anak yang dites</b> dan <b>Level yang dites</b>. Level bertanda (saran) diambil dari kelas formal; boleh memilih level lain.`,
         `Ketuk ${b('Mulai tes →')}. Buka <b>Cara tes</b> bila perlu.`,
         'Di tiap kartu buka <b>Cara uji, bahan, tanda lulus</b>. Huruf, angka, dan kata ditulis guru sendiri; gambar diganti benda nyata.',
-        'Ketuk <b>Lulus</b>, <b>Belum</b>, atau <b>Belum dinilai</b>, dan <b>Paket utama</b> atau <b>Paket cadangan</b>. Setiap ketukan langsung tersimpan dan masih boleh diubah.',
+        'Ketuk <b>Lulus</b>, <b>Belum</b>, atau <b>Belum dinilai</b>. Setiap ketukan langsung tersimpan dan masih boleh diubah.',
         `Anak lelah? ${b('Jeda, lanjutkan nanti')}. Lanjutkan lewat ${b('Tes Diagnostik')} atau ${b('Lanjutkan tes')} di profil anak.`,
         `Baca kotak <b>Bila disimpan final sekarang</b>, lalu ${b('Simpan final')}.`
       ]) +

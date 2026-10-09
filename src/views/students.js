@@ -196,8 +196,7 @@ export function diagnosticResultSection(s) {
       '·',
       n === ENGLISH ? 'Belum dinilai (anak baru)' : 'Belum dinilai'
     ];
-    const extra = a?.package === 'cadangan' ? ' · paket cadangan' : '';
-    return `<li><span class="diagnostic-mark">${mark}</span> <span class="badge">${h(ind?.slot || String(n))}</span> ${inlineMarkdown(ind ? ind.competency : 'Indikator ' + n)} <small class="muted">${label}${extra}</small></li>`;
+    return `<li><span class="diagnostic-mark">${mark}</span> <span class="badge">${h(ind?.slot || String(n))}</span> ${inlineMarkdown(ind ? ind.competency : 'Indikator ' + n)} <small class="muted">${label}</small></li>`;
   }).join('');
   return `<hr><h3>Hasil tes diagnostik</h3>${head}<ul class="diagnostic-result-list">${items}</ul>`;
 }
