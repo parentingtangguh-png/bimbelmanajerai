@@ -73,7 +73,11 @@ File yang diubah: `src/views/diagnostic.js`, `src/main.js`, `src/views/students.
 |-------|---------|---------|
 | B1 L4 cara uji | `Gunakan ketentuan pelafalan, termasuk toleransi /c/ dan /h/` | `/c/ bunyi awal "cuci" (bukan "ce"); /h/ embusan singkat "hhh" (bukan "ha")` |
 
-**Audit L5: LULUS** — tidak ada masalah pada cara uji, bahan, atau tanda lulus. Semua kriteria inline dan bisa dibaca langsung guru.
+**Audit L5: 1 masalah pada E2** — cara uji menyebut "Prosedur sama dengan L4" tanpa mencantumkan instruksinya di dalam kartu (Kriteria 2: tidak ambigu). Diperbaiki dengan menyalin instruksi langsung. Migrasi: `20261009070000_fix_l5_e2_cara_uji.sql`.
+
+| Kartu | Sebelum | Sesudah |
+|-------|---------|---------|
+| E2 L5 cara uji | `Prosedur sama dengan L4; pembagian tetap bebas dan konkret.` | `Guru menyebut total yang sudah disiapkan. Minta, "Pisahkan…" Setelah selesai, tanyakan banyak benda…` |
 
 **Audit L6–L8: 3 masalah pada D1 dan D2 L6–L7**
 
