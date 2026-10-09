@@ -1308,6 +1308,90 @@ v['15:F1'] = `<div class="ind-visual">
   <p class="ind-note">Guru tunjukkan sketsa. Anak tunjuk nama bangun yang disebutkan dan sebutkan satu sifatnya.</p>
 </div>`;
 
+// ── Level 16 ──────────────────────────────────────────────────────────────────
+
+v['16:B1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-paragraf">
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">A</span>
+          <span>"Air <b>menguap</b> saat terkena panas, yaitu berubah menjadi uap."</span>
+          <span class="ind-paragraf-tag">← berubah jadi uap</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">B</span>
+          <span>"Tanaman <b>menyerap</b> air melalui akar."</span>
+          <span class="ind-paragraf-tag">← mengambil / masuk ke dalam</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">C</span>
+          <span>"Hewan <b>beradaptasi</b> agar dapat hidup di lingkungannya."</span>
+          <span class="ind-paragraf-tag">← menyesuaikan diri</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">D</span>
+          <span>"<b>Data</b> dikumpulkan untuk mengetahui hasil pengamatan."</span>
+          <span class="ind-paragraf-tag">← informasi hasil catatan</span>
+        </div>
+      </div>
+      <figcaption>Kunci: A berubah jadi uap · B masuk ke dalam · C menyesuaikan diri · D informasi hasil catatan. Ambang 3 dari 4</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru bacakan tiap kalimat. Anak jelaskan arti kata yang dicetak tebal berdasarkan kalimat itu.</p>
+</div>`;
+
+v['16:E1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <table class="ind-nilaitempat">
+        <thead><tr><th>PERBANDINGAN</th><th>PALING SEDERHANA</th></tr></thead>
+        <tbody>
+          <tr><td>6 : 9</td><td class="ind-nilaitempat--r">2 : 3</td></tr>
+          <tr><td>8 : 12</td><td class="ind-nilaitempat--r">2 : 3</td></tr>
+          <tr><td>10 : 15</td><td class="ind-nilaitempat--r">2 : 3</td></tr>
+          <tr><td>12 : 16</td><td class="ind-nilaitempat--r">3 : 4</td></tr>
+          <tr><td>5 : 20</td><td class="ind-nilaitempat--r">1 : 4</td></tr>
+        </tbody>
+      </table>
+      <figcaption>Ambang 4 dari 5 disederhanakan benar</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru tulis tiap perbandingan. Anak sederhanakan ke bentuk paling kecil.</p>
+</div>`;
+
+v['16:F1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig" style="align-items:center;gap:0">
+      <svg viewBox="0 0 180 140" class="ind-bangun-svg" style="max-width:180px">
+        <circle cx="90" cy="62" r="50" fill="none" stroke="currentColor" stroke-width="2"/>
+        <line x1="40" y1="62" x2="140" y2="62" stroke="currentColor" stroke-width="1.5" stroke-dasharray="5,3"/>
+        <line x1="90" y1="62" x2="140" y2="62" stroke="#c79a3b" stroke-width="3"/>
+        <circle cx="90" cy="62" r="3.5" fill="currentColor"/>
+        <circle cx="140" cy="62" r="3" fill="currentColor"/>
+        <circle cx="40" cy="62" r="3" fill="currentColor"/>
+        <text x="90" y="54" text-anchor="middle" font-size="13" fill="currentColor">O</text>
+        <text x="147" y="60" text-anchor="start" font-size="13" fill="currentColor">A</text>
+        <text x="33" y="60" text-anchor="end" font-size="13" fill="currentColor">B</text>
+        <text x="116" y="54" text-anchor="middle" font-size="12" fill="#c79a3b" font-style="italic">r</text>
+        <text x="90" y="84" text-anchor="middle" font-size="12" fill="currentColor" font-style="italic">d</text>
+      </svg>
+      <table class="ind-nilaitempat" style="margin-top:6px">
+        <thead><tr><th>NO</th><th>PERTANYAAN</th><th>JAWABAN</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Tunjuk jari-jari</td><td>Garis OA</td></tr>
+          <tr><td>2</td><td>Tunjuk diameter</td><td>Garis AB</td></tr>
+          <tr><td>3</td><td>Diameter = 2 × jari-jari?</td><td>Benar</td></tr>
+          <tr><td>4</td><td>Pi kira-kira berapa?</td><td>≈ 3,14 atau 22/7</td></tr>
+          <tr><td>5</td><td>Jika jari-jari 7, diameter berapa?</td><td>14</td></tr>
+        </tbody>
+      </table>
+      <figcaption>Ambang 4 dari 5 benar</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru gambar lingkaran berpusat O, tandai jari-jari OA dan diameter AB. Anak jawab lima pertanyaan.</p>
+</div>`;
+
 export function indicatorVisual(level, slot) {
   return v[`${level}:${slot}`] || '';
 }
