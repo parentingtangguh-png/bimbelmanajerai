@@ -1082,6 +1082,110 @@ v['13:F1'] = `<div class="ind-visual">
   <p class="ind-note">Guru tunjukkan sketsa tiga bangun. Anak tunjuk nama bangun dan jawab pertanyaan sisi/rusuk/titik sudut.</p>
 </div>`;
 
+// ── Level 14 ─────────────────────────────────────────────────────────────────
+
+// B1 L14: fakta vs opini — 4 kalimat, kunci fakta/opini/fakta/opini
+v['14:B1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-paragraf">
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">A</span>
+          <span>"Kelas dimulai pukul delapan."</span>
+          <span class="ind-paragraf-tag">← fakta</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">B</span>
+          <span>"Belajar pagi lebih menyenangkan."</span>
+          <span class="ind-paragraf-tag">← opini</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">C</span>
+          <span>"Perpustakaan memiliki dua rak buku."</span>
+          <span class="ind-paragraf-tag">← fakta</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">D</span>
+          <span>"Buku cerita itu paling bagus."</span>
+          <span class="ind-paragraf-tag">← opini</span>
+        </div>
+      </div>
+      <figcaption>Kunci: A fakta · B opini · C fakta · D opini. Ambang 3 dari 4</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru bacakan tiap kalimat. Anak sebut jenisnya: fakta atau opini.</p>
+</div>`;
+
+// E1 L14: desimal ↔ pecahan, ambang 4 dari 5
+v['14:E1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <table class="ind-nilaitempat">
+        <thead><tr><th>Desimal</th><th class="ind-nilaitempat--r">Pecahan setara</th></tr></thead>
+        <tbody>
+          <tr><td>0,5</td><td class="ind-nilaitempat--r"><strong>5/10</strong></td></tr>
+          <tr><td>0,25</td><td class="ind-nilaitempat--r"><strong>25/100</strong></td></tr>
+          <tr><td>0,75</td><td class="ind-nilaitempat--r"><strong>75/100</strong></td></tr>
+          <tr><td>0,3</td><td class="ind-nilaitempat--r"><strong>3/10</strong></td></tr>
+          <tr><td>0,08</td><td class="ind-nilaitempat--r"><strong>8/100</strong></td></tr>
+        </tbody>
+      </table>
+      <figcaption>Guru baca desimal; anak sebut pecahannya. Ambang 4 dari 5</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru bacakan desimal satu per satu. Anak pasangkan dengan pecahan yang nilainya sama.</p>
+</div>`;
+
+// F1 L14: tabel data buku + bar chart sederhana, ambang 4 dari 5
+v['14:F1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <table class="ind-nilaitempat">
+        <thead><tr><th>Nama</th><th class="ind-nilaitempat--r">Buku dibaca</th></tr></thead>
+        <tbody>
+          <tr><td>Ani</td><td class="ind-nilaitempat--r"><strong>6</strong></td></tr>
+          <tr><td>Budi</td><td class="ind-nilaitempat--r"><strong>4</strong></td></tr>
+          <tr><td>Cici</td><td class="ind-nilaitempat--r"><strong>8</strong></td></tr>
+          <tr><td>Dodi</td><td class="ind-nilaitempat--r"><strong>5</strong></td></tr>
+        </tbody>
+      </table>
+    </figure>
+    <figure class="ind-fig" style="align-items:flex-end;gap:0">
+      <svg viewBox="0 0 180 90" style="width:180px;height:90px;display:block">
+        <line x1="20" y1="5" x2="20" y2="75" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="20" y1="75" x2="175" y2="75" stroke="currentColor" stroke-width="1.2"/>
+        <rect x="28" y="30" width="24" height="45" fill="var(--green)" opacity=".75"/>
+        <rect x="66" y="45" width="24" height="30" fill="var(--green)" opacity=".75"/>
+        <rect x="104" y="15" width="24" height="60" fill="var(--green)" opacity=".75"/>
+        <rect x="142" y="38" width="24" height="37" fill="var(--green)" opacity=".75"/>
+        <text x="40" y="84" text-anchor="middle" font-size="9" fill="currentColor">Ani</text>
+        <text x="78" y="84" text-anchor="middle" font-size="9" fill="currentColor">Budi</text>
+        <text x="116" y="84" text-anchor="middle" font-size="9" fill="currentColor">Cici</text>
+        <text x="154" y="84" text-anchor="middle" font-size="9" fill="currentColor">Dodi</text>
+        <text x="40" y="26" text-anchor="middle" font-size="9" fill="currentColor">6</text>
+        <text x="78" y="41" text-anchor="middle" font-size="9" fill="currentColor">4</text>
+        <text x="116" y="11" text-anchor="middle" font-size="9" fill="currentColor">8</text>
+        <text x="154" y="34" text-anchor="middle" font-size="9" fill="currentColor">5</text>
+      </svg>
+      <figcaption style="font-size:.72rem">Diagram batang: jumlah buku dibaca</figcaption>
+    </figure>
+    <figure class="ind-fig">
+      <table class="ind-nilaitempat">
+        <thead><tr><th>Pertanyaan</th><th class="ind-nilaitempat--r">Jawaban</th></tr></thead>
+        <tbody>
+          <tr><td>Siapa paling banyak?</td><td class="ind-nilaitempat--r"><strong>Cici</strong></td></tr>
+          <tr><td>Siapa paling sedikit?</td><td class="ind-nilaitempat--r"><strong>Budi</strong></td></tr>
+          <tr><td>Selisih Ani dan Budi?</td><td class="ind-nilaitempat--r"><strong>2</strong></td></tr>
+          <tr><td>Jumlah Budi dan Dodi?</td><td class="ind-nilaitempat--r"><strong>9</strong></td></tr>
+          <tr><td>Berapa orang dalam data?</td><td class="ind-nilaitempat--r"><strong>4</strong></td></tr>
+        </tbody>
+      </table>
+      <figcaption>Ambang 4 dari 5</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru tunjukkan tabel dan diagram. Anak jawab lima pertanyaan lisan.</p>
+</div>`;
+
 export function indicatorVisual(level, slot) {
   return v[`${level}:${slot}`] || '';
 }
