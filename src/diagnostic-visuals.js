@@ -143,6 +143,62 @@ v['1:F2'] = `<div class="ind-visual">
   <p class="ind-note">Buka penutup hanya setelah jawaban anak dicatat.</p>
 </div>`;
 
+// F1 L1: dua set bahan — Set 1 warna (2 merah + 2 biru), Set 2 ukuran (2 besar + 2 kecil)
+v['1:F1'] = `<div class="ind-visual">
+  <div class="ind-row">
+    <figure class="ind-fig">
+      <svg viewBox="0 0 86 64" width="82" height="60" aria-hidden="true">
+        <rect x="2" y="4" width="30" height="18" rx="2" fill="#c0392b"/>
+        <rect x="54" y="4" width="30" height="18" rx="2" fill="#2980b9"/>
+        <rect x="20" y="38" width="30" height="18" rx="2" fill="#2980b9"/>
+        <rect x="54" y="38" width="30" height="18" rx="2" fill="#c0392b"/>
+      </svg>
+      <figcaption>Set 1 · 2 merah + 2 biru<br>sama bentuk &amp; ukuran</figcaption>
+    </figure>
+    <figure class="ind-fig">
+      <svg viewBox="0 0 86 64" width="82" height="60" aria-hidden="true">
+        <rect x="2" y="6" width="36" height="22" rx="2" fill="currentColor"/>
+        <rect x="48" y="14" width="20" height="12" rx="2" fill="currentColor"/>
+        <rect x="2" y="38" width="20" height="12" rx="2" fill="currentColor"/>
+        <rect x="36" y="34" width="36" height="22" rx="2" fill="currentColor"/>
+      </svg>
+      <figcaption>Set 2 · 2 besar + 2 kecil<br>sama bentuk &amp; warna</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Berikan semua 4 potongan sekaligus — anak menyusun sendiri menjadi dua kelompok.</p>
+</div>`;
+
+// D2 L1: empat bentuk yang diterima sebagai tanda lulus — tanpa model, dari instruksi lisan
+v['1:D2'] = `<div class="ind-visual">
+  <div class="ind-row">
+    <figure class="ind-fig">
+      <svg viewBox="0 0 32 56" width="28" height="50" aria-hidden="true">
+        <line x1="16" y1="6" x2="16" y2="50" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <figcaption>Tegak<br>atas–bawah</figcaption>
+    </figure>
+    <figure class="ind-fig">
+      <svg viewBox="0 0 56 32" width="50" height="28" aria-hidden="true">
+        <line x1="6" y1="16" x2="50" y2="16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <figcaption>Mendatar<br>kiri–kanan</figcaption>
+    </figure>
+    <figure class="ind-fig">
+      <svg viewBox="0 0 40 56" width="34" height="50" aria-hidden="true">
+        <line x1="6" y1="50" x2="34" y2="6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <figcaption>Miring<br>diagonal jelas</figcaption>
+    </figure>
+    <figure class="ind-fig">
+      <svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true">
+        <ellipse cx="24" cy="24" rx="20" ry="15" fill="none" stroke="currentColor" stroke-width="2.5"/>
+      </svg>
+      <figcaption>Lingkaran<br>boleh oval</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Tanpa model — instruksi lisan saja. Sedikit goyangan diterima.</p>
+</div>`;
+
 // ── Level 2 ──────────────────────────────────────────────────────────────────
 
 // D1 L2: empat bentuk pramenulis — silang, lingkaran, siku, segi empat
