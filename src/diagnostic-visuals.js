@@ -1150,7 +1150,7 @@ v['14:F1'] = `<div class="ind-visual">
         </tbody>
       </table>
     </figure>
-    <figure class="ind-fig" style="align-items:flex-end;gap:0">
+    <figure class="ind-fig" style="align-items:center;gap:0">
       <svg viewBox="0 0 180 90" style="width:180px;height:90px;display:block">
         <line x1="20" y1="5" x2="20" y2="75" stroke="currentColor" stroke-width="1.2"/>
         <line x1="20" y1="75" x2="175" y2="75" stroke="currentColor" stroke-width="1.2"/>
