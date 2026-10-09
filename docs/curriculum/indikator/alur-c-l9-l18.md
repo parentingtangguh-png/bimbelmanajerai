@@ -36,7 +36,7 @@ Alur C L1–L8 (pramembaca → dekoding → membaca kalimat) dikunci terpisah di
 
 | Level | Kompetensi | Cara uji | Bahan | Tanda lulus |
 |---|---|---|---|---|
-| **L9** | Menemukan satu informasi tersurat dari teks pendek yang dibaca sendiri. | Setelah anak membaca teks C1 L9, tanyakan: **"Apa yang dimakan Rani saat istirahat?"** | Teks sama dengan C1 L9. | Jawaban tepat: **roti**. |
+| **L9** | Menemukan satu informasi tersurat dari teks pendek yang dibaca sendiri. | Setelah anak membaca teks C1 L9, tanyakan: **"Apa yang dimakan Rani saat istirahat?"** | **Rani membawa bekal. Ia makan roti saat istirahat. Setelah itu, Rani minum air.** | Jawaban tepat: **roti**. |
 | **L10** | Menemukan dua informasi tersurat dari teks pendek yang dibaca sendiri. | Setelah anak membaca teks C1 L10, tanyakan: **"Apa yang dirapikan Bima?"** dan **"Apa saja yang dimasukkan Bima?"** | Teks sama dengan C1 L10. | **2 dari 2** tepat. Kunci: **tas; buku dan pensil**. |
 | **L11** | Menentukan gagasan pokok teks informasi pendek yang dibaca sendiri. | Setelah anak membaca teks C1 L11, tanyakan: **"Apa gagasan utama teks ini?"** | Teks sama dengan C1 L11. | Jawaban menyebut gagasan utama: **air dibutuhkan tubuh / kita perlu cukup minum air**. |
 | **L12** | Menentukan urutan kejadian dari teks narasi yang dibaca sendiri. | Setelah anak membaca teks C1 L12, tanyakan: **"Apa kejadian pertama, kejadian berikutnya, dan kejadian terakhir?"** | Teks sama dengan C1 L12. | Anak menyebut **3 dari 3** kejadian utama dalam urutan benar: **Siti lupa membawa pensil; meminjam pensil kepada Dina; mengembalikan pensil**. |

@@ -107,6 +107,12 @@ Audit ulang L7 (9 Okt 2026): ditemukan 1 masalah tambahan pada E1 L7 bahan yang 
 |-------|---------|---------|
 | A2 L8 tanda lulus | `Semua unsur wajib diperiksa menggunakan rincian rubrik di bawah.` | Hambatan, tindakan mengatasi, dan hasil akhir dicantumkan langsung. |
 
+**Audit ulang L9–L18 (9 Okt 2026):** ditemukan masalah pada C2 L9 bahan "Teks sama dengan C1 L9" — referensi ke kartu lain (Kriteria 2). Diperbaiki dengan mencantumkan teks langsung. Migrasi: `20261009110000_fix_l9_c2_bahan.sql`.
+
+| Kartu | Sebelum | Sesudah |
+|-------|---------|---------|
+| C2 L9 bahan | `Teks sama dengan C1 L9.` | Teks bacaan dicantumkan langsung. |
+
 **Audit L9–L18: SEMUA LULUS** — 200 kartu (20 level × 14 indikator minus English/Karakter per alur). Semua kriteria inline lengkap, bahan ditulis guru di papan, tidak ada referensi rubrik eksternal, ambang kelulusan numerik.
 
 File yang diubah: `docs/curriculum/indikator/alur-d.md`, `alur-e.md`, migrasi `20261009040000_fix_l6_l7_cara_uji.sql`.
