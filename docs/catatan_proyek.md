@@ -55,3 +55,18 @@ File yang diubah: `src/diagnostic-visuals.js`, `docs/curriculum/indikator/alur-d
 Pilihan "Paket utama" dan "Paket cadangan" dihapus dari tampilan kartu tes. Guru tidak perlu memilih paket — semua nilai tersimpan sebagai `utama`. Kolom `package` di database tetap ada (tidak ada migrasi), nilai lama tidak terpengaruh.
 
 File yang diubah: `src/views/diagnostic.js`, `src/main.js`, `src/views/students.js`, `src/views/guide.js`, `tests/render.test.mjs`.
+
+---
+
+### 9 Oktober 2026 — Audit kartu tes diagnostik Level 2
+
+**Audit 3 kartu L2** (C1, D1, F1) menggunakan 7 kriteria. Semua kartu lulus — tidak ada masalah pada cara uji, bahan, atau tanda lulus.
+
+Ditemukan 2 masalah minor pada keterangan visual:
+
+| Visual | Masalah | Perbaikan |
+|--------|---------|-----------|
+| C1 L2 | Catatan menyebut `★` yang tidak ada di visual; jawaban ditandai warna emas via CSS | Diubah: `★ = tulisan huruf (jawaban)` → `Emas = tulisan huruf (jawaban)` |
+| F1 L2 | Catatan menyebut `★ (tebal)` yang tidak ada; jawaban ditandai emas saja | Diubah: `★ (tebal) = jawaban benar` → `Emas = jawaban benar` |
+
+File yang diubah: `src/diagnostic-visuals.js`.

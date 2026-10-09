@@ -252,7 +252,7 @@ v['2:C1'] = `<div class="ind-visual">
       <figcaption>Kunci: <strong>ioa</strong> (posisi 2)</figcaption>
     </figure>
   </div>
-  <p class="ind-note">★ = tulisan huruf (jawaban). Bentuk geometri diganti goresan nyata saat tes.</p>
+  <p class="ind-note">Emas = tulisan huruf (jawaban). Bentuk geometri diganti goresan nyata saat tes.</p>
 </div>`;
 
 // F1 L2: enam butir geometri 4 pilihan — tunjuk bentuk yang disebut
@@ -313,7 +313,7 @@ v['2:F1'] = `<div class="ind-visual">
       <figcaption>B6: tanya <strong>persegi panjang</strong></figcaption>
     </figure>
   </div>
-  <p class="ind-note">★ (tebal) = jawaban benar. Kunci posisi: 3; 4; 3; 2; 3; 2.</p>
+  <p class="ind-note">Emas = jawaban benar. Kunci posisi: 3; 4; 3; 2; 3; 2.</p>
 </div>`;
 
 // ── Level 3 ──────────────────────────────────────────────────────────────────
