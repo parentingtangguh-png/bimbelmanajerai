@@ -1186,6 +1186,128 @@ v['14:F1'] = `<div class="ind-visual">
   <p class="ind-note">Guru tunjukkan tabel dan diagram. Anak jawab lima pertanyaan lisan.</p>
 </div>`;
 
+// ── Level 15 ─────────────────────────────────────────────────────────────────
+
+// B1 L15: struktur teks — klaim, argumen, simpulan
+v['15:B1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-paragraf">
+        <div class="ind-paragraf-row ind-paragraf-row--pokok">
+          <span class="ind-paragraf-num">1</span>
+          <span>"Membaca rutin perlu dibiasakan."</span>
+          <span class="ind-paragraf-tag">← klaim</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">2</span>
+          <span>"Kebiasaan ini menambah kosakata dan membantu anak memahami pelajaran."</span>
+          <span class="ind-paragraf-tag">← argumen</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">3</span>
+          <span>"Jadi, anak sebaiknya menyediakan waktu membaca setiap hari."</span>
+          <span class="ind-paragraf-tag">← simpulan</span>
+        </div>
+      </div>
+      <figcaption>Kunci: 1 klaim · 2 argumen · 3 simpulan. Lulus 3 dari 3</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru bacakan teks. Anak sebut bagian tiap kalimat: klaim, argumen, atau simpulan.</p>
+</div>`;
+
+// E1 L15: bilangan bulat negatif — garis bilangan, perbandingan, urutan, bilangan berlawanan
+v['15:E1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig" style="align-items:center">
+      <svg viewBox="0 0 260 44" style="width:260px;height:44px;display:block">
+        <line x1="10" y1="22" x2="250" y2="22" stroke="currentColor" stroke-width="1.4"/>
+        <polygon points="250,18 258,22 250,26" fill="currentColor"/>
+        ${[-6,-5,-4,-3,-2,-1,0,1,2,3,4].map((n,i) => {
+          const x = 20 + i*21;
+          return `<line x1="${x}" y1="17" x2="${x}" y2="27" stroke="currentColor" stroke-width="1.2"/>
+<text x="${x}" y="38" text-anchor="middle" font-size="9" fill="currentColor">${n}</text>`;
+        }).join('')}
+        <circle cx="83" cy="22" r="4" fill="var(--green)" opacity=".8"/>
+      </svg>
+      <figcaption style="font-size:.72rem">Garis bilangan; lingkaran = posisi −4</figcaption>
+    </figure>
+    <figure class="ind-fig">
+      <table class="ind-nilaitempat">
+        <thead><tr><th>Pasangan</th><th class="ind-nilaitempat--r">Yang lebih besar</th></tr></thead>
+        <tbody>
+          <tr><td>−3 dan 2</td><td class="ind-nilaitempat--r"><strong>2</strong></td></tr>
+          <tr><td>−5 dan −1</td><td class="ind-nilaitempat--r"><strong>−1</strong></td></tr>
+          <tr><td>0 dan −4</td><td class="ind-nilaitempat--r"><strong>0</strong></td></tr>
+        </tbody>
+      </table>
+    </figure>
+    <figure class="ind-fig">
+      <table class="ind-nilaitempat">
+        <thead><tr><th>Tugas</th><th class="ind-nilaitempat--r">Jawaban</th></tr></thead>
+        <tbody>
+          <tr><td>Urutkan dari terkecil: −2, 4, −6, 1, 0</td><td class="ind-nilaitempat--r"><strong>−6, −2, 0, 1, 4</strong></td></tr>
+          <tr><td>Bilangan berlawanan dari −4</td><td class="ind-nilaitempat--r"><strong>4</strong></td></tr>
+        </tbody>
+      </table>
+      <figcaption>Ambang 4 dari 5 tugas benar</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru bacakan soal lisan. Anak sebut bilangan yang lebih besar, urutan, atau bilangan berlawanan.</p>
+</div>`;
+
+// F1 L15: jenis segitiga + jajargenjang — SVG sketsa dan tabel sifat
+v['15:F1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig ind-fig--row" style="justify-content:center;gap:14px;flex-wrap:wrap">
+      <div class="ind-bangun-wrap">
+        <svg viewBox="0 0 60 54" class="ind-bangun-svg">
+          <polygon points="30,4 56,50 4,50" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        <small>sama sisi</small>
+      </div>
+      <div class="ind-bangun-wrap">
+        <svg viewBox="0 0 60 54" class="ind-bangun-svg">
+          <polygon points="30,4 52,50 8,50" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        <small>sama kaki</small>
+      </div>
+      <div class="ind-bangun-wrap">
+        <svg viewBox="0 0 60 54" class="ind-bangun-svg">
+          <polygon points="6,50 6,10 52,50" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="6" y="43" width="7" height="7" fill="none" stroke="currentColor" stroke-width="1"/>
+        </svg>
+        <small>siku-siku</small>
+      </div>
+      <div class="ind-bangun-wrap">
+        <svg viewBox="0 0 60 54" class="ind-bangun-svg">
+          <polygon points="18,6 54,46 4,38" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        <small>sembarang</small>
+      </div>
+      <div class="ind-bangun-wrap">
+        <svg viewBox="0 0 70 54" class="ind-bangun-svg">
+          <polygon points="16,8 58,8 54,46 12,46" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        <small>jajargenjang</small>
+      </div>
+    </figure>
+    <figure class="ind-fig">
+      <table class="ind-nilaitempat">
+        <thead><tr><th>Bangun</th><th>Satu sifat kunci</th></tr></thead>
+        <tbody>
+          <tr><td>Segitiga sama sisi</td><td>3 sisi sama panjang</td></tr>
+          <tr><td>Segitiga sama kaki</td><td>2 sisi sama panjang</td></tr>
+          <tr><td>Segitiga siku-siku</td><td>1 sudut 90°</td></tr>
+          <tr><td>Segitiga sembarang</td><td>semua sisi berbeda</td></tr>
+          <tr><td>Jajargenjang</td><td>sisi berhadapan sejajar &amp; sama panjang</td></tr>
+        </tbody>
+      </table>
+      <figcaption>Ambang 4 dari 5 identifikasi atau sifat benar</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru tunjukkan sketsa. Anak tunjuk nama bangun yang disebutkan dan sebutkan satu sifatnya.</p>
+</div>`;
+
 export function indicatorVisual(level, slot) {
   return v[`${level}:${slot}`] || '';
 }
