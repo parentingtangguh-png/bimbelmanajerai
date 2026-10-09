@@ -145,6 +145,18 @@ Audit ulang L7 (9 Okt 2026): ditemukan 1 masalah tambahan pada E1 L7 bahan yang 
 |-------|---------|---------|
 | C2 L9 bahan | `Teks sama dengan C1 L9.` | Teks bacaan dicantumkan langsung. |
 
+**Audit ulang L9 (9 Okt 2026): 4 masalah** — D1 bahan tanpa teks konkret + tanda lulus subyektif; F1 cara uji tidak cocok bahan + kunci tidak ada + pertanyaan ambigu; A2 "dibaca lancar" tidak terdefinisi; D2 "saling berhubungan" dan "gagasan lengkap" tidak terdefinisi. Migrasi: `20261009170000_fix_l9_d1_f1_a2_d2.sql`.
+
+| Kartu | Sebelum | Sesudah |
+|-------|---------|---------|
+| D1 L9 bahan | "Paragraf tentang kegiatan sehari-hari" | Teks paragraf 42 kata dicantumkan langsung |
+| D1 L9 tanda lulus | "≥90% huruf terbaca" | "semua kata dapat dibaca guru tanpa menebak" |
+| F1 L9 cara uji | "tunjuk bangun… lalu sebutkan satu sifatnya" | Diselaraskan: "Tunjuk bangun yang saya maksud. Satu pertanyaan per butir." |
+| F1 L9 bahan | 5 pertanyaan; 2 tumpang tindih; 1 ambigu | 4 pertanyaan dengan satu jawaban jelas masing-masing |
+| F1 L9 tanda lulus | "4 dari 5; tanpa kunci" | "3 dari 4. Kunci: (1)–(4) dicantumkan" |
+| A2 L9 tanda lulus | "Minimal 2 kalimat dibaca lancar" | "Seluruh 3 kalimat dibaca dari awal sampai akhir" |
+| D2 L9 tanda lulus | "saling berhubungan; gagasan lengkap; ≤4 dalam 15–30 kata" | Kriteria operasional + hapus rentang 15–30 kata |
+
 **Audit L9–L18: SEMUA LULUS** — 200 kartu (20 level × 14 indikator minus English/Karakter per alur). Semua kriteria inline lengkap, bahan ditulis guru di papan, tidak ada referensi rubrik eksternal, ambang kelulusan numerik.
 
 File yang diubah: `docs/curriculum/indikator/alur-d.md`, `alur-e.md`, migrasi `20261009040000_fix_l6_l7_cara_uji.sql`.
