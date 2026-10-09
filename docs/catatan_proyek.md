@@ -58,6 +58,31 @@ File yang diubah: `src/views/diagnostic.js`, `src/main.js`, `src/views/students.
 
 ---
 
+### 9 Oktober 2026 — Audit kartu tes diagnostik L3–L18
+
+**Audit L3, L4, L5: LULUS** — tidak ada masalah pada cara uji, bahan, atau tanda lulus. Semua kriteria inline dan bisa dibaca langsung guru.
+
+**Audit L6–L8: 3 masalah pada D1 dan D2 L6–L7**
+
+Tanda lulus D1 L6, D1 L7, dan D2 L7 menyebut "rubrik spasi" tanpa menjelaskan standarnya di dalam kartu (Kriteria 2: tidak ambigu). Definisi ada di seksi Rubrik Tulisan alur-d.md tetapi tidak terlihat guru saat memegang kartu.
+
+Tambahan: cara uji E2 L7 menyebut "perintah baku (Penyiapan Khusus)" tanpa mencantumkan kalimat instruksinya (Kriteria 2).
+
+| Kartu | Sebelum | Sesudah |
+|-------|---------|---------|
+| D1 L6 tanda lulus | `...memenuhi rubrik spasi tanpa pemisahan palsu di dalam kata` | `...memiliki celah jelas (≈ selebar huruf 'o' tulisan anak) tanpa celah di dalam kata` |
+| D1 L7 tanda lulus | `...dua batas kata memenuhi rubrik spasi` | `...dua batas kata memiliki celah jelas (≈ selebar huruf 'o' tulisan anak)` |
+| D2 L7 tanda lulus | `...dua batas kata memenuhi rubrik spasi` | `...dua batas kata memiliki celah jelas (≈ selebar huruf 'o' tulisan anak)` |
+| E2 L7 cara uji | `Gunakan hanya perintah baku (Penyiapan Khusus).` | `Instruksi: "Isi bagian yang kosong supaya kedua sisi sama."` |
+
+**Audit L8: LULUS** — D1 L8 dan D2 L8 sudah memakai "batas kata tepat" dan rubrik inline; tidak ada referensi eksternal.
+
+**Audit L9–L18: SEMUA LULUS** — 200 kartu (20 level × 14 indikator minus English/Karakter per alur). Semua kriteria inline lengkap, bahan ditulis guru di papan, tidak ada referensi rubrik eksternal, ambang kelulusan numerik.
+
+File yang diubah: `docs/curriculum/indikator/alur-d.md`, `alur-e.md`, migrasi `20261009040000_fix_l6_l7_cara_uji.sql`.
+
+---
+
 ### 9 Oktober 2026 — Audit kartu tes diagnostik Level 2
 
 **Audit 3 kartu L2** (C1, D1, F1) menggunakan 7 kriteria. Semua kartu lulus — tidak ada masalah pada cara uji, bahan, atau tanda lulus.
