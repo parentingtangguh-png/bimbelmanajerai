@@ -31,6 +31,18 @@ Setiap kartu tes (cara uji + bahan + tanda lulus) diperiksa terhadap 7 kriteria 
 
 ## Pekerjaan yang sudah selesai
 
+### 9 Oktober 2026 — Audit ulang Level 1 (audit kedua)
+
+**Audit ulang 13 kartu L1** (EN dilewati — tidak ditampilkan dalam alur diagnostik). Ditemukan 1 masalah yang terlewat audit pertama:
+
+| Kartu | Masalah | Perbaikan |
+|-------|---------|-----------|
+| E2 L1 bahan | Kode susunan **R/M/S** tidak dijelaskan inline; artinya ada di seksi Penyiapan Khusus | Diganti: "2 benda baris renggang; 1 benda di tengah; 3 benda baris melengkung; 2 benda sebaran rapat tidak beraturan" |
+
+Migrasi: `20261009120000_fix_l1_e2_bahan.sql`. Semua 12 kartu akademik + KR lainnya LULUS.
+
+---
+
 ### 9 Oktober 2026 — Audit dan perbaikan kartu tes diagnostik Level 1
 
 **Audit 14 kartu L1** menggunakan 7 kriteria di atas. Ditemukan 4 masalah:
