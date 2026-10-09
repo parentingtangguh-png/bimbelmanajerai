@@ -974,6 +974,114 @@ v['12:F1'] = `<div class="ind-visual">
   <p class="ind-note">Guru gambar petak kotak di kertas. Anak hitung banyak kotak dan bandingkan luas keempat bangun.</p>
 </div>`;
 
+v['13:B1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-paragraf">
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">A</span>
+          <span>"Disiplin adalah sikap menaati aturan dan waktu."</span>
+          <span class="ind-paragraf-tag">← definisi</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">B</span>
+          <span>"Contohnya, anak datang tepat waktu dan membawa alat belajar."</span>
+          <span class="ind-paragraf-tag">← contoh</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">C</span>
+          <span>"Belajar sendiri membuat kita fokus, sedangkan belajar kelompok membantu berdiskusi."</span>
+          <span class="ind-paragraf-tag">← perbandingan</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">D</span>
+          <span>"Amanah berarti menjaga kepercayaan yang diberikan orang lain."</span>
+          <span class="ind-paragraf-tag">← definisi</span>
+        </div>
+      </div>
+      <figcaption>Kunci: A definisi · B contoh · C perbandingan · D definisi. Ambang 3 dari 4</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru bacakan tiap kutipan. Anak sebut jenisnya: definisi, contoh, atau perbandingan.</p>
+</div>`;
+
+v['13:E1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <table class="ind-nilaitempat">
+        <thead>
+          <tr><th>Bilangan</th><th>Angka ditanya</th><th class="ind-nilaitempat--r">Nilai tempat</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="ind-nilaitempat--bil"><u>8</u>.426</td><td class="muted">8</td><td class="ind-nilaitempat--r">8.000 (ribuan)</td></tr>
+          <tr><td class="ind-nilaitempat--bil">9.<u>5</u>03</td><td class="muted">5</td><td class="ind-nilaitempat--r">500 (ratusan)</td></tr>
+        </tbody>
+      </table>
+    </figure>
+    <figure class="ind-fig">
+      <table class="ind-nilaitempat">
+        <thead>
+          <tr><th>Soal</th><th class="ind-nilaitempat--r">Jawaban</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>FPB dari 12 dan 18</td><td class="ind-nilaitempat--r"><strong>6</strong></td></tr>
+          <tr><td>KPK dari 4 dan 6</td><td class="ind-nilaitempat--r"><strong>12</strong></td></tr>
+          <tr><td>KPK dari 5 dan 10</td><td class="ind-nilaitempat--r"><strong>10</strong></td></tr>
+        </tbody>
+      </table>
+      <figcaption>Guru tanyakan lisan. Ambang 4 dari 5 (nilai tempat + FPB/KPK)</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru bacakan soal satu per satu. Anak sebut nilai tempat atau jawaban FPB/KPK.</p>
+</div>`;
+
+v['13:F1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig ind-fig--row" style="justify-content:center;gap:16px">
+      <div class="ind-bangun-wrap">
+        <svg viewBox="0 0 60 58" class="ind-bangun-svg">
+          <polygon points="4,18 34,18 34,48 4,48" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <polygon points="4,18 14,8 44,8 34,18" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <polygon points="34,18 44,8 44,38 34,48" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        <small>kubus</small>
+      </div>
+      <div class="ind-bangun-wrap">
+        <svg viewBox="0 0 68 52" class="ind-bangun-svg">
+          <polygon points="4,18 46,18 46,46 4,46" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <polygon points="4,18 16,6 58,6 46,18" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <polygon points="46,18 58,6 58,34 46,46" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        <small>balok</small>
+      </div>
+      <div class="ind-bangun-wrap">
+        <svg viewBox="0 0 70 58" class="ind-bangun-svg">
+          <polygon points="4,50 34,50 19,18" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="4" y1="50" x2="20" y2="50" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="34" y1="50" x2="50" y2="50" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="19" y1="18" x2="35" y2="18" stroke="currentColor" stroke-width="1.5"/>
+          <polygon points="20,50 50,50 35,18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3,2"/>
+        </svg>
+        <small>prisma segitiga</small>
+      </div>
+    </figure>
+    <figure class="ind-fig">
+      <table class="ind-nilaitempat">
+        <thead><tr><th>Pertanyaan guru</th><th class="ind-nilaitempat--r">Jawaban</th></tr></thead>
+        <tbody>
+          <tr><td>Kubus — berapa sisi?</td><td class="ind-nilaitempat--r"><strong>6</strong></td></tr>
+          <tr><td>Balok — berapa rusuk?</td><td class="ind-nilaitempat--r"><strong>12</strong></td></tr>
+          <tr><td>Prisma segitiga — berapa sisi?</td><td class="ind-nilaitempat--r"><strong>5</strong></td></tr>
+          <tr><td>Kubus — berapa titik sudut?</td><td class="ind-nilaitempat--r"><strong>8</strong></td></tr>
+          <tr><td>Sisi-sisi balok berbentuk apa?</td><td class="ind-nilaitempat--r"><strong>persegi panjang</strong></td></tr>
+        </tbody>
+      </table>
+      <figcaption>Ambang 4 dari 5</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru tunjukkan sketsa tiga bangun. Anak tunjuk nama bangun dan jawab pertanyaan sisi/rusuk/titik sudut.</p>
+</div>`;
+
 export function indicatorVisual(level, slot) {
   return v[`${level}:${slot}`] || '';
 }
