@@ -1824,6 +1824,71 @@ v['16:F1'] = `<div class="ind-visual">
   <p class="ind-note">Guru gambar lingkaran berpusat O, tandai jari-jari OA dan diameter AB. Anak jawab lima pertanyaan.</p>
 </div>`;
 
+// C1 L16: teks ilmiah populer — paragraf berlabel, kalimat kunci disorot
+v['16:C1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-paragraf">
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">1</span>
+          <span>Air dapat berubah bentuk karena panas.</span>
+        </div>
+        <div class="ind-paragraf-row ind-paragraf-row--pokok">
+          <span class="ind-paragraf-num">2</span>
+          <span>Saat dipanaskan, sebagian air <strong style="color:var(--green)">berubah menjadi uap</strong>.</span>
+          <span class="ind-paragraf-tag">← informasi kunci</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">3</span>
+          <span>Proses ini disebut menguap.</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">4</span>
+          <span>Uap air dapat terlihat seperti asap tipis.</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">5</span>
+          <span>Perubahan ini sering terjadi saat air mendidih.</span>
+        </div>
+      </div>
+      <figcaption>Anak baca cepat dalam hati → tunjuk atau bacakan kalimat 2 sebagai informasi kunci (air berubah jadi uap). ≤1 kesalahan kata.</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru tulis teks. Anak cari cepat kalimat yang menjawab "apa yang berubah saat air dipanaskan", lalu baca nyaring kalimat itu.</p>
+</div>`;
+
+// F2 L16: keliling lingkaran — tabel soal + kunci
+v['16:F2'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig" style="align-items:center">
+      <svg viewBox="0 0 120 80" style="width:120px;height:80px;display:block">
+        <circle cx="40" cy="40" r="30" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="10" y1="40" x2="70" y2="40" stroke="currentColor" stroke-width="1.2" stroke-dasharray="4,2"/>
+        <line x1="40" y1="40" x2="70" y2="40" stroke="#c79a3b" stroke-width="2.5"/>
+        <circle cx="40" cy="40" r="2.5" fill="currentColor"/>
+        <text x="56" y="35" text-anchor="middle" font-size="9" fill="#c79a3b" font-style="italic">r</text>
+        <text x="40" y="58" text-anchor="middle" font-size="9" fill="currentColor" font-style="italic">K = 2πr = πd</text>
+        <text x="90" y="20" text-anchor="middle" font-size="9" fill="currentColor">π ≈ 22/7</text>
+        <text x="90" y="33" text-anchor="middle" font-size="9" fill="currentColor">atau 3,14</text>
+      </svg>
+    </figure>
+    <figure class="ind-fig">
+      <table class="ind-nilaitempat">
+        <thead><tr><th>Soal</th><th class="ind-nilaitempat--r">Keliling</th></tr></thead>
+        <tbody>
+          <tr><td>Diameter 14 cm</td><td class="ind-nilaitempat--r"><strong>44 cm</strong></td></tr>
+          <tr><td>Jari-jari 7 cm</td><td class="ind-nilaitempat--r"><strong>44 cm</strong></td></tr>
+          <tr><td>Diameter 10 cm</td><td class="ind-nilaitempat--r"><strong>31,4 cm</strong></td></tr>
+          <tr><td>Jari-jari 5 cm</td><td class="ind-nilaitempat--r"><strong>31,4 cm</strong></td></tr>
+          <tr><td>Roda diameter 28 cm</td><td class="ind-nilaitempat--r"><strong>88 cm</strong></td></tr>
+        </tbody>
+      </table>
+      <figcaption>Ambang 4 dari 5 benar</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Gunakan 22/7 jika dimensi kelipatan 7; gunakan 3,14 jika tidak. Roda 1 putaran = satu keliling penuh.</p>
+</div>`;
+
 // ── Level 17 ──────────────────────────────────────────────────────────────────
 
 v['17:B1'] = `<div class="ind-visual">
