@@ -955,16 +955,15 @@ v['9:F1'] = `<div class="ind-visual">
     <figure class="ind-fig">
       <table class="ind-tabel-kunci">
         <tbody>
-          <tr><td class="muted">(1) sisi sama panjang semua</td><td><strong>persegi</strong></td></tr>
-          <tr><td class="muted">(2) memiliki 3 sisi</td><td><strong>segitiga</strong></td></tr>
+          <tr><td class="muted">(1) sisinya semua sama panjang</td><td><strong>persegi</strong></td></tr>
+          <tr><td class="muted">(2) memiliki tepat 3 sisi</td><td><strong>segitiga</strong></td></tr>
           <tr><td class="muted">(3) tidak memiliki sudut</td><td><strong>lingkaran</strong></td></tr>
-          <tr><td class="muted">(4) memiliki 4 sudut</td><td><strong>persegi / persegi panjang</strong></td></tr>
-          <tr><td class="muted">(5) tidak punya sudut sama sekali</td><td><strong>lingkaran</strong></td></tr>
+          <tr><td class="muted">(4) tepat 4 sudut, sisi belum tentu sama panjang</td><td><strong>persegi panjang</strong></td></tr>
         </tbody>
       </table>
     </figure>
   </div>
-  <p class="ind-note">Guru gambar 4 bangun di kertas. Anak tunjuk bangun lalu sebutkan satu sifatnya. Ambang 4 dari 5.</p>
+  <p class="ind-note">Guru gambar 4 bangun. Anak tunjuk bangun yang disebut. Ambang 3 dari 4.</p>
 </div>`;
 
 v['10:E1'] = `<div class="ind-visual">
