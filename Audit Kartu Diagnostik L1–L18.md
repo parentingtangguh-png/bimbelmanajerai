@@ -6,9 +6,9 @@ Rumah Belajar Rainbow Kids Alfatih · 9–10 Oktober 2026 · Kriteria K1–K7 (E
 
 **234**Kartu diperiksa
 
-**109**Perbaikan diterapkan
+**112**Perbaikan diterapkan
 
-**24**Migrasi SQL
+**25**Migrasi SQL
 
 > **Catatan kerja:** Setiap usulan perbaikan wajib menampilkan teks **sebelum** dan teks **sesudah** secara berdampingan sebelum migrasi dibuat. Pemilik menyetujui teks sesudah terlebih dahulu; migrasi baru dibuat setelah persetujuan eksplisit.
 
@@ -32,9 +32,9 @@ Navigasi cepat per level
 
 [L2](#l2) 10
 
-[L3](#l3) 4
+[L3](#l3) 7
 
-[L4](#l4) 2
+[L4](#l4) 3
 
 [L5](#l5) 1
 
@@ -120,7 +120,9 @@ L3
 
 ## Kata dan Angka Awal
 
-4 perbaikan
+4 perbaikan sudah diterapkan (migrasi 050, 140) · 3 temuan baru dari audit kriteria revisi
+
+**Sudah diterapkan**
 
 | Kartu | K | Masalah | Perbaikan |
 | --- | --- | --- | --- |
@@ -129,16 +131,25 @@ L3
 | E2 | K2 | Cara uji: "Prosedur seperti L2" — referensi lintas-level | Instruksi menghitung kumpulan dicantumkan langsung (benda boleh ditata ulang) |
 | E2 | K2 | Bahan menggunakan kode R/M/S | Deskripsi konkret: "8 benda baris renggang; 6 benda sebaran rapat; …" angka 6–10 |
 
+**Temuan baru — sudah diterapkan (migrasi 020, diagnostic-visuals.js)**
+
+| Kartu | K | Masalah | Perbaikan |
+| --- | --- | --- | --- |
+| A2 | K6 | "Klausa yang menyebut benda dan sedikitnya satu ciri fisik" tidak operasional; tidak ada contoh lulus/belum | Tambahkan: "Contoh lulus: 'Bolanya merah.' atau 'Sendoknya keras.' — Contoh belum: 'Bola.' atau 'Merah.' saja." |
+| B1 | K7 | Deret grafem k d s m l t ditampilkan ke anak; tidak ada visual SVG (B1 L2 sudah ada visual serupa) | Buat visual SVG deret grafem k d s m l t; m pengecoh dari L2 |
+| E1 | K7 | Deret angka 9 6 4 10 7 8 ditampilkan ke anak; tidak ada visual SVG (E1 L2 sudah ada visual serupa) | Buat visual SVG deret angka 9 6 4 10 7 8; 4 pengecoh |
+
 L4
 
 ## Suku Kata dan Bilangan 11–20
 
-2 perbaikan
+3 perbaikan · migrasi 060, 150, 20261010-000
 
 | Kartu | K | Masalah | Perbaikan |
 | --- | --- | --- | --- |
 | B1 | K2 | Cara uji merujuk "ketentuan pelafalan" di seksi Kalibrasi yang tidak terlihat | Aturan /c/ (bunyi awal "cuci") dan /h/ (embusan "hhh") dicantumkan inline |
 | B1 | K2 | Tidak ada instruksi untuk anak cara merespons | Instruksi "Tunjuk tulisan untuk bunyi yang kamu dengar" ditambahkan |
+| C1 | K2 K6 | Tanda lulus menyebut "sedikitnya satu kata tepat dari setiap struktur" tanpa menjelaskan inline mana kata KV-KV dan mana V-KV | Diganti: "Sedikitnya satu tepat dari tiap kelompok: **paku/dasi** (diawali konsonan) dan **ibu/itu** (diawali vokal)." |
 
 L5
 

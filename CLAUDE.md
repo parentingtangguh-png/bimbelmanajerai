@@ -14,8 +14,8 @@ Berkas ini menggambarkan **keadaan sekarang**, bukan riwayat. Kalau sesuatu di s
 
 ## ▶ Mulai di sini: status terakhir (10 Okt 2026)
 - **Fokus sekarang ada di guru, bukan fitur** (keputusan pemilik 2 Okt: "sederhanakan pekerjaan, jangan overengineering, jangan melebar"). Yang menunggu guru: menandai sesi selesai tepat waktu dan menuntaskan tes diagnostik anak yang masih draf. **Jangan menawarkan audit atau fitur baru** sampai pemilik meminta.
-- **Audit kartu diagnostik L1–L18 sedang berjalan (10 Okt 2026):** kriteria K1–K7 direvisi menjadi operasional (tabel lulus/gagal per kriteria); sebelum/sesudah ditampilkan di chat untuk persetujuan pemilik sebelum migrasi. Dokumen audit: `Audit Kartu Diagnostik L1–L18.md` (lokal, tidak di-push). Progress: **L1 selesai** (10 temuan, 10 diterapkan), **L2 selesai** (10 temuan, 10 diterapkan), **L3 selesai** (7 temuan, 7 diterapkan). L4–L18 belum diaudit ulang dengan kriteria revisi.
-  - Catatan kerja audit: sebelum/sesudah ditampilkan di chat; pemilik setujui dulu; baru migrasi SQL (dijalankan pemilik di SQL Editor) + push GitHub.
+- **Audit kartu diagnostik L1–L18 selesai (10 Okt 2026):** kriteria K1–K7 direvisi menjadi operasional (tabel lulus/gagal per kriteria). Dokumen audit: `Audit Kartu Diagnostik L1–L18.md` (lokal, tidak di-push). Semua 18 level selesai — 113 perbaikan diterapkan (28 migrasi SQL). Migrasi `20261009*` (27 buah) + `20261010000000_fix_l4_c1_tanda_lulus.sql`; belum di-push ke Supabase dan GitHub.
+  - Catatan kerja audit: sebelum/sesudah **wajib ditampilkan sebagai pratinjau di pane browser** (bukan hanya teks di chat) sebelum pemilik menyetujui; baru migrasi SQL (dijalankan pemilik di SQL Editor) + push GitHub.
 - **Ilustrasi visual diagnostik (diperbarui 10 Okt 2026):** `src/diagnostic-visuals.js` kini 53 entri setelah audit K7 L3 menambah B1, E1. Peta slot per level:
   - L1: C1, D1, C2, E2, B1, F2, F1, D2 · L2: **B1, C1, C2, D1, E1, F1** · L3: **B1, E1**, E2, F1 · L4: F1
   - L5: E1, F1 · L6–L8: B1, E1, F1 · L9–L11: E1, F1 · L12–L18: B1, E1, F1
