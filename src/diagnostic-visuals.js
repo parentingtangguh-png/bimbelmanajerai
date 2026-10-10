@@ -1255,6 +1255,34 @@ v['12:F1'] = `<div class="ind-visual">
   <p class="ind-note">Guru gambar petak kotak di kertas. Anak hitung banyak kotak dan bandingkan luas keempat bangun.</p>
 </div>`;
 
+v['13:C1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-paragraf">
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">1</span>
+          <span>Tanaman membutuhkan air.</span>
+        </div>
+        <div class="ind-paragraf-row ind-paragraf-row--pokok">
+          <span class="ind-paragraf-num">2</span>
+          <span>Akar tanaman <u><strong>menyerap</strong></u> air dari tanah.</span>
+          <span class="ind-paragraf-tag">← kata sasaran</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">3</span>
+          <span>Air itu membantu batang dan daun tetap segar.</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">4</span>
+          <span>Tanaman yang cukup air dapat tumbuh baik.</span>
+        </div>
+      </div>
+      <figcaption>Anak baca kalimat sekitar kata bergaris bawah, lalu jelaskan artinya</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru tulis teks di kertas/papan, garis bawahi kata "menyerap". Arti diterima: mengambil / masuknya air ke akar.</p>
+</div>`;
+
 v['13:B1'] = `<div class="ind-visual">
   <div class="ind-col">
     <figure class="ind-fig">
