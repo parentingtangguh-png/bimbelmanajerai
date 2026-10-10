@@ -1393,6 +1393,41 @@ v['13:F1'] = `<div class="ind-visual">
 
 // ── Level 14 ─────────────────────────────────────────────────────────────────
 
+// C1 L14: teks kalimat majemuk kompleks — koma jeda ditandai
+v['14:C1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-paragraf">
+        <div class="ind-paragraf-row ind-paragraf-row--pokok">
+          <span class="ind-paragraf-num">1</span>
+          <span>Ketika hujan turun<strong style="color:var(--green)">,</strong> anak-anak tetap belajar di kelas.</span>
+          <span class="ind-paragraf-tag">← jeda koma</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">2</span>
+          <span>Mereka tidak bermain di halaman karena lantai menjadi licin.</span>
+        </div>
+        <div class="ind-paragraf-row ind-paragraf-row--pokok">
+          <span class="ind-paragraf-num">3</span>
+          <span>Walaupun begitu<strong style="color:var(--green)">,</strong> suasana kelas tetap menyenangkan.</span>
+          <span class="ind-paragraf-tag">← jeda koma</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">4</span>
+          <span>Guru mengajak anak membaca cerita.</span>
+        </div>
+        <div class="ind-paragraf-row ind-paragraf-row--pokok">
+          <span class="ind-paragraf-num">5</span>
+          <span>Setelah hujan reda<strong style="color:var(--green)">,</strong> mereka pulang dengan tertib.</span>
+          <span class="ind-paragraf-tag">← jeda koma</span>
+        </div>
+      </div>
+      <figcaption>Guru catat: anak beri jeda pada koma hijau (ada 3) + jeda akhir kalimat (5). Ambang 3 dari 5 tanda baca dijeda wajar</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru tulis teks di kertas/papan. Amati jeda anak pada koma (setelah "turun", "begitu", "reda") dan titik akhir kalimat. Lulus bila 3 dari 5 dijeda dengan wajar.</p>
+</div>`;
+
 // B1 L14: fakta vs opini — 4 kalimat, kunci fakta/opini/fakta/opini
 v['14:B1'] = `<div class="ind-visual">
   <div class="ind-col">
