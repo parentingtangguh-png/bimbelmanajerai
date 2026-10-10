@@ -375,6 +375,40 @@ v['2:C2'] = `<div class="ind-visual">
 
 // ── Level 3 ──────────────────────────────────────────────────────────────────
 
+// B1 L3: deret enam grafem (5 target + pengecoh m dari L2) — guru tunjukkan ke anak
+v['3:B1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-grafem-row">
+        <span class="ind-grafem-card ind-grafem-card--target">k</span>
+        <span class="ind-grafem-card ind-grafem-card--target">d</span>
+        <span class="ind-grafem-card ind-grafem-card--target">s</span>
+        <span class="ind-grafem-card">m</span>
+        <span class="ind-grafem-card ind-grafem-card--target">l</span>
+        <span class="ind-grafem-card ind-grafem-card--target">t</span>
+      </div>
+      <figcaption>Deret 6 grafem · <strong>m</strong> = pengecoh dari L2 · anak menunjuk satu per bunyi yang disebut guru</figcaption>
+    </figure>
+  </div>
+</div>`;
+
+// E1 L3: deret enam angka 6–10 + pengecoh 4 dari L1–2 — guru tunjukkan ke anak
+v['3:E1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-grafem-row">
+        <span class="ind-grafem-card ind-grafem-card--target">9</span>
+        <span class="ind-grafem-card ind-grafem-card--target">6</span>
+        <span class="ind-grafem-card">4</span>
+        <span class="ind-grafem-card ind-grafem-card--target">10</span>
+        <span class="ind-grafem-card ind-grafem-card--target">7</span>
+        <span class="ind-grafem-card ind-grafem-card--target">8</span>
+      </div>
+      <figcaption>Deret tetap terlihat sepanjang tes · <strong>4</strong> = pengecoh · anak menunjuk angka yang disebut guru</figcaption>
+    </figure>
+  </div>
+</div>`;
+
 // E2 L3: lima kumpulan benda 6–10 dengan susunan R/M/S (8-R, 6-S, 10-M, 7-S, 9-R)
 v['3:E2'] = `<div class="ind-visual">
   <div class="ind-grid ind-grid--3">
