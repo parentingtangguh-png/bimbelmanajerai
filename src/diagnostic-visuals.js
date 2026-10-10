@@ -1652,6 +1652,94 @@ v['15:F1'] = `<div class="ind-visual">
   <p class="ind-note">Guru tunjukkan sketsa. Anak tunjuk nama bangun yang disebutkan dan sebutkan satu sifatnya.</p>
 </div>`;
 
+// C1 L15: teks argumentasi — fase prediksi (judul+kalimat 1) lalu baca penuh
+v['15:C1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-paragraf">
+        <div class="ind-paragraf-row ind-paragraf-row--pokok">
+          <span class="ind-paragraf-num">▶</span>
+          <span><strong>Membaca Setiap Hari</strong></span>
+          <span class="ind-paragraf-tag">← judul (fase 1)</span>
+        </div>
+        <div class="ind-paragraf-row ind-paragraf-row--pokok">
+          <span class="ind-paragraf-num">1</span>
+          <span>Membaca setiap hari perlu dibiasakan.</span>
+          <span class="ind-paragraf-tag">← kalimat pertama (fase 1)</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">2</span>
+          <span>Kebiasaan ini menambah kosakata.</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">3</span>
+          <span>Anak yang sering membaca juga lebih mudah memahami pelajaran.</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">4</span>
+          <span>Membaca tidak harus lama, tetapi perlu dilakukan rutin.</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">5</span>
+          <span>Karena itu, anak sebaiknya menyediakan waktu membaca setiap hari.</span>
+        </div>
+      </div>
+      <figcaption>Fase 1: tulis judul + kalimat 1, minta prediksi. Fase 2: tulis sisa, anak baca penuh ≤5 kesalahan kata.</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Baris bergaris (▶ dan 1) = yang ditulis dulu. Anak menebak isi teks sebelum melihat kalimat 2–5.</p>
+</div>`;
+
+// F2 L15: luas segitiga dan jajargenjang — sketsa bangun dengan dimensi dan kunci
+v['15:F2'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig ind-fig--row" style="justify-content:center;gap:14px;flex-wrap:wrap">
+      <div class="ind-bangun-wrap">
+        <svg viewBox="0 0 70 60" class="ind-bangun-svg">
+          <polygon points="35,4 66,52 4,52" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <text x="35" y="62" text-anchor="middle" font-size="8" fill="currentColor">a=8</text>
+          <text x="68" y="32" text-anchor="start" font-size="8" fill="currentColor">t=5</text>
+        </svg>
+        <small>½×8×5=<strong>20</strong> cm²</small>
+      </div>
+      <div class="ind-bangun-wrap">
+        <svg viewBox="0 0 70 60" class="ind-bangun-svg">
+          <polygon points="35,4 66,52 4,52" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <text x="35" y="62" text-anchor="middle" font-size="8" fill="currentColor">a=10</text>
+          <text x="68" y="32" text-anchor="start" font-size="8" fill="currentColor">t=6</text>
+        </svg>
+        <small>½×10×6=<strong>30</strong> cm²</small>
+      </div>
+      <div class="ind-bangun-wrap">
+        <svg viewBox="0 0 70 54" class="ind-bangun-svg">
+          <polygon points="16,8 62,8 54,46 8,46" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <text x="38" y="58" text-anchor="middle" font-size="8" fill="currentColor">a=9</text>
+          <text x="64" y="30" text-anchor="start" font-size="8" fill="currentColor">t=4</text>
+        </svg>
+        <small>9×4=<strong>36</strong> cm²</small>
+      </div>
+      <div class="ind-bangun-wrap">
+        <svg viewBox="0 0 70 54" class="ind-bangun-svg">
+          <polygon points="16,8 62,8 54,46 8,46" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <text x="38" y="58" text-anchor="middle" font-size="8" fill="currentColor">a=12</text>
+          <text x="64" y="30" text-anchor="start" font-size="8" fill="currentColor">t=5</text>
+        </svg>
+        <small>12×5=<strong>60</strong> cm²</small>
+      </div>
+    </figure>
+    <figure class="ind-fig">
+      <table class="ind-nilaitempat">
+        <thead><tr><th>Gabungan</th><th class="ind-nilaitempat--r">Luas</th></tr></thead>
+        <tbody>
+          <tr><td>Persegi panjang 6×4 + segitiga a=6 t=3</td><td class="ind-nilaitempat--r"><strong>24 + 9 = 33 cm²</strong></td></tr>
+        </tbody>
+      </table>
+      <figcaption>Ambang 4 dari 5 benar</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru tulis dimensi di kertas/papan. Anak hitung: segitiga = ½×a×t; jajargenjang = a×t; gabungan = jumlahkan tiap bagian.</p>
+</div>`;
+
 // ── Level 16 ──────────────────────────────────────────────────────────────────
 
 v['16:B1'] = `<div class="ind-visual">
