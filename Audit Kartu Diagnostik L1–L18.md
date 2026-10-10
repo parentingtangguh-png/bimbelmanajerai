@@ -10,11 +10,25 @@ Rumah Belajar Rainbow Kids Alfatih · 9–10 Oktober 2026 · Kriteria K1–K7 (E
 
 **24**Migrasi SQL
 
-7 Kriteria: K1 Sederhana K2 Tidak ambigu K3 Bahan mudah didapat K4 Mudah dibuat K5 Aman K6 Tanda lulus pasti K7 Mudah digambar (SVG) — Temuan audit hanya menyentuh K2, K3, K6; K1/K4/K5/K7 lulus di semua level.
+> **Catatan kerja:** Setiap usulan perbaikan wajib menampilkan teks **sebelum** dan teks **sesudah** secara berdampingan sebelum migrasi dibuat. Pemilik menyetujui teks sesudah terlebih dahulu; migrasi baru dibuat setelah persetujuan eksplisit.
+
+### Definisi 7 Kriteria
+
+| Kriteria | Lulus jika | Gagal jika |
+| --- | --- | --- |
+| **K1** Satu tugas, satu ukur | Kartu mengujikan tepat satu kompetensi dengan satu cara ukur | Cara uji menggabungkan dua kemampuan berbeda dalam satu skor, atau tanda lulus memiliki dua syarat independen tanpa bobot jelas |
+| **K2** Semua istilah berdiri sendiri | Setiap instruksi, nama bahan, dan kode dapat dipahami tanpa membuka kartu lain, level lain, atau dokumen terpisah | Ada frasa "prosedur yang sama", "sesuai ketentuan bersama", kode huruf/angka tidak dijelaskan inline, atau "lihat rubrik X" |
+| **K3** Bahan ada di rumah atau warung terdekat | Semua bahan dapat ditemukan tanpa memesan atau membeli di toko khusus | Bahan hanya tersedia di toko alat tulis kota besar, memerlukan pembuatan khusus >5 menit, atau tidak ada padanannya di rumah tangga biasa |
+| **K4** Persiapan selesai dalam 2 menit | Guru dapat menyiapkan bahan dari nol dalam ≤2 menit dengan hanya gunting dan pensil | Perlu mencetak, melaminasi, membuat >8 potongan, atau menata secara kompleks |
+| **K5** Aman untuk anak 4–12 tahun | Tidak ada bahan tajam, kecil (tersedak), kimia, atau panas | Bahan dapat melukai atau tertelan anak usia TK–SD awal |
+| **K6** Guru tahu lulus/belum dalam 3 detik | Tanda lulus berisi angka ambang ("X dari Y") dan kunci jawaban eksplisit; tidak memerlukan estimasi atau pertimbangan subjektif | Kata "cukup", "sesuai", "wajar", "lazim" tanpa contoh konkret; kunci tidak dicantumkan; kriteria merujuk standar di luar kartu |
+| **K7** Visual dapat digambar sebagai SVG sederhana | Visual dapat dibuat dari teks, garis, kotak, lingkaran SVG | Visual memerlukan gambar realistis, foto, atau >30 elemen SVG |
+
+Temuan audit menyentuh K2, K3, K6; K1/K4/K5/K7 lulus di semua level.
 
 Navigasi cepat per level
 
-[L1](#l1) 5
+[L1](#l1) 10
 
 [L2](#l2) 3
 
@@ -54,7 +68,9 @@ L1
 
 ## Pra-membaca dan Pra-menulis
 
-5 perbaikan
+5 perbaikan sudah diterapkan (migrasi 030, 120) · 5 temuan baru dari audit kriteria revisi
+
+**Sudah diterapkan**
 
 | Kartu | K | Masalah | Perbaikan |
 | --- | --- | --- | --- |
@@ -63,6 +79,16 @@ L1
 | E2 | K2 | Cara uji: "sesuai ketentuan bersama" — referensi tidak jelas | Instruksi menunjuk/menyentuh/memindahkan satu per satu dicantumkan langsung |
 | E2 | K2 | Bahan menggunakan kode R/M/S (Renggang/Melengkung/Sebaran) yang tidak dijelaskan | Kode diganti deskripsi benda konkret: "2 benda baris renggang; 1 benda di tengah; …" |
 | C2 | K2 | Tidak ada panduan memilih 5 nama pengecoh yang tepat | Panduan cepat memilih pengecoh ditambahkan: panjang ±1 huruf, dua berawal huruf sama |
+
+**Temuan baru — belum diterapkan**
+
+| Kartu | K | Masalah | Usulan perbaikan |
+| --- | --- | --- | --- |
+| A2 | K6 | "Padanan nama yang lazim diterima" — tidak ada contoh; guru berbeda bisa punya batas berbeda | Tambahkan contoh: cangkir/gelas diterima untuk gelas plastik, bola merah/bola kecil diterima untuk bola polos |
+| C2 | K2 | "Satu susunan" tidak menjelaskan formasi 6 kartu nama | Ganti "satu susunan" → "tata 6 kartu nama dalam 2 baris × 3 kolom" |
+| D1 | K6 | "Miring: perpindahan diagonal jelas" tidak menyatakan arah harus mengikuti model | Tambahkan: "arah mengikuti model (naik ke kanan)" |
+| E1 | K2 | "Tanpa bilangan hilang atau tersisip setelah koreksi diri" — tidak jelas apakah koreksi diri diperbolehkan | Pisahkan: "Koreksi diri diperbolehkan; evaluasi dilakukan pada ucapan akhir setelah anak selesai mengoreksi." |
+| F2 | K2 | Bahan "tutup botol dan penutup" tidak konsisten dengan cara uji "kain/wadah terbalik polos" | Selaraskan bahan: "Tutup botol; kain polos atau wadah plastik terbalik sebagai penutup." |
 
 L2
 
