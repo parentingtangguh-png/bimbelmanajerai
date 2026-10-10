@@ -1085,6 +1085,41 @@ v['11:F1'] = `<div class="ind-visual">
   <p class="ind-note">Semua pertanyaan lisan. Tidak perlu alat timbang. Ambang 4 dari 5.</p>
 </div>`;
 
+v['11:C1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-paragraf">
+        <div class="ind-paragraf-row ind-paragraf-row--pokok">
+          <span class="ind-paragraf-num">—</span>
+          <span><strong>Manfaat Air</strong></span>
+          <span class="ind-paragraf-tag">← judul</span>
+        </div>
+        <div class="ind-paragraf-row ind-paragraf-row--pokok">
+          <span class="ind-paragraf-num">1</span>
+          <span>Air dibutuhkan tubuh setiap hari.</span>
+          <span class="ind-paragraf-tag">← kalimat pembuka</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">2</span>
+          <span>Kita minum air agar tubuh tidak lemas.</span>
+          <span class="ind-paragraf-tag muted">← kalimat rincian</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">3</span>
+          <span>Air juga membantu tubuh tetap segar.</span>
+          <span class="ind-paragraf-tag muted">← kalimat rincian</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">4</span>
+          <span>Karena itu, kita perlu minum cukup air.</span>
+        </div>
+      </div>
+      <figcaption>Anak tunjuk: judul → "Manfaat Air" · kalimat pembuka → kalimat 1 · kalimat rincian → kalimat 2 atau 3</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru tulis teks di kertas/papan. Anak baca lalu tunjuk bagian yang diminta. Lulus bila 2 dari 3 bagian benar.</p>
+</div>`;
+
 v['12:B1'] = `<div class="ind-visual">
   <div class="ind-col">
     <figure class="ind-fig">
