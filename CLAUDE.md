@@ -12,10 +12,12 @@ Berkas ini menggambarkan **keadaan sekarang**, bukan riwayat. Kalau sesuatu di s
 - **Satu bimbel, satu pemasangan.** Bukan multi-tenant dan tidak akan dibagikan ke bimbel lain.
 - **Dipakai guru dengan siswa nyata mulai 17 Sep 2026** (keputusan pemilik 16 Sep 2026). Sejak itu produksi berisi **data anak nyata**: jangan membuat data uji di produksi, jangan menghapus atau mengubah apa pun tanpa izin eksplisit, dan jangan menampilkan nama/data anak di berkas yang di-commit (repo publik). Pertanyaan data cukup query baca-saja.
 
-## ▶ Mulai di sini: status terakhir (9 Okt 2026)
+## ▶ Mulai di sini: status terakhir (10 Okt 2026)
 - **Fokus sekarang ada di guru, bukan fitur** (keputusan pemilik 2 Okt: "sederhanakan pekerjaan, jangan overengineering, jangan melebar"). Yang menunggu guru: menandai sesi selesai tepat waktu dan menuntaskan tes diagnostik anak yang masih draf. **Jangan menawarkan audit atau fitur baru** sampai pemilik meminta.
-- **Ilustrasi visual diagnostik selesai (9 Okt 2026): semua 48 entri di `src/diagnostic-visuals.js` sudah di produksi dan diaudit.** Setiap kartu tes diagnostik yang membutuhkan ilustrasi kini menampilkan `<div class="ind-visual">` berisi SVG atau tabel interaktif. Peta slot per level:
-  - L1: C1, D1, C2, E2, B1, F2, F1, D2 · L2: C1, D1, F1 · L3: E2, F1 · L4: F1
+- **Audit kartu diagnostik L1–L18 sedang berjalan (10 Okt 2026):** kriteria K1–K7 direvisi menjadi operasional (tabel lulus/gagal per kriteria); sebelum/sesudah ditampilkan di chat untuk persetujuan pemilik sebelum migrasi. Dokumen audit: `Audit Kartu Diagnostik L1–L18.md` (lokal, tidak di-push). Progress: **L1 selesai** (10 temuan, 10 diterapkan), **L2 selesai** (10 temuan, 10 diterapkan). L3–L18 belum diaudit ulang dengan kriteria revisi.
+  - Catatan kerja audit: sebelum/sesudah ditampilkan di chat; pemilik setujui dulu; baru migrasi SQL (dijalankan pemilik di SQL Editor) + push GitHub.
+- **Ilustrasi visual diagnostik (diperbarui 10 Okt 2026):** `src/diagnostic-visuals.js` kini 51 entri setelah audit K7 L2 menambah B1, E1, C2. Peta slot per level:
+  - L1: C1, D1, C2, E2, B1, F2, F1, D2 · L2: **B1, C1, C2, D1, E1, F1** · L3: E2, F1 · L4: F1
   - L5: E1, F1 · L6–L8: B1, E1, F1 · L9–L11: E1, F1 · L12–L18: B1, E1, F1
   - CSS pendukung: `.ind-visual`, `.ind-col`, `.ind-fig`, `.ind-grafem-row`, `.ind-grafem-card`, `.ind-grafem-card--target`, `.ind-nilaitempat`, `.ind-nilaitempat--r`, `.ind-bangun-svg`, `.ind-bangun-wrap`, `.ind-paragraf`, `.ind-paragraf-row`, `.ind-paragraf-row--pokok`, `.ind-paragraf-num`, `.ind-paragraf-tag`, `.ind-note`
   - Fungsi ekspor: `indicatorVisual(level, slot)` di `src/diagnostic-visuals.js`; kunci `'LEVEL:SLOT'` → HTML string; level/slot bukan kunci = string kosong (tidak tampil)

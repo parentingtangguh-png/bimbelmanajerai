@@ -316,6 +316,63 @@ v['2:F1'] = `<div class="ind-visual">
   <p class="ind-note">Emas = jawaban benar. Kunci posisi: 3; 4; 3; 2; 3; 2.</p>
 </div>`;
 
+// B1 L2: deret lima grafem konsonan + pengecoh vokal — guru tunjukkan ke anak
+v['2:B1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-grafem-row">
+        <span class="ind-grafem-card ind-grafem-card--target">p</span>
+        <span class="ind-grafem-card ind-grafem-card--target">m</span>
+        <span class="ind-grafem-card">a</span>
+        <span class="ind-grafem-card ind-grafem-card--target">b</span>
+        <span class="ind-grafem-card ind-grafem-card--target">n</span>
+      </div>
+      <figcaption>Deret 5 grafem · <strong>a</strong> = pengecoh vokal · anak menunjuk satu per bunyi yang disebut guru</figcaption>
+    </figure>
+  </div>
+</div>`;
+
+// E1 L2: deret lima angka 1–5 — guru tunjukkan ke anak, anak menunjuk angka yang disebut
+v['2:E1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-grafem-row">
+        <span class="ind-grafem-card ind-grafem-card--target">3</span>
+        <span class="ind-grafem-card ind-grafem-card--target">1</span>
+        <span class="ind-grafem-card ind-grafem-card--target">5</span>
+        <span class="ind-grafem-card ind-grafem-card--target">2</span>
+        <span class="ind-grafem-card ind-grafem-card--target">4</span>
+      </div>
+      <figcaption>Deret tetap terlihat sepanjang tes · anak menunjuk angka yang disebut guru</figcaption>
+    </figure>
+  </div>
+</div>`;
+
+// C2 L2: tata letak 3 kartu tulisan (atas) + 5 benda sasaran & pengecoh (bawah)
+v['2:C2'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-grafem-row">
+        <span class="ind-grafem-card ind-grafem-card--target">lap</span>
+        <span class="ind-grafem-card ind-grafem-card--target">air</span>
+        <span class="ind-grafem-card ind-grafem-card--target">roti</span>
+      </div>
+      <figcaption>3 kartu tulisan ditampilkan satu per satu ke tempat netral</figcaption>
+    </figure>
+    <figure class="ind-fig" style="margin-top:8px">
+      <div class="ind-grafem-row">
+        <span class="ind-grafem-card ind-grafem-card--target" style="font-size:0.7em">kain lap</span>
+        <span class="ind-grafem-card ind-grafem-card--target" style="font-size:0.7em">wadah air</span>
+        <span class="ind-grafem-card ind-grafem-card--target" style="font-size:0.7em">roti</span>
+        <span class="ind-grafem-card" style="font-size:0.7em">sendok</span>
+        <span class="ind-grafem-card" style="font-size:0.7em">topi</span>
+      </div>
+      <figcaption>5 benda di meja · emas = sasaran · abu = pengecoh tanpa tulisan</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Benda tetap di meja sepanjang tes. Posisi benda diacak sebelum tes dimulai.</p>
+</div>`;
+
 // ── Level 3 ──────────────────────────────────────────────────────────────────
 
 // E2 L3: lima kumpulan benda 6–10 dengan susunan R/M/S (8-R, 6-S, 10-M, 7-S, 9-R)

@@ -22,7 +22,7 @@ Rumah Belajar Rainbow Kids Alfatih · 9–10 Oktober 2026 · Kriteria K1–K7 (E
 | **K4** Persiapan selesai dalam 2 menit | Guru dapat menyiapkan bahan dari nol dalam ≤2 menit dengan hanya gunting dan pensil | Perlu mencetak, melaminasi, membuat >8 potongan, atau menata secara kompleks |
 | **K5** Aman untuk anak 4–12 tahun | Tidak ada bahan tajam, kecil (tersedak), kimia, atau panas | Bahan dapat melukai atau tertelan anak usia TK–SD awal |
 | **K6** Guru tahu lulus/belum dalam 3 detik | Tanda lulus berisi angka ambang ("X dari Y") dan kunci jawaban eksplisit; tidak memerlukan estimasi atau pertimbangan subjektif | Kata "cukup", "sesuai", "wajar", "lazim" tanpa contoh konkret; kunci tidak dicantumkan; kriteria merujuk standar di luar kartu |
-| **K7** Visual dapat digambar sebagai SVG sederhana | Visual dapat dibuat dari teks, garis, kotak, lingkaran SVG | Visual memerlukan gambar realistis, foto, atau >30 elemen SVG |
+| **K7** Ilustrasi SVG memperjelas cara uji | Bila cara uji, bahan, atau perintah untuk anak memerlukan gambaran visual agar guru mudah memahami, ilustrasi tersebut tersedia dan dapat dibuat dari bentuk dasar SVG (teks, garis, kotak, lingkaran) | Kartu memerlukan gambaran visual tapi tidak ada ilustrasi; atau ilustrasi yang diperlukan membutuhkan gambar realistis/foto yang tidak bisa direpresentasikan sebagai SVG sederhana |
 
 Temuan audit menyentuh K2, K3, K6; K1/K4/K5/K7 lulus di semua level.
 
@@ -30,7 +30,7 @@ Navigasi cepat per level
 
 [L1](#l1) 10
 
-[L2](#l2) 3
+[L2](#l2) 10
 
 [L3](#l3) 4
 
@@ -94,13 +94,27 @@ L2
 
 ## Bunyi dan Benda
 
-3 perbaikan
+3 perbaikan sudah diterapkan (migrasi 130) · 7 temuan baru dari audit kriteria revisi
+
+**Sudah diterapkan**
 
 | Kartu | K | Masalah | Perbaikan |
 | --- | --- | --- | --- |
 | B1 | K2 | Cara uji: "perintah yang sama" — tidak ada instruksi untuk anak dan aturan bunyi | Instruksi "Tunjuk tulisan untuk bunyi yang kamu dengar" + daftar bunyi /n/,/b/,/p/,/n/,/m/,/b/ dicantumkan langsung |
 | D1 | K2 | Cara uji: "perintah yang sama" — referensi lintas-kartu | Instruksi "Buat seperti ini di tempat kosong" dengan bentuk terlihat dicantumkan langsung |
 | E2 | K2 | Bahan menggunakan kode R/M/S yang tidak dijelaskan | Deskripsi konkret: "4 benda baris renggang; 5 benda sebaran rapat; …" dengan penekanan angka 4–5 |
+
+**Temuan baru — belum diterapkan**
+
+| Kartu | K | Masalah | Usulan perbaikan |
+| --- | --- | --- | --- |
+| A2 | K2 | "Penataan dapat dibantu dengan isyarat" — "isyarat" tidak jelas; apakah boleh menyebut nama tindakan? | Ganti: "Guru boleh membantu memposisikan benda dengan gestur atau menunjuk — tanpa menyebut nama tindakan." |
+| A2 | K6 | "Satu klausa yang menyatakan tindakan/keadaan beserta benda" — "klausa" tidak operasional; tidak ada contoh lulus/tidak lulus | Ganti dengan contoh konkret: "Aku pegang buku." = lulus; "Buku." atau "Pegang." saja = tidak lulus |
+| B1 | K7 | Deret grafem p m a b n ditampilkan ke anak tapi tidak ada visual SVG (B1 L1 punya visual serupa) | Buat visual SVG deret grafem p m a b n |
+| C2 | K2 | "Ikuti Prosedur C2 L2" — referensi eksternal redundan; prosedur sudah dijelaskan di kalimat sesudahnya | Hapus kalimat pembuka "Ikuti Prosedur C2 L2." |
+| C2 | K7 | Tata letak 3 kartu tulisan + 5 benda cukup kompleks; tidak ada visual SVG untuk membantu guru memahami susunan | Buat visual SVG tata letak: 3 label di atas, 5 benda di bawah |
+| E1 | K7 | Deret angka 3 1 5 2 4 ditampilkan ke anak tapi tidak ada visual SVG | Buat visual SVG deret angka 3 1 5 2 4 |
+| F2 | K2 | Bahan "tutup botol dan penutup" tidak menyebut jenis penutup | Selaraskan: "Tutup botol; kain polos atau wadah plastik terbalik sebagai penutup." |
 
 L3
 
