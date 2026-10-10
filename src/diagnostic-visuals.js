@@ -1002,8 +1002,8 @@ v['10:F1'] = `<div class="ind-visual">
       <div class="ind-jam-wrap">
         <svg viewBox="0 0 80 80" width="72" height="72" class="ind-bangun-svg">
           <circle cx="40" cy="40" r="36" fill="none" stroke="currentColor" stroke-width="2"/>
-          <line x1="40" y1="40" x2="55" y2="15" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-          <line x1="40" y1="40" x2="40" y2="66" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="40" y1="40" x2="40" y2="66" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          <line x1="40" y1="40" x2="29" y2="51" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           <circle cx="40" cy="40" r="2.5" fill="currentColor"/>
         </svg>
         <small><strong>07.30</strong></small>
@@ -1012,7 +1012,7 @@ v['10:F1'] = `<div class="ind-visual">
         <svg viewBox="0 0 80 80" width="72" height="72" class="ind-bangun-svg">
           <circle cx="40" cy="40" r="36" fill="none" stroke="currentColor" stroke-width="2"/>
           <line x1="40" y1="40" x2="40" y2="14" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-          <line x1="40" y1="40" x2="56" y2="40" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="40" y1="40" x2="26" y2="32" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           <circle cx="40" cy="40" r="2.5" fill="currentColor"/>
         </svg>
         <small><strong>10.00</strong></small>
