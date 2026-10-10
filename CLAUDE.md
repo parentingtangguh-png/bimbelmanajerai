@@ -14,11 +14,11 @@ Berkas ini menggambarkan **keadaan sekarang**, bukan riwayat. Kalau sesuatu di s
 
 ## ▶ Mulai di sini: status terakhir (10 Okt 2026)
 - **Fokus sekarang ada di guru, bukan fitur** (keputusan pemilik 2 Okt: "sederhanakan pekerjaan, jangan overengineering, jangan melebar"). Yang menunggu guru: menandai sesi selesai tepat waktu dan menuntaskan tes diagnostik anak yang masih draf. **Jangan menawarkan audit atau fitur baru** sampai pemilik meminta.
-- **Audit kartu diagnostik L1–L18 selesai (10 Okt 2026):** kriteria K1–K7 direvisi menjadi operasional (tabel lulus/gagal per kriteria). Dokumen audit: `Audit Kartu Diagnostik L1–L18.md` (lokal, tidak di-push). Semua 18 level selesai — 113 perbaikan diterapkan (28 migrasi SQL). Migrasi `20261009*` (27 buah) + `20261010000000_fix_l4_c1_tanda_lulus.sql`; belum di-push ke Supabase dan GitHub.
+- **Audit kartu diagnostik L1–L18 berlanjut (10 Okt 2026):** kriteria K1–K7 direvisi menjadi operasional (tabel lulus/gagal per kriteria). Dokumen audit: `Audit Kartu Diagnostik L1–L18.md` (lokal, tidak di-push). L1–L5 selesai — 118 perbaikan diterapkan (33 migrasi SQL). Migrasi `20261009*` (27 buah) + `20261010000000` (L4) + `20261010010000–050000` (L5); sudah di-push ke Supabase. L6–L18 menunggu audit berikutnya.
   - Catatan kerja audit: sebelum/sesudah **wajib ditampilkan sebagai pratinjau di pane browser** (bukan hanya teks di chat) sebelum pemilik menyetujui; baru migrasi SQL (dijalankan pemilik di SQL Editor) + push GitHub.
-- **Ilustrasi visual diagnostik (diperbarui 10 Okt 2026):** `src/diagnostic-visuals.js` kini 53 entri setelah audit K7 L3 menambah B1, E1. Peta slot per level:
+- **Ilustrasi visual diagnostik (diperbarui 10 Okt 2026):** `src/diagnostic-visuals.js` kini 54 entri setelah audit L5 menambah B1. Peta slot per level:
   - L1: C1, D1, C2, E2, B1, F2, F1, D2 · L2: **B1, C1, C2, D1, E1, F1** · L3: **B1, E1**, E2, F1 · L4: F1
-  - L5: E1, F1 · L6–L8: B1, E1, F1 · L9–L11: E1, F1 · L12–L18: B1, E1, F1
+  - L5: **B1**, E1, F1 · L6–L8: B1, E1, F1 · L9–L11: E1, F1 · L12–L18: B1, E1, F1
   - CSS pendukung: `.ind-visual`, `.ind-col`, `.ind-fig`, `.ind-grafem-row`, `.ind-grafem-card`, `.ind-grafem-card--target`, `.ind-nilaitempat`, `.ind-nilaitempat--r`, `.ind-bangun-svg`, `.ind-bangun-wrap`, `.ind-paragraf`, `.ind-paragraf-row`, `.ind-paragraf-row--pokok`, `.ind-paragraf-num`, `.ind-paragraf-tag`, `.ind-note`
   - Fungsi ekspor: `indicatorVisual(level, slot)` di `src/diagnostic-visuals.js`; kunci `'LEVEL:SLOT'` → HTML string; level/slot bukan kunci = string kosong (tidak tampil)
   - **Audit lulus:** semua visual dikonfirmasi ada di bundle `index-BHWH4sA5.js`; diuji oleh Claude in Chrome per level dengan siswa UJI. Visual B1 di L6–L8 hanya tampil saat tes aktif berjalan (app tidak merender visual pada tes yang sudah final) — ini bukan bug.

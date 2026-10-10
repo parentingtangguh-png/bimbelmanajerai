@@ -6,9 +6,49 @@ Rumah Belajar Rainbow Kids Alfatih · 9–10 Oktober 2026 · Kriteria K1–K7 (E
 
 **234**Kartu diperiksa
 
-**112**Perbaikan diterapkan
+**118**Perbaikan diterapkan
 
-**25**Migrasi SQL
+**30**Migrasi SQL
+
+---
+
+## ⚠ Alur Kerja Wajib — Baca dan Terapkan Setiap Audit Level
+
+Setiap kali mengaudit satu level, ikuti langkah-langkah berikut secara berurutan tanpa melewati satu pun:
+
+**1. Ambil data kartu dari sumber terpercaya**
+Baca semua 12 indikator akademik level tersebut (field `method`, `material`, `success`) dari file migrasi SQL (`supabase/migrations/20260915000000_curriculum_8_levels.sql` dan migrasi lanjutan yang menyentuh level itu). Jangan mengandalkan ingatan sesi sebelumnya.
+
+**2. Terapkan K1–K7 ke setiap kartu secara eksplisit**
+Periksa satu per satu semua 12 kartu akademik. Untuk setiap kartu, nyatakan apakah lulus atau gagal pada tiap kriteria. Catat temuan hanya bila ada kegagalan nyata — jangan membuat perbaikan untuk sesuatu yang sudah jelas.
+- K1/K4/K5 biasanya lulus; fokus utama di K2, K6, K7.
+- K7: bandingkan dengan peta slot visual di CLAUDE.md — bila level/slot belum punya visual dan kartu menampilkan deret/tata letak ke anak, periksa apakah visual diperlukan. Konfirmasi ke pemilik sebelum memutuskan perlu/tidak.
+
+**3. Susun pratinjau sebelum/sesudah di localhost**
+Buat `scripts/render-audit-lX.mjs` yang merender kartu dengan CSS aplikasi asli:
+- Render 12 kartu level tersebut dua kolom: kiri = Sebelum, kanan = Sesudah.
+- Kartu yang berubah diberi border hijau + label "Berubah · [slot]".
+- Bila ada visual SVG baru (K7), sisipkan langsung di kolom Sesudah via injeksi HTML (visual belum masuk `diagnostic-visuals.js`).
+- Simpan hasil ke `dist/audit-lX.html`, sajikan di `localhost:4173/audit-lX.html` via server `bimbel-dist`.
+- Ambil screenshot dan pastikan dua kolom tampil berdampingan (lebar pane ~590 px; gunakan breakpoint ≤480 px).
+
+**4. Minta persetujuan pemilik**
+Tunjukkan screenshot pratinjau. Tunggu persetujuan eksplisit sebelum melanjutkan. Jangan membuat migrasi SQL lebih dulu.
+
+**5. Buat migrasi SQL dan update visual (setelah disetujui)**
+- Satu file SQL per perbaikan, nama deskriptif: `supabase/migrations/20261009XXXXXX_fix_lX_[slot]_[masalah].sql`.
+- Visual baru: tambahkan entri `v['X:SLOT']` ke `src/diagnostic-visuals.js` di posisi yang tepat (urut per level).
+- Jalankan `npm test` untuk memastikan tidak ada yang rusak.
+
+**6. Perbarui dokumen ini dan CLAUDE.md**
+- Tambahkan baris temuan di tabel level yang bersangkutan (sudah diterapkan).
+- Perbarui hitungan di header dokumen ini (Kartu diperiksa, Perbaikan diterapkan, Migrasi SQL).
+- Perbarui status di CLAUDE.md (peta slot visual bila ada visual baru).
+
+**7. Commit dan push**
+Setelah pemilik menyetujui hasil akhir, commit semua file (migrasi + visual + dokumen) dan push ke GitHub. Pemilik menjalankan SQL di SQL Editor Supabase.
+
+---
 
 > **Catatan kerja:** Setiap usulan perbaikan wajib menampilkan teks **sebelum** dan teks **sesudah** secara berdampingan sebelum migrasi dibuat. Pemilik menyetujui teks sesudah terlebih dahulu; migrasi baru dibuat setelah persetujuan eksplisit.
 
@@ -155,11 +195,17 @@ L5
 
 ## Membaca Kata dan Penjumlahan
 
-1 perbaikan
+6 perbaikan (migrasi 070, 010–050)
 
 | Kartu | K | Masalah | Perbaikan |
 | --- | --- | --- | --- |
 | E2 | K2 | Cara uji: "Prosedur sama dengan L4" — referensi lintas-level | Instruksi pembagian dua kelompok dicantumkan langsung (tanpa meminta persamaan) |
+| B1 | K2 | "Ki" sebagai pelafalan nama huruf q tidak dijelaskan inline (berbeda dengan "fe" = v yang sudah ada keterangannya) | Tambahkan: `"ki" adalah pelafalan nama \`q\`` setelah keterangan "fe" = v |
+| B1 | K7 | Deret grafem x f w q v y z ditampilkan ke anak; tidak ada visual SVG | Buat visual SVG deret 7 grafem di `diagnostic-visuals.js` v['5:B1'] |
+| C1 | K2 | Method tidak mencantumkan instruksi untuk anak — apa yang diminta dilakukan setelah kata ditampilkan | Tambahkan: "...dan minta anak membaca setiap kata nyaring." |
+| A2 | K6 | "Tiga klausa berbeda" tidak operasional; guru bukan linguis | Ganti "klausa berbeda" → "bagian cerita berbeda" + contoh lulus/belum |
+| B2 | K2 | "Kualitas vokal mengikuti stimulus" tidak operasional | Ganti → "pengucapan vokal mengikuti cara guru menyebut stimulus" |
+| D2 | K2 | Method tidak mencantumkan instruksi untuk anak dan aturan mendiktekan | Tambahkan instruksi anak + cara mendiktekan (ucapkan sekali, minta tulis) |
 
 L6
 

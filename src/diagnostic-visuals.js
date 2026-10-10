@@ -579,6 +579,24 @@ v['4:F1'] = `<div class="ind-visual">
 
 // ── Level 5 ──────────────────────────────────────────────────────────────────
 
+// B1 L5: deret tujuh grafem jarang x f w q v y z — semua ditanyakan; f diulang dalam sebutan
+v['5:B1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-grafem-row">
+        <span class="ind-grafem-card ind-grafem-card--target">x</span>
+        <span class="ind-grafem-card ind-grafem-card--target">f</span>
+        <span class="ind-grafem-card ind-grafem-card--target">w</span>
+        <span class="ind-grafem-card ind-grafem-card--target">q</span>
+        <span class="ind-grafem-card ind-grafem-card--target">v</span>
+        <span class="ind-grafem-card ind-grafem-card--target">y</span>
+        <span class="ind-grafem-card ind-grafem-card--target">z</span>
+      </div>
+      <figcaption>Deret 7 grafem · semua ditanyakan · <strong>f</strong> diulang dalam urutan sebutan · anak menunjuk satu per bunyi yang disebut guru</figcaption>
+    </figure>
+  </div>
+</div>`;
+
 // E1 L5: grid 4×3 angka 11–20 dengan pengecoh 9 dan 10
 v['5:E1'] = `<div class="ind-visual">
   <div class="ind-col">
