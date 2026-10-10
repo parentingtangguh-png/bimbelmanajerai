@@ -1187,6 +1187,37 @@ v['12:E1'] = `<div class="ind-visual">
   <p class="ind-note">Guru tunjukkan kartu pecahan satu per satu. Anak tunjuk bagian yang diarsir dan sebutkan artinya.</p>
 </div>`;
 
+v['12:C1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-paragraf">
+        <div class="ind-paragraf-row ind-paragraf-row--pokok">
+          <span class="ind-paragraf-num">1</span>
+          <span>Pagi itu, Siti lupa membawa pensil.</span>
+          <span class="ind-paragraf-tag">← awal</span>
+        </div>
+        <div class="ind-paragraf-row ind-paragraf-row--pokok">
+          <span class="ind-paragraf-num">2</span>
+          <span>Ia meminjam pensil kepada Dina.</span>
+          <span class="ind-paragraf-tag">← tengah</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">3</span>
+          <span>Setelah selesai menulis, Siti mengembalikan pensil itu.</span>
+          <span class="ind-paragraf-tag muted">← tengah</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">4</span>
+          <span>Dina senang karena barangnya dijaga.</span>
+          <span class="ind-paragraf-tag">← akhir</span>
+        </div>
+      </div>
+      <figcaption>Anak tunjuk: kejadian awal → kalimat 1 · kejadian tengah → kalimat 2 atau 3 · kejadian akhir → kalimat 4</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru tulis teks di kertas/papan. Anak baca lalu tunjuk urutan kejadian. Lulus bila 3 dari 3 urutan benar.</p>
+</div>`;
+
 v['12:F1'] = `<div class="ind-visual">
   <div class="ind-col">
     <figure class="ind-fig ind-fig--row" style="justify-content:center;gap:12px;flex-wrap:wrap">
