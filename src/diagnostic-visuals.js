@@ -2118,6 +2118,64 @@ v['18:F1'] = `<div class="ind-visual">
   <p class="ind-note">Guru tulis data di papan: 6 7 7 8 10 (sudah urut). Anak jawab tiap pertanyaan.</p>
 </div>`;
 
+v['18:C1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-paragraf">
+        <div class="ind-paragraf-row ind-paragraf-row--pokok">
+          <span class="ind-paragraf-tag">Sudut pandang 1</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">1</span>
+          <span>Sebagian siswa senang belajar kelompok.</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">2</span>
+          <span>Mereka merasa dapat bertanya kepada teman dan membagi tugas.</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">3</span>
+          <span>Belajar kelompok juga membuat tugas terasa lebih ringan.</span>
+        </div>
+        <div class="ind-paragraf-row ind-paragraf-row--pokok" style="margin-top:6px">
+          <span class="ind-paragraf-tag">Sudut pandang 2</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">4</span>
+          <span>Sebagian siswa lain lebih suka belajar sendiri.</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">5</span>
+          <span>Mereka merasa lebih fokus dan dapat mengatur waktu sendiri.</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">6</span>
+          <span>Belajar sendiri juga membuat mereka tidak mudah terganggu.</span>
+        </div>
+      </div>
+      <figcaption>Sudut pandang 1 = kelompok · Sudut pandang 2 = sendiri</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru tulis dua paragraf di papan. Anak baca lalu sebut dua sudut pandang masing-masing dengan satu alasan.</p>
+</div>`;
+
+v['18:F2'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <table class="ind-nilaitempat">
+        <thead><tr><th>PERTANYAAN</th><th>DATA 1<br><small>6 7 7 8 10</small></th><th>DATA 2<br><small>12 14 15 15 19</small></th></tr></thead>
+        <tbody>
+          <tr><td>Mean (rata-rata)</td><td class="ind-nilaitempat--r"><b>7,6</b></td><td class="ind-nilaitempat--r"><b>15</b></td></tr>
+          <tr><td>Median (nilai tengah)</td><td class="ind-nilaitempat--r"><b>7</b></td><td class="ind-nilaitempat--r">—</td></tr>
+          <tr><td>Modus (paling sering)</td><td class="ind-nilaitempat--r"><b>7</b></td><td class="ind-nilaitempat--r"><b>15</b></td></tr>
+        </tbody>
+      </table>
+      <figcaption>Ambang 4 dari 5 benar · mean = jumlah ÷ banyak data</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru tulis dua data di papan. Anak hitung tertulis lalu jawab 5 pertanyaan.</p>
+</div>`;
+
 export function indicatorVisual(level, slot) {
   return v[`${level}:${slot}`] || '';
 }
