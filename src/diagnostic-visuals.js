@@ -1987,6 +1987,61 @@ v['17:F1'] = `<div class="ind-visual">
   <p class="ind-note">Guru gambar denah di papan dengan skala 1 cm = 2 km. Anak hitung jarak sebenarnya tiap jalur.</p>
 </div>`;
 
+v['17:C1'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <div class="ind-paragraf">
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">1</span>
+          <span>Membawa botol minum sendiri adalah kebiasaan yang baik.</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">2</span>
+          <span>Anak tidak perlu sering membeli minuman kemasan.</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">3</span>
+          <span>Sampah plastik di kelas juga dapat berkurang.</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">4</span>
+          <span>Kebiasaan ini memang perlu diingat setiap pagi.</span>
+        </div>
+        <div class="ind-paragraf-row">
+          <span class="ind-paragraf-num">5</span>
+          <span>Namun, manfaatnya lebih besar daripada repotnya.</span>
+        </div>
+        <div class="ind-paragraf-row ind-paragraf-row--pokok">
+          <span class="ind-paragraf-num">6</span>
+          <span>Karena itu, siswa sebaiknya membawa botol minum sendiri.</span>
+        </div>
+      </div>
+      <figcaption>Kalimat 6 = simpulan sudut pandang penulis</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru tulis teks di papan. Anak baca, lalu sebut sudut pandang penulis + satu bukti dari teks.</p>
+</div>`;
+
+v['17:F2'] = `<div class="ind-visual">
+  <div class="ind-col">
+    <figure class="ind-fig">
+      <table class="ind-nilaitempat">
+        <thead><tr><th>BANGUN</th><th>UKURAN</th><th>LUAS</th></tr></thead>
+        <tbody>
+          <tr><td>Trapesium 1</td><td>a=8, b=12, t=5 cm</td><td class="ind-nilaitempat--r"><b>50 cm²</b></td></tr>
+          <tr><td>Trapesium 2</td><td>a=6, b=10, t=4 cm</td><td class="ind-nilaitempat--r"><b>32 cm²</b></td></tr>
+          <tr><td>Belah ketupat 1</td><td>d₁=10, d₂=8 cm</td><td class="ind-nilaitempat--r"><b>40 cm²</b></td></tr>
+          <tr><td>Belah ketupat 2</td><td>d₁=12, d₂=9 cm</td><td class="ind-nilaitempat--r"><b>54 cm²</b></td></tr>
+          <tr><td>Gabungan</td><td>persegi panjang 8×4 + segitiga 8×3</td><td class="ind-nilaitempat--r"><b>44 cm²</b></td></tr>
+        </tbody>
+      </table>
+      <figcaption>Rumus: trapesium = ½(a+b)t · belah ketupat = ½d₁d₂</figcaption>
+    </figure>
+  </div>
+  <p class="ind-note">Guru tulis soal di papan. Anak hitung tertulis, pisahkan gabungan jadi dua bangun.</p>
+</div>`;
+
+// ── Level 18 ──────────────────────────────────────────────────────────────────
 v['18:B1'] = `<div class="ind-visual">
   <div class="ind-col">
     <figure class="ind-fig">
