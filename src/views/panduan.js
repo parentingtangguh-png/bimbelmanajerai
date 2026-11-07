@@ -46,7 +46,7 @@ export function panduanView() {
       `Isi <b>Tanggal</b> dan <b>Jam</b> (format 08:00 atau 08.00), lalu ${b('Simpan jadwal')}. Pertemuan, tema, dan indikator siswa berjalan otomatis.`,
       `Untuk sesi kedua di hari yang sama, ketuk ${b('＋ Tambah sesi')} pada Pertemuan terakhir.`
     ]) +
-    `<div class="guide-final" style="background:var(--bg-offset,#f8f5ef)"><strong>Menyiapkan kelas malam sebelumnya</strong><ol class="guide-steps">${[
+    `<div class="panduan-tip"><strong>Menyiapkan kelas malam sebelumnya</strong><ol class="guide-steps">${[
       'Tandai semua sesi hari ini selesai.',
       'Buat jadwal dengan tanggal besok.',
       'Buka lembar sesi, centang perkiraan siswa yang hadir.',

@@ -2041,6 +2041,14 @@ dialog::backdrop {
   background: rgba(199,154,59,.1); border: 1px solid rgba(199,154,59,.35);
   font-size: .88rem;
 }
+.panduan-tip {
+  margin: 4px 0 8px; padding: 10px 12px; border-radius: 7px;
+  background: rgba(199,154,59,.12); border: 1px solid rgba(199,154,59,.4);
+  color: inherit;
+}
+.panduan-tip strong { display: block; margin-bottom: 6px; color: var(--green); }
+.panduan-tip .guide-steps { margin: 4px 0 0; }
+.panduan-tip .guide-steps li { color: inherit; }
 
 /* Kabar harian WhatsApp ke orang tua (views/sessions.js, sesi selesai). */
 .wa-button {
