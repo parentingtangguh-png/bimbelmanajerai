@@ -353,6 +353,6 @@ export function scheduleForm(v = {}, id = '') {
   return `<form data-form="schedule"${id ? ` data-id="${h(id)}"` : ''}>
 ${info}
 ${date}
-${field('Jam', 'time', 'time', v.time || '', '')}
+<label>Jam<input name="time" type="text" inputmode="numeric" placeholder="08:00" value="${h(v.time || '')}" pattern="[0-2][0-9][.:][0-5][0-9]"></label>
 <button class="primary full">${v.fixedDate && !id ? 'Tambah sesi' : 'Simpan jadwal'}</button></form>`;
 }

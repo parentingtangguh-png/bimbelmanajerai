@@ -522,7 +522,7 @@ document.addEventListener('submit', async e => {
       }
       case 'schedule': {
         // Pertemuan dan tema ditentukan database; guru hanya mengisi tanggal dan jam.
-        const payload = { scheduled_date: v.date, scheduled_time: v.time || '' };
+        const payload = { scheduled_date: v.date, scheduled_time: (v.time || '').replace('.', ':') };
         await result(db.rpc('save_schedule', { p_schedule: id || null, p_payload: payload }));
         break;
       }
