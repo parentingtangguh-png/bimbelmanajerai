@@ -703,7 +703,7 @@ test('kurikulum 8 level: CP, level berurutan dengan 14 indikator, catatan alur, 
     k8English: data.english
   });
   const kur = curriculumView();
-  assert.match(kur, /KURIKULUM 8 LEVEL/);
+  assert.match(kur, /KURIKULUM 18 LEVEL/);
   assert.ok(!kur.includes('KURIKULUM PILOT'), 'kurikulum lama tidak tampil bila data 8 level ada');
   assert.equal(count(kur, 'class="panel k8-level"'), 8);
   assert.equal(count(kur, 'class="k8-indicator"'), 112);
