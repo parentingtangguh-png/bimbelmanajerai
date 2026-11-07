@@ -77,6 +77,9 @@ const teacher = {
         `Baca kotak <b>Bila disimpan final sekarang</b>, lalu ${b('Simpan final')}.`
       ]) +
         tip(
+          'Tes boleh disimpan final apa adanya — tidak semua indikator harus Lulus. Tujuan tes adalah menemukan titik mulai anak. <b>Belum</b>: sudah diuji, belum lulus. <b>Belum dinilai</b>: tidak ada bukti sah — jangan diberi Belum.'
+        ) +
+        tip(
           'English tidak dinilai pada anak baru. Bila A1, B1, E1, dan D1 semuanya Belum (di atas Level 1), muncul <b>TES BERHENTI</b>: ketuk tombol <b>Mulai tes Level …</b> yang tersedia.'
         )
     ) +
@@ -101,7 +104,10 @@ const teacher = {
         `Ketuk ${b('＋ Buat jadwal')}, isi <b>Tanggal</b> dan <b>Jam</b>, lalu ${b('Simpan jadwal')}. Pertemuan, tema, dan indikator siswa berjalan otomatis.`,
         `Sesi lain di hari yang sama: ${b('＋ Tambah sesi')} pada <b>Pertemuan terakhir</b>.`,
         `${b('＋ Buat jadwal')} baru muncul lagi setelah semua sesi ditandai selesai. ${b('Ubah')} dan ${b('Hapus')} hanya untuk sesi yang belum selesai.`
-      ])
+      ]) +
+        tip(
+          `<b>Menyiapkan kelas malam sebelumnya:</b> tandai semua sesi hari ini selesai → buat jadwal besok → buka lembar sesinya → centang perkiraan siswa yang hadir → ${b('Prompt kegiatan')} → ${b('Salin prompt')} → kirim ke ChatGPT atau Gemini → pelajari rencana kegiatannya. Besok saat kelas mulai, sesuaikan centang kehadiran yang sebenarnya lalu salin prompt ulang bila perlu.`
+        )
     ) +
     part(
       'Menjalankan sesi',
@@ -110,13 +116,16 @@ const teacher = {
         'Buka <b>Siswa yang hadir</b> dan centang anaknya. Anak dengan tes belum final tidak bisa dicentang; anak yang sudah masuk sesi lain hari itu tidak ditampilkan.',
         `Opsional: ${b('Prompt kegiatan')} → ${b('Salin prompt')} → tempel ke <b>obrolan baru</b> di ChatGPT atau Gemini (satu sesi, satu obrolan baru). Jawaban AI berisi ide kegiatan dan kalimat praktis Bahasa Inggris untuk menjalankan kelas; saat menilai, ikuti <b>Cara uji, bahan, tanda lulus</b> di lembar sesi.`,
         'Tiap anak punya satu indikator. Buka <b>Cara uji, bahan, tanda lulus</b>, uji, lalu pilih <b>Lulus</b>, <b>Belum</b>, atau <b>Belum dinilai</b>.',
-        'English dan Karakter boleh dibiarkan <b>Tidak dinilai</b>. English sebagian level baru bisa dinilai setelah anak hadir 3 pertemuan dalam satu tema.',
+        'English dan Karakter boleh dibiarkan <b>Tidak dinilai</b>. English di Level 1, 4, 7, 9, 12, dan 15 bebas dinilai kapan saja; level lain baru bisa dinilai setelah anak hadir 3 pertemuan dalam satu tema.',
         `Setiap centang dan nilai tersimpan sendiri beberapa saat setelah diketuk; lihat tulisan <b>Tersimpan sendiri pukul …</b> di atas tombol. ${b('Simpan sementara')} dipakai bila tulisan itu menyebut belum tersimpan. Setelah semua anak dinilai: ${b('Tandai sesi selesai')}.`
       ])
     ) +
     locked([
       `${b('Tandai sesi selesai')}: sesi dikunci, nilai tidak bisa diubah, dan indikator anak yang Lulus berganti otomatis.`
     ]) +
+    tip(
+      'Sesi boleh ditandai selesai apa adanya. <b>Belum</b>: sudah diuji, belum lulus — anak dilatih lagi di sesi berikutnya. <b>Belum dinilai</b>: tidak ada bukti sah (anak belum bersedia, tugas terputus) — jangan diberi Belum. Keduanya tetap di indikator yang sama dan muncul lagi di sesi berikutnya.'
+    ) +
     tip(
       'Sesi yang sudah selesai hanya bisa dilihat (tombol <b>Lihat</b>). Bila ada kesalahan, hubungi pemilik.'
     ) +
@@ -127,7 +136,8 @@ const teacher = {
       'Kabar harian untuk orang tua',
       steps([
         `Setelah sesi ditandai selesai, ketuk ${b('Lihat')} pada sesi itu.`,
-        `Di setiap anak ketuk ${b('WhatsApp ke')} … — WhatsApp terbuka dengan pesan yang sudah tersusun.`,
+        `Di setiap anak yang hadir ketuk ${b('WhatsApp ke')} … — WhatsApp terbuka dengan pesan kemajuan belajar hari itu.`,
+        `Di bagian <b>Tidak hadir</b> (bawah lembar), ketuk ${b('WhatsApp ke')} … untuk anak yang tidak datang — pesan berisi tema hari itu, kosakata English, dan subtema pertemuan berikutnya.`,
         'Baca pesannya, ubah bila perlu, lalu tekan Kirim. Aplikasi tidak mengirim sendiri dan tidak mencatat pesan yang terkirim.'
       ]) + tip('Tombol mati bila Nomor WhatsApp orang tua belum diisi di profil anak.')
     ) +
