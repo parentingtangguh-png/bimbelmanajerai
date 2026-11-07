@@ -226,7 +226,7 @@ function render() {
   const nav =
     state.role === 'owner'
       ? ['dashboard', 'students', 'team', 'curriculum']
-      : ['dashboard', 'students', 'sessions', 'curriculum'];
+      : ['dashboard', 'students', 'sessions', 'curriculum', 'panduan'];
   // Di layar HP dasbor dibuka oleh menu utama, dan kepala serta doa menemani semua tab. CSS yang
   // memilih mana yang tampil.
   const home = state.view === 'dashboard' ? homeMenu() : '';
