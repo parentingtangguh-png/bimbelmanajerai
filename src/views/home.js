@@ -40,14 +40,17 @@ const icons = {
     '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5"/><circle cx="17.5" cy="9.5" r="2.2"/><path d="M17 15c2.4 0 4 1.4 4 4"/>',
   [homeKeys.kurikulum]:
     '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5V5.5Z"/><path d="M9 8h7M9 12h5"/>',
-  [homeKeys.tim]: '<circle cx="12" cy="7" r="3.4"/><path d="M5 20c0-3.6 3.1-5.6 7-5.6s7 2 7 5.6"/>'
+  [homeKeys.tim]: '<circle cx="12" cy="7" r="3.4"/><path d="M5 20c0-3.6 3.1-5.6 7-5.6s7 2 7 5.6"/>',
+  [homeKeys.panduan]:
+    '<path d="M12 22a10 10 0 1 1 0-20 10 10 0 0 1 0 20Z"/><path d="M12 17v-5M12 8h.01"/>'
 };
 const blurbs = {
   [homeKeys.kelas]: 'Jadwal pertemuan, siswa, dan indikator',
   [homeKeys.ringkasan]: 'Siswa, tes diagnostik, dan sebaran level',
   [homeKeys.siswa]: 'Menambah anak dan menjalankan Tes Diagnostik',
   [homeKeys.kurikulum]: 'Membaca tujuan dan indikator tiap level',
-  [homeKeys.tim]: 'Mendaftarkan guru dan melihat timnya'
+  [homeKeys.tim]: 'Mendaftarkan guru dan melihat timnya',
+  [homeKeys.panduan]: 'Langkah demi langkah dari data siswa hingga kabar orang tua'
 };
 
 function homeCard(key, wide) {
@@ -62,7 +65,8 @@ function homeCard(key, wide) {
 // dan mengelola. Pemilik tidak membuka kelas, jadi tempat itu diisi Tim pengajar.
 function homeCards() {
   const utama = state.role === 'owner' ? homeKeys.tim : homeKeys.kelas;
-  return `<nav class="home-menu">${homeCard(utama, true)}${homeCard(homeKeys.ringkasan)}${homeCard(homeKeys.siswa)}${homeCard(homeKeys.kurikulum, true)}</nav>`;
+  const panduan = state.role === 'teacher' ? homeCard(homeKeys.panduan) : '';
+  return `<nav class="home-menu">${homeCard(utama, true)}${homeCard(homeKeys.ringkasan)}${homeCard(homeKeys.siswa)}${panduan}${homeCard(homeKeys.kurikulum, true)}</nav>`;
 }
 
 export function homeDoa() {

@@ -30,6 +30,7 @@ import { answersOf, isStopped } from './diagnostic.js';
 import { dashboard } from './views/dashboard.js';
 import { homeMenu, homeTop, homeDoa, homeNav, leafArt } from './views/home.js';
 import { guideButton, guideBody } from './views/guide.js';
+import { panduanView } from './views/panduan.js';
 import { teamView } from './views/team.js';
 import './style.css';
 import './curriculum.css';
@@ -241,7 +242,8 @@ function render() {
     students: studentsView,
     sessions: sessionsView,
     team: teamView,
-    curriculum: curriculumView
+    curriculum: curriculumView,
+    panduan: panduanView
   };
   root.innerHTML = `<div class="shell${home ? ' at-home' : ''}">${sidebar(nav)}<main class="workspace">${topbar()}${homeTop(ORG_NAME)}${reminder}${home}<section class="content">${screens[state.view]()}</section>${guideButton()}${homeDoa()}${homeNav()}<footer>${ORG_NAME} <span>Belajar bertumbuh, bersama.</span></footer></main></div><dialog id="modal"></dialog>`;
   scrollTo(0, y);

@@ -32,6 +32,7 @@ import { curriculumView } from '../src/views/curriculum.js';
 import { teamView } from '../src/views/team.js';
 import { homeMenu, homeTop, homeDoa, homeNav } from '../src/views/home.js';
 import { guideButton, guideBody } from '../src/views/guide.js';
+import { panduanView } from '../src/views/panduan.js';
 
 // The screens are plain functions that return HTML, so they can be checked without a browser or a login.
 const count = (html, needle) => html.split(needle).length - 1;
@@ -441,6 +442,7 @@ test('tidak ada kebocoran undefined atau [object Object] di layar mana pun', () 
     ['students', studentsView()],
     ['curriculum', curriculumView()],
     ['team', teamView()],
+    ['panduan', panduanView()],
     ['home', homeMenu() + homeTop('Rumah Belajar Contoh') + homeDoa() + homeNav()]
   ]) {
     assert.ok(!html.includes('undefined'), name + ' memuat undefined');
@@ -452,9 +454,9 @@ test('tidak ada kebocoran undefined atau [object Object] di layar mana pun', () 
 test('menu utama HP: kartu guru, kartu pemilik, dan tombol yang dikenali main.js', () => {
   loadSampleState();
   const guru = homeMenu();
-  // Empat kartu, tidak lebih: Tim pengajar bukan milik guru.
-  assert.equal(count(guru, 'class="home-card'), 4);
-  for (const view of ['sessions', 'dashboard', 'students', 'curriculum'])
+  // Lima kartu untuk guru: Tim pengajar bukan milik guru, tapi Panduan ada.
+  assert.equal(count(guru, 'class="home-card'), 5);
+  for (const view of ['sessions', 'dashboard', 'students', 'curriculum', 'panduan'])
     assert.match(guru, new RegExp('data-view="' + view + '"'), view + ' punya kartunya sendiri');
   assert.ok(!guru.includes('data-view="team"'), 'guru tidak membuka Tim pengajar');
   // Kartu melintang adalah pekerjaan harian guru.

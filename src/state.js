@@ -31,13 +31,14 @@ export const initialState = () => ({
   diagnostic: null
 });
 export const state = initialState();
-export const icons = { dashboard: '◫', students: '◉', sessions: '▤', team: '♧', curriculum: '▥' };
+export const icons = { dashboard: '◫', students: '◉', sessions: '▤', team: '♧', curriculum: '▥', panduan: '◎' };
 export const labels = {
   dashboard: 'Ringkasan',
   students: 'Data siswa',
   sessions: 'Ruang kelas',
   team: 'Tim pengajar',
-  curriculum: 'Kurikulum'
+  curriculum: 'Kurikulum',
+  panduan: 'Panduan'
 };
 // Shown to teachers on every screen, every day. The old banner explained how to start, which stopped
 // being true once teachers began adding their own students; its purpose now is empathy and
@@ -133,7 +134,8 @@ export const homeKeys = {
   ringkasan: 'dashboard',
   siswa: 'students',
   kurikulum: 'curriculum',
-  tim: 'team'
+  tim: 'team',
+  panduan: 'panduan'
 };
 // Tes diagnostik anak (draf atau final), bila sudah dimulai. "Sudah dites" = tesnya sudah final.
 export const testFor = id => state.diagnosticTests.find(t => t.student_id === id);
